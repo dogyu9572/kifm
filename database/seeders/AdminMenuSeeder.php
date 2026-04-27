@@ -1,0 +1,342 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\AdminMenu;
+
+class AdminMenuSeeder extends Seeder
+{
+    /**
+     * 관리자 메뉴 데이터를 시드합니다.
+     * (admin_menus 테이블 현행 데이터 기준 — 2026-04-08 동기화)
+     */
+    public function run(): void
+    {
+        AdminMenu::query()->delete();
+
+        Model::unguard();
+
+        $menus = [
+            [
+                'id' => 1,
+                'parent_id' => null,
+                'name' => '대시보드',
+                'url' => '/backoffice',
+                'icon' => 'fa-tachometer-alt',
+                'order' => 1,
+                'is_active' => 1,
+                'created_at' => '2025-05-05 09:33:08',
+                'updated_at' => '2026-04-07 14:19:07',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 2,
+                'parent_id' => null,
+                'name' => '시스템 관리',
+                'url' => null,
+                'icon' => 'fa-cogs',
+                'order' => 2,
+                'is_active' => 1,
+                'created_at' => '2025-05-05 09:33:08',
+                'updated_at' => '2026-04-07 14:19:07',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 3,
+                'parent_id' => 6,
+                'name' => '기본설정',
+                'url' => '/backoffice/setting',
+                'icon' => null,
+                'order' => 1,
+                'is_active' => 1,
+                'created_at' => '2025-05-05 09:33:08',
+                'updated_at' => '2025-10-07 13:38:54',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 4,
+                'parent_id' => 2,
+                'name' => '메뉴 관리',
+                'url' => '/backoffice/admin-menus',
+                'icon' => null,
+                'order' => 1,
+                'is_active' => 1,
+                'created_at' => '2025-05-05 09:33:08',
+                'updated_at' => '2025-10-09 14:41:00',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 6,
+                'parent_id' => null,
+                'name' => '기본설정',
+                'url' => null,
+                'icon' => 'fa-file-alt',
+                'order' => 3,
+                'is_active' => 1,
+                'created_at' => '2025-05-05 09:33:08',
+                'updated_at' => '2026-04-07 14:19:07',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 7,
+                'parent_id' => 2,
+                'name' => '게시판 관리',
+                'url' => '/backoffice/boards',
+                'icon' => null,
+                'order' => 2,
+                'is_active' => 1,
+                'created_at' => '2025-05-05 09:33:08',
+                'updated_at' => '2025-10-09 14:41:06',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 8,
+                'parent_id' => 21,
+                'name' => '팝업 관리',
+                'url' => '/backoffice/popups',
+                'icon' => null,
+                'order' => 1,
+                'is_active' => 1,
+                'created_at' => '2025-05-05 09:33:08',
+                'updated_at' => '2025-10-07 05:59:49',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 9,
+                'parent_id' => 2,
+                'name' => '게시판 템플릿 관리',
+                'url' => '/backoffice/board-templates',
+                'icon' => null,
+                'order' => 3,
+                'is_active' => 1,
+                'created_at' => '2025-05-06 09:58:14',
+                'updated_at' => '2025-10-19 14:11:43',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 10,
+                'parent_id' => 19,
+                'name' => '공지사항',
+                'url' => '/backoffice/board-posts/notices',
+                'icon' => null,
+                'order' => 1,
+                'is_active' => 1,
+                'created_at' => '2025-05-06 12:44:51',
+                'updated_at' => '2026-01-20 08:18:43',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 17,
+                'parent_id' => 19,
+                'name' => '갤러리',
+                'url' => '/backoffice/board-posts/gallerys',
+                'icon' => null,
+                'order' => 2,
+                'is_active' => 1,
+                'created_at' => '2025-08-21 07:20:49',
+                'updated_at' => '2025-09-29 04:41:25',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 18,
+                'parent_id' => 21,
+                'name' => '배너 관리',
+                'url' => '/backoffice/banners',
+                'icon' => null,
+                'order' => 2,
+                'is_active' => 1,
+                'created_at' => '2025-08-24 09:35:23',
+                'updated_at' => '2025-10-07 05:59:49',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 19,
+                'parent_id' => null,
+                'name' => '게시판관리',
+                'url' => null,
+                'icon' => 'fa-chart-bar',
+                'order' => 5,
+                'is_active' => 1,
+                'created_at' => '2025-08-24 09:36:13',
+                'updated_at' => '2025-12-18 08:46:23',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 20,
+                'parent_id' => 6,
+                'name' => '관리자 관리',
+                'url' => '/backoffice/admins',
+                'icon' => null,
+                'order' => 2,
+                'is_active' => 1,
+                'created_at' => '2025-09-19 00:19:49',
+                'updated_at' => '2025-10-09 04:28:31',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 21,
+                'parent_id' => null,
+                'name' => '홈페이지관리',
+                'url' => null,
+                'icon' => 'fa-home',
+                'order' => 6,
+                'is_active' => 1,
+                'created_at' => '2025-09-23 07:20:08',
+                'updated_at' => '2025-12-18 08:46:23',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 22,
+                'parent_id' => null,
+                'name' => '기업정보관리',
+                'url' => null,
+                'icon' => 'fa-users',
+                'order' => 7,
+                'is_active' => 1,
+                'created_at' => '2025-09-23 07:21:13',
+                'updated_at' => '2025-12-18 08:46:23',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 23,
+                'parent_id' => 6,
+                'name' => '관리자 권한 그룹',
+                'url' => '/backoffice/admin-groups',
+                'icon' => null,
+                'order' => 3,
+                'is_active' => 1,
+                'created_at' => '2025-10-18 01:55:21',
+                'updated_at' => '2025-10-18 02:01:41',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 25,
+                'parent_id' => 22,
+                'name' => '인사말',
+                'url' => '/backoffice/board-posts/greetings',
+                'icon' => null,
+                'order' => 3,
+                'is_active' => 1,
+                'created_at' => '2025-09-23 07:29:41',
+                'updated_at' => '2025-12-18 08:45:57',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 39,
+                'parent_id' => 6,
+                'name' => '카테고리 관리',
+                'url' => '/backoffice/categories',
+                'icon' => null,
+                'order' => 4,
+                'is_active' => 1,
+                'created_at' => '2025-10-09 01:02:41',
+                'updated_at' => '2025-10-18 02:01:41',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 41,
+                'parent_id' => null,
+                'name' => '통계 관리',
+                'url' => null,
+                'icon' => 'fa-chart-line',
+                'order' => 8,
+                'is_active' => 1,
+                'created_at' => '2025-12-18 08:44:54',
+                'updated_at' => '2025-12-18 08:45:42',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 42,
+                'parent_id' => 41,
+                'name' => '접속통계',
+                'url' => '/backoffice/access-statistics',
+                'icon' => null,
+                'order' => 1,
+                'is_active' => 1,
+                'created_at' => '2025-12-18 08:46:17',
+                'updated_at' => '2025-12-18 08:46:27',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 43,
+                'parent_id' => 41,
+                'name' => '사용자 접속로그 목록',
+                'url' => '/backoffice/user-access-logs',
+                'icon' => null,
+                'order' => 2,
+                'is_active' => 1,
+                'created_at' => '2025-12-18 08:46:51',
+                'updated_at' => '2025-12-18 08:47:27',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 44,
+                'parent_id' => 41,
+                'name' => '관리자 접속로그 목록',
+                'url' => '/backoffice/admin-access-logs',
+                'icon' => null,
+                'order' => 3,
+                'is_active' => 1,
+                'created_at' => '2025-12-18 08:47:05',
+                'updated_at' => '2025-12-18 08:47:27',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 45,
+                'parent_id' => null,
+                'name' => '회원 관리',
+                'url' => null,
+                'icon' => 'fa-users',
+                'order' => 4,
+                'is_active' => 1,
+                'created_at' => '2026-04-07 14:19:00',
+                'updated_at' => '2026-04-07 14:19:07',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 46,
+                'parent_id' => 45,
+                'name' => '회원 목록',
+                'url' => '/backoffice/members',
+                'icon' => null,
+                'order' => 1,
+                'is_active' => 1,
+                'created_at' => '2026-04-07 14:22:42',
+                'updated_at' => '2026-04-07 14:40:26',
+                'permission_key' => null,
+            ],
+            [
+                'id' => 47,
+                'parent_id' => 45,
+                'name' => '탈퇴 회원 목록',
+                'url' => '/backoffice/withdrawn',
+                'icon' => null,
+                'order' => 2,
+                'is_active' => 1,
+                'created_at' => '2026-04-07 14:40:19',
+                'updated_at' => '2026-04-07 14:40:26',
+                'permission_key' => null,
+            ],
+        ];
+
+        $parentMenus = array_filter($menus, static function ($menu) {
+            return $menu['parent_id'] === null;
+        });
+
+        foreach ($parentMenus as $menu) {
+            AdminMenu::create($menu);
+        }
+
+        $childMenus = array_filter($menus, static function ($menu) {
+            return $menu['parent_id'] !== null;
+        });
+
+        foreach ($childMenus as $menu) {
+            AdminMenu::create($menu);
+        }
+
+        Model::reguard();
+    }
+}

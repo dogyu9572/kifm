@@ -1,0 +1,449 @@
+/**
+ * 게시판 관리 페이지 전용 스타일
+ * 라우팅: /backoffice/boards
+ */
+
+/* 템플릿 정보 표시 박스 */
+.board-template-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.template-info-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.template-info-header h6 {
+    margin: 0;
+    color: #495057;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.template-info-header i {
+    margin-right: 8px;
+    color: #6c757d;
+}
+
+.template-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.template-info-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 0;
+}
+
+.template-info-label {
+    min-width: 120px;
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 13px;
+}
+
+.template-info-value {
+    color: #212529;
+    font-size: 13px;
+    flex: 1;
+    line-height: 1.5;
+}
+
+/* 사이드바 토글 버튼 강제 표시 (모바일에서만) */
+@media (max-width: 768px) {
+    .sidebar-toggle {
+        display: flex !important;
+        align-items: center;
+    }
+    
+    /* 모바일에서 사이드바 슬라이드 효과 */
+    .sidebar {
+        position: fixed !important;
+        left: 0 !important;
+        width: 260px !important;
+        height: 100vh !important;
+        min-height: 200vh !important;
+        background-color: #343a40 !important;
+        z-index: 9999 !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s ease !important;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0) !important;
+    }
+}
+
+
+/* 게시판 관리 헤더 */
+.board-header h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.board-header .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.9rem;
+    margin-left: auto;
+}
+
+
+/* 게시판 검색 필터 스타일 */
+.board-filter {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 4px rgba(52, 144, 220, 0.2);
+}
+
+.board-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.board-filter-col {
+    flex: 1;
+    min-width: 200px;
+}
+
+.board-filter-col:last-child {
+    flex: 0 0 auto;
+    min-width: auto;
+}
+
+/* 반응형 필터 */
+@media (max-width: 768px) {
+    .board-filter-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .board-filter-col {
+        min-width: 100%;
+    }
+    
+    .board-filter-col:last-child {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+}
+
+.filter-form {
+    margin: 0;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #495057;
+    margin: 0;
+}
+
+.filter-input,
+.filter-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    min-width: 150px;
+    background-color: white;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+/* 게시판 전용 컬럼 스타일 */
+.board-name-column {
+    width: 150px;
+    min-width: 150px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .board-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-group {
+        width: 100%;
+    }
+    
+    .filter-input,
+    .filter-select {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .board-list-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .list-controls {
+        justify-content: center;
+    }
+}
+
+/* 목록 헤더 스타일 */
+.board-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 0;
+}
+
+.list-info {
+    display: flex;
+    align-items: center;
+}
+
+.list-count {
+    font-weight: 500;
+    color: #495057;
+    font-size: 14px;
+}
+
+.list-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* 사용 중인 게시판 목록 스타일 */
+.used-boards-list {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.used-board-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.used-board-item:last-child {
+    border-bottom: none;
+}
+
+.used-board-item .board-name {
+    font-weight: 500;
+    color: #495057;
+}
+
+.used-board-item .board-slug {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-left: 8px;
+}
+
+.used-board-item .btn {
+    margin-left: auto;
+}
+
+/* 배지 스타일 개선 */
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.per-page-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.per-page-label {
+    font-size: 14px;
+    color: #495057;
+    margin: 0;
+}
+
+.per-page-select {
+    padding: 6px 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.per-page-select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* ============================================
+   필드 설정 UI 스타일
+   ============================================ */
+.field-config-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.field-config-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    gap: 15px;
+}
+
+.field-config-checkbox {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.field-config-required {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.field-config-checkbox input[type="checkbox"],
+.field-config-required input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.field-config-checkbox label,
+.field-config-required label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: normal;
+    user-select: none;
+}
+
+.field-config-checkbox input[type="checkbox"]:disabled,
+.field-config-required input[type="checkbox"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 제목/내용 특별 스타일 제거 */
+
+/* Badge 스타일 */
+.badge {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 75%;
+    font-weight: 600;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+}
+
+.badge-secondary {
+    background-color: #6c757d;
+}
+
+.badge-success {
+    background-color: #28a745;
+}
+
+.btn-group {
+    display: inline-flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.btn-group .btn {
+    white-space: nowrap;
+}
+
+/* 템플릿 액션 버튼들 */
+.template-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: center;
+    flex-direction: row;
+    width: 100%;
+}
+
+.template-actions .btn {
+    border-radius: 4px !important;
+    white-space: nowrap;
+    margin: 0;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    min-width: auto;
+}
+
+.template-actions form {
+    margin: 0;
+    display: inline-flex;
+}
+
+.template-actions button {
+    white-space: nowrap;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+}

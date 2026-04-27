@@ -1,0 +1,51 @@
+/* 브라우저 기본 스타일 리셋 */
+@import url("/css/font.css");
+* {margin:0;padding:0;box-sizing:border-box;}
+body {margin:0;padding:0;font-family:'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;background-attachment:fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;color:#2c3e50;line-height:1.5;position:relative;}
+
+/* 인트로 */
+.intro_wrap {display:flex; width:100vw; height:100vh; min-height:540px;}
+.intro_wrap .txt {width:37.5%; display:flex; justify-content:center; align-items:center; padding:0 20px;}
+.intro_wrap .inbox {position:relative; width:100%; max-width:400px; display:flex; align-items:center; height:100%; padding-bottom:80px;}
+.intro_wrap .aic {width:100%;}
+.intro_wrap .header {margin-bottom:80px;}
+.intro_wrap .logo {width:100%; height:40px; background:url('/images/logo.svg') no-repeat 0 0 / contain; font-size:0;}
+.intro_wrap h1 {display:block; font-size:36px; color:#151C23; font-weight:700; line-height:40px;}
+.intro_wrap p {font-size:17px; color:#374553; line-height:28px; margin:16px 0 40px;}
+.intro_wrap .btn {display:block; font-size:16px; color:#fff; font-weight:600; line-height:52px; height:52px; width:100%; background:#1B49FF; border-radius:8px; text-align:center; text-decoration:none; border:0;}
+.intro_wrap .btn:hover {text-decoration:underline;}
+.intro_wrap .footer {position:absolute; bottom:60px; left:0; font-size:14px; color:#374553;}
+.intro_wrap .background_img {width:62.5%; background:url('/images/img_intro.jpg') no-repeat 50% 50% / cover;}
+/* 로그인 */
+.login-form {width:100%;}
+.form-group {margin-bottom:16px;}
+.form-group + .form-group {margin-bottom:48px;}
+.form-group label {display:block; margin-bottom:6px; font-size:15px; color:#374553; font-weight:600; letter-spacing:-.3px;}
+.form-input {width:100%; padding:15px; border:1px solid #C5C8CE; border-radius:8px; font-size:15px; background:#fff; font-weight:400; transition:all 0.3s ease;}
+.form-input:focus {outline:none; border-color:#151C23;}
+
+/* tablet */
+@media (max-width:1023px) {
+    .intro_wrap .txt,
+	.intro_wrap .background_img {width:50%;}
+}
+
+/* mobile */
+@media (max-width:480px) {
+	.intro_wrap {flex-direction: column; min-height:600px;}
+    .intro_wrap .txt,
+	.intro_wrap .background_img {width:100%;}
+	.intro_wrap .txt {height:440px;}
+	.intro_wrap .inbox {padding-bottom:50px;}
+	.intro_wrap .header {margin-bottom:40px;}
+	.intro_wrap .logo {height:30px;}
+	.intro_wrap h1 {font-size:24px; line-height:30px;}
+	.intro_wrap p {font-size: 13px; line-height: 20px; margin: 8px 0 20px;}
+	.intro_wrap .btn {font-size: 14px; line-height:40px; height: 40px;}
+	.intro_wrap .footer {bottom:30px; font-size: 12px;}
+	.intro_wrap .background_img {height:calc(100% - 440px);}
+	
+	.form-group {margin-bottom:8px;}
+	.form-group label {margin-bottom:4px; font-size:13px;}
+	.form-input {padding:10px; font-size:13px;}
+}

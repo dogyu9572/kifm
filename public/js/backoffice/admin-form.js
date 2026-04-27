@@ -1,0 +1,135 @@
+/**
+ * 관리자 생성/수정 폼 JavaScript
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    initLoginIdCheck();
+});
+
+/**
+ * 아이디 중복 체크 초기화
+ */
+function initLoginIdCheck() {
+    const loginIdInput = document.getElementById('login_id');
+    const checkBtn = document.getElementById('check-login-id-btn');
+    const messageDiv = document.getElementById('login-id-message');
+    const verifiedHidden = document.getElementById('login_id_verified');
+
+    if (!loginIdInput || !checkBtn || !messageDiv) return;
+
+    let isChecked = false;
+    let lastCheckedValue = '';
+
+    function setVerified(flag) {
+        if (verifiedHidden) {
+            verifiedHidden.value = flag ? '1' : '0';
+        }
+    }
+
+    // 중복 체크 버튼 클릭
+    checkBtn.addEventListener('click', function() {
+        const loginId = loginIdInput.value.trim();
+
+        if (!loginId) {
+            showMessage('아이디를 입력해주세요.', 'error');
+            return;
+        }
+
+        // 이전에 체크한 값과 같으면 재체크하지 않음
+        if (isChecked && lastCheckedValue === loginId) {
+            return;
+        }
+
+        checkLoginIdDuplicate(loginId);
+    });
+
+    // 아이디 입력 시 체크 상태 초기화
+    loginIdInput.addEventListener('input', function() {
+        if (isChecked && lastCheckedValue !== this.value.trim()) {
+            isChecked = false;
+            setVerified(false);
+            clearMessage();
+        }
+    });
+
+    /**
+     * 아이디 중복 체크
+     */
+    function checkLoginIdDuplicate(loginId) {
+        checkBtn.disabled = true;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        fetch('/backoffice/admins/check-login-id', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ login_id: loginId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            checkBtn.disabled = false;
+
+            if (data.available) {
+                isChecked = true;
+                lastCheckedValue = loginId;
+                setVerified(true);
+                showMessage(data.message, 'success');
+            } else {
+                isChecked = false;
+                setVerified(false);
+                showMessage(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            checkBtn.disabled = false;
+            showMessage('중복 체크 중 오류가 발생했습니다.', 'error');
+        });
+    }
+
+    /**
+     * 메시지 표시
+     */
+    function showMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.className = 'login-id-message ' + type;
+
+        if (type === 'success') {
+            messageDiv.style.color = '#28a745';
+        } else {
+            messageDiv.style.color = '#dc3545';
+        }
+    }
+
+    /**
+     * 메시지 제거
+     */
+    function clearMessage() {
+        messageDiv.textContent = '';
+        messageDiv.className = 'login-id-message';
+        messageDiv.style.color = '';
+    }
+
+    // 폼 제출 시: 아이디 중복 확인 필수 (생성 폼에 hidden 이 있을 때만)
+    const adminForm = document.getElementById('adminForm');
+    if (adminForm && verifiedHidden) {
+        adminForm.addEventListener('submit', function(e) {
+            const loginId = loginIdInput.value.trim();
+
+            if (!loginId) {
+                return;
+            }
+
+            if (!isChecked || lastCheckedValue !== loginId) {
+                e.preventDefault();
+                alert('아이디 중복 확인을 완료한 뒤 저장해주세요.');
+                return false;
+            }
+        });
+    }
+}
+
