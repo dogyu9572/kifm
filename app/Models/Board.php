@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 
 class Board extends Model
@@ -30,6 +31,7 @@ class Board extends Model
         'permission_read',
         'permission_write',
         'permission_comment',
+        'enable_comments',
         'field_config',
         'custom_fields_config',
     ];
@@ -45,6 +47,7 @@ class Board extends Model
         'enable_notice' => 'boolean',
         'is_single_page' => 'boolean',
         'enable_sorting' => 'boolean',
+        'enable_comments' => 'boolean',
         'field_config' => 'array',
         'custom_fields_config' => 'array',
     ];
@@ -61,29 +64,6 @@ class Board extends Model
         'is_single_page' => false,
         'enable_sorting' => false,
     ];
-
-    /**
-     * 이 게시판에 속한 게시글들 관계
-     */
-    public function posts()
-    {
-        return $this->hasMany(BoardPost::class);
-    }
-
-    /**
-     * 이 게시판에 속한 댓글들 관계
-     */
-    public function comments()
-    {
-        return $this->hasManyThrough(
-            BoardComment::class,
-            BoardPost::class,
-            'board_id', // 로컬 키 (boards.id와 연결되는 board_posts 테이블의 외래 키)
-            'post_id',  // 원격 키 (board_posts.id와 연결되는 board_comments 테이블의 외래 키)
-            'id',       // 로컬 테이블의 기본 키 (boards.id)
-            'id'        // 중간 테이블의 기본 키 (board_posts.id)
-        );
-    }
 
     /**
      * 이 게시판에 적용된 스킨 관계
@@ -252,44 +232,39 @@ class Board extends Model
     }
 
     /**
-     * 공지글을 포함한 게시글 목록을 가져옵니다.
+     * 위원회 관리 메뉴의 공지·토론·자료실 게시판 slug (위원회 선택값은 community_committees 기준)
+     *
+     * @return list<string>
      */
-    public function getPostsWithNotices($perPage = 15)
+    public static function communityCommitteeBoardSlugs(): array
     {
-        return $this->posts()
-            ->orderBy('is_notice', 'desc')  // 공지글이 먼저
-            ->orderBy('created_at', 'desc') // 그 다음 최신순
-            ->paginate($perPage);
+        return [
+            'community_committee_notices',
+            'community_committee_discussions',
+            'community_committee_archive',
+        ];
     }
 
-    /**
-     * 공지글만 가져옵니다.
-     */
-    public function getNotices()
+    public static function usesCommunityCommitteeCategories(?string $slug): bool
     {
-        return $this->posts()
-            ->where('is_notice', true)
-            ->orderBy('created_at', 'desc')
-            ->get();
-    }
-
-    /**
-     * 일반 게시글만 가져옵니다 (공지글 제외).
-     */
-    public function getRegularPosts($perPage = 15)
-    {
-        return $this->posts()
-            ->where('is_notice', false)
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        return $slug !== null && $slug !== ''
+            && in_array($slug, self::communityCommitteeBoardSlugs(), true);
     }
 
     /**
      * 이 게시판의 카테고리 옵션을 가져옵니다
+     *
+     * @return \Illuminate\Support\Collection<int, \App\Models\Category|\App\Models\CommunityCommittee>
      */
-    public function getCategoryOptions()
+    public function getCategoryOptions(): Collection
     {
-        // 템플릿에서 선택된 그룹의 모든 하위 카테고리 가져오기
+        if (self::usesCommunityCommitteeCategories($this->slug)) {
+            return CommunityCommittee::query()
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+        }
+
         return $this->template?->getCategoryOptions() ?? collect();
     }
 }

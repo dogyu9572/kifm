@@ -43,6 +43,13 @@
             </div>
             <div class="main-content">
                 @yield('content')
+                @if(isset($board, $post) && ($board->enable_comments ?? false) && isset($boardPostCommentsThread))
+                    @include('backoffice.board-posts.partials.comments-panel', [
+                        'board' => $board,
+                        'post' => $post,
+                        'comments' => $boardPostCommentsThread,
+                    ])
+                @endif
             </div>
         </div>
     </div>

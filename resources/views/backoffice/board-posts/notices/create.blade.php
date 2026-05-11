@@ -209,6 +209,28 @@
                     @endforeach
                 @endif
 
+                @if($board->isFieldEnabled('attachments'))
+                <div class="board-form-group">
+                    <label class="board-form-label">
+                        첨부파일
+                        @if($board->isFieldRequired('attachments'))
+                            <span class="required">*</span>
+                        @endif
+                    </label>
+                    <div class="board-file-upload">
+                        <div class="board-file-input-wrapper">
+                            <input type="file" class="board-file-input" id="attachments" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar" @if($board->isFieldRequired('attachments')) required @endif>
+                            <div class="board-file-input-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span class="board-file-input-text">파일을 선택하거나 여기로 드래그하세요</span>
+                                <span class="board-file-input-subtext">최대 5개, 각 파일 10MB 이하</span>
+                            </div>
+                        </div>
+                        <div class="board-file-preview" id="filePreview"></div>
+                    </div>
+                </div>
+                @endif
+
                 @if($board->isFieldEnabled('author_name'))
                 <div class="board-form-group">
                     <label for="author_name" class="board-form-label">
@@ -248,28 +270,6 @@
                         </label>
                     </div>
                     <small class="board-form-text">체크하면 본인만 조회할 수 있습니다.</small>
-                </div>
-                @endif
-
-                @if($board->isFieldEnabled('attachments'))
-                <div class="board-form-group">
-                    <label class="board-form-label">
-                        첨부파일
-                        @if($board->isFieldRequired('attachments'))
-                            <span class="required">*</span>
-                        @endif
-                    </label>
-                    <div class="board-file-upload">
-                        <div class="board-file-input-wrapper">
-                            <input type="file" class="board-file-input" id="attachments" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.rar" @if($board->isFieldRequired('attachments')) required @endif>
-                            <div class="board-file-input-content">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <span class="board-file-input-text">파일을 선택하거나 여기로 드래그하세요</span>
-                                <span class="board-file-input-subtext">최대 5개, 각 파일 10MB 이하</span>
-                            </div>
-                        </div>
-                        <div class="board-file-preview" id="filePreview"></div>
-                    </div>
                 </div>
                 @endif
 

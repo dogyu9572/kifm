@@ -14,7 +14,7 @@ return new class extends Migration
         if (Schema::hasTable('categories')) {
             return;
         }
-        
+
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade')->comment('상위 카테고리 ID');

@@ -218,18 +218,6 @@
                     @endforeach
                 @endif
 
-                @if($board->isFieldEnabled('author_name'))
-                <div class="board-form-group">
-                    <label for="author_name" class="board-form-label">
-                        작성자
-                        @if($board->isFieldRequired('author_name'))
-                            <span class="required">*</span>
-                        @endif
-                    </label>
-                    <input type="text" class="board-form-control" id="author_name" name="author_name" value="{{ old('author_name', auth()->user()->name ?? $post->author_name) }}" @if($board->isFieldRequired('author_name')) required @endif>
-                </div>
-                @endif
-
                 @if($board->isFieldEnabled('password'))
                 <div class="board-form-group">
                     <label for="password" class="board-form-label">
@@ -290,7 +278,7 @@
                                                 <i class="fas fa-file"></i>
                                                 <span class="board-attachment-name">{{ $attachment['name'] }}</span>
                                                 <span class="board-attachment-size">({{ number_format($attachment['size'] / 1024 / 1024, 2) }}MB)</span>
-                                                <button type="button" class="board-attachment-remove" onclick="removeExistingFile({{ $index }})">
+                                                <button type="button" class="board-attachment-remove" data-existing-file-index="{{ $index }}">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                                 <input type="hidden" name="existing_attachments[]" value="{{ json_encode($attachment) }}">
@@ -303,6 +291,18 @@
                         
                         <div class="board-file-preview" id="filePreview"></div>
                     </div>
+                </div>
+                @endif
+
+                @if($board->isFieldEnabled('author_name'))
+                <div class="board-form-group">
+                    <label for="author_name" class="board-form-label">
+                        작성자
+                        @if($board->isFieldRequired('author_name'))
+                            <span class="required">*</span>
+                        @endif
+                    </label>
+                    <input type="text" class="board-form-control" id="author_name" name="author_name" value="{{ old('author_name', auth()->user()->name ?? $post->author_name) }}" @if($board->isFieldRequired('author_name')) required @endif>
                 </div>
                 @endif
 

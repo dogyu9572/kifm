@@ -4,19 +4,26 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BoardPostRequest;
-use App\Services\Backoffice\BoardPostService;
 use App\Models\Board;
+use App\Services\Backoffice\BoardPostCommentService;
+use App\Services\Backoffice\BoardPostService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class BoardPostController extends Controller
 {
     protected $boardPostService;
 
-    public function __construct(BoardPostService $boardPostService)
-    {
+    protected BoardPostCommentService $boardPostCommentService;
+
+    public function __construct(
+        BoardPostService $boardPostService,
+        BoardPostCommentService $boardPostCommentService
+    ) {
         $this->boardPostService = $boardPostService;
+        $this->boardPostCommentService = $boardPostCommentService;
     }
 
     /**
@@ -25,21 +32,22 @@ class BoardPostController extends Controller
     public function index(Request $request, $slug)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         // 단일페이지 모드인 경우 특별 처리
         if ($board->is_single_page) {
             $posts = $this->boardPostService->getPosts($slug, $request);
-            
+
             // 기존 게시글이 있으면 수정 페이지로 리다이렉트
             if ($posts->count() > 0) {
                 $post = $posts->first();
+
                 return redirect()->route('backoffice.board-posts.edit', [$slug, $post->id]);
             }
-            
+
             // 게시글이 없으면 생성 페이지로 리다이렉트
             return redirect()->route('backoffice.board-posts.create', $slug);
         }
-        
+
         $posts = $this->boardPostService->getPosts($slug, $request);
 
         // 자동 생성된 뷰 사용
@@ -52,24 +60,25 @@ class BoardPostController extends Controller
     public function create($slug)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         // 단일페이지 모드인 경우 기존 게시글이 있으면 수정 페이지로 리다이렉트
         if ($board->is_single_page) {
-            $posts = $this->boardPostService->getPosts($slug, new Request());
+            $posts = $this->boardPostService->getPosts($slug, new Request);
             if ($posts->count() > 0) {
                 $post = $posts->first();
+
                 return redirect()->route('backoffice.board-posts.edit', [$slug, $post->id]);
             }
         }
-        
+
         // 정렬 기능이 활성화된 경우 다음 정렬순서 값 계산
-        $nextSortOrder = $board->enable_sorting 
-            ? $this->boardPostService->calculateNextSortOrder($slug) 
+        $nextSortOrder = $board->enable_sorting
+            ? $this->boardPostService->calculateNextSortOrder($slug)
             : 0;
-        
+
         // 카테고리 옵션 가져오기
         $categoryOptions = $board->getCategoryOptions();
-        
+
         // 자동 생성된 뷰 사용
         return view("backoffice.board-posts.{$slug}.create", compact('board', 'nextSortOrder', 'categoryOptions'));
     }
@@ -80,23 +89,36 @@ class BoardPostController extends Controller
     public function store(BoardPostRequest $request, $slug)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         // 유효성 검사는 BoardPostRequest에서 처리됨
         $validated = $request->validated();
-        
+
         // 단일페이지 모드인 경우 기존 게시글이 있으면 업데이트
         if ($board->is_single_page) {
-            $posts = $this->boardPostService->getPosts($slug, new Request());
+            $posts = $this->boardPostService->getPosts($slug, new Request);
             if ($posts->count() > 0) {
                 $post = $posts->first();
                 $this->boardPostService->updatePost($slug, $post->id, $validated, $request, $board);
+
                 return redirect()->route('backoffice.board-posts.edit', [$slug, $post->id])
                     ->with('success', '내용이 수정되었습니다.');
             }
         }
-        
-        // 서비스를 통해 게시글 저장
-        $postId = $this->boardPostService->storePost($slug, $validated, $request, $board);
+
+        try {
+            // 서비스를 통해 게시글 저장
+            $postId = $this->boardPostService->storePost($slug, $validated, $request, $board);
+        } catch (\Throwable $e) {
+            Log::error('게시글 저장 실패', [
+                'slug' => $slug,
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['attachments' => '첨부파일 저장 중 오류가 발생했습니다. 저장소 권한을 확인해주세요.']);
+        }
 
         return redirect()->route('backoffice.board-posts.index', $slug)
             ->with('success', '게시글이 저장되었습니다.');
@@ -108,11 +130,11 @@ class BoardPostController extends Controller
     public function show($slug, $postId)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         // 서비스를 통해 게시글 조회
         $post = $this->boardPostService->getPost($slug, $postId);
-        
-        if (!$post) {
+
+        if (! $post) {
             abort(404, '게시글을 찾을 수 없습니다.');
         }
 
@@ -126,19 +148,24 @@ class BoardPostController extends Controller
     public function edit($slug, $postId)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         // 서비스를 통해 게시글 조회
         $post = $this->boardPostService->getPost($slug, $postId);
-        
-        if (!$post) {
+
+        if (! $post) {
             abort(404, '게시글을 찾을 수 없습니다.');
         }
 
         // 카테고리 옵션 가져오기
         $categoryOptions = $board->getCategoryOptions();
 
+        $boardPostCommentsThread = null;
+        if ($board->enable_comments) {
+            $boardPostCommentsThread = $this->boardPostCommentService->listRootWithReplies($slug, (int) $post->id);
+        }
+
         // 자동 생성된 뷰 사용
-        return view("backoffice.board-posts.{$slug}.edit", compact('board', 'post', 'categoryOptions'));
+        return view("backoffice.board-posts.{$slug}.edit", compact('board', 'post', 'categoryOptions', 'boardPostCommentsThread'));
     }
 
     /**
@@ -147,20 +174,33 @@ class BoardPostController extends Controller
     public function update(BoardPostRequest $request, $slug, $postId)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         // 유효성 검사는 BoardPostRequest에서 처리됨
         $validated = $request->validated();
-        
-        // 서비스를 통해 게시글 수정
-        $success = $this->boardPostService->updatePost($slug, $postId, $validated, $request, $board);
-        
-        if (!$success) {
+
+        try {
+            // 서비스를 통해 게시글 수정
+            $success = $this->boardPostService->updatePost($slug, $postId, $validated, $request, $board);
+        } catch (\Throwable $e) {
+            Log::error('게시글 수정 실패', [
+                'slug' => $slug,
+                'post_id' => $postId,
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['attachments' => '첨부파일 저장 중 오류가 발생했습니다. 저장소 권한을 확인해주세요.']);
+        }
+
+        if (! $success) {
             abort(404, '게시글을 찾을 수 없습니다.');
         }
 
         // 단일페이지 모드인 경우 특별한 메시지
         $message = $board->is_single_page ? '내용이 수정되었습니다.' : '게시글이 수정되었습니다.';
-        
+
         return redirect($this->resolveListReturnUrl($request, $slug))
             ->with('success', $message);
     }
@@ -178,8 +218,8 @@ class BoardPostController extends Controller
         }
 
         // 외부 리다이렉트 방지: 현재 도메인 + 해당 게시판 목록 경로만 허용
-        $allowedPrefix = url('/backoffice/board-posts/' . $slug);
-        if (!Str::startsWith($returnUrl, $allowedPrefix)) {
+        $allowedPrefix = url('/backoffice/board-posts/'.$slug);
+        if (! Str::startsWith($returnUrl, $allowedPrefix)) {
             return $defaultUrl;
         }
 
@@ -192,11 +232,11 @@ class BoardPostController extends Controller
     public function destroy($slug, $postId)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         // 서비스를 통해 게시글 삭제
         $success = $this->boardPostService->deletePost($slug, $postId);
-        
-        if (!$success) {
+
+        if (! $success) {
             abort(404, '게시글을 찾을 수 없습니다.');
         }
 
@@ -210,27 +250,27 @@ class BoardPostController extends Controller
     public function bulkDestroy(Request $request, $slug)
     {
         $board = Board::where('slug', $slug)->firstOrFail();
-        
+
         $request->validate([
             'post_ids' => 'required|array',
-            'post_ids.*' => 'integer|exists:board_' . $slug . ',id'
+            'post_ids.*' => 'integer|exists:board_'.$slug.',id',
         ]);
 
         $postIds = $request->input('post_ids');
-        
+
         try {
             // 서비스를 통해 일괄 삭제
             $deletedCount = $this->boardPostService->bulkDelete($slug, $postIds);
 
             return response()->json([
                 'success' => true,
-                'message' => $deletedCount . '개의 게시글이 삭제되었습니다.',
-                'deleted_count' => $deletedCount
+                'message' => $deletedCount.'개의 게시글이 삭제되었습니다.',
+                'deleted_count' => $deletedCount,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => '삭제 중 오류가 발생했습니다: ' . $e->getMessage()
+                'message' => '삭제 중 오류가 발생했습니다: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -244,19 +284,19 @@ class BoardPostController extends Controller
             'slug' => 'required|string',
             'updates' => 'required|array',
             'updates.*.post_id' => 'required|integer',
-            'updates.*.sort_order' => 'required|integer|min:0'
+            'updates.*.sort_order' => 'required|integer|min:0',
         ]);
 
         try {
             $slug = $request->input('slug');
             $updates = $request->input('updates');
-            $tableName = 'board_' . $slug;
-            
+            $tableName = 'board_'.$slug;
+
             // 테이블이 존재하는지 확인
-            if (!DB::getSchemaBuilder()->hasTable($tableName)) {
+            if (! DB::getSchemaBuilder()->hasTable($tableName)) {
                 return response()->json([
                     'success' => false,
-                    'message' => '게시판을 찾을 수 없습니다.'
+                    'message' => '게시판을 찾을 수 없습니다.',
                 ], 404);
             }
 
@@ -266,19 +306,19 @@ class BoardPostController extends Controller
                     ->where('id', $update['post_id'])
                     ->update([
                         'sort_order' => $update['sort_order'],
-                        'updated_at' => now()
+                        'updated_at' => now(),
                     ]);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => '정렬 순서가 저장되었습니다.'
+                'message' => '정렬 순서가 저장되었습니다.',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => '정렬 순서 저장 중 오류가 발생했습니다: ' . $e->getMessage()
+                'message' => '정렬 순서 저장 중 오류가 발생했습니다: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -290,19 +330,19 @@ class BoardPostController extends Controller
     {
         // 모든 board_ 테이블에서 게시글 ID 찾기
         $tables = DB::select("SHOW TABLES LIKE 'board_%'");
-        
+
         foreach ($tables as $table) {
-            $tableName = array_values((array)$table)[0];
+            $tableName = array_values((array) $table)[0];
             if ($tableName === 'boards' || $tableName === 'board_skins' || $tableName === 'board_comments') {
                 continue;
             }
-            
+
             $exists = DB::table($tableName)->where('id', $postId)->exists();
             if ($exists) {
                 return str_replace('board_', '', $tableName);
             }
         }
-        
+
         return null;
     }
 }

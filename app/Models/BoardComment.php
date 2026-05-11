@@ -15,12 +15,14 @@ class BoardComment extends Model
      * @var array
      */
     protected $fillable = [
+        'board_slug',
         'post_id',
         'parent_id',
         'user_id',
         'author_name',
         'password',
         'content',
+        'attachments',
         'depth',
         'is_secret',
     ];
@@ -33,7 +35,26 @@ class BoardComment extends Model
     protected $casts = [
         'is_secret' => 'boolean',
         'depth' => 'integer',
+        'attachments' => 'array',
     ];
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<static>
+     */
+    public function scopeForPostSlug($query, string $slug)
+    {
+        return $query->where('board_slug', $slug);
+    }
+
+    /**
+     * @param  \Illuminate\Database\Eloquent\Builder<static>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<static>
+     */
+    public function scopeForPost($query, string $slug, int $postId)
+    {
+        return $query->where('board_slug', $slug)->where('post_id', $postId);
+    }
 
     /**
      * 이 댓글의 작성자 관계

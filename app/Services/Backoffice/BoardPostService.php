@@ -3,18 +3,22 @@
 namespace App\Services\Backoffice;
 
 use App\Models\Board;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class BoardPostService
 {
+    public function __construct(
+        private BoardPostCommentService $boardPostCommentService
+    ) {}
+
     /**
      * 동적 테이블명 생성
      */
     public function getTableName(string $slug): string
     {
-        return 'board_' . $slug;
+        return 'board_'.$slug;
     }
 
     /**
@@ -23,13 +27,13 @@ class BoardPostService
     public function getPosts(string $slug, Request $request)
     {
         $query = DB::table($this->getTableName($slug));
-        
-        $this->applySearchFilters($query, $request);
-        
+
+        $this->applySearchFilters($query, $request, $slug);
+
         // 목록 개수 설정
         $perPage = $request->get('per_page', 15);
         $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 15;
-        
+
         // 정렬 기능이 활성화된 게시판인지 확인
         $board = Board::where('slug', $slug)->first();
         if ($board && $board->enable_sorting) {
@@ -48,13 +52,36 @@ class BoardPostService
         }
 
         $this->transformDates($posts);
+
+        if ($board && $board->enable_comments) {
+            $this->attachCommentCounts($posts, $slug);
+        }
+
         return $posts;
+    }
+
+    /**
+     * 목록에 댓글 수(comments_count)를 붙입니다.
+     */
+    private function attachCommentCounts($posts, string $slug): void
+    {
+        $ids = $posts->getCollection()->pluck('id')->filter()->map(fn ($id) => (int) $id)->all();
+        if ($ids === []) {
+            return;
+        }
+
+        $counts = $this->boardPostCommentService->commentCountsForPosts($slug, $ids);
+        $posts->getCollection()->transform(function ($post) use ($counts) {
+            $post->comments_count = (int) ($counts[$post->id] ?? 0);
+
+            return $post;
+        });
     }
 
     /**
      * 검색 필터 적용
      */
-    private function applySearchFilters($query, Request $request): void
+    private function applySearchFilters($query, Request $request, string $slug): void
     {
         if ($request->filled('start_date')) {
             $query->whereDate('created_at', '>=', $request->start_date);
@@ -68,24 +95,173 @@ class BoardPostService
             $query->where('category', $request->category);
         }
 
-        if ($request->filled('keyword')) {
-            $this->applyKeywordSearch($query, $request->keyword, $request->search_type);
+        if (in_array($slug, ['general_archive', 'academic_archive'], true)) {
+            if ($request->filled('visibility')) {
+                if ($request->visibility === 'public') {
+                    $query->where('is_active', true);
+                } elseif ($request->visibility === 'private') {
+                    $query->where('is_active', false);
+                }
+            }
+
+            $memberGradeFilter = $request->input('member_grade', $request->input('member_type'));
+            if (! empty($memberGradeFilter)) {
+                $memberTypeValues = $this->resolveMemberTypeFilterValues((string) $memberGradeFilter);
+                $query->where(function ($subQuery) use ($memberTypeValues) {
+                    // 체크박스 배열/단일 문자열 저장 케이스 모두 대응
+                    foreach ($memberTypeValues as $index => $memberType) {
+                        $method = $index === 0 ? 'whereRaw' : 'orWhereRaw';
+                        $subQuery->{$method}(
+                            "JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"member_type\"')) = ?",
+                            [$memberType]
+                        );
+                        $subQuery->orWhereRaw(
+                            "JSON_CONTAINS(JSON_EXTRACT(custom_fields, '$.\"member_type\"'), JSON_QUOTE(?))",
+                            [$memberType]
+                        );
+                    }
+                });
+            }
+
+            if ($request->filled('executive_access')) {
+                $executiveAccess = (string) $request->executive_access;
+                $query->where(function ($subQuery) use ($executiveAccess) {
+                    // 권장 키(is_executive_public) + 호환 키(executive_access) 동시 지원
+                    $subQuery->whereRaw(
+                        "JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"is_executive_public\"')) = ?",
+                        [$executiveAccess]
+                    )->orWhereRaw(
+                        "JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"executive_access\"')) = ?",
+                        [$executiveAccess]
+                    );
+                });
+            }
         }
+
+        if ($slug === 'member_archive') {
+            if ($request->filled('visibility')) {
+                if ($request->visibility === 'public') {
+                    $query->where('is_active', true);
+                } elseif ($request->visibility === 'private') {
+                    $query->where('is_active', false);
+                }
+            }
+
+            if ($request->filled('member_grade')) {
+                $memberGrade = (string) $request->member_grade;
+                $query->whereRaw(
+                    "JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"member_grade\"')) = ?",
+                    [$memberGrade]
+                );
+            }
+
+            if ($request->filled('archive_type')) {
+                $archiveType = (string) $request->archive_type;
+                $query->whereRaw(
+                    "JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"archive_type\"')) = ?",
+                    [$archiveType]
+                );
+            }
+        }
+
+        if (in_array($slug, ['member_square_notices', 'inquiry_qna'], true) && $request->filled('visibility')) {
+            if ($request->visibility === 'public') {
+                $query->where('is_active', true);
+            } elseif ($request->visibility === 'private') {
+                $query->where('is_active', false);
+            }
+        }
+
+        if ($slug === 'society_history') {
+            if ($request->filled('year')) {
+                $query->whereRaw(
+                    "JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"history_year\"')) = ?",
+                    [(string) $request->year]
+                );
+            }
+
+            if ($request->filled('month')) {
+                $query->whereRaw(
+                    "JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"history_month\"')) = ?",
+                    [(string) $request->month]
+                );
+            }
+
+            if ($request->filled('visibility')) {
+                if ($request->visibility === 'public') {
+                    $query->where('is_active', true);
+                } elseif ($request->visibility === 'private') {
+                    $query->where('is_active', false);
+                }
+            }
+        }
+
+        if ($request->filled('keyword')) {
+            $this->applyKeywordSearch($query, $request->keyword, $request->search_type, $slug);
+        }
+    }
+
+    /**
+     * 회원설정 필터값(영문/한글)을 실제 저장값 배열로 변환합니다.
+     */
+    private function resolveMemberTypeFilterValues(string $memberType): array
+    {
+        $memberTypeMap = [
+            'associate' => '준회원',
+            'regular' => '정회원',
+            'lifetime' => '평생회원',
+            'senior' => '시니어회원',
+        ];
+
+        if (isset($memberTypeMap[$memberType])) {
+            return [$memberType, $memberTypeMap[$memberType]];
+        }
+
+        $reverseMatch = array_search($memberType, $memberTypeMap, true);
+        if ($reverseMatch !== false) {
+            return [$memberType, $reverseMatch];
+        }
+
+        return [$memberType];
     }
 
     /**
      * 키워드 검색 적용
      */
-    private function applyKeywordSearch($query, string $keyword, ?string $searchType): void
+    private function applyKeywordSearch($query, string $keyword, ?string $searchType, string $slug): void
     {
         if ($searchType === 'title') {
             $query->where('title', 'like', "%{$keyword}%");
-        } elseif ($searchType === 'content') {
-            $query->where('content', 'like', "%{$keyword}%");
-        } else {
-            $query->where(function($q) use ($keyword) {
+        } elseif ($searchType === 'keyword' && $slug === 'member_archive') {
+            $query->where(function ($q) use ($keyword) {
                 $q->where('title', 'like', "%{$keyword}%")
-                  ->orWhere('content', 'like', "%{$keyword}%");
+                    ->orWhere('content', 'like', "%{$keyword}%");
+            });
+        } elseif ($searchType === 'keyword' && $slug === 'inquiry_qna') {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('author_name', 'like', "%{$keyword}%")
+                    ->orWhere('content', 'like', "%{$keyword}%");
+            });
+        } elseif ($searchType === 'keyword' && $slug === 'society_history') {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('content', 'like', "%{$keyword}%");
+            });
+        } elseif ($searchType === 'author') {
+            $query->where('author_name', 'like', "%{$keyword}%");
+        } elseif ($searchType === 'content' && $slug !== 'general_archive') {
+            // 일반 자료실 외 게시판은 기존 동작 유지
+            $query->where('content', 'like', "%{$keyword}%");
+        } elseif ($slug === 'member_archive') {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('content', 'like', "%{$keyword}%");
+            });
+        } else {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                    ->orWhere('author_name', 'like', "%{$keyword}%");
             });
         }
     }
@@ -101,6 +277,7 @@ class BoardPostService
                     $post->$dateField = Carbon::parse($post->$dateField);
                 }
             }
+
             return $post;
         });
     }
@@ -111,7 +288,7 @@ class BoardPostService
     public function storePost(string $slug, array $validated, Request $request, $board): int
     {
         $data = $this->preparePostData($validated, $request, $slug, $board);
-        
+
         return DB::table($this->getTableName($slug))->insertGetId($data);
     }
 
@@ -123,13 +300,18 @@ class BoardPostService
         // 정렬 기능 활성화된 게시판인 경우 자동으로 sort_order 설정
         $sortOrder = 0;
         if ($board && $board->enable_sorting) {
-            $sortOrder = $this->getNextSortOrder($slug);
+            $requestedSortOrder = $request->input('sort_order');
+            if ($requestedSortOrder !== null && is_numeric($requestedSortOrder)) {
+                $sortOrder = max(0, (int) $requestedSortOrder);
+            } else {
+                $sortOrder = $this->getNextSortOrder($slug);
+            }
         }
-        
+
         // is_active 필드 처리: 필드가 활성화되어 있고 요청에 있으면 사용, 없으면 기본값 true
         $isActive = true;
         if ($board && $board->isFieldEnabled('is_active')) {
-            $isActive = $request->has('is_active') ? (bool)$request->input('is_active') : true;
+            $isActive = $request->has('is_active') ? (bool) $request->input('is_active') : true;
         }
 
         return [
@@ -147,10 +329,10 @@ class BoardPostService
             'custom_fields' => $this->getCustomFieldsJson($request, $board),
             'view_count' => (int) ($validated['view_count'] ?? 0),
             'sort_order' => $sortOrder,
-            'created_at' => !empty($validated['created_at'])
+            'created_at' => ! empty($validated['created_at'])
                 ? Carbon::parse($validated['created_at'])
                 : now(),
-            'updated_at' => now()
+            'updated_at' => now(),
         ];
     }
 
@@ -161,7 +343,7 @@ class BoardPostService
     {
         $maxSortOrder = DB::table($this->getTableName($slug))
             ->max('sort_order');
-        
+
         return ($maxSortOrder ?? 0) + 1;
     }
 
@@ -179,6 +361,7 @@ class BoardPostService
     private function sanitizeContent(string $content): string
     {
         $allowedTags = '<p><br><strong><em><u><ol><ul><li><h1><h2><h3><h4><h5><h6><blockquote><pre><code><table><thead><tbody><tr><td><th><a><img><div><span><iframe><video><source>';
+
         return strip_tags($content, $allowedTags);
     }
 
@@ -191,17 +374,17 @@ class BoardPostService
         if ($request->has('remove_thumbnail')) {
             return null;
         }
-        
+
         // 새 썸네일이 업로드된 경우
         if ($request->hasFile('thumbnail')) {
-            return $request->file('thumbnail')->store('thumbnails/' . $slug, 'public');
+            return $request->file('thumbnail')->store('thumbnails/'.$slug, 'public');
         }
-        
+
         // 기존 썸네일이 있는 경우 보존
         if ($request->has('existing_thumbnail')) {
             return $request->input('existing_thumbnail');
         }
-        
+
         return null;
     }
 
@@ -212,7 +395,7 @@ class BoardPostService
     {
         $attachments = [];
         $removeIndices = $request->input('remove_attachments', []);
-        
+
         // 기존 첨부파일 보존 (제거 요청이 없는 것만)
         if ($request->has('existing_attachments')) {
             $existingAttachments = $request->input('existing_attachments', []);
@@ -221,7 +404,7 @@ class BoardPostService
                 if (in_array($index, $removeIndices)) {
                     continue;
                 }
-                
+
                 if (is_string($attachment)) {
                     $attachment = json_decode($attachment, true);
                 }
@@ -230,19 +413,19 @@ class BoardPostService
                 }
             }
         }
-        
+
         // 새 첨부파일 추가
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $attachments[] = [
                     'name' => $file->getClientOriginalName(),
-                    'path' => $file->store('uploads/' . $slug, 'public'),
+                    'path' => $file->store('uploads/'.$slug, 'public'),
                     'size' => $file->getSize(),
-                    'type' => $file->getMimeType()
+                    'type' => $file->getMimeType(),
                 ];
             }
         }
-        
+
         return $attachments;
     }
 
@@ -252,7 +435,8 @@ class BoardPostService
     private function getCustomFieldsJson(Request $request, $board): ?string
     {
         $customFields = $this->processCustomFields($request, $board);
-        return !empty($customFields) ? json_encode($customFields) : null;
+
+        return ! empty($customFields) ? json_encode($customFields) : null;
     }
 
     /**
@@ -260,7 +444,7 @@ class BoardPostService
      */
     private function processCustomFields(Request $request, $board): array
     {
-        if (!$board->custom_fields_config || !is_array($board->custom_fields_config)) {
+        if (! $board->custom_fields_config || ! is_array($board->custom_fields_config)) {
             return [];
         }
 
@@ -269,6 +453,7 @@ class BoardPostService
             $fieldName = $fieldConfig['name'];
             $customFields[$fieldName] = $request->input("custom_field_{$fieldName}");
         }
+
         return $customFields;
     }
 
@@ -278,12 +463,13 @@ class BoardPostService
     public function getPost(string $slug, int $postId)
     {
         $post = DB::table($this->getTableName($slug))->where('id', $postId)->first();
-        
-        if (!$post) {
+
+        if (! $post) {
             return null;
         }
 
         $this->transformSinglePostDates($post);
+
         return $post;
     }
 
@@ -306,9 +492,9 @@ class BoardPostService
     {
         // 기존 게시물 조회
         $existingPost = $this->getPost($slug, $postId);
-        
+
         $data = $this->prepareUpdateData($validated, $request, $slug, $board, $existingPost);
-        
+
         return DB::table($this->getTableName($slug))
             ->where('id', $postId)
             ->update($data);
@@ -325,10 +511,10 @@ class BoardPostService
         // 필드가 활성화되어 있지만 요청에 없으면 기본값 true
         $isActive = true;
         if ($board && $board->isFieldEnabled('is_active')) {
-            $isActive = $request->has('is_active') ? (bool)$request->input('is_active') : true;
+            $isActive = $request->has('is_active') ? (bool) $request->input('is_active') : true;
         } elseif ($existingPost && isset($existingPost->is_active)) {
             // 필드가 비활성화되어 있으면 기존 값 유지
-            $isActive = (bool)$existingPost->is_active;
+            $isActive = (bool) $existingPost->is_active;
         }
 
         return [
@@ -343,12 +529,12 @@ class BoardPostService
             'thumbnail' => $this->handleThumbnail($request, $slug),
             'attachments' => json_encode($this->handleAttachments($request, $slug)),
             'custom_fields' => $this->getCustomFieldsJson($request, $board),
-            'created_at' => !empty($validated['created_at'])
+            'created_at' => ! empty($validated['created_at'])
                 ? Carbon::parse($validated['created_at'])
                 : ($existingPost->created_at ?? now()),
             'view_count' => (int) ($validated['view_count'] ?? ($existingPost->view_count ?? 0)),
             'sort_order' => $request->input('sort_order', 0),
-            'updated_at' => now()
+            'updated_at' => now(),
         ];
     }
 
@@ -358,13 +544,15 @@ class BoardPostService
     public function deletePost(string $slug, int $postId): bool
     {
         $post = DB::table($this->getTableName($slug))->where('id', $postId)->first();
-        
-        if (!$post) {
+
+        if (! $post) {
             return false;
         }
 
         $this->deleteAttachments($post);
-        
+
+        $this->boardPostCommentService->softDeleteAllForPost($slug, $postId);
+
         return DB::table($this->getTableName($slug))->where('id', $postId)->delete();
     }
 
@@ -373,18 +561,18 @@ class BoardPostService
      */
     private function deleteAttachments($post): void
     {
-        if (!$post->attachments) {
+        if (! $post->attachments) {
             return;
         }
 
         $attachments = json_decode($post->attachments, true);
-        if (!is_array($attachments)) {
+        if (! is_array($attachments)) {
             return;
         }
 
         foreach ($attachments as $attachment) {
             if (isset($attachment['path'])) {
-                $filePath = storage_path('app/public/' . $attachment['path']);
+                $filePath = storage_path('app/public/'.$attachment['path']);
                 if (file_exists($filePath)) {
                     unlink($filePath);
                 }
@@ -397,6 +585,8 @@ class BoardPostService
      */
     public function bulkDelete(string $slug, array $postIds): int
     {
+        $this->boardPostCommentService->softDeleteAllForPosts($slug, $postIds);
+
         return DB::table($this->getTableName($slug))->whereIn('id', $postIds)->delete();
     }
 }

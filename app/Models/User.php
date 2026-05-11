@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'join_type',
         'login_id',
         'name',
+        'name_en',
         'email',
         'password',
         'phone_number',
@@ -29,6 +31,7 @@ class User extends Authenticatable
         'address_base',
         'address_detail',
         'school_name',
+        'graduate_year',
         'is_school_representative',
         'email_marketing_consent',
         'email_marketing_consent_at',
@@ -44,6 +47,26 @@ class User extends Authenticatable
         'position',
         'contact',
         'withdrawn_at',
+        'member_level',
+        'job_type',
+        'member_status_raw',
+        'license_number',
+        'specialist_number',
+        'specialty',
+        'medical_department',
+        'workplace_name',
+        'workplace_phone',
+        'workplace_zipcode',
+        'workplace_address',
+        'workplace_address_detail',
+        'membership_fee_basis_at',
+        'annual_fee_status',
+        'certified_instructor',
+        'committee_codes',
+        'legacy_import_json',
+        'legacy_csv_no',
+        'created_at',
+        'updated_at',
     ];
 
     /**
@@ -76,6 +99,11 @@ class User extends Authenticatable
             'terms_agreed_at' => 'datetime',
             'email_marketing_consent_at' => 'datetime',
             'kakao_marketing_consent_at' => 'datetime',
+            'graduate_year' => 'integer',
+            'membership_fee_basis_at' => 'date',
+            'certified_instructor' => 'boolean',
+            'committee_codes' => 'array',
+            'legacy_import_json' => 'array',
         ];
     }
 
@@ -169,6 +197,120 @@ class User extends Authenticatable
         };
     }
 
+    /**
+     * 회원 목록 명세용 키워드 검색 (search_field 영문 키).
+     */
+    public function scopeMemberListKeyword($query, ?string $field, ?string $term)
+    {
+        $term = trim((string) $term);
+        if ($term === '' || ! $field) {
+            return $query;
+        }
+
+        $like = '%' . $term . '%';
+
+        return match ($field) {
+            'name' => $query->where('name', 'like', $like),
+            'id' => $query->where('login_id', 'like', $like),
+            'email' => $query->where('email', 'like', $like),
+            'phone', 'mobile' => $query->where('phone_number', 'like', $like),
+            'address' => $query->where(function ($q) use ($like) {
+                $q->where('address_base', 'like', $like)
+                    ->orWhere('address_detail', 'like', $like)
+                    ->orWhere('workplace_address', 'like', $like)
+                    ->orWhere('workplace_address_detail', 'like', $like);
+            }),
+            'licenseNo' => $query->where('license_number', 'like', $like),
+            'specialistNo' => $query->where('specialist_number', 'like', $like),
+            'specialty' => $query->where('specialty', 'like', $like),
+            'workplace' => $query->where('workplace_name', 'like', $like),
+            'university' => $query->where('school_name', 'like', $like),
+            'graduateYear' => $query->where('graduate_year', 'like', $like),
+            default => $query,
+        };
+    }
+
+    public function scopeWhereMemberLevels($query, ?array $levels)
+    {
+        if ($levels === null || $levels === []) {
+            return $query;
+        }
+        if (in_array('all', $levels, true)) {
+            return $query;
+        }
+
+        return $query->whereIn('member_level', $levels);
+    }
+
+    public function scopeWhereCertifiedFilter($query, ?string $mode)
+    {
+        if ($mode === null || $mode === '' || $mode === 'all') {
+            return $query;
+        }
+        if ($mode === 'certified') {
+            return $query->where('certified_instructor', true);
+        }
+        if ($mode === 'none') {
+            return $query->where(function ($q) {
+                $q->whereNull('certified_instructor')->orWhere('certified_instructor', false);
+            });
+        }
+
+        return $query;
+    }
+
+    public function scopeWhereInactiveDormant($query, bool $only)
+    {
+        if (! $only) {
+            return $query;
+        }
+        $cutoff = now()->subYear();
+
+        return $query->whereRaw('COALESCE(last_login_at, created_at) < ?', [$cutoff]);
+    }
+
+    public function scopeWhereAnnualFeeStatus($query, ?string $status)
+    {
+        if ($status === null || $status === '' || $status === 'all') {
+            return $query;
+        }
+        if ($status === 'none') {
+            return $query->where(function ($q) {
+                $q->whereNull('annual_fee_status')->orWhere('annual_fee_status', 'none');
+            });
+        }
+
+        return $query->where('annual_fee_status', $status);
+    }
+
+    public function scopeWhereMembershipFeeBasis($query, ?string $dueMode, ?string $dueDate)
+    {
+        if ($dueMode === null || $dueMode === '' || $dueMode === 'all' || ! $dueDate) {
+            return $query;
+        }
+        if ($dueMode === 'gte') {
+            return $query->whereDate('membership_fee_basis_at', '>=', $dueDate);
+        }
+        if ($dueMode === 'lte') {
+            return $query->whereDate('membership_fee_basis_at', '<=', $dueDate);
+        }
+
+        return $query;
+    }
+
+    public function scopeWhereSearchDateRange($query, ?string $condition, ?string $start, ?string $end)
+    {
+        $column = ($condition === 'lastLogin') ? 'last_login_at' : 'created_at';
+        if ($start) {
+            $query->whereDate($column, '>=', $start);
+        }
+        if ($end) {
+            $query->whereDate($column, '<=', $end);
+        }
+
+        return $query;
+    }
+
     public function scopeByJoinDateRange($query, $startDate = null, $endDate = null)
     {
         if ($startDate) {
@@ -216,6 +358,26 @@ class User extends Authenticatable
     public function adminGroup()
     {
         return $this->belongsTo(AdminGroup::class, 'admin_group_id');
+    }
+
+    public function membershipPayments(): HasMany
+    {
+        return $this->hasMany(MembershipPayment::class, 'member_id');
+    }
+
+    public function memberExecutives(): HasMany
+    {
+        return $this->hasMany(MemberExecutive::class, 'member_id');
+    }
+
+    public function certifiedMember()
+    {
+        return $this->hasOne(CertifiedMember::class, 'member_id');
+    }
+
+    public function eduTrainingPayments(): HasMany
+    {
+        return $this->hasMany(EduTrainingPayment::class, 'member_id');
     }
 
     /**

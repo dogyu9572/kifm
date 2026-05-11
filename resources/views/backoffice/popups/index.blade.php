@@ -1,6 +1,6 @@
 @extends('backoffice.layouts.app')
 
-@section('title', '팝업 관리')
+@section('title', $pageTitle ?? '팝업 관리')
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/backoffice/popups.css') }}">
@@ -16,18 +16,41 @@
     <div class="board-container">
         <div class="board-page-header">
             <div class="board-page-buttons">
-                <a href="{{ route('backoffice.popups.create') }}" class="btn btn-success">
+                <a href="{{ $routes['create'] }}" class="btn btn-success">
                     <i class="fas fa-plus"></i> 새 팝업 추가
-                </a>              
+                </a>
             </div>
         </div>
 
         <div class="board-card">
             <div class="board-card-body">
-                <!-- 검색 필터 -->
                 <div class="popup-filter">
-                    <form method="GET" action="{{ route('backoffice.popups.index') }}" class="filter-form">
+                    <form method="GET" action="{{ $routes['index'] }}" class="filter-form">
                         <div class="filter-row">
+                            @if(($menuScope ?? \App\Models\Popup::MENU_SCOPE_SITE) === \App\Models\Popup::MENU_SCOPE_COMMITTEE)
+                                <div class="filter-group">
+                                    <label for="community_committee_id" class="filter-label">위원회</label>
+                                    <select id="community_committee_id" name="community_committee_id" class="filter-select">
+                                        <option value="">전체</option>
+                                        @foreach ($committeeFilterOptions as $c)
+                                            <option value="{{ $c->id }}" @selected((string) request('community_committee_id') === (string) $c->id)>
+                                                {{ $c->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label for="target_board_slug" class="filter-label">게시판</label>
+                                    <select id="target_board_slug" name="target_board_slug" class="filter-select">
+                                        <option value="">전체</option>
+                                        @foreach (\App\Models\Popup::COMMITTEE_TARGET_BOARDS as $slug => $label)
+                                            <option value="{{ $slug }}" @selected(request('target_board_slug') === $slug)>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
                             <div class="filter-group">
                                 <label for="is_active" class="filter-label">사용여부</label>
                                 <select id="is_active" name="is_active" class="filter-select">
@@ -82,7 +105,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search"></i> 검색
                                     </button>
-                                    <a href="{{ route('backoffice.popups.index') }}" class="btn btn-secondary">
+                                    <a href="{{ $routes['index'] }}" class="btn btn-secondary">
                                         <i class="fas fa-undo"></i> 초기화
                                     </a>
                                 </div>
@@ -92,18 +115,17 @@
                 </div>
 
                 @if($popups->count() > 0)
-                    <!-- 목록 개수 선택 -->
                     <div class="popup-list-header">
                         <div class="list-info">
                             <span class="list-count">총 {{ $popups->total() }}개</span>
                         </div>
                         <div class="list-controls">
-                            <form method="GET" action="{{ route('backoffice.popups.index') }}" class="per-page-form">
+                            <form method="GET" action="{{ $routes['index'] }}" class="per-page-form">
                                 @foreach(request()->except('per_page') as $key => $value)
                                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                 @endforeach
                                 <label for="per_page" class="per-page-label">목록개수:</label>
-                                <select id="per_page" name="per_page" class="per-page-select" onchange="this.form.submit()">
+                                <select id="per_page" name="per_page" class="per-page-select bo-popup-per-page">
                                     <option value="10" @selected(request('per_page', 10) == 10)>10</option>
                                     <option value="20" @selected(request('per_page') == 20)>20</option>
                                     <option value="50" @selected(request('per_page') == 50)>50</option>
@@ -112,7 +134,7 @@
                             </form>
                         </div>
                     </div>
-                    <div class="popup-list" id="popupList">
+                    <div class="popup-list" id="popupList" data-update-order-url="{{ $routes['update_order'] }}">
                         @foreach($popups as $popup)
                             <div class="popup-item" data-id="{{ $popup->id }}">
                                 <div class="popup-drag-handle">
@@ -143,6 +165,17 @@
                                             <span class="popup-position">위치: {{ $popup->position_top }}, {{ $popup->position_left }}</span>
                                         </div>
                                         <div class="popup-meta">
+                                            @if(($menuScope ?? \App\Models\Popup::MENU_SCOPE_SITE) === \App\Models\Popup::MENU_SCOPE_COMMITTEE)
+                                                <span class="popup-committee">위원회: {{ $popup->communityCommittee?->name ?? '-' }}</span>
+                                                <span class="popup-board">
+                                                    게시판:
+                                                    @if($popup->target_board_slug)
+                                                        {{ \App\Models\Popup::COMMITTEE_TARGET_BOARDS[$popup->target_board_slug] ?? $popup->target_board_slug }}
+                                                    @else
+                                                        -
+                                                    @endif
+                                                </span>
+                                            @endif
                                             <span class="popup-status {{ $popup->is_active ? 'active' : 'inactive' }}">
                                                 {{ $popup->is_active ? '사용' : '숨김' }}
                                             </span>
@@ -160,10 +193,10 @@
                                 </div>
                                 <div class="popup-actions">
                                     <div class="board-btn-group">
-                                        <a href="{{ route('backoffice.popups.edit', $popup) }}" class="btn btn-primary btn-sm">
+                                        <a href="{{ ($menuScope ?? \App\Models\Popup::MENU_SCOPE_SITE) === \App\Models\Popup::MENU_SCOPE_COMMITTEE ? route('backoffice.committee-popups.edit', $popup) : route('backoffice.popups.edit', $popup) }}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-edit"></i> 수정
                                         </a>
-                                        <form action="{{ route('backoffice.popups.destroy', $popup) }}" method="POST" class="d-inline" onsubmit="return confirm('정말로 삭제하시겠습니까?')">
+                                        <form action="{{ ($menuScope ?? \App\Models\Popup::MENU_SCOPE_SITE) === \App\Models\Popup::MENU_SCOPE_COMMITTEE ? route('backoffice.committee-popups.destroy', $popup) : route('backoffice.popups.destroy', $popup) }}" method="POST" class="d-inline js-delete-confirm-form">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm">

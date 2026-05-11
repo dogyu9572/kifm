@@ -25,6 +25,7 @@ class HomeController extends Controller
         
         // 활성화된 팝업 조회 (쿠키 확인하여 숨겨진 팝업 제외)
         $popups = Popup::select('id', 'title', 'popup_type', 'popup_display_type', 'popup_image', 'popup_content', 'url', 'url_target', 'width', 'height', 'position_top', 'position_left')
+            ->forMenuScope(Popup::MENU_SCOPE_SITE)
             ->active()
             ->inPeriod()
             ->ordered()

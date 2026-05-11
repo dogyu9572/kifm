@@ -22,10 +22,8 @@ yarn-error.log
 Thumbs.db
 
 # IDE 및 에디터 관련
+# .cursor 하위는 .cursor/.gitignore에서 제외 (rules, skills는 커밋 대상)
 .cursor-server/
-# .cursor는 무시하지 않음 — rules/skills 등은 저장소에 포함 (로컬 전용 파일 생기면 여기에만 추가)
-.cursor/projects/
-.cursor/skills-cursor/
 .config/
 .local/
 .ssh/
@@ -50,7 +48,10 @@ setup-*-server.sh.backup
 *~
 
 public/temp/
-docs/
+
+# 기획/문서 원본(저장소 제외)
+/docs/
+
 backup/
 deploy/
 storage/

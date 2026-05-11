@@ -15,12 +15,28 @@ alwaysApply: true
 - 신규 메뉴는 `members` 화면 구조를 기준으로 CRUD 레이아웃 패턴을 재사용한다.
 - 공용 스타일은 `public/css/backoffice/backoffice-crud.css`를 우선 사용한다.
 - 테이블 선택 체크박스는 `bo-row-checkbox`, 인라인 폼은 `bo-inline-form`을 기본으로 사용한다.
+- 신규 메뉴의 필터/검색 레이아웃은 `resources/views/backoffice/members/withdrawn.blade.php` 구조를 기본 베이스로 사용한다.
+
+## 라우트명-뷰 폴더 네이밍 일치 (필수)
+- 백오피스 신규 메뉴는 라우트 경로명과 `resources/views/backoffice` 하위 폴더명을 동일 규칙으로 맞춘다.
+- 기본 규칙은 `kebab-case`를 사용한다. (예: `member-executives` 라우트 ↔ `resources/views/backoffice/member-executives`)
+- `kebab-case` 라우트와 `snake_case` 뷰 폴더를 혼용하지 않는다.
+- 검색 편의성과 유지보수를 위해 동일 메뉴에서 단일 네이밍만 사용한다.
+
+## CSS 파일 운영 원칙 (필수)
+- 신규 메뉴 개발 시 메뉴별 전용 CSS 파일을 새로 만들지 않는다.
+- 기존 공용 CSS(`boards.css`, `backoffice-crud.css` 등)와 기존 공용 클래스 조합으로 먼저 구현한다.
+- 화면 고유 스타일이 불가피한 경우에만 사용자 승인 후 최소 범위로 추가한다.
+- 임시 보정 CSS를 누적하지 않고 공용 패턴으로 흡수 가능한지 먼저 검토한다.
 
 ## 금지 항목
 - 신규 메뉴에서 `member-*` 네이밍 재사용 금지
 - 동일한 UI 블록을 메뉴별로 복붙해 별도 마크업/클래스로 분기하는 방식 금지
+- 라우트명과 뷰 폴더명을 서로 다른 네이밍(`member-executives` vs `member_executives`)으로 운영하는 방식 금지
+- 신규 메뉴마다 별도 CSS 파일을 생성해 유사 스타일을 중복 관리하는 방식 금지
 
 ## 작업 절차
 1. 새 화면 작업 전 공용 클래스(`bo-*`)로 표현 가능한지 먼저 확인한다.
 2. 공용으로 가능한 블록은 partial/component로 분리한다.
-3. 도메인 특화 항목만 메뉴 전용 클래스/JS로 분리한다.
+3. 라우트명과 뷰 폴더명 네이밍을 먼저 확정하고, 동일 네이밍으로 생성한다.
+4. 도메인 특화 항목만 메뉴 전용 클래스/JS로 분리한다.

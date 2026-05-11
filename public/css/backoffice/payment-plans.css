@@ -1,0 +1,59 @@
+/* 결제 항목 관리 (목록 + 등록/수정) */
+.bo-hidden {
+    display: none !important;
+}
+
+.filter-group-grow {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-group-grow .filter-input {
+    max-width: none;
+    width: 100%;
+}
+
+.bo-amount-cell {
+    white-space: normal;
+}
+
+.bo-amount-line {
+    display: block;
+    line-height: 1.4;
+}
+
+.board-form-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #495057;
+    margin: 28px 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.board-form-section-title:first-of-type {
+    margin-top: 0;
+}
+
+.board-form-control--max-md {
+    max-width: 420px;
+}
+
+.board-form-control--max-xs {
+    max-width: 220px;
+}
+
+.board-payment-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+}
+
+.bo-muted-text {
+    color: #6c757d;
+    padding: 0.25rem 0;
+}
+
+.bo-amount-panel.bo-hidden {
+    display: none !important;
+}

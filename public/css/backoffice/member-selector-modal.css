@@ -1,0 +1,112 @@
+.bo-member-search-modal {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.bo-member-search-modal-content {
+    width: 920px;
+    max-width: 92vw;
+    margin: 6vh auto;
+    border-radius: 12px;
+}
+
+.bo-member-search-modal .modal-header {
+    padding: 14px 22px 14px 18px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+
+.bo-member-search-modal .modal-body {
+    padding: 18px 20px 18px;
+    text-align: left;
+}
+
+.bo-member-search-modal .close {
+    border: 0;
+    background: transparent;
+    color: #6b7280;
+    font-size: 24px;
+    line-height: 1;
+    padding: 4px 6px;
+    cursor: pointer;
+}
+
+.bo-member-search-modal .modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.bo-member-search-modal .board-filter.member-search-modal-filter {
+    margin-bottom: 14px;
+}
+
+.bo-member-search-modal .board-filter .filter-row {
+    display: grid;
+    grid-template-columns: 170px 1fr auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.bo-member-search-modal .board-filter .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.bo-member-search-modal .board-filter .filter-buttons {
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+}
+
+.bo-member-search-modal .board-filter .filter-buttons .btn {
+    height: 38px;
+    min-width: 88px;
+}
+
+.bo-member-search-modal .input-with-button {
+    max-width: 520px;
+}
+
+.bo-member-search-modal .input-with-button .board-form-control {
+    flex: 1;
+}
+
+.bo-member-search-modal .input-with-button .btn {
+    min-width: 100px;
+}
+
+.bo-member-select-inline {
+    max-width: 520px;
+}
+
+.bo-member-search-modal .board-table th,
+.bo-member-search-modal .board-table td {
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.bo-member-search-modal .board-table tbody td {
+    height: 44px;
+}
+
+.bo-member-search-modal .js-member-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.bo-member-search-modal .js-member-pagination .pagination {
+    margin: 0;
+}
+
+.bo-member-search-modal .js-member-pagination .page-link {
+    cursor: pointer;
+}
+
+@media (max-width: 991px) {
+    .bo-member-search-modal .board-filter .filter-row {
+        grid-template-columns: 1fr;
+    }
+}

@@ -29,6 +29,8 @@ function initPopupSortable() {
 }
 
 function savePopupOrder() {
+    const popupList = document.getElementById('popupList');
+    const updateUrl = popupList?.dataset?.updateOrderUrl || '/backoffice/popups/update-order';
     const popupOrder = [];
     const totalItems = document.querySelectorAll('#popupList > .popup-item').length;
     document.querySelectorAll('#popupList > .popup-item').forEach((item, index) => {
@@ -36,7 +38,7 @@ function savePopupOrder() {
         if (popupId) popupOrder.push({ id: parseInt(popupId, 10), order: totalItems - index });
     });
 
-    fetch('/backoffice/popups/update-order', {
+    fetch(updateUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -133,7 +135,7 @@ function initImagePreview() {
         reader.onload = (evt) => {
             preview.innerHTML = `
                 <img src="${evt.target.result}" alt="미리보기" class="thumbnail-preview">
-                <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="removeImagePreview()">
+                <button type="button" class="btn btn-sm btn-outline-danger mt-2 js-clear-popup-upload-preview">
                     <i class="fas fa-trash"></i> 이미지 제거
                 </button>
             `;
@@ -182,6 +184,40 @@ function initDateInputs() {
     });
 }
 
+function initDeleteConfirmForms() {
+    const deleteForms = document.querySelectorAll('.js-delete-confirm-form');
+    if (!deleteForms.length) return;
+    deleteForms.forEach((form) => {
+        form.addEventListener('submit', function (event) {
+            const confirmed = confirm('정말로 삭제하시겠습니까?');
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        });
+    });
+}
+
+function initPopupPerPageSelect() {
+    document.querySelectorAll('.bo-popup-per-page').forEach((select) => {
+        select.addEventListener('change', function () {
+            const form = this.closest('form');
+            if (form) form.submit();
+        });
+    });
+}
+
+function initPopupImageRemoveButtons() {
+    document.addEventListener('click', function (e) {
+        const t = e.target;
+        if (!(t instanceof Element)) return;
+        const btn = t.closest('.js-remove-popup-image, .js-clear-popup-upload-preview');
+        if (btn) {
+            e.preventDefault();
+            removeImagePreview();
+        }
+    });
+}
+
 function showSuccessMessage(message) {
     const existingAlert = document.querySelector('.alert-success');
     if (existingAlert) existingAlert.remove();
@@ -215,6 +251,9 @@ document.addEventListener('DOMContentLoaded', function () {
     initImagePreview();
     initDragAndDrop();
     initDateInputs();
+    initDeleteConfirmForms();
+    initPopupPerPageSelect();
+    initPopupImageRemoveButtons();
 
     document.querySelectorAll('form').forEach((form) => {
         form.addEventListener('submit', function () {

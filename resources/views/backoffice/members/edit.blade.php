@@ -4,6 +4,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/backoffice/backoffice-crud.css') }}">
+<link rel="stylesheet" href="{{ asset('css/backoffice/members-list.css') }}">
 @endsection
 
 @section('scripts')
@@ -14,8 +15,8 @@
 
 @section('content')
 @if ($errors->any())
-    <div class="alert alert-danger board-hidden-alert">
-        <ul>
+    <div class="board-alert board-alert-danger">
+        <ul class="mb-0">
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach
@@ -32,25 +33,18 @@
 
     <div class="board-card">
         <div class="board-card-body">
-            <form action="{{ route('backoffice.members.update', $member->id) }}" method="POST" id="memberForm">
+            <form action="{{ route('backoffice.members.update', $member->id) }}" method="POST" id="memberForm" class="bo-member-form">
                 @csrf
                 @method('PUT')
-                @include('backoffice.members._form', ['mode' => 'edit', 'member' => $member])
-            </form>
-
-            <div class="board-form-actions">
-                <button type="submit" class="btn btn-primary" form="memberForm">
-                    <i class="fas fa-save"></i> 저장
-                </button>
-                <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
-                <form action="{{ route('backoffice.members.destroy', $member->id) }}" method="POST" class="bo-inline-form" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
-                        <i class="fas fa-trash"></i> 삭제
+                @include('backoffice.members._form')
+                @include('backoffice.members._history_placeholders')
+                <div class="board-form-actions board-form-actions--member-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 저장
                     </button>
-                </form>
-            </div>
+                    <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

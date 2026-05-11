@@ -223,8 +223,44 @@ class CategorySeeder extends Seeder
             'is_active' => true,
         ]);
 
+        // ========================================
+        // 위원회 공지 카테고리 그룹 (회원 소속 위원회와 명칭 정합)
+        // ========================================
+
+        $committeeNoticeGroup = Category::create([
+            'parent_id' => null,
+            'code' => 'C021',
+            'name' => '위원회 공지',
+            'depth' => 0,
+            'display_order' => 3,
+            'is_active' => true,
+        ]);
+
+        $committeeNames = [
+            'C022' => '학술위원회',
+            'C023' => '편집위원회',
+            'C024' => '교육위원회',
+            'C025' => '재무위원회',
+            'C026' => '윤리위원회',
+            'C027' => '기획위원회',
+        ];
+
+        $order = 1;
+        foreach ($committeeNames as $code => $name) {
+            Category::create([
+                'parent_id' => $committeeNoticeGroup->id,
+                'code' => $code,
+                'name' => $name,
+                'depth' => 1,
+                'display_order' => $order,
+                'is_active' => true,
+            ]);
+            $order++;
+        }
+
         $this->command->info('카테고리 시더 실행 완료!');
         $this->command->info('- 게시판 그룹: 1개 그룹, 8개 카테고리 생성');
         $this->command->info('- 상품 그룹: 1개 그룹, 11개 카테고리 생성');
+        $this->command->info('- 위원회 공지 그룹: 1개 그룹, 6개 위원회 카테고리 생성');
     }
 }

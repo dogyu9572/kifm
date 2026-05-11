@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Board;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * @method string route(string $param)
@@ -18,15 +19,35 @@ class BoardPostRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->input('category') === '') {
+            $this->merge(['category' => null]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      */
     public function rules(): array
     {
+        $slug = (string) $this->route('slug', '');
+        $board = Board::where('slug', $slug)->first();
+
+        $categoryRules = ['nullable', 'string', 'max:50'];
+        if ($board && Board::usesCommunityCommitteeCategories($slug)) {
+            $categoryRules = array_values(array_filter([
+                $board->isFieldRequired('category') ? 'required' : 'nullable',
+                'string',
+                'max:100',
+                Rule::exists('community_committees', 'name'),
+            ]));
+        }
+
         $rules = [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'category' => 'nullable|string|max:50',
+            'category' => $categoryRules,
             'is_notice' => 'nullable|boolean',
             'is_secret' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
@@ -137,7 +158,8 @@ class BoardPostRequest extends FormRequest
             'title.required' => '제목은 필수 입력 항목입니다.',
             'title.max' => '제목은 최대 255자까지 입력 가능합니다.',
             'content.required' => '내용은 필수 입력 항목입니다.',
-            'category.max' => '카테고리는 최대 50자까지 입력 가능합니다.',
+            'category.max' => '위원회(분류) 값은 최대 :max자까지 입력 가능합니다.',
+            'category.exists' => '위원회 목록에 등록된 이름만 선택할 수 있습니다.',
             'created_at.date' => '등록일 형식이 올바르지 않습니다.',
             'view_count.integer' => '조회수는 숫자만 입력 가능합니다.',
             'view_count.min' => '조회수는 0 이상이어야 합니다.',

@@ -22,16 +22,16 @@ return new class extends Migration
             $table->json('attachments')->nullable();
             $table->integer('view_count')->default(0);
             $table->integer('sort_order')->default(0)->comment('정렬 순서');
-            
+
             // 커스텀 필드들 (JSON으로 저장)
             $table->json('custom_fields')->nullable();
-            
+
             // 갤러리 전용 컬럼 (사용하지 않으면 NULL)
             $table->string('thumbnail')->nullable(); // 썸네일 이미지 경로
-            
+
             // 게시물 노출 여부
             $table->boolean('is_active')->default(true)->comment('게시물 노출 여부');
-            
+
             $table->timestamps();
             $table->softDeletes();
 

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Backoffice;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\Backoffice\CreateBoardRequest;
 use App\Http\Requests\Backoffice\UpdateBoardRequest;
 use App\Models\Board;
-use App\Services\Backoffice\BoardService;
 use App\Services\Backoffice\BoardFileGeneratorService;
+use App\Services\Backoffice\BoardService;
 use App\Services\Backoffice\BoardTemplateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +14,9 @@ use Illuminate\Support\Facades\Log;
 class BoardController extends BaseController
 {
     protected $boardService;
+
     protected $boardFileGeneratorService;
+
     protected $templateService;
 
     public function __construct(
@@ -34,6 +35,7 @@ class BoardController extends BaseController
     public function index(Request $request)
     {
         $boards = $this->boardService->getBoardsWithFilters($request);
+
         return $this->view('backoffice.boards.index', compact('boards'));
     }
 
@@ -44,6 +46,7 @@ class BoardController extends BaseController
     {
         $skins = $this->boardService->getActiveSkins();
         $templates = $this->templateService->getActiveTemplates();
+
         return $this->view('backoffice.boards.create', compact('skins', 'templates'));
     }
 
@@ -66,13 +69,20 @@ class BoardController extends BaseController
 
             // 스킨 파일들을 게시판별 디렉토리로 복사
             try {
-                $skin = $board->skin;
-                $this->boardFileGeneratorService->generateBoardFiles($board);
+                $isGenerated = $this->boardFileGeneratorService->generateBoardFiles($board);
+                if (! $isGenerated) {
+                    $this->boardService->deleteBoard($board);
+
+                    return redirect()->back()
+                        ->withErrors(['skin_id' => '스킨 파일 생성에 실패했습니다. 디렉토리 권한 및 스킨 경로를 확인해주세요.'])
+                        ->withInput();
+                }
             } catch (\Exception $e) {
                 // 스킨 복사 실패 시 게시판 삭제
                 $this->boardService->deleteBoard($board);
+
                 return redirect()->back()
-                    ->withErrors(['skin_id' => '스킨 복사 중 오류가 발생했습니다: ' . $e->getMessage()])
+                    ->withErrors(['skin_id' => '스킨 복사 중 오류가 발생했습니다: '.$e->getMessage()])
                     ->withInput();
             }
 
@@ -82,11 +92,11 @@ class BoardController extends BaseController
         } catch (\Exception $e) {
             Log::error('게시판 생성 실패', [
                 'error' => $e->getMessage(),
-                'data' => $request->validated()
+                'data' => $request->validated(),
             ]);
 
             return redirect()->back()
-                ->withErrors(['error' => '게시판 생성 중 오류가 발생했습니다: ' . $e->getMessage()])
+                ->withErrors(['error' => '게시판 생성 중 오류가 발생했습니다: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -97,6 +107,7 @@ class BoardController extends BaseController
     public function show(Board $board)
     {
         $board->load('skin');
+
         return $this->view('backoffice.boards.show', compact('board'));
     }
 
@@ -110,7 +121,7 @@ class BoardController extends BaseController
             ->orderBy('is_system', 'desc')
             ->orderBy('id', 'desc')
             ->get();
-        
+
         return $this->view('backoffice.boards.edit', compact('board', 'templates'));
     }
 
@@ -130,11 +141,11 @@ class BoardController extends BaseController
             Log::error('게시판 수정 실패', [
                 'board_id' => $board->id,
                 'error' => $e->getMessage(),
-                'data' => $request->validated()
+                'data' => $request->validated(),
             ]);
 
             return redirect()->back()
-                ->withErrors(['error' => '게시판 수정 중 오류가 발생했습니다: ' . $e->getMessage()])
+                ->withErrors(['error' => '게시판 수정 중 오류가 발생했습니다: '.$e->getMessage()])
                 ->withInput();
         }
     }
@@ -155,11 +166,11 @@ class BoardController extends BaseController
         } catch (\Exception $e) {
             Log::error('게시판 삭제 실패', [
                 'board_id' => $board->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return redirect()->back()
-                ->withErrors(['error' => '게시판 삭제 중 오류가 발생했습니다: ' . $e->getMessage()]);
+                ->withErrors(['error' => '게시판 삭제 중 오류가 발생했습니다: '.$e->getMessage()]);
         }
     }
 }

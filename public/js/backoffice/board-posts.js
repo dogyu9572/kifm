@@ -6,7 +6,20 @@
 document.addEventListener('DOMContentLoaded', function() {
     checkSessionMessage();
     initBulkActions();
+    initDeleteConfirmForms();
+    initPerPageSubmitSelects();
 });
+
+/** 목록 표시 개수 등 변경 시 폼 자동 제출 (인라인 onchange 대체) */
+function initPerPageSubmitSelects() {
+    document.querySelectorAll('select[data-js-submit-form="1"]').forEach(function (select) {
+        select.addEventListener('change', function () {
+            if (this.form) {
+                this.form.submit();
+            }
+        });
+    });
+}
 
 // 세션 메시지 확인 함수
 function checkSessionMessage() {
@@ -58,6 +71,21 @@ function initBulkActions() {
         if (confirm(`선택한 ${selectedPosts.length}개의 게시글을 삭제하시겠습니까?`)) {
             bulkDeletePosts(selectedPosts);
         }
+    });
+}
+
+// 삭제 폼 확인 모달 초기화
+function initDeleteConfirmForms() {
+    const deleteForms = document.querySelectorAll('.js-delete-confirm-form');
+    if (!deleteForms.length) return;
+
+    deleteForms.forEach((form) => {
+        form.addEventListener('submit', function (event) {
+            const confirmed = confirm('정말 이 게시글을 삭제하시겠습니까?');
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        });
     });
 }
 

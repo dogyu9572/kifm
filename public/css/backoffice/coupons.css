@@ -1,0 +1,23 @@
+/* 쿠폰 관리 */
+.bo-coupon-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.bo-coupon-code-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 520px;
+}
+
+.board-form-control--coupon-code {
+    flex: 1;
+    min-width: 160px;
+    max-width: 280px;
+}
+
+.bo-discount-panel.bo-hidden {
+    display: none !important;
+}

@@ -8,6 +8,18 @@
 	    <ul class="sidebar-menu">
 	        @php
 	            $currentPath = request()->path();
+                $activePathCandidates = [$currentPath];
+
+                // 신청현황은 위원회 목록 하위 동선으로 취급해 사이드바 활성화를 맞춘다.
+                if (\Illuminate\Support\Str::startsWith($currentPath, 'backoffice/community-committee-applicants')) {
+                    $activePathCandidates[] = 'backoffice/community-committees';
+                }
+                if (\Illuminate\Support\Str::startsWith($currentPath, 'backoffice/committee-popups')) {
+                    $activePathCandidates[] = 'backoffice/committee-popups';
+                }
+                if (\Illuminate\Support\Str::startsWith($currentPath, 'backoffice/popups')) {
+                    $activePathCandidates[] = 'backoffice/popups';
+                }
 	        @endphp
 	        @foreach($mainMenus as $menu)
 	            @php
@@ -21,7 +33,7 @@
 	                    // URL이 비어있지 않은 경우에만 비교
 	                    if(!empty($menuPath)) {
 	                        // 정확한 경로 매칭만 사용 (하위 경로는 제외)
-	                        $isActive = $currentPath === $menuPath;
+	                        $isActive = in_array($menuPath, $activePathCandidates, true);
 	                    }
 	                }
 	
@@ -32,7 +44,7 @@
 	                        if($child->url && !empty(trim($child->url, '/'))) {
 	                            $childPath = trim($child->url, '/');
 	                            // 정확한 경로 매칭만 사용 (하위 경로는 제외)
-	                            if($currentPath === $childPath) {
+	                            if(in_array($childPath, $activePathCandidates, true)) {
 	                                $hasActiveChild = true;
 	                                break;
 	                            }
@@ -79,7 +91,7 @@
 	                                @if($child->is_active)
 	                                    @php
 	                                        $childPath = trim($child->url, '/');
-	                                        $isChildActive = !empty($childPath) && $currentPath === $childPath;
+	                                        $isChildActive = !empty($childPath) && in_array($childPath, $activePathCandidates, true);
 	                                    @endphp
 	                                    <li class="{{ $isChildActive ? 'active' : '' }}">
 	                                        <a href="{{ is_string($child->url) ? url($child->url) : $child->url }}">

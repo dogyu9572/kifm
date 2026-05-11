@@ -20,7 +20,7 @@ return new class extends Migration
 
             // 그룹별 메뉴 중복 방지
             $table->unique(['group_id', 'menu_id'], 'unique_group_menu_permission');
-            
+
             // 인덱스 추가
             $table->index(['group_id', 'granted']);
             $table->index('menu_id');
@@ -35,4 +35,3 @@ return new class extends Migration
         Schema::dropIfExists('admin_group_menu_permissions');
     }
 };
-

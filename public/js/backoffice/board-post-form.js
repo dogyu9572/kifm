@@ -103,7 +103,8 @@ class FileManager {
         this.filePreview = document.getElementById('filePreview');
         this.fileUpload = this.fileInput?.closest('.board-file-upload');
         this.maxFiles = 5;
-        this.maxFileSize = 10 * 1024 * 1024;
+        const maxFileSizeMb = Number(this.fileInput?.dataset.maxFileSizeMb || 10);
+        this.maxFileSize = maxFileSizeMb * 1024 * 1024;
 
         if (this.fileInput && this.fileUpload) this.init();
     }
@@ -135,6 +136,7 @@ class FileManager {
     }
 
     replaceAllFiles(files) {
+        const maxFileSizeMb = Math.floor(this.maxFileSize / 1024 / 1024);
         if (files.length > this.maxFiles) {
             alert(`최대 ${this.maxFiles}개까지만 선택할 수 있습니다.`);
             this.fileInput.value = '';
@@ -142,7 +144,7 @@ class FileManager {
         }
 
         if (files.some((file) => file.size > this.maxFileSize)) {
-            alert('10MB 이상인 파일이 있습니다. 10MB 이하의 파일만 선택해주세요.');
+            alert(`${maxFileSizeMb}MB 이상인 파일이 있습니다. ${maxFileSizeMb}MB 이하의 파일만 선택해주세요.`);
             this.fileInput.value = '';
             return;
         }
@@ -154,13 +156,14 @@ class FileManager {
     }
 
     handleFiles(files) {
+        const maxFileSizeMb = Math.floor(this.maxFileSize / 1024 / 1024);
         if (files.length > this.maxFiles) {
             alert(`최대 ${this.maxFiles}개까지만 선택할 수 있습니다.`);
             return;
         }
 
         if (files.some((file) => file.size > this.maxFileSize)) {
-            alert('10MB 이상인 파일이 있습니다. 10MB 이하의 파일만 선택해주세요.');
+            alert(`${maxFileSizeMb}MB 이상인 파일이 있습니다. ${maxFileSizeMb}MB 이하의 파일만 선택해주세요.`);
             return;
         }
 
@@ -243,6 +246,20 @@ function initBoardPostFormPage() {
 
     document.querySelectorAll('form').forEach((form) => {
         form.addEventListener('submit', () => syncEditorContent(form));
+    });
+
+    document.addEventListener('click', (event) => {
+        const removeExistingFileButton = event.target.closest('.board-attachment-remove[data-existing-file-index]');
+        if (!removeExistingFileButton || !window.fileManager) {
+            return;
+        }
+
+        const fileIndex = Number(removeExistingFileButton.dataset.existingFileIndex);
+        if (Number.isNaN(fileIndex)) {
+            return;
+        }
+
+        window.fileManager.removeExistingFile(fileIndex);
     });
 }
 

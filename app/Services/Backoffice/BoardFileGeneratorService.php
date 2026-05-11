@@ -3,11 +3,10 @@
 namespace App\Services\Backoffice;
 
 use App\Models\Board;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class BoardFileGeneratorService
 {
@@ -30,8 +29,9 @@ class BoardFileGeneratorService
         } catch (\Exception $e) {
             Log::error('게시판 파일 생성 실패', [
                 'board_slug' => $board->slug,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -41,10 +41,10 @@ class BoardFileGeneratorService
      */
     private function createBoardTable(Board $board): void
     {
-        $tableName = 'board_' . $board->slug;
+        $tableName = 'board_'.$board->slug;
 
-        if (!Schema::hasTable($tableName)) {
-            Schema::create($tableName, function (Blueprint $table) use ($board) {
+        if (! Schema::hasTable($tableName)) {
+            Schema::create($tableName, function (Blueprint $table) {
                 // 기본 컬럼들 (모든 게시판 공통)
                 $table->id();
                 $table->unsignedBigInteger('user_id')->nullable();
@@ -58,16 +58,16 @@ class BoardFileGeneratorService
                 $table->json('attachments')->nullable();
                 $table->integer('view_count')->default(0);
                 $table->integer('sort_order')->default(0)->comment('정렬 순서');
-                
+
                 // 커스텀 필드들 (JSON으로 저장)
                 $table->json('custom_fields')->nullable();
-                
+
                 // 갤러리 전용 컬럼 (사용하지 않으면 NULL)
                 $table->string('thumbnail')->nullable(); // 썸네일 이미지 경로
-                
+
                 // 게시물 노출 여부
                 $table->boolean('is_active')->default(true)->comment('게시물 노출 여부');
-                
+
                 $table->timestamps();
                 $table->softDeletes();
 
@@ -86,23 +86,31 @@ class BoardFileGeneratorService
      */
     private function createBoardViews(Board $board): void
     {
-        // 스킨 ID에 따라 소스 경로 결정
-        $skinSlug = $this->getSkinSlug($board->skin_id);
-        $sourcePath = resource_path("views/backoffice/board-skins/{$skinSlug}");
+        // 실제 스킨 디렉토리 기준으로 소스 경로 결정
+        $skinDirectory = $this->resolveSkinDirectory($board);
+        $sourcePath = resource_path("views/backoffice/board-skins/{$skinDirectory}");
         $targetPath = resource_path("views/backoffice/board-posts/{$board->slug}");
-        
+
         // 디버깅 로그
         Log::info('게시판 뷰 생성 시작', [
             'board_id' => $board->id,
             'board_slug' => $board->slug,
             'skin_id' => $board->skin_id,
-            'skin_slug' => $skinSlug,
+            'skin_directory' => $skinDirectory,
             'source_path' => $sourcePath,
-            'target_path' => $targetPath
+            'target_path' => $targetPath,
         ]);
-        
-        if (!File::exists($targetPath)) {
-            File::makeDirectory($targetPath, 0755, true);
+
+        if (! File::isDirectory($sourcePath)) {
+            throw new \RuntimeException("스킨 디렉토리를 찾을 수 없습니다: {$sourcePath}");
+        }
+
+        if (! File::exists($targetPath) && ! File::makeDirectory($targetPath, 0755, true)) {
+            throw new \RuntimeException("게시판 뷰 디렉토리 생성에 실패했습니다: {$targetPath}");
+        }
+
+        if (! is_writable($targetPath)) {
+            throw new \RuntimeException("게시판 뷰 디렉토리에 쓰기 권한이 없습니다: {$targetPath}");
         }
 
         // 선택된 스킨의 모든 파일을 복사
@@ -110,17 +118,20 @@ class BoardFileGeneratorService
     }
 
     /**
-     * 스킨 ID에 따른 스킨 슬러그를 반환합니다.
+     * 게시판에 연결된 스킨 디렉토리를 반환합니다.
      */
-    private function getSkinSlug(int $skinId): string
+    private function resolveSkinDirectory(Board $board): string
     {
-        $skinMap = [
-            1 => 'default',   // 기본 스킨
-            2 => 'gallery',   // 갤러리 스킨
-            // 추가 스킨들...
-        ];
-        
-        return $skinMap[$skinId] ?? 'default';
+        if (! $board->relationLoaded('skin')) {
+            $board->load('skin');
+        }
+
+        $skinDirectory = $board->skin?->directory;
+        if (empty($skinDirectory)) {
+            throw new \RuntimeException("게시판에 연결된 스킨 정보를 찾을 수 없습니다. board_id={$board->id}");
+        }
+
+        return $skinDirectory;
     }
 
     /**
@@ -128,17 +139,23 @@ class BoardFileGeneratorService
      */
     private function copySkinFiles(string $sourcePath, string $targetPath, Board $board): void
     {
-        $files = File::glob($sourcePath . '/*.blade.php');
-        
+        $files = File::glob($sourcePath.'/*.blade.php');
+        if (empty($files)) {
+            throw new \RuntimeException("복사할 스킨 템플릿 파일이 없습니다: {$sourcePath}");
+        }
+
         foreach ($files as $file) {
             $filename = basename($file);
             $content = File::get($file);
-            
+
             // 변수 치환
             $content = $this->replaceBoardVariables($content, $board);
-            
+
             // 새 위치에 저장
-            File::put($targetPath . '/' . $filename, $content);
+            $result = File::put($targetPath.'/'.$filename, $content);
+            if ($result === false) {
+                throw new \RuntimeException("스킨 파일 저장에 실패했습니다: {$targetPath}/{$filename}");
+            }
         }
     }
 
@@ -153,7 +170,7 @@ class BoardFileGeneratorService
             '{{ $board->name ?? \'게시판\' }}' => $board->name,
             '{{ $board->slug ?? \'notice\' }}' => $board->slug,
         ];
-        
+
         return str_replace(array_keys($replacements), array_values($replacements), $content);
     }
 
@@ -176,8 +193,9 @@ class BoardFileGeneratorService
         } catch (\Exception $e) {
             Log::error('게시판 리소스 삭제 실패', [
                 'board_slug' => $board->slug,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -188,7 +206,7 @@ class BoardFileGeneratorService
     private function deleteBoardViews(Board $board): void
     {
         $viewPath = resource_path("views/backoffice/board-posts/{$board->slug}");
-        
+
         if (File::exists($viewPath)) {
             File::deleteDirectory($viewPath);
             Log::info('게시판 뷰 파일 삭제 완료', ['path' => $viewPath]);
@@ -200,7 +218,7 @@ class BoardFileGeneratorService
      */
     private function deleteBoardTable(Board $board): void
     {
-        $tableName = 'board_' . $board->slug;
+        $tableName = 'board_'.$board->slug;
 
         if (Schema::hasTable($tableName)) {
             Schema::dropIfExists($tableName);
@@ -215,7 +233,7 @@ class BoardFileGeneratorService
     {
         $migrationPath = database_path('migrations');
         $pattern = "*_create_board_{$board->slug}_table.php";
-        $migrationFiles = File::glob($migrationPath . '/' . $pattern);
+        $migrationFiles = File::glob($migrationPath.'/'.$pattern);
 
         foreach ($migrationFiles as $file) {
             File::delete($file);
@@ -231,7 +249,7 @@ class BoardFileGeneratorService
         $migrationPath = database_path('migrations');
         $timestamp = now()->format('Y_m_d_His');
         $fileName = "{$timestamp}_create_board_{$board->slug}_table.php";
-        $filePath = $migrationPath . '/' . $fileName;
+        $filePath = $migrationPath.'/'.$fileName;
 
         $content = $this->getMigrationContent($board);
         File::put($filePath, $content);

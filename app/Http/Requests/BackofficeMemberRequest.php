@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BackofficeMemberRequest extends FormRequest
 {
@@ -18,18 +19,47 @@ class BackofficeMemberRequest extends FormRequest
         $memberId = $member instanceof User ? $member->id : $member;
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
 
+        $committeeCodes = array_keys(config('member_committees', []));
+
+        $optionalWhenUpdate = $isUpdate ? 'sometimes|' : '';
+
         $rules = [
-            'name' => 'required|string|max:8',
-            'phone_number' => 'required|string|unique:users,phone_number' . ($isUpdate ? ',' . $memberId : ''),
+            'name' => 'required|string|max:20',
+            'name_en' => 'nullable|string|max:100',
+            'phone_number' => array_filter([
+                'nullable',
+                'string',
+                $memberId ? Rule::unique('users', 'phone_number')->ignore($memberId) : Rule::unique('users', 'phone_number'),
+            ]),
             'email' => 'nullable|email|unique:users,email' . ($isUpdate ? ',' . $memberId : ''),
             'birth_date' => 'nullable|string|regex:/^\d{8}$/',
-            'school_name' => 'required|string',
-            'is_school_representative' => 'boolean',
-            'email_marketing_consent' => 'boolean',
-            'kakao_marketing_consent' => 'boolean',
-            'address_postcode' => 'nullable|string',
-            'address_base' => 'nullable|string',
-            'address_detail' => 'nullable|string',
+            'school_name' => 'nullable|string|max:255',
+            'is_school_representative' => array_filter(explode('|', $optionalWhenUpdate . 'boolean')),
+            'email_marketing_consent' => array_filter(explode('|', $optionalWhenUpdate . 'boolean')),
+            'kakao_marketing_consent' => array_filter(explode('|', $optionalWhenUpdate . 'boolean')),
+            'address_postcode' => array_filter(explode('|', $optionalWhenUpdate . 'nullable|string')),
+            'address_base' => array_filter(explode('|', $optionalWhenUpdate . 'nullable|string')),
+            'address_detail' => array_filter(explode('|', $optionalWhenUpdate . 'nullable|string')),
+            'member_level' => ['required', Rule::in(['pending', 'associate', 'regular', 'lifetime', 'senior'])],
+            'job_type' => ['required', Rule::in(['specialist', 'resident', 'public_doctor', 'military_doctor', 'nurse', 'other'])],
+            'license_number' => 'nullable|string|max:80',
+            'specialist_number' => 'nullable|string|max:80',
+            'specialty' => 'nullable|string|max:120',
+            'medical_department' => 'nullable|string|max:100',
+            'workplace_name' => 'nullable|string|max:200',
+            'workplace_phone' => 'nullable|string|max:40',
+            'workplace_zipcode' => 'nullable|string|max:20',
+            'workplace_address' => 'nullable|string',
+            'workplace_address_detail' => 'nullable|string',
+            'graduate_year' => 'nullable|integer|min:1950|max:2100',
+            'membership_fee_basis_at' => array_filter(explode('|', $optionalWhenUpdate . 'nullable|date')),
+            'annual_fee_status' => array_merge(
+                array_filter(explode('|', $optionalWhenUpdate . 'nullable')),
+                [Rule::in(['none', 'paid', 'unpaid'])]
+            ),
+            'certified_instructor' => array_filter(explode('|', $optionalWhenUpdate . 'boolean')),
+            'committee_codes' => 'nullable|array',
+            'committee_codes.*' => ['string', Rule::in($committeeCodes)],
         ];
 
         if ($isUpdate) {
@@ -38,30 +68,43 @@ class BackofficeMemberRequest extends FormRequest
         } else {
             $rules['join_type'] = 'required|in:email,kakao,naver';
             $rules['login_id'] = 'required|string|unique:users,login_id';
-
-            if ($this->input('join_type') === 'email') {
-                $rules['password'] = 'required|string|min:8|max:10|confirmed';
-                $rules['password_confirmation'] = 'required|string|same:password';
-            } else {
-                $rules['password'] = 'nullable|string|min:8|max:10|confirmed';
-                $rules['password_confirmation'] = 'nullable|string|same:password';
-            }
+            $rules['password'] = 'required|string|min:8|max:10|confirmed';
+            $rules['password_confirmation'] = 'required|string|same:password';
         }
 
         return $rules;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (! $this->has('committee_codes')) {
+            $this->merge(['committee_codes' => []]);
+        }
+
+        if (! $this->isMethod('PUT') && ! $this->isMethod('PATCH')) {
+            if (! $this->filled('join_type')) {
+                $this->merge(['join_type' => 'email']);
+            }
+            $this->merge([
+                'certified_instructor' => $this->boolean('certified_instructor'),
+                'is_school_representative' => $this->boolean('is_school_representative'),
+                'email_marketing_consent' => $this->boolean('email_marketing_consent'),
+                'kakao_marketing_consent' => $this->boolean('kakao_marketing_consent'),
+            ]);
+        }
+    }
+
     public function messages(): array
     {
         return [
+            'member_level.required' => '회원 등급을 선택해주세요.',
+            'job_type.required' => '구분을 선택해주세요.',
             'name.required' => '이름은 필수 입력 항목입니다.',
-            'name.max' => '이름은 최대 8자까지 입력 가능합니다.',
-            'phone_number.required' => '휴대폰번호는 필수 입력 항목입니다.',
+            'name.max' => '이름은 최대 20자까지 입력 가능합니다.',
             'phone_number.unique' => '이미 사용 중인 휴대폰번호입니다.',
             'email.email' => '올바른 이메일 형식이 아닙니다.',
             'email.unique' => '이미 사용 중인 이메일입니다.',
             'birth_date.regex' => '생년월일은 8자리 숫자(YYYYMMDD) 형식으로 입력해주세요.',
-            'school_name.required' => '학교명은 필수 입력 항목입니다.',
             'join_type.required' => '가입 구분은 필수 선택 항목입니다.',
             'join_type.in' => '가입 구분은 이메일, 카카오, 네이버 중 하나를 선택해야 합니다.',
             'login_id.required' => '아이디는 필수 입력 항목입니다.',
@@ -79,7 +122,7 @@ class BackofficeMemberRequest extends FormRequest
         $validator->after(function ($validator) {
             $isRep = $this->boolean('is_school_representative');
             $schoolName = trim((string) $this->input('school_name', ''));
-            if (!$isRep || $schoolName === '') {
+            if (! $isRep || $schoolName === '') {
                 return;
             }
 

@@ -1,6 +1,6 @@
 @extends('backoffice.layouts.app')
 
-@section('title', '팝업 추가')
+@section('title', $pageTitle ?? '팝업 추가')
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/backoffice/popups.css') }}">
@@ -9,14 +9,14 @@
 @section('content')
     <div class="board-container">
         <div class="board-header">      
-            <a href="{{ route('backoffice.popups.index') }}" class="btn btn-secondary btn-sm">
+            <a href="{{ $routes['index'] }}" class="btn btn-secondary btn-sm">
                 <i class="fas fa-arrow-left"></i> <span class="btn-text">목록으로</span>
             </a>
         </div>
 
         <div class="board-card">
             <div class="board-card-body">
-                <form action="{{ route('backoffice.popups.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ $routes['store'] }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     
                     <div class="board-form-row">
@@ -31,6 +31,43 @@
                             </div>
                         </div>
                     </div>
+
+                    @if(($menuScope ?? \App\Models\Popup::MENU_SCOPE_SITE) === \App\Models\Popup::MENU_SCOPE_COMMITTEE)
+                    <div class="board-form-row">
+                        <div class="board-form-col board-form-col-6">
+                            <div class="board-form-group">
+                                <label for="community_committee_id" class="board-form-label">위원회 <span class="text-danger">*</span></label>
+                                <select class="board-form-control @error('community_committee_id') is-invalid @enderror" id="community_committee_id" name="community_committee_id" required>
+                                    <option value="">위원회를 선택하세요</option>
+                                    @foreach($committeeOptions as $committee)
+                                        <option value="{{ $committee->id }}" @selected(old('community_committee_id') == $committee->id)>
+                                            {{ $committee->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('community_committee_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="board-form-col board-form-col-6">
+                            <div class="board-form-group">
+                                <label for="target_board_slug" class="board-form-label">게시판 <span class="text-danger">*</span></label>
+                                <select class="board-form-control @error('target_board_slug') is-invalid @enderror" id="target_board_slug" name="target_board_slug" required>
+                                    <option value="">게시판을 선택하세요</option>
+                                    @foreach($committeeTargetBoards as $slug => $label)
+                                        <option value="{{ $slug }}" @selected(old('target_board_slug') === $slug)>
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('target_board_slug')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="board-form-row">
                         <div class="board-form-col board-form-col-12">
@@ -276,7 +313,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> 저장
                         </button>
-                        <a href="{{ route('backoffice.popups.index') }}" class="btn btn-secondary">
+                        <a href="{{ $routes['index'] }}" class="btn btn-secondary">
                             <i class="fas fa-times"></i> 취소
                         </a>
                     </div>

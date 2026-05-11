@@ -4,6 +4,7 @@
 
 @section('styles')
 <link rel="stylesheet" href="{{ asset('css/backoffice/backoffice-crud.css') }}">
+<link rel="stylesheet" href="{{ asset('css/backoffice/members-list.css') }}">
 @endsection
 
 @section('scripts')
@@ -14,8 +15,8 @@
 
 @section('content')
 @if ($errors->any())
-    <div class="alert alert-danger board-hidden-alert">
-        <ul>
+    <div class="board-alert board-alert-danger">
+        <ul class="mb-0">
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach
@@ -32,16 +33,19 @@
 
     <div class="board-card">
         <div class="board-card-body">
-            <form action="{{ route('backoffice.members.store') }}" method="POST" id="memberForm">
+            <form action="{{ route('backoffice.members.store') }}" method="POST" id="memberForm" class="bo-member-form">
                 @csrf
-                @include('backoffice.members._form', ['mode' => 'create'])
-                <div class="board-form-actions">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> 저장
-                    </button>
-                    <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
-                </div>
+                @include('backoffice.members._form')
             </form>
+
+            @include('backoffice.members._history_placeholders')
+
+            <div class="board-form-actions board-form-actions--member-footer">
+                <button type="submit" class="btn btn-primary" form="memberForm">
+                    <i class="fas fa-save"></i> 저장
+                </button>
+                <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
+            </div>
         </div>
     </div>
 </div>

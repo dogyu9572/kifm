@@ -1,0 +1,8 @@
+# 프로젝트 .cursor: rules·skills만 Git에 포함, 나머지는 로컬/IDE 전용
+projects/
+plans/
+skills-cursor/
+plugins/
+subagents/
+commands/
+ide_state.json

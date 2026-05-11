@@ -16,25 +16,57 @@ class MemberController extends Controller
 
     public function index(Request $request)
     {
+        $grades = $request->get('grades', []);
+        if (! is_array($grades)) {
+            $grades = [];
+        }
+
         $filters = [
             'join_type' => $request->get('join_type', '전체'),
             'join_date_start' => $request->get('join_date_start'),
             'join_date_end' => $request->get('join_date_end'),
+            'date_start' => $request->filled('date_start') ? $request->get('date_start') : $request->get('join_date_start'),
+            'date_end' => $request->filled('date_end') ? $request->get('date_end') : $request->get('join_date_end'),
+            'search_condition' => $request->get('search_condition', 'joinDate'),
             'marketing_consent' => $request->get('marketing_consent', []),
             'search_type' => $request->get('search_type', '전체'),
             'search_term' => $request->get('search_term', ''),
+            'sort_order' => $request->get('sort_order', 'joinDate'),
+            'grades' => $grades,
+            'is_certified' => $request->get('is_certified', 'all'),
+            'inactive_only' => $request->boolean('inactive_only'),
+            'due_mode' => $request->get('due_mode', 'all'),
+            'due_date' => $request->get('due_date'),
+            'annual_fee' => $request->get('annual_fee', 'all'),
+            'executive_status' => $request->get('executive_status', 'all'),
+            'search_field' => $request->get('search_field', ''),
+            'search_keyword' => $request->get('search_keyword', ''),
         ];
 
         $perPage = (int) $request->get('per_page', 20);
         $perPage = in_array($perPage, [20, 50, 100], true) ? $perPage : 20;
         $members = $this->memberService->getMembers($filters, $perPage);
 
-        return view('backoffice.members.index', compact('members', 'filters', 'perPage'));
+        $memberLevelLabels = MemberService::memberLevelLabels();
+        $jobTypeLabels = MemberService::jobTypeLabels();
+        $committeeLabels = config('member_committees', []);
+
+        return view('backoffice.members.index', compact(
+            'members',
+            'filters',
+            'perPage',
+            'memberLevelLabels',
+            'jobTypeLabels',
+            'committeeLabels'
+        ));
     }
 
     public function create()
     {
-        return view('backoffice.members.create');
+        return view('backoffice.members.create', $this->memberFormViewData(
+            new User(),
+            false
+        ));
     }
 
     public function store(BackofficeMemberRequest $request)
@@ -53,7 +85,44 @@ class MemberController extends Controller
     public function edit(User $user)
     {
         $member = $this->memberService->getMember($user->id);
-        return view('backoffice.members.edit', compact('member'));
+
+        return view('backoffice.members.edit', $this->memberFormViewData(
+            $member,
+            true
+        ));
+    }
+
+    /**
+     * 회원 등록/수정 폼에 필요한 뷰 데이터(프로토타입 정합 폼용)
+     *
+     * @return array<string, mixed>
+     */
+    private function memberFormViewData(User $member, bool $isEdit): array
+    {
+        $committeeFromMember = $member->committee_codes ?? [];
+        if (! is_array($committeeFromMember)) {
+            $committeeFromMember = [];
+        }
+        $selectedCommitteeCodes = old('committee_codes', $committeeFromMember);
+        if (! is_array($selectedCommitteeCodes)) {
+            $selectedCommitteeCodes = [];
+        }
+        $selectedCommitteeCodes = array_values(array_filter($selectedCommitteeCodes, static function ($code) {
+            return is_string($code) && $code !== '';
+        }));
+
+        $medicalDepartmentValue = (string) old('medical_department', $member->medical_department ?? '');
+
+        return [
+            'member' => $member,
+            'isEdit' => $isEdit,
+            'committeeLabels' => config('member_committees', []),
+            'memberLevelLabels' => MemberService::memberLevelLabels(),
+            'jobTypeLabels' => MemberService::jobTypeLabels(),
+            'medicalDepartmentOptions' => config('medical_departments', []),
+            'medicalDepartmentValue' => $medicalDepartmentValue,
+            'selectedCommitteeCodes' => $selectedCommitteeCodes,
+        ];
     }
 
     public function update(BackofficeMemberRequest $request, User $user)
@@ -146,13 +215,31 @@ class MemberController extends Controller
 
     public function export(Request $request)
     {
+        $grades = $request->get('grades', []);
+        if (! is_array($grades)) {
+            $grades = [];
+        }
+
         $filters = [
             'join_type' => $request->get('join_type', '전체'),
             'join_date_start' => $request->get('join_date_start'),
             'join_date_end' => $request->get('join_date_end'),
+            'date_start' => $request->filled('date_start') ? $request->get('date_start') : $request->get('join_date_start'),
+            'date_end' => $request->filled('date_end') ? $request->get('date_end') : $request->get('join_date_end'),
+            'search_condition' => $request->get('search_condition', 'joinDate'),
             'marketing_consent' => $request->get('marketing_consent', []),
             'search_type' => $request->get('search_type', '전체'),
             'search_term' => $request->get('search_term', ''),
+            'sort_order' => $request->get('sort_order', 'joinDate'),
+            'grades' => $grades,
+            'is_certified' => $request->get('is_certified', 'all'),
+            'inactive_only' => $request->boolean('inactive_only'),
+            'due_mode' => $request->get('due_mode', 'all'),
+            'due_date' => $request->get('due_date'),
+            'annual_fee' => $request->get('annual_fee', 'all'),
+            'executive_status' => $request->get('executive_status', 'all'),
+            'search_field' => $request->get('search_field', ''),
+            'search_keyword' => $request->get('search_keyword', ''),
         ];
 
         $members = $this->memberService->exportMembersToCsv($filters);
@@ -163,23 +250,48 @@ class MemberController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ];
 
-        $callback = static function () use ($members) {
+        $levelLabels = MemberService::memberLevelLabels();
+        $jobLabels = MemberService::jobTypeLabels();
+
+        $callback = static function () use ($members, $levelLabels, $jobLabels) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
-            fputcsv($file, ['No', '가입구분', 'ID', '학교명', '이름', '휴대폰번호', '이메일주소', '학교 대표자', '가입일시']);
+            fputcsv($file, [
+                'No',
+                '가입구분',
+                '회원등급',
+                '구분',
+                '인정의',
+                'ID',
+                '이름',
+                '영문명',
+                '학교명',
+                '휴대폰',
+                '이메일',
+                '직장명',
+                '가입일',
+                '최종로그인',
+            ]);
 
             foreach ($members as $index => $member) {
                 $joinTypeLabel = $member->join_type === 'email' ? '이메일' : ($member->join_type === 'kakao' ? '카카오' : '네이버');
+                $level = $member->member_level ? ($levelLabels[$member->member_level] ?? $member->member_level) : '';
+                $job = $member->job_type ? ($jobLabels[$member->job_type] ?? $member->job_type) : '';
                 fputcsv($file, [
                     $index + 1,
                     $joinTypeLabel,
+                    $level,
+                    $job,
+                    $member->certified_instructor ? '인정의' : '-',
                     $member->login_id ?? '',
-                    $member->school_name ?? '',
                     $member->name,
+                    $member->name_en ?? '',
+                    $member->school_name ?? '',
                     $member->phone_number ?? '',
                     $member->email ?? '',
-                    $member->is_school_representative ? 'Y' : 'N',
+                    $member->workplace_name ?? '',
                     optional($member->created_at)->format('Y.m.d H:i'),
+                    optional($member->last_login_at)->format('Y.m.d H:i'),
                 ]);
             }
 

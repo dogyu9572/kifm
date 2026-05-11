@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\BoardTemplate;
 use App\Models\BoardSkin;
+use App\Models\BoardTemplate;
 use App\Models\Category;
+use Illuminate\Database\Seeder;
 
 class BoardTemplateSeeder extends Seeder
 {
@@ -16,9 +16,10 @@ class BoardTemplateSeeder extends Seeder
     {
         // 기본 스킨 가져오기
         $defaultSkin = BoardSkin::first();
-        
-        if (!$defaultSkin) {
+
+        if (! $defaultSkin) {
             $this->command->warn('스킨이 없습니다. 먼저 BoardSkinSeeder를 실행하세요.');
+
             return;
         }
 
@@ -26,6 +27,9 @@ class BoardTemplateSeeder extends Seeder
         $boardCategoryGroup = Category::where('depth', 0)
             ->where('name', '게시판')
             ->first();
+
+        $historyYearOptions = implode(',', range((int) date('Y') + 5, 1950));
+        $historyMonthOptions = implode(',', range(1, 12));
 
         $templates = [
             // 1. 공지사항 템플릿
@@ -139,6 +143,418 @@ class BoardTemplateSeeder extends Seeder
                 'permission_comment' => 'member',
                 'is_active' => true,
             ],
+            // 5. 학술 자료실 템플릿
+            [
+                'name' => '학술 자료실',
+                'description' => '학술 자료실 전용 필터/권한 커스텀 필드가 포함된 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => true, 'required' => true, 'label' => '게시글 분류'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => [
+                    [
+                        'name' => 'member_type',
+                        'type' => 'checkbox',
+                        'label' => '회원설정',
+                        'options' => '준회원,정회원,평생회원,시니어회원',
+                        'required' => false,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                    [
+                        'name' => 'is_executive_public',
+                        'type' => 'radio',
+                        'label' => '임원공개여부',
+                        'options' => 'all,executive',
+                        'required' => true,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                ],
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => true,
+                'category_id' => $boardCategoryGroup?->id,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 6. 일반 자료실 템플릿
+            [
+                'name' => '일반 자료실',
+                'description' => '일반 자료실 전용 필터/권한 커스텀 필드가 포함된 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => true, 'required' => true, 'label' => '게시글 분류'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => [
+                    [
+                        'name' => 'member_type',
+                        'type' => 'checkbox',
+                        'label' => '회원설정',
+                        'options' => '준회원,정회원,평생회원,시니어회원',
+                        'required' => false,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                    [
+                        'name' => 'is_executive_public',
+                        'type' => 'radio',
+                        'label' => '임원공개여부',
+                        'options' => 'all,executive',
+                        'required' => true,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                ],
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => true,
+                'category_id' => $boardCategoryGroup?->id,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 7. 회원 자료실 템플릿
+            [
+                'name' => '회원 자료실',
+                'description' => '회원 전용 자료 유형/회원등급 필터가 포함된 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => [
+                    [
+                        'name' => 'archive_type',
+                        'type' => 'radio',
+                        'label' => '자료 유형',
+                        'options' => 'ebook,video,paper,guide',
+                        'required' => true,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                    [
+                        'name' => 'member_grade',
+                        'type' => 'radio',
+                        'label' => '회원 설정',
+                        'options' => 'all,associate,regular,lifetime',
+                        'required' => true,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                ],
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 8. 학회 공지 템플릿
+            [
+                'name' => '학회 공지',
+                'description' => '커뮤니티 학회 공지 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 9. 기타 공지 템플릿
+            [
+                'name' => '기타 공지',
+                'description' => '커뮤니티 기타 공지 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 10. 학회 앨범 템플릿
+            [
+                'name' => '학회 앨범',
+                'description' => '커뮤니티 학회 앨범 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => true, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => false,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 11. Q&A 템플릿
+            [
+                'name' => 'Q&A',
+                'description' => '문의사항 Q&A 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 12. 회칙 관리 템플릿
+            [
+                'name' => '회칙 관리',
+                'description' => '홈페이지 회칙 단일페이지 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '타이틀'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '회칙 내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => false, 'required' => false, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => false, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => false, 'required' => false, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => false, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => false,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 1,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 13. 개인정보처리방침 템플릿
+            [
+                'name' => '개인정보처리방침',
+                'description' => '홈페이지 개인정보처리방침 단일페이지 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '타이틀'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '개인정보처리방침'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => false, 'required' => false, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => false, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => false, 'required' => false, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => false, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => false,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 1,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 14. 이용약관 템플릿
+            [
+                'name' => '이용약관',
+                'description' => '홈페이지 이용약관 단일페이지 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '타이틀'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '이용약관'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => false, 'required' => false, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => false, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => false, 'required' => false, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => false, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => false,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 1,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 15. 학회 연혁 템플릿
+            [
+                'name' => '학회 연혁',
+                'description' => '연도/월/순서/사용여부 기반 학회 연혁 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'content' => ['enabled' => true, 'required' => false, 'label' => '상세 내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => false, 'required' => false, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => false, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '사용여부'],
+                    'created_at' => ['enabled' => false, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => [
+                    [
+                        'name' => 'history_year',
+                        'type' => 'select',
+                        'label' => '연도',
+                        'options' => $historyYearOptions,
+                        'required' => true,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                    [
+                        'name' => 'history_month',
+                        'type' => 'select',
+                        'label' => '월',
+                        'options' => $historyMonthOptions,
+                        'required' => true,
+                        'max_length' => null,
+                        'placeholder' => null,
+                    ],
+                ],
+                'enable_notice' => false,
+                'enable_sorting' => true,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
+            // 16. 위원회 공지 템플릿 (위원회 선택 옵션은 Board::getCategoryOptions → community_committees)
+            [
+                'name' => '위원회 공지',
+                'description' => '커뮤니티 위원회별 공지 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => true, 'required' => true, 'label' => '위원회'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => true,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($templates as $template) {
@@ -148,6 +564,8 @@ class BoardTemplateSeeder extends Seeder
             );
         }
 
-        $this->command->info('✓ 기본 템플릿 4종이 생성되었습니다.');
+        BoardTemplate::where('name', '연간 일정 관리')->delete();
+
+        $this->command->info('✓ 기본 템플릿 16종이 생성되었습니다.');
     }
 }

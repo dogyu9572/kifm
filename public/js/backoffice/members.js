@@ -5,24 +5,79 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const $ = jQuery;
 
-    function isEditPage() {
-        const action = $('#memberForm').attr('action') || '';
-        return action.includes('/members/') && !action.endsWith('/members');
-    }
-
-    if (!isEditPage()) {
-        $(document).on('change', 'input[name="join_type"]', function () {
-            const joinType = $(this).val();
-            if (joinType === 'email') {
-                $('#passwordGroup, #passwordConfirmationGroup').show();
-                $('#password, #password_confirmation').prop('required', true);
-            } else {
-                $('#passwordGroup, #passwordConfirmationGroup').hide();
-                $('#password, #password_confirmation').prop('required', false).val('');
+    document.querySelectorAll('.bo-member-delete-form').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const msg = form.getAttribute('data-confirm') || '삭제하시겠습니까?';
+            if (!window.confirm(msg)) {
+                event.preventDefault();
             }
         });
-        $('input[name="join_type"]:checked').trigger('change');
+    });
+
+    const perPageSelect = document.getElementById('perPageSelect');
+    if (perPageSelect) {
+        perPageSelect.addEventListener('change', function () {
+            if (this.form) {
+                this.form.submit();
+            }
+        });
     }
+
+    function toYmd(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + day;
+    }
+
+    document.querySelectorAll('.bo-date-preset').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const preset = this.getAttribute('data-preset');
+            const start = document.getElementById('date_start');
+            const end = document.getElementById('date_end');
+            if (!start || !end) {
+                return;
+            }
+            const today = new Date();
+            if (preset === 'all') {
+                start.value = '';
+                end.value = '';
+                return;
+            }
+            if (preset === 'today') {
+                const v = toYmd(today);
+                start.value = v;
+                end.value = v;
+                return;
+            }
+            if (preset === 'yesterday') {
+                const d = new Date(today);
+                d.setDate(d.getDate() - 1);
+                const v = toYmd(d);
+                start.value = v;
+                end.value = v;
+                return;
+            }
+            if (preset === 'week') {
+                const d = new Date(today);
+                d.setDate(d.getDate() - 6);
+                start.value = toYmd(d);
+                end.value = toYmd(today);
+                return;
+            }
+            if (preset === 'month') {
+                const d = new Date(today.getFullYear(), today.getMonth(), 1);
+                start.value = toYmd(d);
+                end.value = toYmd(today);
+                return;
+            }
+            if (preset === 'year') {
+                const d = new Date(today.getFullYear(), 0, 1);
+                start.value = toYmd(d);
+                end.value = toYmd(today);
+            }
+        });
+    });
 
     $(document).on('click', '#btnSearchAddress', function () {
         if (typeof daum === 'undefined') return;
@@ -31,6 +86,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('#address_postcode').val(data.zonecode);
                 $('#address_base').val(data.address);
                 $('#address_detail').focus();
+            },
+        }).open();
+    });
+
+    $(document).on('click', '#btnSearchWorkplaceAddress', function () {
+        if (typeof daum === 'undefined') return;
+        new daum.Postcode({
+            oncomplete: function (data) {
+                $('#workplace_zipcode').val(data.zonecode);
+                $('#workplace_address').val(data.address);
+                $('#workplace_address_detail').focus();
             },
         }).open();
     });

@@ -1,0 +1,498 @@
+/* 회원 목록 필터: 두 번째 레퍼런스 이미지 형태(한 줄 압축형) */
+.bo-member-inline-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.25rem;
+    margin-bottom: 0.65rem;
+}
+
+.bo-member-inline-item {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.bo-member-inline-item--wide {
+    flex: 1 1 540px;
+}
+
+.bo-member-inline-item--break {
+    flex: 1 1 100%;
+}
+
+.bo-member-inline-label {
+    min-width: 78px;
+    color: #222;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.bo-member-inline-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 0.35rem 0.7rem;
+}
+
+.board-radio-group.bo-member-inline-group {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.bo-member-inline-row--due {
+    align-items: center;
+}
+
+.bo-member-inline-group--due {
+    align-items: center;
+}
+
+.bo-member-inline-group--due .board-radio-item {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+}
+
+.bo-member-inline-group--due .board-radio-item label {
+    line-height: 1;
+}
+
+.bo-member-inline-item--certified {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.bo-member-inline-item--certified .bo-member-inline-group {
+    flex-wrap: nowrap;
+}
+
+.bo-member-inline-item--certified .board-radio-item {
+    white-space: nowrap;
+}
+
+.bo-member-inline-item--sort {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    margin-left: 0;
+}
+
+.bo-member-inline-item--sort .bo-member-inline-group {
+    flex-wrap: nowrap;
+}
+
+.bo-member-inline-item--sort .board-radio-item {
+    white-space: nowrap;
+}
+
+.bo-member-inline-item--grade {
+    flex: 0 1 auto;
+}
+
+.bo-member-inline-group .board-radio-item,
+.bo-member-inline-group .checkbox-label {
+    margin-bottom: 0;
+}
+
+.bo-member-inline-group .board-radio-item label,
+.bo-member-inline-group .checkbox-label span {
+    font-size: 12px;
+}
+
+.bo-member-date-input {
+    width: 160px;
+    max-width: 100%;
+    height: 34px;
+}
+
+.bo-member-date-sep {
+    color: #777;
+    font-size: 12px;
+}
+
+.bo-member-search-field {
+    width: 120px;
+    height: 36px;
+}
+
+.bo-member-search-input {
+    min-width: 340px;
+    flex: 1 1 340px;
+    height: 36px;
+}
+
+.bo-member-date-presets .btn,
+.bo-member-submit-buttons .btn {
+    padding: 0.35rem 0.65rem;
+    font-size: 12px;
+}
+
+.bo-member-date-presets,
+.bo-member-submit-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.bo-member-date-presets.filter-buttons,
+.bo-member-submit-buttons.filter-buttons {
+    align-items: center !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.board-filter .bo-member-inline-row .filter-buttons .btn {
+    margin-top: 0 !important;
+}
+
+.bo-member-submit-buttons {
+    align-self: center;
+    margin-left: 0;
+}
+
+.bo-member-submit-buttons .btn {
+    height: 34px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bo-member-inline-row--search {
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.bo-member-inline-row--search .bo-member-inline-item:first-child {
+    flex: 0 1 auto;
+    min-width: auto;
+}
+
+.bo-member-inline-row--search .bo-member-inline-item:last-child {
+    flex: 0 0 auto;
+}
+
+.bo-member-inline-row--search .bo-member-inline-group {
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+.bo-member-submit-buttons {
+    margin-left: auto;
+}
+
+.bo-member-exec-note {
+    margin: 0;
+    color: #666;
+    font-size: 12px;
+}
+
+/* 임원/인정의 검색 줄 크기 보정(탈퇴회원 화면과 유사 밀도) */
+.bo-member-search-row .bo-member-search-keyword {
+    flex: 1 1 320px;
+    min-width: 320px;
+}
+
+.bo-member-search-row .filter-buttons .btn {
+    height: 34px;
+    padding: 0.35rem 0.65rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 임원관리 필터 간격 보정 */
+.bo-exec-filter .bo-exec-inline-row {
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-bottom: 10px;
+}
+
+.bo-exec-filter .bo-exec-inline-row .bo-member-inline-label {
+    min-width: 96px;
+}
+
+.bo-exec-filter .bo-exec-inline-row .bo-member-inline-group {
+    flex: 1;
+    align-items: center;
+}
+
+.bo-exec-filter .bo-exec-inline-row .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+}
+
+.bo-exec-filter .bo-exec-search-row .bo-exec-search-input {
+    flex: 1 1 280px;
+    min-width: 280px;
+    height: 41px;
+}
+
+.bo-exec-filter .bo-exec-search-row .filter-select,
+.bo-exec-filter .bo-exec-search-row .filter-buttons .btn {
+    height: 41px;
+}
+
+/* 임원관리 필터 타이포 통일 */
+.bo-exec-filter .bo-member-inline-label,
+.bo-exec-filter .filter-label {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.bo-exec-filter .checkbox-label span,
+.bo-exec-filter .board-radio-item label,
+.bo-exec-filter .filter-select,
+.bo-exec-filter .filter-input,
+.bo-exec-filter .btn {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* 인정의관리 필터 타이포/컨트롤 통일 */
+.bo-certified-filter .filter-label {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.bo-certified-filter .checkbox-label span,
+.bo-certified-filter .board-radio-item label,
+.bo-certified-filter .filter-select,
+.bo-certified-filter .filter-input,
+.bo-certified-filter .btn {
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.bo-certified-filter .filter-select,
+.bo-certified-filter .filter-input,
+.bo-certified-filter .filter-buttons .btn {
+    height: 34px;
+}
+
+.bo-certified-filter .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.75rem;
+}
+
+.bo-certified-filter .bo-certified-inline-options {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.bo-certified-filter .bo-certified-inline-options .checkbox-label {
+    white-space: nowrap;
+}
+
+.bo-certified-filter .bo-certified-inline-row {
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-bottom: 10px;
+}
+
+.bo-certified-filter .bo-certified-inline-row .bo-member-inline-label {
+    min-width: 96px;
+}
+
+.bo-certified-filter .bo-certified-date-range {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bo-certified-filter .bo-certified-search-row .bo-certified-search-input {
+    flex: 1 1 280px;
+    min-width: 280px;
+    height: 41px;
+}
+
+.bo-certified-filter .bo-certified-search-row .filter-select,
+.bo-certified-filter .bo-certified-search-row .filter-buttons .btn {
+    height: 41px;
+}
+
+@media (max-width: 1200px) {
+    .bo-member-inline-label {
+        min-width: 68px;
+    }
+
+    .bo-member-search-input {
+        min-width: 220px;
+    }
+}
+
+/* 회원 등록/수정: 프로토타입 정합(섹션·2열·안내) */
+.board-card-body > .bo-form-section + .bo-form-section {
+    margin-top: 1.5rem;
+}
+
+.bo-form-row--stacked {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.bo-form-row--stacked .bo-form-label {
+    width: 100%;
+    min-width: 0;
+    padding-bottom: 4px;
+}
+
+.bo-form-row--stacked .bo-form-field {
+    width: 100%;
+    max-width: none;
+}
+
+.bo-form-row--stacked .bo-form-field .board-form-control--max-md {
+    max-width: 100%;
+}
+
+.bo-member-dual-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.25rem;
+    width: 100%;
+}
+
+.bo-member-dual-col {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+.bo-member-dual-col--full {
+    flex: 1 1 100%;
+}
+
+/* 회원 등록/수정(#memberForm): 행 밑줄 없음 · 공용 CRUD 밑줄·400px 제한 해제 · 입력 전폭 */
+form#memberForm.bo-member-form .bo-form-section .bo-form-list > .bo-form-row,
+form#memberForm.bo-member-form .bo-form-section .bo-member-dual-col .bo-form-row {
+    border-bottom: none;
+    padding: 0.4rem 0 0.7rem;
+}
+
+form#memberForm.bo-member-form .bo-form-section .bo-form-list > .bo-form-row:last-child,
+form#memberForm.bo-member-form .bo-form-section .bo-member-dual-col .bo-form-row:last-child {
+    border-bottom: none;
+}
+
+form#memberForm.bo-member-form .bo-form-section .bo-form-list > .bo-member-dual-row {
+    padding: 0.25rem 0 0.5rem;
+    border: none;
+}
+
+form#memberForm.bo-member-form .bo-form-section .bo-form-list {
+    padding-top: 0.15rem;
+}
+
+form#memberForm.bo-member-form .bo-section-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+form#memberForm.bo-member-form .bo-form-section + .bo-form-section .bo-section-title {
+    margin-top: 0.35rem;
+}
+
+form#memberForm.bo-member-form .bo-form-label {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+    color: #495057;
+}
+
+form#memberForm.bo-member-form .bo-form-field .board-form-control,
+form#memberForm.bo-member-form .bo-form-field select.board-form-control {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+}
+
+form#memberForm.bo-member-form .bo-form-field .input-with-button {
+    width: 100%;
+    max-width: none;
+}
+
+form#memberForm.bo-member-form .bo-form-field .input-with-button .board-form-control {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    width: auto;
+}
+
+form#memberForm.bo-member-form .bo-school-direct {
+    max-width: none;
+    width: 100%;
+}
+
+form#memberForm.bo-member-form .board-form-control--max-xs,
+form#memberForm.bo-member-form .board-form-control--max-md {
+    max-width: 100%;
+}
+
+form#memberForm.bo-member-form .bo-readonly-box {
+    display: block;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+}
+
+.bo-member-level-help {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: #495057;
+    background: #f4f6f8;
+    border-radius: 6px;
+}
+
+.bo-member-level-help strong {
+    color: #212529;
+}
+
+.bo-member-level-help-accent {
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.bo-form-label-note {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 6px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #495057;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.bo-form-label-sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #6c757d;
+}
+
+.bo-member-committee-group {
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+}
+
+/* 회원 등록/수정: 이력 블록 아래 저장·취소 */
+.board-card-body > .board-form-actions--member-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+}

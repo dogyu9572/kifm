@@ -5,10 +5,9 @@ namespace App\Services\Backoffice;
 use App\Models\Board;
 use App\Models\BoardSkin;
 use App\Models\BoardTemplate;
-use App\Services\Backoffice\BoardFileGeneratorService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class BoardService
 {
@@ -26,22 +25,22 @@ class BoardService
     public function getBoardsWithFilters(Request $request)
     {
         $query = Board::with('skin');
-        
+
         // 게시판명 검색
         if ($request->filled('name')) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+            $query->where('name', 'like', '%'.$request->name.'%');
         }
-        
+
         // 활성화 상태 필터
         if ($request->filled('is_active')) {
             $query->where('is_active', $request->is_active);
         }
-        
+
         // 스킨 필터
         if ($request->filled('skin_id')) {
             $query->where('skin_id', $request->skin_id);
         }
-        
+
         // 등록일 필터
         if ($request->filled('created_from')) {
             $query->whereDate('created_at', '>=', $request->created_from);
@@ -49,11 +48,11 @@ class BoardService
         if ($request->filled('created_to')) {
             $query->whereDate('created_at', '<=', $request->created_to);
         }
-        
+
         // 목록 개수 설정
         $perPage = $request->get('per_page', 10);
         $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
-        
+
         return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
@@ -70,17 +69,19 @@ class BoardService
      */
     public function createBoard(array $data): Board
     {
+        $isTemplateBased = ! empty($data['template_id']);
+
         // slug가 제공된 경우, 소프트 삭제된 동일 slug가 있는지 확인 후 하드 삭제
-        if (!empty($data['slug'])) {
+        if (! empty($data['slug'])) {
             $deletedBoard = Board::withTrashed()->where('slug', $data['slug'])->whereNotNull('deleted_at')->first();
             if ($deletedBoard) {
                 // 소프트 삭제된 게시판이 있으면 하드 삭제 및 관련 리소스 삭제
-                $fileGeneratorService = new BoardFileGeneratorService();
+                $fileGeneratorService = new BoardFileGeneratorService;
                 $fileGeneratorService->deleteBoardResources($deletedBoard);
                 $deletedBoard->forceDelete();
             }
         }
-        
+
         // slug 자동 생성 (비어있거나 중복일 경우)
         if (empty($data['slug'])) {
             $data['slug'] = $this->generateUniqueSlug($data['name']);
@@ -88,13 +89,19 @@ class BoardService
             $data['slug'] = $this->resolveSlugConflict($data['slug']);
         }
 
+        // 템플릿 기반 생성이면 템플릿 설정을 우선 적용
+        if ($isTemplateBased) {
+            $template = BoardTemplate::findOrFail((int) $data['template_id']);
+            $data = array_merge($data, $this->getTemplateSyncData($template));
+        }
+
         // enable_notice 기본값 설정 (체크되지 않은 경우 false)
-        if (!isset($data['enable_notice'])) {
+        if (! isset($data['enable_notice'])) {
             $data['enable_notice'] = false;
         }
 
         // is_active 기본값 설정 (무조건 저장되도록 보장)
-        if (!isset($data['is_active'])) {
+        if (! isset($data['is_active'])) {
             $data['is_active'] = true;
         } else {
             $data['is_active'] = (bool) $data['is_active'];
@@ -107,34 +114,40 @@ class BoardService
             }
         }
 
-        // 커스텀 필드 설정 처리
-        $customFieldsConfig = null;
-        
-        // 템플릿에서 가져온 custom_fields_config가 있으면 사용
-        if (isset($data['custom_fields_config']) && !empty($data['custom_fields_config'])) {
-            if (is_string($data['custom_fields_config'])) {
-                $customFieldsConfig = json_decode($data['custom_fields_config'], true) ?: null;
-            } else {
-                $customFieldsConfig = $data['custom_fields_config'];
+        if ($isTemplateBased) {
+            // 템플릿 기반 생성은 템플릿 설정값을 그대로 사용
+            if (isset($data['custom_fields_config']) && is_string($data['custom_fields_config'])) {
+                $data['custom_fields_config'] = json_decode($data['custom_fields_config'], true) ?: null;
             }
-        } elseif (isset($data['custom_fields']) && !empty($data['custom_fields'])) {
-            // 문자열로 온 경우 JSON 디코딩
-            if (is_string($data['custom_fields'])) {
-                $data['custom_fields'] = json_decode($data['custom_fields'], true) ?: [];
-            }
-            
-            // 배열이고 비어있지 않은 경우에만 처리
-            if (is_array($data['custom_fields']) && !empty($data['custom_fields'])) {
-                $customFieldsConfig = $this->processCustomFieldsConfig($data['custom_fields']);
-            }
-        }
+        } else {
+            // 커스텀 필드 설정 처리
+            $customFieldsConfig = null;
 
-        // 커스텀 필드 설정을 데이터에 추가 (null이면 빈 설정으로 처리)
-        $data['custom_fields_config'] = $customFieldsConfig;
+            // 템플릿에서 가져온 custom_fields_config가 있으면 사용
+            if (isset($data['custom_fields_config']) && ! empty($data['custom_fields_config'])) {
+                if (is_string($data['custom_fields_config'])) {
+                    $customFieldsConfig = json_decode($data['custom_fields_config'], true) ?: null;
+                } else {
+                    $customFieldsConfig = $data['custom_fields_config'];
+                }
+            } elseif (isset($data['custom_fields']) && ! empty($data['custom_fields'])) {
+                // 문자열로 온 경우 JSON 디코딩
+                if (is_string($data['custom_fields'])) {
+                    $data['custom_fields'] = json_decode($data['custom_fields'], true) ?: [];
+                }
+
+                // 배열이고 비어있지 않은 경우에만 처리
+                if (is_array($data['custom_fields']) && ! empty($data['custom_fields'])) {
+                    $customFieldsConfig = $this->processCustomFieldsConfig($data['custom_fields']);
+                }
+            }
+
+            // 커스텀 필드 설정을 데이터에 추가 (null이면 빈 설정으로 처리)
+            $data['custom_fields_config'] = $customFieldsConfig;
+        }
 
         // 게시판 생성
         $board = Board::create($data);
-
 
         return $board;
     }
@@ -144,12 +157,19 @@ class BoardService
      */
     public function createBoardFromTemplate(int $templateId, array $boardData): Board
     {
-        $template = BoardTemplate::findOrFail($templateId);
-        
-        // 템플릿 설정을 게시판 데이터에 병합
-        $data = array_merge([
-            'skin_id' => $template->skin_id,
+        $boardData['template_id'] = $templateId;
+
+        return $this->createBoard($boardData);
+    }
+
+    /**
+     * 템플릿 설정을 게시판 데이터 구조로 변환합니다.
+     */
+    private function getTemplateSyncData(BoardTemplate $template): array
+    {
+        return [
             'template_id' => $template->id,
+            'skin_id' => $template->skin_id,
             'field_config' => $template->field_config,
             'custom_fields_config' => $template->custom_fields_config,
             'enable_notice' => $template->enable_notice,
@@ -160,9 +180,7 @@ class BoardService
             'permission_read' => $template->permission_read,
             'permission_write' => $template->permission_write,
             'permission_comment' => $template->permission_comment,
-        ], $boardData);
-        
-        return $this->createBoard($data);
+        ];
     }
 
     /**
@@ -171,12 +189,12 @@ class BoardService
     private function processCustomFieldsConfig(array $customFields): array
     {
         $processedFields = [];
-        
+
         foreach ($customFields as $field) {
             if (empty($field['name']) || empty($field['label']) || empty($field['type'])) {
                 continue; // 필수 값이 없으면 건너뛰기
             }
-            
+
             $processedFields[] = [
                 'name' => $field['name'],
                 'label' => $field['label'],
@@ -187,7 +205,7 @@ class BoardService
                 'placeholder' => $field['placeholder'] ?? null,
             ];
         }
-        
+
         return $processedFields;
     }
 
@@ -215,11 +233,11 @@ class BoardService
                 ]);
             }
         }
-        
+
         // 기본 정보만 업데이트 (템플릿에서 가져온 설정은 변경 불가)
         $allowedFields = ['name', 'slug', 'description', 'template_id', 'is_active', 'skin_id', 'field_config', 'custom_fields_config', 'enable_notice', 'enable_sorting', 'enable_category', 'is_single_page', 'list_count', 'permission_read', 'permission_write', 'permission_comment'];
         $updateData = array_intersect_key($data, array_flip($allowedFields));
-        
+
         return $board->update($updateData);
     }
 
@@ -231,19 +249,20 @@ class BoardService
         try {
             // 게시판 삭제
             $result = $board->delete();
-            
+
             if ($result) {
                 // 3. 관련 리소스 삭제 (BoardFileGeneratorService 사용)
-                $fileGeneratorService = new BoardFileGeneratorService();
+                $fileGeneratorService = new BoardFileGeneratorService;
                 $fileGeneratorService->deleteBoardResources($board);
             }
-            
+
             return $result;
         } catch (\Exception $e) {
             Log::error('게시판 삭제 실패', [
                 'board_id' => $board->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return false;
         }
     }
@@ -257,8 +276,8 @@ class BoardService
         $slug = $baseSlug;
         $counter = 1;
 
-        while (!Board::isSlugAvailable($slug)) {
-            $slug = $baseSlug . '-' . $counter;
+        while (! Board::isSlugAvailable($slug)) {
+            $slug = $baseSlug.'-'.$counter;
             $counter++;
         }
 
@@ -277,12 +296,11 @@ class BoardService
         $originalSlug = $slug;
         $counter = 1;
 
-        while (!Board::isSlugAvailable($slug)) {
-            $slug = $originalSlug . '-' . $counter;
+        while (! Board::isSlugAvailable($slug)) {
+            $slug = $originalSlug.'-'.$counter;
             $counter++;
         }
 
         return $slug;
     }
-
 }

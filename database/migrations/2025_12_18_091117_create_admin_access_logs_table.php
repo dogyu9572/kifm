@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('referer', 500)->nullable()->comment('이전 페이지 URL');
             $table->timestamp('accessed_at')->comment('접속 시각');
             $table->timestamps();
-            
+
             // 인덱스
             $table->index('admin_id');
             $table->index('accessed_at');

@@ -3,14 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Popup extends Model
 {
     use SoftDeletes;
 
+    public const MENU_SCOPE_SITE = 'site';
+
+    public const MENU_SCOPE_COMMITTEE = 'committee';
+
+    /** 위원회 팝업에서 선택 가능한 게시판 slug → 라벨 */
+    public const COMMITTEE_TARGET_BOARDS = [
+        'community_committee_notices' => '공지사항',
+        'community_committee_discussions' => '토론장',
+        'community_committee_archive' => '자료실',
+    ];
+
     protected $fillable = [
         'title',
+        'menu_scope',
+        'community_committee_id',
+        'target_board_slug',
         'start_date',
         'end_date',
         'use_period',
@@ -33,6 +48,7 @@ class Popup extends Model
         'is_active' => 'boolean',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'community_committee_id' => 'integer',
     ];
 
     protected $attributes = [
@@ -40,6 +56,16 @@ class Popup extends Model
         'popup_type' => 'image',
         'popup_display_type' => 'normal',
     ];
+
+    public function communityCommittee(): BelongsTo
+    {
+        return $this->belongsTo(CommunityCommittee::class, 'community_committee_id');
+    }
+
+    public function isCommitteeScope(): bool
+    {
+        return $this->menu_scope === self::MENU_SCOPE_COMMITTEE;
+    }
 
     /**
      * 활성화된 팝업만 조회하는 스코프
@@ -71,5 +97,10 @@ class Popup extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order', 'desc')->orderBy('created_at', 'desc');
+    }
+
+    public function scopeForMenuScope($query, string $menuScope)
+    {
+        return $query->where('menu_scope', $menuScope);
     }
 }

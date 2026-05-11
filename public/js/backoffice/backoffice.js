@@ -199,6 +199,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // URL에 따라 해당 메뉴 활성화
     const currentPath = window.location.pathname;
+    const activePathCandidates = [currentPath];
+
+    // 신청현황 페이지는 위원회 목록 메뉴를 활성화 대상으로 본다.
+    if (currentPath.startsWith('/backoffice/community-committee-applicants')) {
+        activePathCandidates.push('/backoffice/community-committees');
+    }
 
     // 2차 메뉴 먼저 확인 (더 구체적인 경로)
     let isSubmenuActive = false;
@@ -209,7 +215,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const linkPath = url.pathname;
 
         // 현재 경로가 링크 경로와 정확히 일치하거나, 링크 경로로 시작하는 경우
-        if (currentPath === linkPath || (linkPath !== '/backoffice' && currentPath.startsWith(linkPath + '/'))) {
+        const isExactMatch = activePathCandidates.includes(linkPath);
+        const isNestedMatch = activePathCandidates.some((path) => linkPath !== '/backoffice' && path.startsWith(linkPath + '/'));
+        if (isExactMatch || isNestedMatch) {
             // 서브메뉴 아이템 활성화
             const menuItem = link.parentElement;
             menuItem.classList.add('active');
@@ -234,7 +242,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const linkPath = url.pathname;
 
             // 현재 경로가 링크 경로와 정확히 일치하거나, 링크 경로로 시작하는 경우
-            if (currentPath === linkPath || (linkPath !== '/backoffice' && currentPath.startsWith(linkPath + '/'))) {
+            const isExactMatch = activePathCandidates.includes(linkPath);
+            const isNestedMatch = activePathCandidates.some((path) => linkPath !== '/backoffice' && path.startsWith(linkPath + '/'));
+            if (isExactMatch || isNestedMatch) {
                 // 메뉴 아이템 활성화
                 link.parentElement.classList.add('active');
             }

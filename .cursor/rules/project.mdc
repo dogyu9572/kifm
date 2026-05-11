@@ -18,6 +18,7 @@ alwaysApply: false
 - `28-collaboration-ambiguity-gate.mdc`
 - `29-subagent-orchestration-policy.mdc`
 - `30-migrations-policy.mdc`
+- `33-backoffice-ui-reference-lock.mdc`
 - `40-dev-environment-ops.mdc`
 
 새 규칙은 중복/충돌 제거를 위해 위 파일에서만 관리합니다.
