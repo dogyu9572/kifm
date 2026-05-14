@@ -77,5 +77,10 @@ class EduCourse extends Model
     {
         return $this->hasMany(EduCourseEnrollment::class, 'edu_course_id');
     }
+
+    public function linkedEvent(): BelongsTo
+    {
+        return $this->belongsTo(AcademicEvent::class, 'linked_event_id');
+    }
 }
 

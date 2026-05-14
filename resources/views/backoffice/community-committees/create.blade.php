@@ -44,6 +44,7 @@
 
 @section('scripts')
     <x-backoffice-ckeditor-assets />
+    <script src="{{ asset('js/backoffice/board-image-file-preview.js') }}"></script>
     <script src="{{ asset('js/backoffice/board-post-form.js') }}"></script>
     <script src="{{ asset('js/backoffice/member-selector-modal.js') }}"></script>
     <script src="{{ asset('js/backoffice/community-committees-form.js') }}"></script>

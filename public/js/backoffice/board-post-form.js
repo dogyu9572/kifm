@@ -5,6 +5,15 @@
 
 window.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
+function escapeHtmlForPreview(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
 function syncEditorContent(form) {
     if (typeof window.syncBackofficeCKEditorFields === 'function') {
         window.syncBackofficeCKEditorFields(form || document);
@@ -16,8 +25,8 @@ class ThumbnailManager {
         this.thumbnailInput = document.getElementById('thumbnail');
         this.thumbnailPreview = document.getElementById('thumbnailPreview');
         this.thumbnailUpload = this.thumbnailInput?.closest('.board-file-upload');
-        this.maxFileSize = 5 * 1024 * 1024;
-        this.allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        this.maxFileSize = Number(this.thumbnailInput?.dataset?.maxFileSizeMb || 5) * 1024 * 1024;
+        this.allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
         if (this.thumbnailInput && this.thumbnailUpload) {
             this.init();
@@ -27,7 +36,11 @@ class ThumbnailManager {
     init() {
         this.thumbnailInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) this.handleThumbnail(file);
+            if (file) {
+                this.handleThumbnail(file);
+            } else {
+                this.removeThumbnail();
+            }
         });
 
         this.thumbnailUpload.addEventListener('dragover', (e) => {
@@ -47,19 +60,28 @@ class ThumbnailManager {
             e.stopPropagation();
             this.thumbnailUpload.classList.remove('board-file-drag-over');
             const file = e.dataTransfer.files[0];
-            if (file) this.handleThumbnail(file);
+            if (file) {
+                this.handleThumbnail(file);
+            }
+        });
+
+        this.thumbnailPreview?.addEventListener('click', (e) => {
+            if (e.target.closest('.js-board-post-thumb-remove')) {
+                this.removeThumbnail();
+            }
         });
     }
 
     handleThumbnail(file) {
         if (!this.allowedTypes.includes(file.type)) {
-            alert('이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF)');
+            alert('이미지 파일만 업로드 가능합니다. (JPG, PNG, GIF, WEBP)');
             this.thumbnailInput.value = '';
             return;
         }
 
         if (file.size > this.maxFileSize) {
-            alert('썸네일 이미지는 5MB 이하만 가능합니다.');
+            const mb = Math.floor(this.maxFileSize / 1024 / 1024);
+            alert(`썸네일 이미지는 ${mb}MB 이하만 가능합니다.`);
             this.thumbnailInput.value = '';
             return;
         }
@@ -71,16 +93,29 @@ class ThumbnailManager {
     }
 
     updateThumbnailPreview(file) {
+        const deleteThumb = document.getElementById('delete_thumbnail');
+        if (deleteThumb) {
+            deleteThumb.checked = true;
+        }
+        const existingRow = document.getElementById('bo-thumbnail-existing-item');
+        if (existingRow) {
+            existingRow.classList.add('bo-hidden');
+        }
+
         const reader = new FileReader();
         reader.onload = (e) => {
+            const url = e.target?.result;
+            if (typeof url !== 'string' || !this.thumbnailPreview) {
+                return;
+            }
             this.thumbnailPreview.innerHTML = `
-                <div class="board-file-item">
-                    <div class="board-file-info">
-                        <img src="${e.target.result}" alt="썸네일 미리보기" style="max-width: 200px; max-height: 200px; object-fit: cover; border-radius: 8px;">
-                        <span class="board-file-name">${file.name}</span>
-                        <span class="board-file-size">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>
+                <div class="board-file-preview-item">
+                    <img src="${url}" alt="" class="board-file-preview-img">
+                    <div class="board-file-preview-info">
+                        <span class="board-file-preview-name">${escapeHtmlForPreview(file.name)}</span>
+                        <span class="board-file-preview-size">${(file.size / 1024 / 1024).toFixed(2)} MB</span>
                     </div>
-                    <button type="button" class="board-file-remove" onclick="thumbnailManager.removeThumbnail()">
+                    <button type="button" class="board-file-preview-remove js-board-post-thumb-remove" aria-label="미리보기 제거">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -90,10 +125,24 @@ class ThumbnailManager {
     }
 
     removeThumbnail() {
-        if (this.thumbnailInput) this.thumbnailInput.value = '';
+        if (this.thumbnailInput) {
+            this.thumbnailInput.value = '';
+        }
         const existingThumbnailInput = document.querySelector('input[name="existing_thumbnail"]');
-        if (existingThumbnailInput) existingThumbnailInput.remove();
-        if (this.thumbnailPreview) this.thumbnailPreview.innerHTML = '';
+        if (existingThumbnailInput) {
+            existingThumbnailInput.remove();
+        }
+        const deleteThumb = document.getElementById('delete_thumbnail');
+        if (deleteThumb) {
+            deleteThumb.checked = false;
+        }
+        const existingRow = document.getElementById('bo-thumbnail-existing-item');
+        if (existingRow) {
+            existingRow.classList.remove('bo-hidden');
+        }
+        if (this.thumbnailPreview) {
+            this.thumbnailPreview.innerHTML = '';
+        }
     }
 }
 

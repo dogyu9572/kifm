@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Backoffice\EduCourseRequest;
+use App\Models\AcademicEvent;
 use App\Models\EduCourse;
 use App\Models\EduTraining;
 use App\Models\User;
@@ -51,7 +52,7 @@ class EduCourseController extends Controller
             'yearOptions' => $this->yearOptions(),
             'cancelUrl' => $this->cancelUrl($request),
             'linkedTrainings' => EduTraining::query()->orderByDesc('year')->orderByDesc('id')->get(['id', 'title']),
-            'linkedEvents' => [],
+            'linkedEvents' => $this->linkedAcademicEventsOptions(),
         ]);
     }
 
@@ -75,7 +76,7 @@ class EduCourseController extends Controller
             'yearOptions' => $this->yearOptions(),
             'cancelUrl' => $this->cancelUrl($request),
             'linkedTrainings' => EduTraining::query()->orderByDesc('year')->orderByDesc('id')->get(['id', 'title']),
-            'linkedEvents' => [],
+            'linkedEvents' => $this->linkedAcademicEventsOptions(),
         ]);
     }
 
@@ -215,6 +216,17 @@ class EduCourseController extends Controller
         }
 
         return $years;
+    }
+
+    /** @return list<array{id:int,title:string}> */
+    protected function linkedAcademicEventsOptions(): array
+    {
+        return AcademicEvent::query()
+            ->orderByDesc('year')
+            ->orderByDesc('id')
+            ->get(['id', 'title'])
+            ->map(fn (AcademicEvent $e) => ['id' => $e->id, 'title' => $e->title])
+            ->all();
     }
 
     protected function cancelUrl(Request $request): string

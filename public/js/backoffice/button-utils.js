@@ -50,6 +50,12 @@ class ButtonManager {
      * ButtonManager를 완전히 건너뛸 버튼들
      */
     shouldSkipButton(button) {
+        // CKEditor 5 내부 버튼은 절대 가로채지 않는다.
+        // (capture 단계에서 disabled 처리가 들어가면 파일 업로드 다이얼로그 등이 차단됨)
+        if (button.classList.contains('ck-button') || button.closest('.ck')) {
+            return true;
+        }
+
         // 특정 ID의 버튼들
         const skipIds = ['sessionExtendBtn', 'sidebarToggle', 'navbar-toggler'];
         if (skipIds.includes(button.id)) {

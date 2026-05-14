@@ -4,6 +4,7 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/backoffice/boards.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/backoffice/backoffice-crud.css') }}">
 @endsection
 
 @section('content')
@@ -72,6 +73,10 @@
                     <table class="board-table">
                         <thead>
                             <tr>
+                                <th class="w5 board-checkbox-column">
+                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                </th>
+                                <th class="w8">번호</th>
                                 <th class="w10">상태</th>
                                 <th>제목</th>
                                 <th class="w10">대상 수</th>
@@ -83,6 +88,10 @@
                         <tbody>
                             @forelse ($mails as $mail)
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" value="{{ $mail->id }}" class="form-check-input bo-row-checkbox">
+                                    </td>
+                                    <td>{{ $mails->total() - (($mails->currentPage() - 1) * $mails->perPage()) - $loop->index }}</td>
                                     <td>{{ $mail->status }}</td>
                                     <td>{{ $mail->subject ?: '-' }}</td>
                                     <td>{{ number_format($mail->recipient_count) }}</td>
@@ -100,7 +109,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="text-center">발송 내역이 없습니다.</td></tr>
+                                <tr><td colspan="8" class="text-center">발송 내역이 없습니다.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -113,4 +122,5 @@
 
 @section('scripts')
     <script src="{{ asset('js/backoffice/mail.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
 @endsection

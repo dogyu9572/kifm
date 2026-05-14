@@ -555,6 +555,34 @@ class BoardTemplateSeeder extends Seeder
                 'permission_comment' => 'member',
                 'is_active' => true,
             ],
+            // 17. 학술대회 공지사항 템플릿 (학술대회 선택은 board_academic_notices.event_id 별도 컬럼 사용)
+            [
+                'name' => '학술대회 공지사항',
+                'description' => '학술대회별 공지사항 게시판',
+                'skin_id' => $defaultSkin->id,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+                'enable_notice' => true,
+                'enable_sorting' => false,
+                'enable_category' => false,
+                'category_id' => null,
+                'list_count' => 20,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'is_active' => true,
+            ],
         ];
 
         foreach ($templates as $template) {

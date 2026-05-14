@@ -334,10 +334,20 @@
                                 <div class="board-existing-files">
                                     <div class="board-attachment-list">
                                         @foreach($existingAttachments as $index => $attachment)
+                                            @php
+                                                $attachmentName = $attachment['name'] ?? '';
+                                                $attachmentPath = $attachment['path'] ?? null;
+                                                $attachmentSize = isset($attachment['size']) ? (int) $attachment['size'] : 0;
+                                                $hasDownload = is_string($attachmentPath) && $attachmentPath !== '';
+                                            @endphp
                                             <div class="board-attachment-item existing-file" data-index="{{ $index }}">
                                                 <i class="fas fa-file"></i>
-                                                <span class="board-attachment-name">{{ $attachment['name'] }}</span>
-                                                <span class="board-attachment-size">({{ number_format($attachment['size'] / 1024 / 1024, 2) }}MB)</span>
+                                                @if ($hasDownload)
+                                                    <a href="{{ asset('storage/'.$attachmentPath) }}" download="{{ $attachmentName }}" target="_blank" rel="noopener" class="board-attachment-name">{{ $attachmentName }}</a>
+                                                @else
+                                                    <span class="board-attachment-name">{{ $attachmentName }}</span>
+                                                @endif
+                                                <span class="board-attachment-size">({{ number_format($attachmentSize / 1024 / 1024, 2) }}MB)</span>
                                                 <button type="button" class="board-attachment-remove" onclick="removeExistingFile({{ $index }})">
                                                     <i class="fas fa-times"></i>
                                                 </button>

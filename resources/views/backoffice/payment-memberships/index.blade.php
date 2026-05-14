@@ -106,6 +106,7 @@
                                 <th class="w5 board-checkbox-column">
                                     <input type="checkbox" id="select-all" class="form-check-input">
                                 </th>
+                                <th class="w8">번호</th>
                                 <th class="w10">결제번호</th>
                                 <th class="w8">회원등급</th>
                                 <th class="w10">아이디</th>
@@ -122,7 +123,8 @@
                         <tbody>
                             @forelse ($payments as $payment)
                                 <tr>
-                                    <td><input type="checkbox" class="form-check-input bo-row-checkbox"></td>
+                                    <td><input type="checkbox" value="{{ $payment->id }}" class="form-check-input bo-row-checkbox"></td>
+                                    <td>{{ $payments->total() - (($payments->currentPage() - 1) * $payments->perPage()) - $loop->index }}</td>
                                     <td>{{ $payment->payment_no }}</td>
                                     <td>{{ $memberLevelLabels[$payment->member_grade ?? ''] ?? ($payment->member_grade ?? '-') }}</td>
                                     <td>{{ $payment->member->login_id ?? '-' }}</td>
@@ -154,7 +156,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="12" class="text-center">납부 내역이 없습니다.</td>
+                                    <td colspan="13" class="text-center">납부 내역이 없습니다.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -167,3 +169,7 @@
     </div>
 @endsection
 
+@section('scripts')
+    <script src="{{ asset('js/backoffice/payment-memberships.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
+@endsection

@@ -4,6 +4,7 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/backoffice/boards.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/backoffice/backoffice-crud.css') }}">
 @endsection
 
 @section('content')
@@ -50,6 +51,10 @@
                     <table class="board-table">
                         <thead>
                             <tr>
+                                <th class="w5 board-checkbox-column">
+                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                </th>
+                                <th class="w8">번호</th>
                                 <th class="w10">상태</th>
                                 <th>제목</th>
                                 <th class="w10">대상 수</th>
@@ -61,6 +66,10 @@
                         <tbody>
                             @forelse ($smsMessages as $sms)
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" value="{{ $sms->id }}" class="form-check-input bo-row-checkbox">
+                                    </td>
+                                    <td>{{ $smsMessages->total() - (($smsMessages->currentPage() - 1) * $smsMessages->perPage()) - $loop->index }}</td>
                                     <td>{{ $sms->status }}</td>
                                     <td>{{ $sms->subject ?: \Illuminate\Support\Str::limit((string) $sms->body, 40) }}</td>
                                     <td>{{ number_format($sms->recipient_count) }}</td>
@@ -78,7 +87,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="text-center">발송 이력이 없습니다.</td></tr>
+                                <tr><td colspan="8" class="text-center">발송 이력이 없습니다.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -91,4 +100,5 @@
 
 @section('scripts')
     <script src="{{ asset('js/backoffice/sms.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
 @endsection

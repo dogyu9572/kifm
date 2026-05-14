@@ -128,15 +128,18 @@
     margin-top: 0.25rem;
 }
 
-/* 온라인 강좌 탭: 저장 버튼 톤과 유사한 중간 블루로 완화 */
-.js-course-tab-btn.btn-outline-primary {
+/* 온라인 강좌·학술행사 등록 탭: 저장 버튼 톤과 유사한 중간 블루로 완화 */
+.js-course-tab-btn.btn-outline-primary,
+.js-academic-tab-btn.btn-outline-primary {
     color: #3f7fbe;
     border-color: #bcd3ea;
     background-color: #f5f9ff;
 }
 
 .js-course-tab-btn.btn-outline-primary:hover,
-.js-course-tab-btn.btn-outline-primary:focus {
+.js-course-tab-btn.btn-outline-primary:focus,
+.js-academic-tab-btn.btn-outline-primary:hover,
+.js-academic-tab-btn.btn-outline-primary:focus {
     color: #3f7fbe;
     border-color: #bcd3ea;
     background-color: #f5f9ff;
@@ -146,10 +149,106 @@
 .js-course-tab-btn.btn-outline-primary:not(:disabled):not(.disabled).active,
 .js-course-tab-btn.btn-outline-primary:not(:disabled):not(.disabled):active,
 .js-course-tab-btn.btn-outline-primary:not(:disabled):not(.disabled):active:focus,
-.show > .js-course-tab-btn.btn-outline-primary.dropdown-toggle {
+.show > .js-course-tab-btn.btn-outline-primary.dropdown-toggle,
+.js-academic-tab-btn.btn-outline-primary.active,
+.js-academic-tab-btn.btn-outline-primary:not(:disabled):not(.disabled).active,
+.js-academic-tab-btn.btn-outline-primary:not(:disabled):not(.disabled):active,
+.js-academic-tab-btn.btn-outline-primary:not(:disabled):not(.disabled):active:focus,
+.show > .js-academic-tab-btn.btn-outline-primary.dropdown-toggle {
     color: #fff;
     border-color: #4a8fce !important;
     background-color: #4a8fce !important;
+}
+
+/* 학술행사 연자·스폰서 인라인 테이블: 헤더와 본문 사이 이중선 제거(단일 구분선) */
+.bo-academic-inline-table.board-table thead th {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.bo-academic-inline-table.board-table tbody tr:first-child td {
+    border-top: 0 none !important;
+}
+
+/* 학술행사 세션 목록: 하늘색 헤더 라인 + 회색 이중선 제거 */
+.bo-academic-sessions-table.board-table thead th {
+    border-bottom: 2px solid #59aee8;
+}
+
+.bo-academic-sessions-table.board-table tbody tr:first-child td {
+    border-top: 0 none !important;
+}
+
+/* 학술행사 모달: common/modal.css(좁은 폭·그라데이션 헤더)와 분리, 회원 검색 모달 톤에 맞춤 */
+.bo-academic-modal.modal {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.bo-academic-modal.modal.show {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.bo-academic-modal .modal-dialog {
+    margin: 0;
+    width: 100%;
+    max-width: 920px;
+}
+
+.bo-academic-modal#bo-speaker-bio-modal .modal-dialog {
+    max-width: 720px;
+}
+
+.bo-academic-modal .modal-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.14);
+    overflow: hidden;
+}
+
+.bo-academic-modal .modal-header {
+    background: #ffffff !important;
+    background-image: none !important;
+    color: #1f2937 !important;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 18px;
+}
+
+.bo-academic-modal .modal-title {
+    color: #1f2937;
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.bo-academic-modal .close,
+.bo-academic-modal .close:hover {
+    color: #6b7280;
+    opacity: 1;
+    text-shadow: none;
+}
+
+.bo-academic-modal .modal-body {
+    text-align: left !important;
+    padding: 18px 20px;
+}
+
+.bo-academic-modal .modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.bo-academic-modal .modal-footer .btn + .btn {
+    margin-left: 0.5rem;
 }
 
 /* 수강 신청 상세: 특정 섹션(현금영수증) 내 회색 행 보더 제거 */

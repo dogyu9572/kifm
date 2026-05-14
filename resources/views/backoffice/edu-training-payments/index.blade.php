@@ -19,7 +19,7 @@
         <div class="board-page-header">
             <div class="board-page-buttons">
                 <a href="{{ route('backoffice.edu-training-payments.export', request()->query()) }}" class="btn btn-secondary">
-                    <i class="fas fa-file-download"></i> 엑셀 다운
+                    <i class="fas fa-file-download"></i> 엑셀 다운로드
                 </a>
                 <a href="{{ route('backoffice.edu-training-payments.create') }}" class="btn btn-success">
                     <i class="fas fa-plus"></i> 직접 등록

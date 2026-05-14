@@ -1,0 +1,899 @@
+/**
+ * 학술행사 등록/수정: 탭 전환, 온·오프라인 토글, 동적 행, 회원/초록/스폰서 모달, 연자 약력 모달, CKEditor 동기화
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('bo-academic-event-form');
+    if (!form) {
+        return;
+    }
+
+    const searchSponsorsUrl = form.dataset.searchSponsorsUrl || '';
+    const storeSponsorMasterUrl = form.dataset.storeSponsorMasterUrl || '';
+    const searchAbstractsUrl = form.dataset.searchAbstractsUrl || '';
+    const academicEventIdForAbstracts = form.dataset.academicEventId || '';
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+    document.getElementById('bo-academic-event-address-search')?.addEventListener('click', () => {
+        if (typeof daum === 'undefined' || !daum.Postcode) {
+            window.alert('주소 검색 스크립트를 불러오지 못했습니다.');
+            return;
+        }
+        new daum.Postcode({
+            oncomplete(data) {
+                const base = document.getElementById('bo-academic-event-address');
+                const detail = document.getElementById('bo-academic-event-address-detail');
+                if (base) {
+                    base.value = data.roadAddress || data.address || '';
+                }
+                if (detail) {
+                    detail.focus();
+                }
+            },
+        }).open();
+    });
+
+    const activeTabInput = document.getElementById('bo-academic-event-active-tab');
+    const tabButtons = document.querySelectorAll('.js-academic-tab-btn');
+    const tabPanels = document.querySelectorAll('.js-academic-tab-panel');
+    const setActiveTab = (tabId) => {
+        if (!activeTabInput) {
+            return;
+        }
+        activeTabInput.value = tabId;
+        tabButtons.forEach((button) => {
+            button.classList.toggle('active', button.dataset.tab === tabId);
+        });
+        tabPanels.forEach((panel) => {
+            panel.classList.toggle('bo-hidden', panel.dataset.tabPanel !== tabId);
+        });
+    };
+    tabButtons.forEach((button) => {
+        button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+    });
+    if (activeTabInput?.value) {
+        setActiveTab(activeTabInput.value);
+    }
+
+    document.querySelector('[data-remove-existing-target="event_material"]')?.addEventListener('click', () => {
+        const del = document.getElementById('delete_event_material');
+        if (del) {
+            del.checked = true;
+        }
+        document.getElementById('bo-academic-event-material-existing-item')?.classList.add('bo-hidden');
+    });
+
+    document.querySelector('[data-remove-existing-target="abstract_book"]')?.addEventListener('click', () => {
+        const del = document.getElementById('delete_abstract_book');
+        if (del) {
+            del.checked = true;
+        }
+        document.getElementById('bo-academic-abstract-book-existing-item')?.classList.add('bo-hidden');
+    });
+
+    const applyEventType = () => {
+        const online = form.querySelector('.bo-event-type-input[value="online"]')?.checked;
+        form.querySelectorAll('.bo-online-only').forEach((el) => {
+            el.classList.toggle('bo-hidden', !online);
+        });
+        form.querySelectorAll('.bo-offline-only').forEach((el) => {
+            el.classList.toggle('bo-hidden', !!online);
+        });
+    };
+    form.querySelectorAll('.bo-event-type-input').forEach((r) => r.addEventListener('change', applyEventType));
+    applyEventType();
+
+    const nextIndex = (tbody) => tbody.querySelectorAll('tr.bo-repeat-row').length;
+
+    const reindexAbstractFieldRows = () => {
+        const tbody = document.getElementById('bo-abstract-fields-body');
+        if (!tbody) {
+            return;
+        }
+        const rows = tbody.querySelectorAll('tr.bo-repeat-row');
+        rows.forEach((tr, i) => {
+            tr.querySelectorAll('input[name^="abstract_fields["]').forEach((el) => {
+                const n = el.getAttribute('name');
+                if (n) {
+                    el.setAttribute('name', n.replace(/^abstract_fields\[\d+\]/, `abstract_fields[${i}]`));
+                }
+            });
+            const hiddenSort = tr.querySelector('input[name$="[sort_order]"]');
+            if (hiddenSort) {
+                hiddenSort.value = String(i + 1);
+            }
+        });
+    };
+
+    const reindexMainSponsorSlotRows = () => {
+        const tbody = document.getElementById('bo-main-slots-body');
+        if (!tbody) {
+            return;
+        }
+        const rows = tbody.querySelectorAll('tr.bo-repeat-row');
+        rows.forEach((tr, i) => {
+            tr.querySelectorAll('input[name^="main_sponsor_slots["], select[name^="main_sponsor_slots["]').forEach((el) => {
+                const n = el.getAttribute('name');
+                if (n) {
+                    el.setAttribute('name', n.replace(/^main_sponsor_slots\[\d+\]/, `main_sponsor_slots[${i}]`));
+                }
+            });
+            const hiddenSort = tr.querySelector('input[name$="[sort_order]"]');
+            if (hiddenSort) {
+                hiddenSort.value = String(i + 1);
+            }
+        });
+    };
+
+    const abstractFieldsBody = document.getElementById('bo-abstract-fields-body');
+    if (abstractFieldsBody && typeof Sortable !== 'undefined') {
+        new Sortable(abstractFieldsBody, {
+            handle: '.sort-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            onStart: (evt) => {
+                evt.item.classList.add('dragging');
+            },
+            onEnd: (evt) => {
+                evt.item.classList.remove('dragging');
+                reindexAbstractFieldRows();
+            },
+        });
+    }
+
+    const mainSlotsBody = document.getElementById('bo-main-slots-body');
+    if (mainSlotsBody && typeof Sortable !== 'undefined') {
+        new Sortable(mainSlotsBody, {
+            handle: '.sort-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            onStart: (evt) => {
+                evt.item.classList.add('dragging');
+            },
+            onEnd: (evt) => {
+                evt.item.classList.remove('dragging');
+                reindexMainSponsorSlotRows();
+            },
+        });
+    }
+
+    document.getElementById('bo-add-venue-floor-btn')?.addEventListener('click', () => {
+        const tbody = document.getElementById('bo-venue-floors-body');
+        const tpl = document.getElementById('bo-template-venue-floor');
+        if (!tbody || !tpl) {
+            return;
+        }
+        const i = nextIndex(tbody);
+        const tr = tpl.cloneNode(true);
+        tr.removeAttribute('id');
+        tr.classList.remove('bo-template');
+        tr.classList.add('bo-repeat-row');
+        tr.querySelectorAll('input, select').forEach((el) => {
+            const n = el.getAttribute('name');
+            if (n) {
+                el.setAttribute('name', n.replace('__I__', String(i)));
+            }
+        });
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById('bo-add-abstract-field-btn')?.addEventListener('click', () => {
+        const tbody = document.getElementById('bo-abstract-fields-body');
+        const tpl = document.getElementById('bo-template-abstract-field');
+        if (!tbody || !tpl) {
+            return;
+        }
+        const i = nextIndex(tbody);
+        const tr = tpl.cloneNode(true);
+        tr.removeAttribute('id');
+        tr.classList.remove('bo-template');
+        tr.classList.add('bo-repeat-row');
+        tr.querySelectorAll('input').forEach((el) => {
+            const n = el.getAttribute('name');
+            if (n) {
+                el.setAttribute('name', n.replaceAll('__I__', String(i)));
+            }
+        });
+        tbody.appendChild(tr);
+        reindexAbstractFieldRows();
+    });
+
+    document.getElementById('bo-add-main-slot-btn')?.addEventListener('click', () => {
+        const tbody = document.getElementById('bo-main-slots-body');
+        const tpl = document.getElementById('bo-template-main-sponsor-slot');
+        if (!tbody || !tpl) {
+            return;
+        }
+        const i = nextIndex(tbody);
+        const tr = tpl.cloneNode(true);
+        tr.removeAttribute('id');
+        tr.classList.remove('bo-template');
+        tr.classList.add('bo-repeat-row');
+        tr.querySelectorAll('input, select').forEach((el) => {
+            const n = el.getAttribute('name');
+            if (n) {
+                el.setAttribute('name', n.replaceAll('__I__', String(i)));
+            }
+        });
+        tbody.appendChild(tr);
+        reindexMainSponsorSlotRows();
+    });
+
+    const bindRemove = (root) => {
+        root.querySelectorAll('.bo-remove-row-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const tr = btn.closest('tr');
+                if (tr && tr.parentNode) {
+                    tr.parentNode.removeChild(tr);
+                }
+            });
+        });
+    };
+    bindRemove(form);
+    form.addEventListener('click', (e) => {
+        const t = e.target;
+        if (t && t.classList && t.classList.contains('bo-remove-row-btn')) {
+            bindRemove(form);
+        }
+    });
+
+    form.addEventListener(
+        'click',
+        (e) => {
+            const btn = e.target.closest('.bo-remove-row-btn');
+            if (!btn) {
+                return;
+            }
+            const tr = btn.closest('tr');
+            if (!tr) {
+                return;
+            }
+            const abstractBody = document.getElementById('bo-abstract-fields-body');
+            const mainSlotsBodyEl = document.getElementById('bo-main-slots-body');
+            const inAbstract = abstractBody?.contains(tr);
+            const inMainSlots = mainSlotsBodyEl?.contains(tr);
+            if (!inAbstract && !inMainSlots) {
+                return;
+            }
+            queueMicrotask(() => {
+                if (inAbstract) {
+                    reindexAbstractFieldRows();
+                }
+                if (inMainSlots) {
+                    reindexMainSponsorSlotRows();
+                }
+            });
+        },
+        true,
+    );
+
+    reindexAbstractFieldRows();
+    reindexMainSponsorSlotRows();
+
+    let speakerBioRow = null;
+    const bioModal = document.getElementById('bo-speaker-bio-modal');
+    const bioTextarea = document.getElementById('bo-speaker-bio-textarea');
+    const bioTitle = document.getElementById('bo-speaker-bio-modal-title');
+
+    const showBsModal = (el) => {
+        if (!el) {
+            return;
+        }
+        el.classList.remove('d-none');
+        el.classList.add('show');
+        if (el.classList.contains('bo-academic-modal')) {
+            el.style.removeProperty('display');
+        } else {
+            el.style.display = 'block';
+        }
+        el.removeAttribute('aria-hidden');
+    };
+
+    const hideBsModal = (el) => {
+        if (!el) {
+            return;
+        }
+        el.classList.remove('show');
+        if (el.classList.contains('bo-academic-modal')) {
+            el.style.removeProperty('display');
+        } else {
+            el.style.display = 'none';
+        }
+        el.classList.add('d-none');
+        el.setAttribute('aria-hidden', 'true');
+    };
+
+    document.querySelectorAll('.bo-modal-close').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            hideBsModal(bioModal);
+            hideBsModal(document.getElementById('bo-sponsor-modal'));
+            const absM = document.getElementById('bo-abstract-search-modal');
+            if (absM) {
+                absM.style.display = 'none';
+            }
+        });
+    });
+
+    form.addEventListener('click', (e) => {
+        const btn = e.target.closest('.bo-speaker-bio-btn');
+        if (!btn) {
+            return;
+        }
+        const tr = btn.closest('tr');
+        speakerBioRow = tr;
+        const nameInp = tr?.querySelector('.bo-speaker-name');
+        const hidden = tr?.querySelector('.bo-speaker-bio');
+        if (bioTitle) {
+            bioTitle.textContent = '연자 약력 — ' + (nameInp?.value?.trim() || '(이름 미입력)');
+        }
+        if (bioTextarea && hidden) {
+            bioTextarea.value = hidden.value || '';
+        }
+        showBsModal(bioModal);
+    });
+
+    document.getElementById('bo-speaker-bio-save-btn')?.addEventListener('click', () => {
+        if (!speakerBioRow || !bioTextarea) {
+            return;
+        }
+        const hidden = speakerBioRow.querySelector('.bo-speaker-bio');
+        const label = speakerBioRow.querySelector('.bo-speaker-bio-label');
+        if (hidden) {
+            hidden.value = bioTextarea.value;
+        }
+        if (label) {
+            label.textContent = bioTextarea.value.trim() ? '입력됨' : '';
+        }
+        hideBsModal(bioModal);
+    });
+
+    const addSpeakerRow = (preset) => {
+        const tbody = document.getElementById('bo-speakers-body');
+        if (!tbody) {
+            return;
+        }
+        const p = preset || { source: 'manual' };
+        const i = tbody.querySelectorAll('tr.bo-repeat-row').length;
+        const tr = document.createElement('tr');
+        tr.className = 'bo-repeat-row bo-speaker-row';
+        tr.innerHTML = `
+            <td>
+                <input type="hidden" name="speakers[${i}][source]" class="bo-speaker-source" value="manual">
+                <input type="hidden" name="speakers[${i}][member_id]" class="bo-speaker-member-id" value="">
+                <input type="hidden" name="speakers[${i}][academic_event_abstract_id]" class="bo-speaker-abstract-id" value="">
+                <input type="text" name="speakers[${i}][name]" class="board-form-control bo-speaker-name" value="">
+            </td>
+            <td><input type="text" name="speakers[${i}][affiliation]" class="board-form-control bo-speaker-affiliation" value=""></td>
+            <td><input type="text" name="speakers[${i}][position]" class="board-form-control bo-speaker-position" value=""></td>
+            <td><input type="file" name="speaker_images[]" class="board-form-control" accept="image/*"></td>
+            <td><input type="text" name="speakers[${i}][abstract_title]" class="board-form-control" value=""></td>
+            <td>
+                <input type="hidden" name="speakers[${i}][bio]" class="bo-speaker-bio" value="">
+                <button type="button" class="btn btn-sm btn-outline-primary bo-speaker-bio-btn">약력 입력</button>
+                <span class="bo-speaker-bio-label board-form-help"></span>
+            </td>
+            <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>`;
+        tr.querySelector('.bo-speaker-source').value = p.source || 'manual';
+        tr.querySelector('.bo-speaker-member-id').value = p.member_id || '';
+        tr.querySelector('.bo-speaker-abstract-id').value = p.academic_event_abstract_id || '';
+        tr.querySelector('.bo-speaker-name').value = p.name || '';
+        tr.querySelector('.bo-speaker-affiliation').value = p.affiliation || '';
+        tr.querySelector('.bo-speaker-position').value = p.position || '';
+        tr.querySelector('input[name$="[abstract_title]"]').value = p.abstract_title || '';
+        tr.querySelector('.bo-speaker-bio').value = p.bio || '';
+        if (p.bio && p.bio.trim()) {
+            tr.querySelector('.bo-speaker-bio-label').textContent = '입력됨';
+        }
+        tbody.appendChild(tr);
+    };
+
+    document.getElementById('bo-speaker-add-manual-btn')?.addEventListener('click', () => addSpeakerRow({ source: 'manual' }));
+
+    const speakerMemberSelector = document.getElementById('bo-academic-speaker-member-selector');
+    speakerMemberSelector?.addEventListener('bo-member-selected', (ev) => {
+        const d = ev.detail || {};
+        if (!d.id) {
+            return;
+        }
+        addSpeakerRow({
+            source: 'member',
+            member_id: String(d.id),
+            name: d.name || d.label || '',
+            affiliation: d.organization || '',
+            position: d.position || '',
+        });
+        bindRemove(form);
+        const hidId = speakerMemberSelector.querySelector('.js-member-id');
+        const hidLabel = speakerMemberSelector.querySelector('.js-member-label');
+        if (hidId) {
+            hidId.value = '';
+        }
+        if (hidLabel) {
+            hidLabel.value = '';
+        }
+    });
+
+    const abstractModalEl = document.getElementById('bo-abstract-search-modal');
+    const abstractResultsBody = abstractModalEl?.querySelector('.js-abstract-results');
+    const abstractPaginationRoot = abstractModalEl?.querySelector('.js-abstract-pagination');
+    const abstractKeywordInput = abstractModalEl?.querySelector('.js-abstract-keyword');
+    const abstractPresentationSelect = abstractModalEl?.querySelector('.js-abstract-presentation-type');
+    const abstractStatusSelect = abstractModalEl?.querySelector('.js-abstract-status');
+    let abstractCurrentPage = 1;
+
+    const escAbs = (value) =>
+        String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+
+    const cellAbs = (v) => {
+        const s = v === null || v === undefined ? '' : String(v);
+        if (s === '') {
+            return '-';
+        }
+        return escAbs(s);
+    };
+
+    const closeAbstractModal = () => {
+        if (abstractModalEl) {
+            abstractModalEl.style.display = 'none';
+        }
+    };
+
+    const openAbstractModal = () => {
+        if (!abstractModalEl) {
+            return;
+        }
+        if (!searchAbstractsUrl || !academicEventIdForAbstracts) {
+            window.alert('행사를 먼저 저장한 뒤 초록 연동을 사용할 수 있습니다.');
+            return;
+        }
+        abstractModalEl.style.display = 'block';
+        abstractKeywordInput?.focus();
+    };
+
+    const isAbstractAlreadyLinked = (abstractId) => {
+        const idStr = String(abstractId);
+        const tbody = document.getElementById('bo-speakers-body');
+        if (!tbody) {
+            return false;
+        }
+        return Array.from(tbody.querySelectorAll('.bo-speaker-abstract-id')).some((inp) => String(inp.value) === idStr);
+    };
+
+    const renderAbstractPagination = (meta) => {
+        if (!abstractPaginationRoot || !meta || (meta.last_page ?? 1) <= 1) {
+            if (abstractPaginationRoot) {
+                abstractPaginationRoot.innerHTML = '';
+            }
+            return;
+        }
+        const current = Number(meta.current_page ?? 1);
+        const last = Number(meta.last_page ?? 1);
+        const start = Math.max(1, current - 2);
+        const end = Math.min(last, start + 4);
+        const numberButtons = [];
+        for (let page = start; page <= end; page += 1) {
+            const activeClass = page === current ? 'active' : '';
+            numberButtons.push(
+                `<li class="page-item ${activeClass}"><a class="page-link js-abstract-page" data-page="${page}" href="#">${page}</a></li>`,
+            );
+        }
+        abstractPaginationRoot.innerHTML = `
+            <ul class="pagination">
+                <li class="page-item ${current <= 1 ? 'disabled' : ''}">
+                    <a class="page-link js-abstract-page" data-page="${Math.max(1, current - 1)}" href="#" aria-label="이전 페이지">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                ${numberButtons.join('')}
+                <li class="page-item ${current >= last ? 'disabled' : ''}">
+                    <a class="page-link js-abstract-page" data-page="${Math.min(last, current + 1)}" href="#" aria-label="다음 페이지">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>`;
+    };
+
+    const renderAbstractRows = (rows, meta) => {
+        if (!abstractResultsBody) {
+            return;
+        }
+        if (!Array.isArray(rows) || rows.length === 0) {
+            abstractResultsBody.innerHTML = '<tr><td colspan="9" class="text-center">검색 결과가 없습니다.</td></tr>';
+            return;
+        }
+        const startNo = ((Number(meta?.current_page ?? 1) - 1) * Number(meta?.per_page ?? 10)) + 1;
+        abstractResultsBody.innerHTML = rows
+            .map((row, idx) => {
+                const indexNo = startNo + idx;
+                const id = row.id;
+                return `
+                    <tr>
+                        <td>${indexNo}</td>
+                        <td>${cellAbs(row.title)}</td>
+                        <td>${cellAbs(row.author_name)}</td>
+                        <td>${cellAbs(row.registered_by_label ?? row.registered_by)}</td>
+                        <td>${cellAbs(row.presentation_type_label ?? row.presentation_type)}</td>
+                        <td>${cellAbs(row.submitted_at)}</td>
+                        <td>${cellAbs(row.status_label ?? row.status)}</td>
+                        <td>${cellAbs(row.file_receipt_label ?? row.file_receipt_status)}</td>
+                        <td><button type="button" class="btn btn-sm btn-primary js-select-abstract"
+                            data-id="${escAbs(id)}"
+                            data-author-name="${escAbs(row.author_name ?? '')}"
+                            data-title="${escAbs(row.title ?? '')}"
+                            data-member-id="${escAbs(row.member_id ?? '')}"
+                        >선택</button></td>
+                    </tr>`;
+            })
+            .join('');
+    };
+
+    const fetchAbstracts = async (page = 1) => {
+        if (!abstractResultsBody || !searchAbstractsUrl || !academicEventIdForAbstracts) {
+            return;
+        }
+        abstractCurrentPage = page;
+        const url = new URL(searchAbstractsUrl, window.location.origin);
+        url.searchParams.set('academic_event_id', academicEventIdForAbstracts);
+        url.searchParams.set('page', String(page));
+        const perPage = '10';
+        url.searchParams.set('per_page', perPage);
+        if (abstractPresentationSelect?.value) {
+            url.searchParams.set('presentation_type', abstractPresentationSelect.value);
+        }
+        if (abstractStatusSelect?.value) {
+            url.searchParams.set('status', abstractStatusSelect.value);
+        }
+        const kw = (abstractKeywordInput?.value || '').trim();
+        if (kw !== '') {
+            url.searchParams.set('search_keyword', kw);
+        }
+
+        abstractResultsBody.innerHTML = '<tr><td colspan="9" class="text-center">조회 중입니다...</td></tr>';
+        if (abstractPaginationRoot) {
+            abstractPaginationRoot.innerHTML = '';
+        }
+
+        try {
+            const response = await fetch(url.toString(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+                credentials: 'same-origin',
+            });
+            if (!response.ok) {
+                throw new Error('검색 요청 실패');
+            }
+            const payload = await response.json();
+            renderAbstractRows(payload.data ?? [], payload.meta ?? null);
+            renderAbstractPagination(payload.meta ?? null);
+        } catch {
+            abstractResultsBody.innerHTML = '<tr><td colspan="9" class="text-center">조회 중 오류가 발생했습니다.</td></tr>';
+            if (abstractPaginationRoot) {
+                abstractPaginationRoot.innerHTML = '';
+            }
+        }
+    };
+
+    document.getElementById('bo-speaker-add-abstract-btn')?.addEventListener('click', () => {
+        openAbstractModal();
+        fetchAbstracts(1);
+    });
+
+    abstractModalEl?.querySelector('.js-close-abstract-modal')?.addEventListener('click', closeAbstractModal);
+    abstractModalEl?.addEventListener('click', (event) => {
+        if (event.target === abstractModalEl) {
+            closeAbstractModal();
+        }
+    });
+    abstractModalEl?.querySelector('.js-search-abstract')?.addEventListener('click', () => fetchAbstracts(1));
+    abstractKeywordInput?.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            fetchAbstracts(1);
+        }
+    });
+    abstractPaginationRoot?.addEventListener('click', (event) => {
+        const target = event.target instanceof HTMLElement ? event.target.closest('.js-abstract-page') : null;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+        event.preventDefault();
+        if (target.closest('.disabled')) {
+            return;
+        }
+        const page = Number(target.dataset.page ?? '1');
+        if (Number.isNaN(page) || page < 1 || page === abstractCurrentPage) {
+            return;
+        }
+        fetchAbstracts(page);
+    });
+
+    abstractResultsBody?.addEventListener('click', (event) => {
+        const target = event.target.closest('.js-select-abstract');
+        if (!(target instanceof HTMLElement) || !target.classList.contains('js-select-abstract')) {
+            return;
+        }
+        const abstractId = target.dataset.id ?? '';
+        if (!abstractId) {
+            return;
+        }
+        if (isAbstractAlreadyLinked(abstractId)) {
+            window.alert('이미 연자로 추가된 초록입니다.');
+            return;
+        }
+        const authorName = target.getAttribute('data-author-name') || '';
+        const title = target.getAttribute('data-title') || '';
+        const memberId = target.getAttribute('data-member-id') || '';
+        addSpeakerRow({
+            source: 'abstract',
+            academic_event_abstract_id: abstractId,
+            name: authorName,
+            abstract_title: title,
+            member_id: memberId || '',
+            affiliation: '',
+            position: '',
+        });
+        bindRemove(form);
+        closeAbstractModal();
+    });
+
+    const addSponsorRow = (preset) => {
+        const tbody = document.getElementById('bo-sponsors-body');
+        if (!tbody) {
+            return;
+        }
+        const p = preset || {};
+        const filterEl = document.getElementById('bo-sponsor-level-filter');
+        const filterValue = filterEl?.value || 'all';
+        const defaultLevel = filterValue !== 'all' ? filterValue : 'exhibitors';
+        const i = tbody.querySelectorAll('tr.bo-repeat-row').length;
+        const tr = document.createElement('tr');
+        tr.className = 'bo-repeat-row bo-sponsor-row';
+        tr.innerHTML = `
+            <td>
+                <input type="hidden" name="sponsors[${i}][academic_sponsor_master_id]" class="bo-sponsor-master-id" value="">
+                <input type="text" name="sponsors[${i}][name]" class="board-form-control bo-sponsor-name" value="">
+            </td>
+            <td>
+                <select name="sponsors[${i}][level]" class="board-form-control">
+                    <option value="vip">VIP</option><option value="gold">Gold</option>
+                    <option value="silver">Silver</option><option value="exhibitors" selected>Exhibitors</option>
+                </select>
+            </td>
+            <td><input type="file" name="sponsor_logos[]" class="board-form-control" accept="image/*"></td>
+            <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>`;
+        tr.querySelector('.bo-sponsor-master-id').value = p.master_id || '';
+        tr.querySelector('.bo-sponsor-name').value = p.name || '';
+        const levelSelect = tr.querySelector('select[name^="sponsors["][name$="[level]"]');
+        if (levelSelect) {
+            levelSelect.value = p.level || defaultLevel;
+        }
+        tbody.appendChild(tr);
+        applySponsorLevelFilter();
+    };
+
+    const applySponsorLevelFilter = () => {
+        const filterEl = document.getElementById('bo-sponsor-level-filter');
+        const tbody = document.getElementById('bo-sponsors-body');
+        if (!filterEl || !tbody) {
+            return;
+        }
+        const filterValue = filterEl.value || 'all';
+        tbody.querySelectorAll('tr.bo-sponsor-row').forEach((row) => {
+            const levelSelect = row.querySelector('select[name^="sponsors["][name$="[level]"]');
+            const levelValue = levelSelect?.value || '';
+            const visible = filterValue === 'all' || levelValue === filterValue;
+            row.classList.toggle('bo-hidden', !visible);
+        });
+    };
+
+    document.getElementById('bo-sponsor-add-manual-btn')?.addEventListener('click', () => addSponsorRow({}));
+
+    document.getElementById('bo-sponsor-add-master-btn')?.addEventListener('click', () => {
+        showBsModal(document.getElementById('bo-sponsor-modal'));
+    });
+
+    document.getElementById('bo-sponsor-search-btn')?.addEventListener('click', async () => {
+        const kw = (document.getElementById('bo-sponsor-search-keyword')?.value || '').trim();
+        const url = new URL(searchSponsorsUrl, window.location.origin);
+        url.searchParams.set('keyword', kw);
+        const res = await fetch(url.toString(), { headers: { Accept: 'application/json' } });
+        const json = await res.json();
+        const tb = document.getElementById('bo-sponsor-search-tbody');
+        if (!tb) {
+            return;
+        }
+        tb.innerHTML = '';
+        (json.data || []).forEach((s) => {
+            const tr = document.createElement('tr');
+            const pick = encodeURIComponent(JSON.stringify({ id: s.id, name: s.name }));
+            tr.innerHTML = `<td>${s.name}</td><td>${s.representative_name || ''}</td>
+                <td><button type="button" class="btn btn-sm btn-primary bo-sponsor-pick-btn" data-pick="${pick}">선택</button></td>`;
+            tb.appendChild(tr);
+        });
+    });
+
+    document.getElementById('bo-sponsor-modal')?.addEventListener('click', (e) => {
+        const b = e.target.closest('.bo-sponsor-pick-btn');
+        if (!b) {
+            return;
+        }
+        let d = {};
+        try {
+            d = JSON.parse(decodeURIComponent(b.getAttribute('data-pick') || ''));
+        } catch {
+            return;
+        }
+        addSponsorRow({ master_id: String(d.id), name: d.name });
+        hideBsModal(document.getElementById('bo-sponsor-modal'));
+    });
+
+    document.getElementById('bo-sponsor-level-filter')?.addEventListener('change', applySponsorLevelFilter);
+    document.getElementById('bo-sponsors-body')?.addEventListener('change', (e) => {
+        const select = e.target.closest('select[name^="sponsors["][name$="[level]"]');
+        if (!select) {
+            return;
+        }
+        applySponsorLevelFilter();
+    });
+    applySponsorLevelFilter();
+
+    if (typeof window.initBoardImageFilePreview === 'function') {
+        window.initBoardImageFilePreview({
+            inputId: 'academic_thumbnail_file',
+            previewId: 'academicThumbnailFilePreview',
+            removeExistingSelector: '[data-remove-existing-target="thumbnail"]',
+            deleteCheckboxId: 'delete_thumbnail',
+            existingItemId: 'bo-academic-thumbnail-existing-item',
+        });
+        window.initBoardImageFilePreview({
+            inputId: 'academic_pc_banner_file',
+            previewId: 'academicPcBannerFilePreview',
+            removeExistingSelector: '[data-remove-existing-target="pc_banner"]',
+            deleteCheckboxId: 'delete_pc_banner',
+            existingItemId: 'bo-academic-pc-banner-existing-item',
+        });
+        window.initBoardImageFilePreview({
+            inputId: 'academic_greeting_image_file',
+            previewId: 'academicGreetingImagePreview',
+            removeExistingSelector: '[data-remove-existing-target="greeting_image"]',
+            deleteCheckboxId: 'delete_greeting_image',
+            existingItemId: 'bo-academic-greeting-existing-item',
+        });
+    }
+
+    const initAcademicSingleFilePreview = ({ inputId, previewId, deleteCheckboxId, existingItemId }) => {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        if (!input || !preview) {
+            return;
+        }
+
+        const uploadRoot = input.closest('.board-file-upload');
+        const wrapper = input.closest('.board-file-input-wrapper');
+        const maxFileSizeMb = Number(input.dataset.maxFileSizeMb || 50);
+        const maxBytes = maxFileSizeMb * 1024 * 1024;
+        const deleteCheckbox = deleteCheckboxId ? document.getElementById(deleteCheckboxId) : null;
+        const existingItem = existingItemId ? document.getElementById(existingItemId) : null;
+
+        const hideExisting = () => {
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+            }
+            existingItem?.classList.add('bo-hidden');
+        };
+        const showExisting = () => {
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = false;
+            }
+            existingItem?.classList.remove('bo-hidden');
+        };
+
+        const escapeHtml = (value) => String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+
+        const render = (file) => {
+            preview.innerHTML = `
+                <div class="board-file-item">
+                    <div class="board-file-info">
+                        <i class="fas fa-file"></i>
+                        <span class="board-file-name">${escapeHtml(file.name)}</span>
+                        <span class="board-file-size">(${(file.size / 1024 / 1024).toFixed(2)}MB)</span>
+                    </div>
+                    <button type="button" class="board-file-remove js-academic-single-file-remove" aria-label="첨부 제거">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>`;
+        };
+
+        const clear = () => {
+            preview.innerHTML = '';
+        };
+
+        const processFile = (file) => {
+            if (!file) {
+                input.value = '';
+                clear();
+                showExisting();
+                return;
+            }
+            if (file.size > maxBytes) {
+                window.alert(`파일은 ${maxFileSizeMb}MB 이하만 업로드할 수 있습니다.`);
+                input.value = '';
+                clear();
+                return;
+            }
+            render(file);
+            hideExisting();
+        };
+
+        input.addEventListener('change', (e) => {
+            processFile(e.target.files?.[0] ?? null);
+        });
+
+        preview.addEventListener('click', (e) => {
+            if (!e.target.closest('.js-academic-single-file-remove')) {
+                return;
+            }
+            input.value = '';
+            clear();
+            showExisting();
+        });
+
+        if (wrapper && uploadRoot) {
+            wrapper.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadRoot.classList.add('board-file-drag-over');
+            });
+            wrapper.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadRoot.classList.remove('board-file-drag-over');
+            });
+            wrapper.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadRoot.classList.remove('board-file-drag-over');
+                const file = e.dataTransfer.files?.[0];
+                if (!file) {
+                    return;
+                }
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                input.files = dt.files;
+                processFile(file);
+            });
+        }
+    };
+
+    initAcademicSingleFilePreview({
+        inputId: 'academic_event_material_file',
+        previewId: 'academicEventMaterialFilePreview',
+        deleteCheckboxId: 'delete_event_material',
+        existingItemId: 'bo-academic-event-material-existing-item',
+    });
+
+    initAcademicSingleFilePreview({
+        inputId: 'academic_abstract_book_file',
+        previewId: 'academicAbstractBookFilePreview',
+        deleteCheckboxId: 'delete_abstract_book',
+        existingItemId: 'bo-academic-abstract-book-existing-item',
+    });
+
+    form.addEventListener('submit', () => {
+        if (typeof window.syncBackofficeCKEditorFields === 'function') {
+            window.syncBackofficeCKEditorFields(form);
+        }
+    });
+});

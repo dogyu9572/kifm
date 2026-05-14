@@ -29,6 +29,7 @@ Thumbs.db
 .ssh/
 .npm/
 .dbclient/
+.cursor/
 
 # 시스템 파일
 .bash_history
@@ -36,6 +37,7 @@ Thumbs.db
 .profile
 .viminfo
 .lesshst
+.gitconfig
 
 # 백업 파일
 *.backup

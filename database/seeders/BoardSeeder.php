@@ -28,6 +28,7 @@ class BoardSeeder extends Seeder
         $termsOfServiceTemplate = BoardTemplate::where('name', '이용약관')->first();
         $societyHistoryTemplate = BoardTemplate::where('name', '학회 연혁')->first();
         $committeeNoticeTemplate = BoardTemplate::where('name', '위원회 공지')->first();
+        $academicNoticeTemplate = BoardTemplate::where('name', '학술대회 공지사항')->first();
 
         // 스킨 조회
         $defaultSkin = \App\Models\BoardSkin::where('name', '기본 스킨')->first();
@@ -607,6 +608,37 @@ class BoardSeeder extends Seeder
                     'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
                     'is_active' => ['enabled' => false, 'required' => false, 'label' => '공개여부'],
                     'created_at' => ['enabled' => false, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => null,
+            ],
+            [
+                'name' => '학술대회 공지사항',
+                'slug' => 'academic_notices',
+                'description' => '학술대회별 공지사항 게시판',
+                'skin_id' => $defaultSkin?->id,
+                'template_id' => $academicNoticeTemplate?->id,
+                'is_active' => true,
+                'table_created' => false,
+                'list_count' => 20,
+                'enable_notice' => true,
+                'is_single_page' => false,
+                'enable_sorting' => false,
+                'hot_threshold' => 100,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'enable_comments' => false,
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
                 ],
                 'custom_fields_config' => null,
             ],

@@ -20,6 +20,9 @@ class DatabaseSeeder extends Seeder
         // 관리자 메뉴 시더 실행
         $this->call(AdminMenuSeeder::class);
 
+        // 주치의 진료 과목(우리동네주치의)
+        $this->call(DoctorCategorySeeder::class);
+
         // 게시판 스킨 시더 실행
         $this->call(BoardSkinSeeder::class);
 

@@ -10,6 +10,42 @@ alwaysApply: true
 - 신규 백오피스 메뉴/화면은 아래 레퍼런스의 레이아웃 구조와 UI 패턴을 우선 재사용한다.
 - 기준 경로: `resources/views/backoffice/board-posts/notices`
 - 기준 파일: `index.blade.php`, `create.blade.php`, `edit.blade.php`, `show.blade.php`
+- 목록 **버튼·필터·건수·per_page·체크박스 일괄** 레이아웃은 위가 부족할 때 **`resources/views/backoffice/academic-events/index.blade.php`**, **`resources/views/backoffice/edu-training-payments/index.blade.php`** 를 보조 레퍼런스로 삼는다.
+
+## 목록(index) 화면 고정 레이아웃 (디폴트·임의 변경 금지)
+
+신규·수정 모두 아래를 **그대로 재사용**한다. 사용자가 레이아웃 변경을 명시하지 않으면 **순서·클래스·버튼 의미색을 바꾸지 않는다**.
+
+### 세로 블록 순서 (위→아래)
+1. `session` 알림 (`board-hidden-alert`)
+2. **`board-container`** (필요 시 `id="bo-…-index"`·`data-bulk-destroy-url` 등 **기존 목록과 동일한 data 속성 패턴**만 사용)
+3. **`board-page-header` → `board-page-buttons`**  
+   - **페이지 단위 액션만** 둔다. (선택 삭제, 엑셀 다운로드, 등록/생성 등)  
+   - **검색 필터 폼·필터 입력은 여기에 두지 않는다.**
+4. **`board-card` → `board-card-body`**
+5. **`board-filter`** 안에 GET **`filter-form`** → `filter-row` → `filter-group` / 마지막에 `filter-buttons` (검색 `btn-primary`, 초기화 `btn-secondary` 또는 동일 패턴 링크)
+6. **`board-list-header`** → 왼쪽 **`list-info`** / 오른쪽 **`list-controls`** (`per-page-form`, `표시 개수:` + `per-page-select`)
+7. **`table-responsive` → `board-table`**
+8. **페이지네이션**: `<x-pagination :paginator="…" />` 등 **이미 다른 목록에서 쓰는 컴포넌트·마크업만** 사용한다. 임의 HTML 페이지네이션 신설 금지.
+
+### `board-page-buttons` 안 버튼 (좌→우, 의미색 고정)
+- **선택 삭제**(일괄 삭제): `btn btn-danger`, `id="bulk-delete-btn"`, 아이콘 `fa-trash`, 문구 **`선택 삭제 (N)`** 는 JS에서 기존 목록과 동일 패턴으로만 갱신.
+- **엑셀(보내기)**: `btn btn-secondary`, 아이콘 **`fas fa-file-download`**, 문구 **`엑셀 다운로드`** (다른 표기 금지·위 강제 규칙과 동일).
+- **신규·등록·생성 등 긍정 액션**: `btn btn-success`, `fa-plus` + 기존 메뉴와 동일한 동사(예: 직접 등록, 행사 생성, 새 게시글).
+- 위 세 종이 없는 화면은 예외이나, **있을 때 순서·색은 위 순서를 따른다** (임의로 `outline`만 쓰거나 순서 뒤집기 금지).
+
+### 검색·필터
+- 필터는 반드시 **`board-filter`** 블록 안에만 둔다.
+- `filter-buttons`는 **검색·초기화**만. 엑셀·삭제·등록 버튼을 필터 줄에 붙이지 않는다.
+
+### 테이블 (일괄 삭제 있는 목록)
+- 첫 열: `th.board-checkbox-column` + 전체 선택 `input#select-all.form-check-input`
+- 행: `input.form-check-input.bo-…-checkbox` + `value` id
+- 일괄 삭제 API·JS는 **`academic-events-index.js`** 와 동일한 `fetch` + `FormData` + `registration_ids[]` / `event_ids[]` 식 **기존 도메인 패턴**만 따른다.
+
+### 건수·표시 개수
+- `list-count`: **`Total : {{ $paginator->total() }}`** 만 (위 강제 규칙과 동일).
+- `표시 개수:` + `per-page-select` + GET 유지용 hidden 필터 필드는 **학술행사 목록·연수 결제 목록**과 동일 구조를 복제한다.
 
 ## 강제 규칙
 - 기존 백오피스 레이아웃 구조(컨테이너, 헤더, 버튼, 폼, 테이블, 페이지네이션)와 동일한 패턴을 유지한다.
@@ -17,6 +53,8 @@ alwaysApply: true
 - 사용자 요청 없이 화면 구성, 간격 체계, 버튼 스타일, 색상 체계를 임의 변경하지 않는다.
 - 신규 기능 구현 시에도 시각적 구조보다 데이터 흐름/동작만 변경하는 것을 우선한다.
 - 신규 메뉴는 도메인 종속 접두사(`member-*` 등) 대신 공용 접두사(`bo-*`) 클래스만 사용한다.
+- 목록 상단 **엑셀(또는 CSV)보내기** 링크·버튼의 표시 문구는 **`엑셀 다운로드`**로 통일한다. (`엑셀`, `엑셀 다운`, `엑셀다운로드` 등 축약·변형 문구 사용 금지)
+- 목록 헤더 **건수 표기**(`list-count`)는 `notices`·`academic-events` 등과 동일하게 **`Total : {{ $paginator->total() }}`** 형식만 사용한다. (한글 서술형·`<strong>` 감싸기 등 임의 변형 금지)
 
 ## 금지 항목
 - 레퍼런스와 다른 독자적 레이아웃 구성

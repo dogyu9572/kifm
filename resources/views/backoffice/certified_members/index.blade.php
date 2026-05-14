@@ -86,6 +86,10 @@
                 <table class="board-table">
                     <thead>
                         <tr>
+                            <th class="w5 board-checkbox-column">
+                                <input type="checkbox" id="select-all" class="form-check-input">
+                            </th>
+                            <th class="w8">번호</th>
                             <th>아이디</th>
                             <th>이름</th>
                             <th>이메일</th>
@@ -100,6 +104,10 @@
                     <tbody>
                         @forelse ($certifiedMembers as $certifiedMember)
                             <tr>
+                                <td>
+                                    <input type="checkbox" value="{{ $certifiedMember->id }}" class="form-check-input bo-row-checkbox">
+                                </td>
+                                <td>{{ $certifiedMembers->total() - (($certifiedMembers->currentPage() - 1) * $certifiedMembers->perPage()) - $loop->index }}</td>
                                 <td>{{ $certifiedMember->member->login_id ?? '-' }}</td>
                                 <td>{{ $certifiedMember->member->name ?? '-' }}</td>
                                 <td>{{ $certifiedMember->member->email ?? '-' }}</td>
@@ -120,7 +128,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">등록된 인정의 데이터가 없습니다.</td>
+                                <td colspan="11" class="text-center">등록된 인정의 데이터가 없습니다.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -133,3 +141,6 @@
 </div>
 @endsection
 
+@section('scripts')
+    <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
+@endsection

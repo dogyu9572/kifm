@@ -55,6 +55,7 @@
 @section('scripts')
     <x-backoffice-ckeditor-assets />
     <script src="{{ asset('js/backoffice/member-selector-modal.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-image-file-preview.js') }}"></script>
     <script src="{{ asset('js/backoffice/edu-courses-form.js') }}"></script>
 @endsection
 

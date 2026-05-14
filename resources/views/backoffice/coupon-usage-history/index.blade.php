@@ -83,6 +83,10 @@
                     <table class="board-table">
                         <thead>
                             <tr>
+                                <th class="w5 board-checkbox-column">
+                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                </th>
+                                <th class="w8">번호</th>
                                 <th>쿠폰명</th>
                                 <th class="w10">쿠폰 코드</th>
                                 <th class="w10">회원명</th>
@@ -94,6 +98,10 @@
                         <tbody>
                             @forelse ($histories as $history)
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" value="{{ $history->id ?? $loop->index }}" class="form-check-input bo-row-checkbox">
+                                    </td>
+                                    <td>{{ $histories->total() - (($histories->currentPage() - 1) * $histories->perPage()) - $loop->index }}</td>
                                     <td>{{ $history->coupon_name }}</td>
                                     <td><span class="bo-coupon-code">{{ $history->coupon_code }}</span></td>
                                     <td>{{ $history->member_name }}</td>
@@ -103,7 +111,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">쿠폰 사용 이력이 없습니다.</td>
+                                    <td colspan="8" class="text-center">쿠폰 사용 이력이 없습니다.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -118,4 +126,5 @@
 
 @section('scripts')
     <script src="{{ asset('js/backoffice/coupon-usage-history-index.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
 @endsection

@@ -63,15 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const selectAll = document.getElementById('select-all');
-    if (selectAll) {
-        selectAll.addEventListener('change', function () {
-            document.querySelectorAll('.bo-row-checkbox').forEach(function (cb) {
-                cb.checked = selectAll.checked;
-            });
-        });
-    }
-
     document.querySelectorAll('.js-confirm-delete').forEach(function (form) {
         form.addEventListener('submit', function (event) {
             if (!window.confirm('해당 납부 내역을 삭제하시겠습니까?')) {

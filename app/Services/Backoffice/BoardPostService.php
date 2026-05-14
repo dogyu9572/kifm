@@ -57,7 +57,42 @@ class BoardPostService
             $this->attachCommentCounts($posts, $slug);
         }
 
+        if ($slug === 'academic_notices') {
+            $this->attachAcademicEvents($posts);
+        }
+
         return $posts;
+    }
+
+    /**
+     * academic_notices 목록의 각 게시글에 event_title, event_year 를 매핑합니다.
+     */
+    private function attachAcademicEvents($posts): void
+    {
+        $eventIds = $posts->getCollection()
+            ->pluck('event_id')
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->all();
+
+        if ($eventIds === []) {
+            return;
+        }
+
+        $events = DB::table('academic_events')
+            ->whereIn('id', $eventIds)
+            ->get(['id', 'title', 'year'])
+            ->keyBy('id');
+
+        $posts->getCollection()->transform(function ($post) use ($events) {
+            $eventId = isset($post->event_id) ? (int) $post->event_id : 0;
+            $event = $events->get($eventId);
+            $post->event_title = $event->title ?? null;
+            $post->event_year = $event->year ?? null;
+
+            return $post;
+        });
     }
 
     /**
@@ -169,6 +204,20 @@ class BoardPostService
                 $query->where('is_active', true);
             } elseif ($request->visibility === 'private') {
                 $query->where('is_active', false);
+            }
+        }
+
+        if ($slug === 'academic_notices') {
+            if ($request->filled('event_id')) {
+                $query->where('event_id', (int) $request->event_id);
+            }
+
+            if ($request->filled('visibility')) {
+                if ($request->visibility === 'public') {
+                    $query->where('is_active', true);
+                } elseif ($request->visibility === 'private') {
+                    $query->where('is_active', false);
+                }
             }
         }
 
@@ -314,7 +363,7 @@ class BoardPostService
             $isActive = $request->has('is_active') ? (bool) $request->input('is_active') : true;
         }
 
-        return [
+        $data = [
             'user_id' => null,
             'author_name' => $validated['author_name'] ?? '관리자',
             'title' => $validated['title'],
@@ -334,6 +383,12 @@ class BoardPostService
                 : now(),
             'updated_at' => now(),
         ];
+
+        if ($slug === 'academic_notices') {
+            $data['event_id'] = $request->filled('event_id') ? (int) $request->input('event_id') : null;
+        }
+
+        return $data;
     }
 
     /**
@@ -517,7 +572,7 @@ class BoardPostService
             $isActive = (bool) $existingPost->is_active;
         }
 
-        return [
+        $data = [
             'title' => $validated['title'],
             'content' => $this->sanitizeContent($validated['content']),
             'category' => $validated['category'] ?? null,
@@ -536,6 +591,12 @@ class BoardPostService
             'sort_order' => $request->input('sort_order', 0),
             'updated_at' => now(),
         ];
+
+        if ($slug === 'academic_notices') {
+            $data['event_id'] = $request->filled('event_id') ? (int) $request->input('event_id') : null;
+        }
+
+        return $data;
     }
 
     /**

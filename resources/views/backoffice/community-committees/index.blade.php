@@ -63,6 +63,10 @@
                     <table class="board-table">
                         <thead>
                             <tr>
+                                <th class="w5 board-checkbox-column">
+                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                </th>
+                                <th class="w8">번호</th>
                                 <th class="w10">썸네일</th>
                                 <th class="w15">위원회 유형</th>
                                 <th>위원회명</th>
@@ -75,9 +79,16 @@
                         <tbody>
                             @forelse ($committees as $committee)
                                 <tr>
-                                    <td>                                     
+                                    <td>
+                                        <input type="checkbox" value="{{ $committee->id }}" class="form-check-input bo-row-checkbox">
+                                    </td>
+                                    <td>{{ $committees->total() - (($committees->currentPage() - 1) * $committees->perPage()) - $loop->index }}</td>
+                                    <td>
+                                        @if ($committee->thumbnail_path)
                                             <img src="{{ asset('storage/' . $committee->thumbnail_path) }}" alt="썸네일" width="60" height="40">
-                                       
+                                        @else
+                                            -
+                                        @endif
                                     </td>
                                     <td>{{ $typeLabels[$committee->committee_type] ?? $committee->committee_type }}</td>
                                     <td>{{ $committee->name }}</td>
@@ -102,7 +113,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="7" class="text-center">등록된 위원회가 없습니다.</td></tr>
+                                <tr><td colspan="9" class="text-center">등록된 위원회가 없습니다.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -116,5 +127,6 @@
 
 @section('scripts')
     <script src="{{ asset('js/backoffice/community-committees-index.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
 @endsection
 

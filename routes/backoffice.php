@@ -22,16 +22,27 @@ use App\Http\Controllers\Backoffice\EduTrainingController;
 use App\Http\Controllers\Backoffice\EduCourseController;
 use App\Http\Controllers\Backoffice\EduCourseEnrollmentController;
 use App\Http\Controllers\Backoffice\EduTrainingPaymentController;
+use App\Http\Controllers\Backoffice\AcademicEventController;
+use App\Http\Controllers\Backoffice\AcademicEventSessionController;
+use App\Http\Controllers\Backoffice\AcademicEventAbstractController;
+use App\Http\Controllers\Backoffice\AcademicEventRegistrationController;
+use App\Http\Controllers\Backoffice\AcademicSponsorMasterController;
+use App\Http\Controllers\Backoffice\AcademicHotelController;
+use App\Http\Controllers\Backoffice\LocalDoctorController;
+use App\Http\Controllers\Backoffice\DoctorCategoryController;
 use App\Http\Controllers\Backoffice\LogController;
 use App\Http\Controllers\Backoffice\MailController;
 use App\Http\Controllers\Backoffice\MemberController;
 use App\Http\Controllers\Backoffice\MemberExecutiveController;
 use App\Http\Controllers\Backoffice\MembershipPaymentController;
+use App\Http\Controllers\Backoffice\OneOnOneInquiryController;
 use App\Http\Controllers\Backoffice\PaymentPlanController;
 use App\Http\Controllers\Backoffice\PopupController;
 use App\Http\Controllers\Backoffice\SettingController;
 use App\Http\Controllers\Backoffice\SmsController;
 use App\Http\Controllers\Backoffice\SocietyExecutiveController;
+use App\Http\Controllers\Backoffice\StatsEventController;
+use App\Http\Controllers\Backoffice\StatsMemberController;
 use App\Http\Controllers\Backoffice\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -130,6 +141,10 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.admin-access-logs');
 
     // 통계 관리
+    Route::get('stats/members', [StatsMemberController::class, 'index'])
+        ->name('backoffice.stats.members.index');
+    Route::get('stats/events', [StatsEventController::class, 'index'])
+        ->name('backoffice.stats.events.index');
     Route::get('access-statistics', [AccessStatisticsController::class, 'index'])
         ->name('backoffice.access-statistics');
     Route::get('access-statistics/get-statistics', [AccessStatisticsController::class, 'getStatistics'])
@@ -283,6 +298,83 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         'parameters' => ['edu-training-payments' => 'edu_training_payment'],
     ])->only(['index', 'create', 'store', 'edit', 'update']);
 
+    // 학술 행사
+    Route::post('academic-events/bulk-destroy', [AcademicEventController::class, 'bulkDestroy'])
+        ->name('backoffice.academic-events.bulk-destroy');
+    Route::get('academic-events/search-members', [AcademicEventController::class, 'searchMembers'])
+        ->name('backoffice.academic-events.search-members');
+    Route::get('academic-events/search-abstracts', [AcademicEventController::class, 'searchAbstracts'])
+        ->name('backoffice.academic-events.search-abstracts');
+    Route::get('academic-sponsor-masters/search', [AcademicSponsorMasterController::class, 'search'])
+        ->name('backoffice.academic-sponsor-masters.search');
+    Route::post('academic-sponsor-masters/quick-store', [AcademicSponsorMasterController::class, 'quickStore'])
+        ->name('backoffice.academic-sponsor-masters.quick-store');
+    Route::post('academic-sponsor-masters/bulk-destroy', [AcademicSponsorMasterController::class, 'bulkDestroy'])
+        ->name('backoffice.academic-sponsor-masters.bulk-destroy');
+    Route::post('academic-sponsor-masters/update-sort-order', [AcademicSponsorMasterController::class, 'updateSortOrder'])
+        ->name('backoffice.academic-sponsor-masters.update-sort-order');
+    Route::resource('academic-sponsor-masters', AcademicSponsorMasterController::class, [
+        'names' => 'backoffice.academic-sponsor-masters',
+        'parameters' => ['academic-sponsor-masters' => 'academic_sponsor_master'],
+    ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::post('academic-hotels/bulk-destroy', [AcademicHotelController::class, 'bulkDestroy'])
+        ->name('backoffice.academic-hotels.bulk-destroy');
+    Route::resource('academic-hotels', AcademicHotelController::class, [
+        'names' => 'backoffice.academic-hotels',
+        'parameters' => ['academic-hotels' => 'academic_hotel'],
+    ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    Route::resource('academic-events', AcademicEventController::class, [
+        'names' => 'backoffice.academic-events',
+        'parameters' => ['academic-events' => 'academic_event'],
+    ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+    Route::get('academic-events/{academic_event}/sessions/create', [AcademicEventSessionController::class, 'create'])
+        ->name('backoffice.academic-events.sessions.create');
+    Route::post('academic-events/{academic_event}/sessions', [AcademicEventSessionController::class, 'store'])
+        ->name('backoffice.academic-events.sessions.store');
+    Route::get('academic-events/{academic_event}/sessions/{academic_event_session}/edit', [AcademicEventSessionController::class, 'edit'])
+        ->name('backoffice.academic-events.sessions.edit');
+    Route::put('academic-events/{academic_event}/sessions/{academic_event_session}', [AcademicEventSessionController::class, 'update'])
+        ->name('backoffice.academic-events.sessions.update');
+    Route::delete('academic-events/{academic_event}/sessions/{academic_event_session}', [AcademicEventSessionController::class, 'destroy'])
+        ->name('backoffice.academic-events.sessions.destroy');
+
+    Route::post('academic-event-registrations/bulk-destroy', [AcademicEventRegistrationController::class, 'bulkDestroy'])
+        ->name('backoffice.academic-event-registrations.bulk-destroy');
+    Route::get('academic-event-registrations/export', [AcademicEventRegistrationController::class, 'export'])
+        ->name('backoffice.academic-event-registrations.export');
+    Route::get('academic-event-registrations/search-members', [AcademicEventRegistrationController::class, 'searchMembers'])
+        ->name('backoffice.academic-event-registrations.search-members');
+    Route::get('academic-event-registrations/search-payment-plans', [AcademicEventRegistrationController::class, 'searchPaymentPlans'])
+        ->name('backoffice.academic-event-registrations.search-payment-plans');
+    Route::resource('academic-event-registrations', AcademicEventRegistrationController::class, [
+        'names' => 'backoffice.academic-event-registrations',
+        'parameters' => ['academic-event-registrations' => 'academic_event_registration'],
+    ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::post('academic-event-abstracts/bulk-destroy', [AcademicEventAbstractController::class, 'bulkDestroy'])
+        ->name('backoffice.academic-event-abstracts.bulk-destroy');
+    Route::get('academic-event-abstracts/search-members', [AcademicEventAbstractController::class, 'searchMembers'])
+        ->name('backoffice.academic-event-abstracts.search-members');
+    Route::resource('academic-event-abstracts', AcademicEventAbstractController::class, [
+        'names' => 'backoffice.academic-event-abstracts',
+        'parameters' => ['academic-event-abstracts' => 'academic_event_abstract'],
+    ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    // 우리동네주치의
+    Route::get('local-doctors/search-members', [LocalDoctorController::class, 'searchMembers'])
+        ->name('backoffice.local-doctors.search-members');
+    Route::post('local-doctors/bulk-destroy', [LocalDoctorController::class, 'bulkDestroy'])
+        ->name('backoffice.local-doctors.bulk-destroy');
+    Route::resource('local-doctors', LocalDoctorController::class, [
+        'names' => 'backoffice.local-doctors',
+        'parameters' => ['local-doctors' => 'local_doctor'],
+    ])->except(['show']);
+    Route::resource('doctor-categories', DoctorCategoryController::class, [
+        'names' => 'backoffice.doctor-categories',
+        'parameters' => ['doctor-categories' => 'doctor_category'],
+    ])->except(['show']);
+
     // 주소록 관리 (전용 MVC)
     Route::get('address-books', [AddressBookController::class, 'index'])->name('backoffice.address-books.index');
     Route::get('address-books/create', [AddressBookController::class, 'create'])->name('backoffice.address-books.create');
@@ -409,6 +501,16 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         Route::get('/{popup}/edit', [PopupController::class, 'edit'])->name('edit');
         Route::put('/{popup}', [PopupController::class, 'update'])->name('update');
         Route::delete('/{popup}', [PopupController::class, 'destroy'])->name('destroy');
+    });
+
+    // 문의사항 관리 > 1:1 문의 관리 (URL 단일 세그먼트)
+    Route::post('one-on-one-inquiries/bulk-destroy', [OneOnOneInquiryController::class, 'bulkDestroy'])
+        ->name('backoffice.one-on-one-inquiries.bulk-destroy');
+    Route::prefix('one-on-one-inquiries')->name('backoffice.one-on-one-inquiries.')->group(function () {
+        Route::get('/', [OneOnOneInquiryController::class, 'index'])->name('index');
+        Route::get('/{one_on_one_inquiry}/edit', [OneOnOneInquiryController::class, 'edit'])->name('edit');
+        Route::put('/{one_on_one_inquiry}', [OneOnOneInquiryController::class, 'update'])->name('update');
+        Route::delete('/{one_on_one_inquiry}', [OneOnOneInquiryController::class, 'destroy'])->name('destroy');
     });
 
     // 세션 연장

@@ -274,6 +274,7 @@
                             <th class="w5 board-checkbox-column">
                                 <input type="checkbox" id="select-all" class="form-check-input">
                             </th>
+                            <th class="w8">번호</th>
                             <th>등급</th>
                             <th>구분</th>
                             <th>인정의</th>
@@ -293,6 +294,7 @@
                                 <td>
                                     <input type="checkbox" name="selected_members[]" value="{{ $member->id }}" class="form-check-input bo-row-checkbox">
                                 </td>
+                                <td>{{ $members->total() - (($members->currentPage() - 1) * $members->perPage()) - $loop->index }}</td>
                                 <td>{{ $memberLevelLabels[$member->member_level] ?? '-' }}</td>
                                 <td>{{ $member->job_type ? ($jobTypeLabels[$member->job_type] ?? $member->job_type) : '-' }}</td>
                                 <td>{{ $member->certified_instructor ? '인정의' : '-' }}</td>
@@ -328,7 +330,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="12" class="text-center">등록된 회원이 없습니다.</td>
+                                <td colspan="13" class="text-center">등록된 회원이 없습니다.</td>
                             </tr>
                         @endforelse
                     </tbody>

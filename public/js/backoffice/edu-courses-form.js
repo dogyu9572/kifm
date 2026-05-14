@@ -7,8 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const activeTabInput = document.getElementById('bo-edu-course-active-tab');
     const tabButtons = document.querySelectorAll('.js-course-tab-btn');
     const tabPanels = document.querySelectorAll('.js-course-tab-panel');
-    const formatFileSize = (bytes) => `(${(bytes / 1024 / 1024).toFixed(2)}MB)`;
-
     const setActiveTab = (tabId) => {
         activeTabInput.value = tabId;
         tabButtons.forEach((button) => {
@@ -310,6 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    const formatFileSize = (bytes) => `(${(bytes / 1024 / 1024).toFixed(2)}MB)`;
+
     const bindSingleFileInput = ({ inputId, previewId, existingKey, acceptText }) => {
         const fileInput = document.getElementById(inputId);
         const preview = document.getElementById(previewId);
@@ -368,6 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             fileInput.value = '';
             renderPreview(null);
+            if (removeExistingCheckbox) {
+                removeExistingCheckbox.checked = false;
+            }
+            if (existingItem) {
+                existingItem.classList.remove('bo-hidden');
+            }
         });
 
         removeExistingButton?.addEventListener('click', () => {
@@ -380,12 +386,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    bindSingleFileInput({
-        inputId: 'thumbnail_file',
-        previewId: 'thumbnailFilePreview',
-        existingKey: 'thumbnail',
-        acceptText: '썸네일',
-    });
+    if (typeof window.initBoardImageFilePreview === 'function') {
+        window.initBoardImageFilePreview({
+            inputId: 'thumbnail_file',
+            previewId: 'thumbnailFilePreview',
+            removeExistingSelector: '[data-remove-existing-target="thumbnail"]',
+            deleteCheckboxId: 'delete_thumbnail',
+            existingItemId: 'bo-thumbnail-existing-item',
+        });
+    }
+
     bindSingleFileInput({
         inputId: 'lecture_file',
         previewId: 'lectureFilePreview',

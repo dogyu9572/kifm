@@ -4,6 +4,7 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/backoffice/boards.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/backoffice/backoffice-crud.css') }}">
 @endsection
 
 @section('content')
@@ -41,6 +42,9 @@
                     <table class="board-table">
                         <thead>
                             <tr>
+                                <th class="w5 board-checkbox-column">
+                                    <input type="checkbox" id="select-all" class="form-check-input">
+                                </th>
                                 <th class="w8">번호</th>
                                 <th>주소록명</th>
                                 <th class="w12">등록 회원 수</th>
@@ -52,6 +56,9 @@
                         <tbody>
                             @forelse ($addressBooks as $addressBook)
                                 <tr>
+                                    <td>
+                                        <input type="checkbox" value="{{ $addressBook->id }}" class="form-check-input bo-row-checkbox">
+                                    </td>
                                     <td>{{ $addressBooks->total() - (($addressBooks->currentPage() - 1) * $addressBooks->perPage()) - $loop->index }}</td>
                                     <td>{{ $addressBook->name }}</td>
                                     <td>{{ number_format($addressBook->member_count) }}명</td>
@@ -67,7 +74,7 @@
                                     </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="6" class="text-center">등록된 주소록이 없습니다.</td></tr>
+                                <tr><td colspan="7" class="text-center">등록된 주소록이 없습니다.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -80,4 +87,5 @@
 
 @section('scripts')
     <script src="{{ asset('js/backoffice/address-books.js') }}"></script>
+    <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
 @endsection

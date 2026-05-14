@@ -141,5 +141,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncLimitInput();
     ensureEmptyRow();
+
+    if (typeof window.initBoardImageFilePreview === 'function') {
+        window.initBoardImageFilePreview({
+            inputId: 'banner_file',
+            previewId: 'bannerFilePreview',
+            removeExistingSelector: '[data-remove-existing-target="banner"]',
+            deleteCheckboxId: 'delete_banner',
+            existingItemId: 'bo-banner-existing-item',
+        });
+    }
 });
 

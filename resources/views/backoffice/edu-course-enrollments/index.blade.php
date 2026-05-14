@@ -16,7 +16,7 @@
         <div class="board-page-header">
             <div class="board-page-buttons">
                 <button type="button" id="bulk-delete-btn" class="btn btn-danger"><i class="fas fa-trash"></i> 선택 삭제</button>
-                <a href="{{ route('backoffice.edu-course-enrollments.export', request()->query()) }}" class="btn btn-secondary"><i class="fas fa-file-download"></i> 엑셀 다운</a>
+                <a href="{{ route('backoffice.edu-course-enrollments.export', request()->query()) }}" class="btn btn-secondary"><i class="fas fa-file-download"></i> 엑셀 다운로드</a>
             </div>
         </div>
 

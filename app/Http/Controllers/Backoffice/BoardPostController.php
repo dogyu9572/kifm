@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BoardPostRequest;
+use App\Models\AcademicEvent;
 use App\Models\Board;
 use App\Services\Backoffice\BoardPostCommentService;
 use App\Services\Backoffice\BoardPostService;
@@ -50,8 +51,13 @@ class BoardPostController extends Controller
 
         $posts = $this->boardPostService->getPosts($slug, $request);
 
-        // 자동 생성된 뷰 사용
-        return view("backoffice.board-posts.{$slug}.index", compact('board', 'posts'));
+        $viewData = compact('board', 'posts');
+
+        if ($slug === 'academic_notices') {
+            $viewData['events'] = $this->getAcademicEventsForSelect();
+        }
+
+        return view("backoffice.board-posts.{$slug}.index", $viewData);
     }
 
     /**
@@ -79,8 +85,13 @@ class BoardPostController extends Controller
         // 카테고리 옵션 가져오기
         $categoryOptions = $board->getCategoryOptions();
 
-        // 자동 생성된 뷰 사용
-        return view("backoffice.board-posts.{$slug}.create", compact('board', 'nextSortOrder', 'categoryOptions'));
+        $viewData = compact('board', 'nextSortOrder', 'categoryOptions');
+
+        if ($slug === 'academic_notices') {
+            $viewData['events'] = $this->getAcademicEventsForSelect();
+        }
+
+        return view("backoffice.board-posts.{$slug}.create", $viewData);
     }
 
     /**
@@ -164,8 +175,24 @@ class BoardPostController extends Controller
             $boardPostCommentsThread = $this->boardPostCommentService->listRootWithReplies($slug, (int) $post->id);
         }
 
-        // 자동 생성된 뷰 사용
-        return view("backoffice.board-posts.{$slug}.edit", compact('board', 'post', 'categoryOptions', 'boardPostCommentsThread'));
+        $viewData = compact('board', 'post', 'categoryOptions', 'boardPostCommentsThread');
+
+        if ($slug === 'academic_notices') {
+            $viewData['events'] = $this->getAcademicEventsForSelect();
+        }
+
+        return view("backoffice.board-posts.{$slug}.edit", $viewData);
+    }
+
+    /**
+     * 학술대회 셀렉트용 목록 (year DESC, id DESC)
+     */
+    private function getAcademicEventsForSelect()
+    {
+        return AcademicEvent::query()
+            ->orderByDesc('year')
+            ->orderByDesc('id')
+            ->get(['id', 'title', 'year']);
     }
 
     /**

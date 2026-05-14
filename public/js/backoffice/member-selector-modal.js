@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const loginId = escapeAttr(member.login_id ?? '');
                 const licenseNumber = escapeAttr(member.license_number ?? '');
                 const organization = escapeAttr(member.organization ?? '');
+                const position = escapeAttr(member.position ?? '');
                 const name = escapeAttr(member.name ?? '');
                 return `
                     <tr>
@@ -81,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             data-label="${escapeAttr(label)}"
                             data-name="${name}"
                             data-organization="${organization}"
+                            data-position="${position}"
                             data-phone="${phone}"
                             data-email="${email}"
                             data-login-id="${loginId}"
@@ -145,7 +147,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const response = await fetch(url.toString(), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+                    credentials: 'same-origin',
+                });
                 if (!response.ok) {
                     throw new Error('검색 요청 실패');
                 }
@@ -217,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         label: target.dataset.label ?? '',
                         name: target.dataset.name ?? '',
                         organization: target.dataset.organization ?? '',
+                        position: target.dataset.position ?? '',
                         phone_number: target.dataset.phone ?? '',
                         email: target.dataset.email ?? '',
                         login_id: target.dataset.loginId ?? '',

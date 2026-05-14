@@ -61,6 +61,10 @@ class BoardPostRequest extends FormRequest
             'sort_order' => 'nullable|integer|min:0'
         ];
 
+        if ($slug === 'academic_notices') {
+            $rules['event_id'] = ['required', 'integer', Rule::exists('academic_events', 'id')];
+        }
+
         // 커스텀 필드 검증 규칙 추가
         $customRules = $this->getCustomFieldRules();
         
@@ -167,7 +171,10 @@ class BoardPostRequest extends FormRequest
             'thumbnail.mimes' => '썸네일은 jpeg, png, jpg, gif 형식만 지원합니다.',
             'thumbnail.max' => '썸네일은 최대 5MB까지 업로드 가능합니다.',
             'attachments.*.file' => '첨부파일은 파일이어야 합니다.',
-            'attachments.*.max' => '첨부파일은 최대 10MB까지 업로드 가능합니다.'
+            'attachments.*.max' => '첨부파일은 최대 10MB까지 업로드 가능합니다.',
+            'event_id.required' => '학술대회를 선택해 주세요.',
+            'event_id.integer' => '학술대회 선택값이 올바르지 않습니다.',
+            'event_id.exists' => '존재하지 않는 학술대회입니다.',
         ];
 
         // 커스텀 필드 에러 메시지 추가
