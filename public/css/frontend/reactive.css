@@ -1,0 +1,17 @@
+/* ------------------------------ PC Guide ------------------------------ */
+@media screen and (max-width:1440px){
+}
+
+/* ------------------------------ Hover ------------------------------ */
+@media screen and (min-width:1024px){
+}
+
+/* ------------------------------ Tablet PC ------------------------------ */
+@media screen and (max-width:1023px){
+}
+
+/* ------------------------------ Mobile ------------------------------ */
+@media screen and (max-width:767px){
+	.pc_vw {display:none !important;}
+	.mo_vw {display:block !important;}
+}

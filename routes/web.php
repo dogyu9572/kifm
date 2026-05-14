@@ -49,5 +49,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
 // 분리된 라우트 파일들 포함
 // =============================================================================
 
+// 사용자(프론트) 라우트 (Frontend 네임스페이스)
+require __DIR__.'/frontend.php';
+
 // 백오피스 라우트 (관리자 전용)
 require __DIR__.'/backoffice.php';
