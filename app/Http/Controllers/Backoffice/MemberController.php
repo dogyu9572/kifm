@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BackofficeMemberRequest;
 use App\Models\User;
+use App\Services\Backoffice\MemberHistoryService;
 use App\Services\Backoffice\MemberService;
 use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
-    public function __construct(private readonly MemberService $memberService)
-    {
+    public function __construct(
+        private readonly MemberService $memberService,
+        private readonly MemberHistoryService $memberHistoryService,
+    ) {
     }
 
     public function index(Request $request)
@@ -86,10 +89,11 @@ class MemberController extends Controller
     {
         $member = $this->memberService->getMember($user->id);
 
-        return view('backoffice.members.edit', $this->memberFormViewData(
-            $member,
-            true
-        ));
+        $viewData = $this->memberFormViewData($member, true);
+        $viewData['histories'] = $this->memberHistoryService->forMember($member);
+        $viewData['historyLabels'] = MemberHistoryService::labels();
+
+        return view('backoffice.members.edit', $viewData);
     }
 
     /**
