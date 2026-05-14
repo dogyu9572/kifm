@@ -16,6 +16,7 @@ class HomeController extends Controller
         $gNum = "main";
         $gName = "";
         $sName = "";
+        $page_type = "professional";
         
         // gallerys 게시판 최신글 4개
         $galleryPosts = $this->getLatestPosts('gallerys', 4);
@@ -42,7 +43,7 @@ class HomeController extends Controller
             ->ordered()
             ->get();
         
-        return view('home.index', compact('gNum', 'gName', 'sName', 'galleryPosts', 'noticePosts', 'popups', 'banners'));
+        return view('home.index', compact('gNum', 'gName', 'sName', 'page_type', 'galleryPosts', 'noticePosts', 'popups', 'banners'));
     }
     
     /**
