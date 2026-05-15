@@ -116,6 +116,12 @@ Route::prefix('terms')->name('terms.')->group(function () {
 // 회원 (Phase 4 에서 기존 Auth 와 통합 예정)
 Route::prefix('member')->name('member.')->group(function () {
     Route::get('/login', [FrontendMemberController::class, 'login'])->name('login');
+    Route::post('/login', [FrontendMemberController::class, 'loginStore'])
+        ->middleware('throttle:15,1')
+        ->name('login.store');
+    Route::post('/logout', [FrontendMemberController::class, 'logout'])
+        ->middleware(['auth', 'throttle:30,1'])
+        ->name('logout');
     Route::get('/dormant_auth', [FrontendMemberController::class, 'dormantAuth'])->name('dormant_auth');
     Route::get('/password_reset', [FrontendMemberController::class, 'passwordReset'])->name('password_reset');
     Route::get('/find_id', [FrontendMemberController::class, 'findId'])->name('find_id');

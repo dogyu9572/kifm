@@ -127,12 +127,20 @@
 				</ul>
 				@if(isset($gNum) && $gNum !== 'online_academy')
 				<ul class="member" aria-label="회원 메뉴">
-					<!-- 로그인 전 -->
-					<li><a href="/member/login">로그인</a></li>
-					<li><a href="/member/register">회원가입</a></li>
-					<!-- 로그인 후 -->
-					<li><a href="#this">로그아웃</a></li>
-					<li><a href="/mypage/profile_edit">마이페이지</a></li>
+					@guest
+					<li><a href="{{ route('member.login') }}">로그인</a></li>
+					<li><a href="{{ route('member.register') }}">회원가입</a></li>
+					@else
+					<li>
+						<form action="{{ route('member.logout') }}" method="POST" class="member-nav-logout-form">
+							@csrf
+							<button type="submit" class="member-nav-link">로그아웃</button>
+						</form>
+					</li>
+					@if(auth()->user()?->role === 'user')
+					<li><a href="{{ route('mypage.profile_edit') }}">마이페이지</a></li>
+					@endif
+					@endguest
 				</ul>
 				@endif
 			</div>
@@ -250,8 +258,17 @@
 				</li>
 			</ul>
 			<div class="member">
-				<a href="/mypage/profile_edit" class="btn i1">마이페이지</a>
-				<a href="#this" class="btn i2">로그아웃</a>
+				@guest
+				<a href="{{ route('member.login') }}" class="btn i1">로그인</a>
+				@else
+				@if(auth()->user()?->role === 'user')
+				<a href="{{ route('mypage.profile_edit') }}" class="btn i1">마이페이지</a>
+				@endif
+				<form action="{{ route('member.logout') }}" method="POST" class="member-nav-logout-form member-nav-logout-form--academic">
+					@csrf
+					<button type="submit" class="btn i2">로그아웃</button>
+				</form>
+				@endguest
 			</div>
 		</div>
 	</header>

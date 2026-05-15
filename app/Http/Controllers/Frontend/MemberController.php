@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FrontendMemberLoginRequest;
 use App\Http\Requests\FrontendMemberRegisterRequest;
 use App\Models\CommunityCommittee;
 use App\Models\User;
@@ -10,6 +11,8 @@ use App\Services\Backoffice\MemberService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
 class MemberController extends Controller
@@ -20,7 +23,67 @@ class MemberController extends Controller
 
     public function login(): View
     {
-        return $this->renderMember('login', '01', '로그인', 'login');
+        $loginPopup = Session::pull('member_login_popup');
+
+        return $this->renderMember('login', '01', '로그인', 'login', compact('loginPopup'));
+    }
+
+    public function loginStore(FrontendMemberLoginRequest $request): RedirectResponse
+    {
+        $credentials = [
+            'login_id' => $request->validated('login_id'),
+            'password' => $request->validated('password'),
+            'role' => 'user',
+        ];
+
+        if (! Auth::attempt($credentials, false)) {
+            return back()
+                ->withInput($request->only('login_id'))
+                ->withErrors(['login_id' => '아이디 또는 비밀번호가 올바르지 않습니다.']);
+        }
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->withdrawn_at !== null) {
+            Auth::logout();
+
+            return back()
+                ->withInput($request->only('login_id'))
+                ->withErrors(['login_id' => '탈퇴 처리된 계정입니다.']);
+        }
+
+        if ($user->member_level === 'pending') {
+            Auth::logout();
+            $request->session()->regenerate();
+
+            return redirect()
+                ->route('member.login')
+                ->with('member_login_popup', 'pending');
+        }
+
+        if ($user->isDormantMember()) {
+            Auth::logout();
+            $request->session()->regenerate();
+
+            return redirect()
+                ->route('member.login')
+                ->with('member_login_popup', 'dormant');
+        }
+
+        $request->session()->regenerate();
+        $user->forceFill(['last_login_at' => now()])->save();
+
+        return redirect()->intended(route('home'));
+    }
+
+    public function logout(Request $request): RedirectResponse
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
     }
 
     public function dormantAuth(): View
@@ -101,7 +164,12 @@ class MemberController extends Controller
             'phone_number.required' => '휴대폰 번호를 입력해주세요.',
         ]);
 
-        $phone = (string) $request->input('phone_number');
+        $phone = User::normalizePhone((string) $request->input('phone_number', ''));
+        if ($phone === '' || ! preg_match('/^01[016789]\d{7,8}$/', $phone)) {
+            return response()->json([
+                'message' => '휴대폰 번호 형식을 확인해주세요. (숫자만 입력)',
+            ], 422);
+        }
         $exists = $this->memberService->checkDuplicatePhone($phone, null);
 
         return response()->json([

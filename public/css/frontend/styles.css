@@ -65,6 +65,8 @@
 	.header .top .member li {position:relative;}
 	.header .top .member li + li:before {content:""; position:absolute; top:50%; left:-16px; width:1px; height:12px; background:#666; transform:translateY(-50%);}
 	.header .top .member a {color:#666;}
+	.header .top .member form.member-nav-logout-form {display:inline;margin:0;padding:0;border:0;background:none;vertical-align:baseline;}
+	.header .top .member button.member-nav-link {background:none;border:0;padding:0;margin:0;font:inherit;cursor:pointer;color:#666;}
 	.header .btm {padding:16px 0;}
 	.header .btm .inner {display:flex; justify-content:space-between; align-items:center;}
 	.header .btm .left {display:flex; align-items:center; gap:60px;}

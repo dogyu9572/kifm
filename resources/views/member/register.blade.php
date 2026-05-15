@@ -78,7 +78,7 @@
 							<li>
 								<label for="register-phone">휴대폰 번호<span class="c_iden">*</span></label>
 								<div class="inbtn">
-									<input type="text" id="register-phone" name="phone_number" class="text" value="{{ old('phone_number') }}" placeholder="휴대폰 번호를 입력해 주세요." required autocomplete="tel">
+									<input type="text" id="register-phone" name="phone_number" class="text js-register-phone-input" value="{{ old('phone_number') }}" placeholder="숫자만 입력 (하이픈 자동)" inputmode="numeric" autocomplete="tel" maxlength="13">
 									<button type="button" class="btn btn_wkk js-register-check-phone">중복 확인</button>
 								</div>
 								@error('phone_number')
@@ -163,12 +163,12 @@
 								<label for="register-company-address">직장주소</label>
 								<div class="half_box flex">
 									<div class="inbtn">
-										<input type="text" id="register-company-address" name="workplace_address" class="text" value="{{ old('workplace_address') }}" placeholder="직장 주소(기본)" maxlength="255">
-										<button type="button" class="btn btn_wkk">주소검색</button>
+										<input type="text" id="register-company-address" name="workplace_address" class="text" value="{{ old('workplace_address') }}" placeholder="직장 주소(기본)" maxlength="255" readonly>
+										<button type="button" class="btn btn_wkk js-register-search-workplace-address">주소검색</button>
 									</div>
-									<input type="text" name="workplace_address_detail" class="text half" value="{{ old('workplace_address_detail') }}" placeholder="나머지 주소를 입력해 주세요." maxlength="255">
+									<input type="text" id="register-workplace-address-detail" name="workplace_address_detail" class="text half" value="{{ old('workplace_address_detail') }}" placeholder="나머지 주소를 입력해 주세요." maxlength="255">
 								</div>
-								<input type="hidden" name="workplace_zipcode" value="{{ old('workplace_zipcode') }}">
+								<input type="hidden" id="register-workplace-zipcode" name="workplace_zipcode" value="{{ old('workplace_zipcode') }}">
 								@error('workplace_zipcode')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
@@ -293,5 +293,6 @@
 @endsection
 
 @push('scripts')
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="{{ asset('js/frontend/member-register.js') }}"></script>
 @endpush

@@ -9,6 +9,97 @@
         return meta ? meta.getAttribute('content') : '';
     }
 
+    /**
+     * 한국 휴대폰 표시용 하이픈 (저장값은 숫자만 — 서버에서 User::normalizePhone 처리)
+     */
+    function formatPhoneKoreaDisplay(raw) {
+        var d = String(raw || '')
+            .replace(/\D/g, '')
+            .slice(0, 11);
+        if (!d.length) {
+            return '';
+        }
+        if (d.length <= 3) {
+            return d;
+        }
+        // 10자리 완성(011 등 구형) → 3-3-4
+        if (d.length === 10 && d[2] !== '0') {
+            return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+        }
+        // 010·016~019 또는 11자리 입력 중 → 3-4-4
+        if (d.startsWith('010') || d.length === 11 || /^01[6789]/.test(d)) {
+            if (d.length <= 7) {
+                return d.slice(0, 3) + '-' + d.slice(3);
+            }
+            return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+        }
+        // 011 입력 중(10자리 미만) → 3-3-4 형태로 진행
+        if (d.startsWith('011')) {
+            if (d.length <= 6) {
+                return d.slice(0, 3) + '-' + d.slice(3);
+            }
+            if (d.length === 10) {
+                return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+            }
+        }
+        if (d.length <= 7) {
+            return d.slice(0, 3) + '-' + d.slice(3);
+        }
+        return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+    }
+
+    function bindRegisterPhoneInput() {
+        var input = document.querySelector('input.js-register-phone-input[name="phone_number"]');
+        if (!input) {
+            return;
+        }
+        var apply = function () {
+            var formatted = formatPhoneKoreaDisplay(input.value);
+            input.value = formatted;
+            var end = formatted.length;
+            input.setSelectionRange(end, end);
+        };
+        if (input.value) {
+            input.value = formatPhoneKoreaDisplay(input.value);
+        }
+        input.addEventListener('input', apply);
+        input.addEventListener('blur', function () {
+            input.value = formatPhoneKoreaDisplay(input.value);
+        });
+        input.addEventListener('paste', function () {
+            window.requestAnimationFrame(apply);
+        });
+    }
+
+    function bindWorkplaceAddressSearch() {
+        var btn = document.querySelector('.js-register-search-workplace-address');
+        if (!btn) {
+            return;
+        }
+        btn.addEventListener('click', function () {
+            if (typeof daum === 'undefined' || !daum.Postcode) {
+                window.alert('주소 검색을 불러오지 못했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
+                return;
+            }
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    var zip = document.getElementById('register-workplace-zipcode');
+                    var base = document.getElementById('register-company-address');
+                    var detail = document.getElementById('register-workplace-address-detail');
+                    if (zip) {
+                        zip.value = data.zonecode;
+                    }
+                    if (base) {
+                        base.value = data.address;
+                    }
+                    if (detail) {
+                        detail.focus();
+                    }
+                },
+            }).open();
+        });
+    }
+
     function postForm(url, bodyObj) {
         var body = new URLSearchParams();
         body.append('_token', getCsrfToken());
@@ -83,6 +174,9 @@
             return;
         }
 
+        bindRegisterPhoneInput();
+        bindWorkplaceAddressSearch();
+
         bindCommitteeLimit();
 
         bindDuplicateButton('.js-register-check-login-id', root.dataset.checkLoginId, 'login_id', function () {
@@ -97,7 +191,7 @@
 
         bindDuplicateButton('.js-register-check-phone', root.dataset.checkPhone, 'phone_number', function () {
             var el = document.querySelector('input[name="phone_number"]');
-            return el ? el.value.trim() : '';
+            return el ? el.value.replace(/\D/g, '') : '';
         });
 
         bindDuplicateButton('.js-register-check-license', root.dataset.checkLicense, 'license_number', function () {

@@ -85,6 +85,13 @@ class BackofficeMemberRequest extends FormRequest
             $this->merge(['committee_codes' => []]);
         }
 
+        if ($this->exists('phone_number')) {
+            $normalizedPhone = User::normalizePhone((string) $this->input('phone_number', ''));
+            $this->merge([
+                'phone_number' => $normalizedPhone !== '' ? $normalizedPhone : null,
+            ]);
+        }
+
         if (! $this->isMethod('PUT') && ! $this->isMethod('PATCH')) {
             if (! $this->filled('join_type')) {
                 $this->merge(['join_type' => 'email']);

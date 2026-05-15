@@ -1,5 +1,5 @@
 ---
-description: 사용자(프론트) 공개 페이지 폼·유효성 검사 표시 일관성(필드별 오류, 보조 버튼 알럿)
+description: 사용자(프론트) 공개 페이지 — 디자인·문구·항목 고정(동적 연동 예외만), 폼 유효성·휴대폰 등 비시각 변경
 globs: "{resources/views/member/**/*.blade.php,resources/views/mypage/**/*.blade.php,resources/views/subcommittee/**/*.blade.php,resources/views/member_plaza/**/*.blade.php,resources/views/home/**/*.blade.php,resources/views/archives/**/*.blade.php,resources/views/introduction/**/*.blade.php,resources/views/terms/**/*.blade.php,resources/views/total_search/**/*.blade.php,resources/views/our_neighborhood_doctor/**/*.blade.php,resources/views/online_academy/**/*.blade.php,resources/views/academic_event/**/*.blade.php,resources/views/academic_conference/**/*.blade.php,public/js/frontend/**/*.js}"
 alwaysApply: false
 ---
@@ -9,6 +9,13 @@ alwaysApply: false
 ## 적용 범위
 - `resources/views/backoffice/**`는 제외한다. (백오피스는 `25-backoffice-ui-consistency.mdc` 등 기존 규칙을 따른다.)
 - 위 `globs`에 없더라도 **`layouts.frontend` 등 사용자 공개 레이아웃**을 쓰는 신규 폼·입력 화면에는 **동일 원칙**을 적용한다.
+
+## 사용자 페이지 디자인·문구·항목 고정 (최우선)
+- **디자인 변경 금지**: 레이아웃·간격·클래스 조합·DOM 순서·인풋/버튼 형태 등 **시각적 결과가 달라지는 수정을 하지 않는다.**
+- **텍스트·항목(라벨·플레이스홀더·섹션 제목·고정 문구·필드 구성) 임의 변경 금지**: 사용자가 **명시적으로 바꾸라고 요청한 경우가 아니면** 한 글자·한 항목도 바꾸지 않는다.
+- **허용되는 변경(예외)**: 기존에 **하드코딩된 위치**에 한해, **관리자(백오피스)·DB·API 연동**으로 내용만 **동적으로 치환**되는 경우뿐이다. (같은 자리·같은 마크업 구조를 유지하고 출력 소스만 데이터 바인딩으로 바꾼다.)
+- **그 외**: 사용자가 **명시적으로 변경을 요청한 작업**에 포함된 범위만 수정한다. (리팩터·문구 다듬기·레이아웃 개선·접근성 명목의 구조 변경 등 임의 변경 금지.)
+- 위 예외가 아닌데 Blade/JS/CSS를 건드려야 하면 **먼저 사용자에게 범위 확인** 후 진행한다.
 
 ## 필드별 서버 검증 메시지 (기본)
 - `FormRequest` 등 서버 검증 실패 시, **페이지 최상단에만** 오류를 모아 두지 않는다.  
@@ -27,7 +34,15 @@ alwaysApply: false
 - **중복 확인**, **본인인증 단계 호출**, **단발성 확인 API** 등 폼 **제출과 별개**인 버튼 액션의 결과 안내는 기본적으로 **`window.alert`**(또는 이 프로젝트에서 이미 쓰는 동일 패턴)로 처리한다.
 - **폼 제출 후** 서버가 돌려준 검증 오류는 **알럿으로 대체하지 않고** 위의 **필드별 `@error`**로만 보여준다. (동일 실패를 알럿+필드 이중으로 쌓지 않는다.)
 
+## 휴대폰(휴대전화) 번호 입력·저장 (공통)
+- **DB·`unique`·중복 API 비교값**은 항상 **숫자만** 저장한다. (`App\Models\User::normalizePhone()` — 비숫자 제거.)
+- **`FormRequest::prepareForValidation()`**에서 `phone_number`를 병합한 뒤, 필요 시 `regex:/^01[016789]\d{7,8}$/` 등 **한국 휴대 패턴**으로 검증한다. (회원가입 등 필수 입력 화면 기준.)
+- **화면 입력**: `inputmode="numeric"`, 표시는 전용 JS에서 **하이픈 자동 삽입**(인라인 이벤트 금지 — `public/js/frontend/*.js`). 제출 시 값에 하이픈이 있어도 서버에서 제거한다.
+- **Fetch로 전달**하는 중복 확인 등에는 **숫자만** 실어 보낸다.
+- 백오피스 등 다른 경로의 `phone_number`도 저장 전 **`User::normalizePhone`으로 통일**한다. (필드가 요청에 없으면 병합하지 않아 부분 수정 시 값을 지우지 않는다.)
+
 ## 작업 완료 전 점검
+- **디자인·문구·항목**: 요청 범위 밖의 시각·카피 변경이 없는지(불필요한 `placeholder`·라벨·클래스·래퍼 추가/삭제 없음)
 - 상단 일괄 오류 블록 잔존 여부(정적 검색: `$errors->all()` 루프를 상단에만 쓰는 패턴)
 - `FormRequest` 규칙 키와 뷰의 `@error` 키 대응 누락 여부
 - `style=`, `onclick=`, Blade 내부 `<style>`, `<script>` 잔존 여부 (`20-blade-and-assets.mdc` 점검과 동일 범위)

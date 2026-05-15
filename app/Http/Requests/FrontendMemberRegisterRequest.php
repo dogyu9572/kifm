@@ -27,7 +27,7 @@ class FrontendMemberRegisterRequest extends FormRequest
             'password_confirmation' => ['required', 'string', 'same:password'],
             'name' => ['required', 'string', 'max:20'],
             'name_en' => ['required', 'string', 'max:100'],
-            'phone_number' => ['required', 'string', Rule::unique('users', 'phone_number')],
+            'phone_number' => ['required', 'string', 'regex:/^01[016789]\d{7,8}$/', Rule::unique('users', 'phone_number')],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'job_type' => ['required', Rule::in(['specialist', 'resident', 'public_doctor', 'military_doctor', 'nurse', 'other'])],
             'license_number' => ['required', 'string', 'max:80'],
@@ -74,6 +74,9 @@ class FrontendMemberRegisterRequest extends FormRequest
         if ($gy === '' || $gy === null) {
             $this->merge(['graduate_year' => null]);
         }
+        $this->merge([
+            'phone_number' => User::normalizePhone((string) $this->input('phone_number', '')),
+        ]);
     }
 
     public function messages(): array
@@ -89,6 +92,7 @@ class FrontendMemberRegisterRequest extends FormRequest
             'name.required' => '한글 이름을 입력해주세요.',
             'name_en.required' => '영문 이름을 입력해주세요.',
             'phone_number.required' => '휴대폰 번호를 입력해주세요.',
+            'phone_number.regex' => '휴대폰 번호 형식을 확인해주세요. (010 등 10~11자리)',
             'phone_number.unique' => '이미 사용 중인 휴대폰번호입니다.',
             'email.required' => '이메일을 입력해주세요.',
             'email.email' => '올바른 이메일 형식이 아닙니다.',

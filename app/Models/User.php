@@ -116,6 +116,22 @@ class User extends Authenticatable
     }
 
     /**
+     * 일반 회원 기준 휴면 여부(마지막 로그인 또는 가입일로부터 1년 미접속)
+     */
+    public function isDormantMember(): bool
+    {
+        if ($this->role !== 'user') {
+            return false;
+        }
+        $ref = $this->last_login_at ?? $this->created_at;
+        if ($ref === null) {
+            return false;
+        }
+
+        return $ref->lt(now()->subYear());
+    }
+
+    /**
      * 사용자가 슈퍼 관리자인지 확인
      */
     public function isSuperAdmin(): bool
