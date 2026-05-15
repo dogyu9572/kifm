@@ -37,6 +37,7 @@
                     @include('backoffice.local-doctors._form', [
                         'localDoctor' => null,
                         'categories' => $categories,
+                        'categoryManageUrl' => $categoryManageUrl ?? null,
                         'functionalTests' => $functionalTests,
                         'treatmentAreas' => $treatmentAreas,
                         'statusLabels' => $statusLabels,

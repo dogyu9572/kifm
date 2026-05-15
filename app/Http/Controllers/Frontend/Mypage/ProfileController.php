@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Frontend\Mypage;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Mypage\Concerns\RendersMypageViews;
+use App\Http\Requests\FrontendMypageLocalDoctorUpdateRequest;
 use App\Http\Requests\FrontendMypageProfileUpdateRequest;
-use App\Models\LocalDoctor;
 use App\Models\MemberExecutive;
 use App\Models\User;
 use App\Services\Backoffice\MemberService;
 use App\Services\Frontend\MypageAnnualFeeCardService;
 use App\Services\Frontend\MypageCertificationSummaryService;
+use App\Services\Frontend\MypageLocalDoctorService;
 use App\Services\Frontend\MypageProfileUpdateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class ProfileController extends Controller
         private readonly MypageAnnualFeeCardService $annualFeeCardService,
         private readonly MypageCertificationSummaryService $certificationSummaryService,
         private readonly MypageProfileUpdateService $profileUpdateService,
+        private readonly MypageLocalDoctorService $mypageLocalDoctorService,
     ) {}
 
     public function edit(): View
@@ -107,13 +109,31 @@ class ProfileController extends Controller
     public function hospitalInformation(): View
     {
         $user = $this->currentMember();
-        $doctor = LocalDoctor::query()->where('member_id', $user->id)->first();
+        $doctor = $this->mypageLocalDoctorService->findForMember($user);
+        $canEdit = $this->mypageLocalDoctorService->canMemberEdit($doctor);
 
-        return $this->renderMypage('hospital_information', '07', '병원 정보 관리하기', 'hospital_information', [
-            'user' => $user,
-            'doctor' => $doctor,
-            'memberLevelLabel' => MemberService::memberLevelLabels()[$user->member_level] ?? $user->member_level,
-        ]);
+        return $this->renderMypage('hospital_information', '07', '병원 정보 관리하기', 'hospital_information', array_merge(
+            [
+                'user' => $user,
+                'doctor' => $doctor,
+                'canEdit' => $canEdit,
+                'memberLevelLabel' => MemberService::memberLevelLabels()[$user->member_level] ?? $user->member_level,
+            ],
+            $this->mypageLocalDoctorService->formContext($doctor),
+        ));
+    }
+
+    public function updateHospitalInformation(FrontendMypageLocalDoctorUpdateRequest $request): RedirectResponse
+    {
+        $this->mypageLocalDoctorService->updateForMember(
+            $this->currentMember(),
+            $request,
+            $request->validated(),
+        );
+
+        return redirect()
+            ->route('mypage.hospital_information')
+            ->with('success', '병원 정보가 저장되었습니다.');
     }
 
     public function executiveActivities(Request $request): View

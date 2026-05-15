@@ -863,6 +863,10 @@
 	.national_map_wrap .svg_national svg .name .click .bg {opacity:1;}
 	.national_map_wrap .svg_national svg .name .hover .txt,
 	.national_map_wrap .svg_national svg .name .click .txt {fill:#0088B8;}
+	.national_map_wrap .svg_national.is-map-hidden {display:none;}
+	.national_map_wrap .hospital_list li.our_doctor_empty {text-align:center; padding:48px 24px;}
+	.national_map_wrap .hospital_list li.our_doctor_empty p {color:#666; padding-left:0; background:none;}
+	.pop_doctor .doctor_top .btn_outlink.is-hidden {display:none;}
 	.national_map_wrap .svg_local svg .name .hover path,
 	.national_map_wrap .svg_local svg .name .click path {fill:#fff;}
 	.national_map_wrap .map_svg {display:none;}

@@ -33,7 +33,6 @@
                 <div class="board-list-header">
                     <div class="list-info">
                         <span class="list-count">Total : {{ $categories->total() }}</span>
-                        <strong class="ms-3">진료 과목 목록</strong>
                     </div>
                     <div class="list-controls">
                         <form method="GET" action="{{ route('backoffice.doctor-categories.index') }}" class="per-page-form" id="bo-doctor-categories-per-page-form">

@@ -96,6 +96,9 @@ Route::prefix('member_plaza')->name('member_plaza.')->group(function () {
 // 우리동네 주치의
 Route::prefix('our_neighborhood_doctor')->name('our_neighborhood_doctor.')->group(function () {
     Route::get('/', [OurNeighborhoodDoctorController::class, 'index'])->name('index');
+    Route::get('/doctors/{local_doctor}/popup', [OurNeighborhoodDoctorController::class, 'popup'])
+        ->whereNumber('local_doctor')
+        ->name('popup');
 });
 
 // 온라인 아카데미
@@ -152,6 +155,7 @@ Route::prefix('mypage')->name('mypage.')->middleware(['auth', 'frontend.member']
     Route::post('/membership-payment/cancel', [MypageAnnualFeeController::class, 'cancelPending'])->name('membership_payment.cancel');
     Route::get('/secession', [MypageProfileController::class, 'secession'])->name('secession');
     Route::get('/hospital_information', [MypageProfileController::class, 'hospitalInformation'])->name('hospital_information');
+    Route::put('/hospital_information', [MypageProfileController::class, 'updateHospitalInformation'])->name('hospital_information.update');
     Route::get('/executive_activities', [MypageProfileController::class, 'executiveActivities'])->name('executive_activities');
     Route::get('/committee_participation', [MypageProfileController::class, 'committeeParticipation'])->name('committee_participation');
     Route::get('/committee_participation_admin', [MypageProfileController::class, 'committeeParticipationAdmin'])->name('committee_participation_admin');

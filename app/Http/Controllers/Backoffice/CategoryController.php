@@ -24,7 +24,7 @@ class CategoryController extends Controller
     {
         // 그룹 목록 조회
         $groups = $this->categoryService->getGroups();
-        
+
         // 선택된 그룹 ID (파라미터 또는 첫 번째 그룹)
         $selectedGroupId = $request->get('group', $groups->first()?->id);
         

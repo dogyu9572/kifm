@@ -77,7 +77,6 @@ class LocalDoctorService
             }
             $doctor->save();
             $this->syncCategories($doctor, $validated['category_ids'] ?? []);
-
             return $doctor->fresh(['doctorCategories']);
         });
     }

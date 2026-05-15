@@ -29,7 +29,8 @@ class LocalDoctorController extends Controller
             'doctors' => $doctors,
             'perPage' => $doctors->perPage(),
             'statusLabels' => LocalDoctorService::statusLabels(),
-            'categories' => DoctorCategory::query()->where('status', 'active')->orderBy('sort_order')->orderBy('name')->get(),
+            'categories' => $this->activeDoctorCategories(),
+            'categoryManageUrl' => route('backoffice.doctor-categories.index'),
             'sidos' => $sidos,
             'sigunguBySido' => $sigunguBySido,
         ]);
@@ -41,7 +42,8 @@ class LocalDoctorController extends Controller
             'localDoctor' => null,
             'cancelUrl' => $this->cancelUrl($request),
             'statusLabels' => LocalDoctorService::statusLabels(),
-            'categories' => DoctorCategory::query()->where('status', 'active')->orderBy('sort_order')->orderBy('name')->get(),
+            'categories' => $this->activeDoctorCategories(),
+            'categoryManageUrl' => route('backoffice.doctor-categories.index'),
             'sidos' => config('local_doctor_regions.sidos', []),
             'sigunguBySido' => config('local_doctor_regions.sigungu_by_sido', []),
             'functionalTests' => config('local_doctor_form_options.functional_tests', []),
@@ -66,7 +68,8 @@ class LocalDoctorController extends Controller
             'localDoctor' => $localDoctor,
             'cancelUrl' => $this->cancelUrl($request),
             'statusLabels' => LocalDoctorService::statusLabels(),
-            'categories' => DoctorCategory::query()->where('status', 'active')->orderBy('sort_order')->orderBy('name')->get(),
+            'categories' => $this->activeDoctorCategories(),
+            'categoryManageUrl' => route('backoffice.doctor-categories.index'),
             'sidos' => config('local_doctor_regions.sidos', []),
             'sigunguBySido' => config('local_doctor_regions.sigungu_by_sido', []),
             'functionalTests' => config('local_doctor_form_options.functional_tests', []),
@@ -162,5 +165,17 @@ class LocalDoctorController extends Controller
     protected function cancelUrl(Request $request): string
     {
         return $request->query('return_url', route('backoffice.local-doctors.index'));
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Collection<int, DoctorCategory>
+     */
+    protected function activeDoctorCategories()
+    {
+        return DoctorCategory::query()
+            ->where('status', 'active')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
     }
 }
