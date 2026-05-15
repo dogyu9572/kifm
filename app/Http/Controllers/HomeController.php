@@ -31,10 +31,8 @@ class HomeController extends Controller
             ->inPeriod()
             ->ordered()
             ->get()
-            ->filter(function($popup) {
-                // 서버사이드에서 쿠키 확인하여 숨겨진 팝업 제외
-                $cookieName = 'popup_hide_' . $popup->id;
-                return !isset($_COOKIE[$cookieName]) || $_COOKIE[$cookieName] !== '1';
+            ->filter(function ($popup) {
+                return ! Popup::isHiddenByTodayCookie((int) $popup->id);
             });
 
         // 활성화된 배너 조회

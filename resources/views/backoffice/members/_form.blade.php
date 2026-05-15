@@ -1,4 +1,4 @@
-{{-- 변수: 컨트롤러에서 $isEdit, $member, $memberLevelLabels, $jobTypeLabels, $committeeLabels, $medicalDepartmentOptions, $medicalDepartmentValue, $selectedCommitteeCodes --}}
+{{-- 변수: 컨트롤러에서 $isEdit, $member, $memberLevelLabels, $jobTypeLabels, $committeesForForm, $medicalDepartmentOptions, $medicalDepartmentValue, $selectedCommitteeCodes --}}
 {{-- 프로토타입 member-detail.ejs·명세와 동일한 섹션·순서. 가입 구분은 화면 없음(등록 시 hidden email + Request 기본값). 비밀번호는 기본 정보 내 아이디/이름 행 바로 아래(프로토타입 없음·시스템용). --}}
 
 <div class="bo-form-section">
@@ -328,10 +328,10 @@
         <div class="bo-form-row bo-form-row--stacked">
             <div class="bo-form-field">
                 <div class="checkbox-group bo-member-committee-group">
-                    @foreach ($committeeLabels as $code => $label)
+                    @foreach ($committeesForForm as $committeeOption)
                         <label class="checkbox-label">
-                            <input type="checkbox" name="committee_codes[]" value="{{ $code }}" @checked(in_array($code, $selectedCommitteeCodes, true))>
-                            <span>{{ $label }}</span>
+                            <input type="checkbox" name="committee_codes[]" value="{{ (string) $committeeOption->id }}" @checked(in_array((string) $committeeOption->id, $selectedCommitteeCodes, true))>
+                            <span>{{ $committeeOption->name }}</span>
                         </label>
                     @endforeach
                 </div>

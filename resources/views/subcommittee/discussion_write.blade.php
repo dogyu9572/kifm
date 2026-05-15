@@ -8,11 +8,13 @@
 
 <section class="scon" aria-labelledby="subcommittee-heading">
 	<div class="inner">
+		@include('subcommittee.partials.committee_header', ['useCommitteeH1' => true, 'showCommitteeTabs' => true])
+
 		<div class="sub_title">{{ $dName }}</div>
-		
+
 		<div class="discussion_area">
 			<div class="discussion_top">
-				<h1>심도있는 <strong class="c_iden">학술적 교류를 <br/>위한 토론의 장</strong>입니다.</h1>
+				<h2>심도있는 <strong class="c_iden">학술적 교류를 <br/>위한 토론의 장</strong>입니다.</h2>
 				<p>함께 나누고 싶은 토론 주제를 등록해 주세요</p>
 			</div>
 			
@@ -36,7 +38,7 @@
 			</div>
 			
 			<div class="btns_btm flex_center">
-				<button type="button" class="btn btn_kwg" onclick="history.back();">취소</button>
+				<a href="{{ route('subcommittee.discussion', $committee) }}" class="btn btn_kwg">취소</a>
 				<button type="submit" class="btn btn_wbb">저장</button>
 			</div>
 		</div>

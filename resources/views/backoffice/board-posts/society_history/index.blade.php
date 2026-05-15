@@ -15,6 +15,14 @@
         </div>
     @endif
 
+    @php
+        $customFieldsConfig = collect($board->custom_fields_config ?? []);
+        $historyYearOptionsRaw = (string) ($customFieldsConfig->firstWhere('name', 'history_year')['options'] ?? '');
+        $historyMonthOptionsRaw = (string) ($customFieldsConfig->firstWhere('name', 'history_month')['options'] ?? '1,2,3,4,5,6,7,8,9,10,11,12');
+        $historyYearOptions = array_values(array_filter(array_map('trim', explode(',', $historyYearOptionsRaw))));
+        $historyMonthOptions = array_values(array_filter(array_map('trim', explode(',', $historyMonthOptionsRaw))));
+    @endphp
+
     <div class="board-container">
         <div class="board-page-header">
             <div class="board-page-buttons">
@@ -22,8 +30,8 @@
                     <i class="fas fa-trash"></i> 선택 삭제
                 </button>
                 <a href="{{ route('backoffice.board-posts.create', $board->slug ?? 'notice') }}" class="btn btn-success">
-                    <i class="fas fa-plus"></i> 새 게시글
-                </a>              
+                    <i class="fas fa-plus"></i> 연혁 추가
+                </a>
             </div>
         </div>
 
@@ -34,29 +42,35 @@
                     <form method="GET" action="{{ route('backoffice.board-posts.index', $board->slug ?? 'notice') }}" class="filter-form">
                         <div class="filter-row">
                             <div class="filter-group">
-                                <label for="start_date" class="filter-label">등록일 시작</label>
-                                <input type="date" id="start_date" name="start_date" class="filter-input"
-                                    value="{{ request('start_date') }}">
-                            </div>
-                            <div class="filter-group">
-                                <label for="end_date" class="filter-label">등록일 끝</label>
-                                <input type="date" id="end_date" name="end_date" class="filter-input"
-                                    value="{{ request('end_date') }}">
-                            </div>
-                            <div class="filter-group">
-                                <label for="search_type" class="filter-label">검색 구분</label>
-                                <select id="search_type" name="search_type" class="filter-select">
+                                <label for="year" class="filter-label">연도</label>
+                                <select id="year" name="year" class="filter-select">
                                     <option value="">전체</option>
-                                    <option value="title" @selected(request('search_type') == 'title')>제목
-                                    </option>
-                                    <option value="content" @selected(request('search_type') == 'content')>내용
-                                    </option>
+                                    @foreach ($historyYearOptions as $year)
+                                        <option value="{{ $year }}" @selected((string) request('year') === (string) $year)>{{ $year }}년</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <label for="keyword" class="filter-label">검색어</label>
+                                <label for="month" class="filter-label">월</label>
+                                <select id="month" name="month" class="filter-select">
+                                    <option value="">전체</option>
+                                    @foreach ($historyMonthOptions as $month)
+                                        <option value="{{ $month }}" @selected((string) request('month') === (string) $month)>{{ $month }}월</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="visibility" class="filter-label">사용여부</label>
+                                <select id="visibility" name="visibility" class="filter-select">
+                                    <option value="">전체</option>
+                                    <option value="public" @selected(request('visibility') === 'public')>사용</option>
+                                    <option value="private" @selected(request('visibility') === 'private')>미사용</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="keyword" class="filter-label">내용</label>
                                 <input type="text" id="keyword" name="keyword" class="filter-input"
-                                    placeholder="검색어를 입력하세요" value="{{ request('keyword') }}">
+                                    placeholder="검색어를 입력하세요." value="{{ request('keyword') }}">
                             </div>
                             <div class="filter-group">
                                 <div class="filter-buttons">
@@ -80,10 +94,10 @@
                     </div>
                     <div class="list-controls">
                         <form method="GET" action="{{ route('backoffice.board-posts.index', $board->slug ?? 'notice') }}" class="per-page-form">
-                            <input type="hidden" name="start_date" value="{{ request('start_date') }}">
-                            <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+                            <input type="hidden" name="year" value="{{ request('year') }}">
+                            <input type="hidden" name="month" value="{{ request('month') }}">
+                            <input type="hidden" name="visibility" value="{{ request('visibility') }}">
                             <input type="hidden" name="keyword" value="{{ request('keyword') }}">
-                            <input type="hidden" name="search_type" value="{{ request('search_type') }}">
                             <label for="per_page" class="per-page-label">표시 개수:</label>
                             <select name="per_page" id="per_page" class="per-page-select" onchange="this.form.submit()">
                                 <option value="10" @selected(request('per_page', 15) == 10)>10개</option>
@@ -105,16 +119,23 @@
                                 @if($board->enable_sorting)
                                     <th class="w5">순서</th>
                                 @endif
-                                <th class="w5">번호</th>
-                                <th class="w10">구분</th>
-                                <th>제목</th>
-                                <th class="w10">작성자</th>
-                                <th class="w10">작성일</th>
+                                <th class="w10">연도</th>
+                                <th class="w10">월</th>
+                                <th>내용</th>
+                                <th class="w10">사용여부</th>
                                 <th class="w15">관리</th>
                             </tr>
                         </thead>
                         <tbody @if($board->enable_sorting) id="sortable-tbody" @endif>
                             @forelse($posts as $post)
+                                @php
+                                    $customFields = $post->custom_fields ? json_decode($post->custom_fields, true) : [];
+                                    if (! is_array($customFields)) {
+                                        $customFields = [];
+                                    }
+                                    $historyYear = $customFields['history_year'] ?? '-';
+                                    $historyMonth = $customFields['history_month'] ?? '-';
+                                @endphp
                                 <tr @if($board->enable_sorting) data-post-id="{{ $post->id }}" @endif>
                                     <td>
                                         <input type="checkbox" name="selected_posts[]" value="{{ $post->id }}" class="form-check-input post-checkbox">
@@ -124,24 +145,16 @@
                                             <i class="fas fa-grip-vertical sort-handle" title="드래그하여 순서 변경"></i>
                                         </td>
                                     @endif
+                                    <td>{{ $historyYear }}</td>
+                                    <td>{{ $historyMonth }}</td>
+                                    <td>{{ $post->title }}</td>
                                     <td>
-                                        @if ($post->is_notice)
-                                            <span class="board-notice-badge">공지</span>
+                                        @if ($post->is_active)
+                                            <span class="status-badge status-active">사용</span>
                                         @else
-                                            @php
-                                                $postNumber = $posts->total() - ($posts->currentPage() - 1) * $posts->perPage() - $loop->index;
-                                            @endphp
-                                            {{ $postNumber }}
+                                            <span class="status-badge status-inactive">미사용</span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <span class="status-badge status-general">일반</span>
-                                    </td>
-                                    <td>
-                                        {{ $post->title }}
-                                    </td>
-                                    <td>{{ $post->author_name ?? '알 수 없음' }}</td>
-                                    <td>{{ $post->created_at->format('Y-m-d') }}</td>
                                     <td>
                                         <div class="board-btn-group">
                                             <a href="{{ route('backoffice.board-posts.edit', [$board->slug ?? 'notice', $post->id]) }}"
@@ -162,7 +175,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ $board->enable_sorting ? '8' : '7' }}" class="text-center">등록된 게시글이 없습니다.</td>
+                                    <td colspan="{{ $board->enable_sorting ? '7' : '6' }}" class="text-center">등록된 게시글이 없습니다.</td>
                                 </tr>
                             @endforelse
                         </tbody>

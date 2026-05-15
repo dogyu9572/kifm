@@ -97,6 +97,9 @@
 	@endif
     <!-- page Styles -->
     @yield('styles')
+    @if(($gNum ?? '') == '03')
+    <link rel="stylesheet" href="{{ asset('css/frontend/popup.css') }}">
+    @endif
 
     <!-- jQuery -->
     <script src="//code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -297,10 +300,10 @@
 							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_event/training_course" @if(($sNum ?? '') == '02') aria-current="page" @endif>연수강좌</a></li>
 						@endif
 						@if(isset($gNum) && $gNum == '03')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/subcommittee" @if(($sNum ?? '') == '01') aria-current="page" @endif>산하위원회</a></li>
-							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/subcommittee/notice" @if(($sNum ?? '') == '02') aria-current="page" @endif>임상 영양 및 대사 의학 위원회</a></li>
-							<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/subcommittee/notice" @if(($sNum ?? '') == '03') aria-current="page" @endif>스트레스 및 호르몬 균형 위원회</a></li>
-							<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/subcommittee/notice" @if(($sNum ?? '') == '04') aria-current="page" @endif>환경 의학 및 독소 제거 위원회</a></li>
+							<li class="{{ request()->routeIs('subcommittee.index') ? 'on' : '' }}"><a href="{{ route('subcommittee.index') }}" @if(request()->routeIs('subcommittee.index')) aria-current="page" @endif>산하위원회</a></li>
+							@foreach ($navCommittees ?? [] as $navC)
+								<li class="{{ isset($committee) && $committee->id === $navC->id ? 'on' : '' }}"><a href="{{ route('subcommittee.notice', $navC) }}" @if(isset($committee) && $committee->id === $navC->id) aria-current="page" @endif>{{ $navC->name }}</a></li>
+							@endforeach
 						@endif
 						@if(isset($gNum) && $gNum == '04')
 							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/archives/general" @if(($sNum ?? '') == '01') aria-current="page" @endif>일반 자료실</a></li>
@@ -351,10 +354,10 @@
 							<li class="{{ ($dNum ?? '') == '02' ? 'on' : '' }}"><a href="/introduction/bylaws_operation" @if(($dNum ?? '') == '02') aria-current="page" @endif>업무 및 운영 내규</a></li>
 							<li class="{{ ($dNum ?? '') == '03' ? 'on' : '' }}"><a href="/introduction/bylaws_protocol" @if(($dNum ?? '') == '03') aria-current="page" @endif>업무 프로토콜</a></li>
 						@endif
-						@if(isset($gNum) && $gNum == '03')
-							<li class="{{ ($dNum ?? '') == '01' ? 'on' : '' }}"><a href="/subcommittee/notice" @if(($dNum ?? '') == '01') aria-current="page" @endif>공지사항</a></li>
-							<li class="{{ ($dNum ?? '') == '02' ? 'on' : '' }}"><a href="/subcommittee/discussion" @if(($dNum ?? '') == '02') aria-current="page" @endif>토론장</a></li>
-							<li class="{{ ($dNum ?? '') == '03' ? 'on' : '' }}"><a href="/subcommittee/archives" @if(($dNum ?? '') == '03') aria-current="page" @endif>자료실</a></li>
+						@if(isset($gNum) && $gNum == '03' && isset($committee))
+							<li class="{{ request()->routeIs('subcommittee.notice') || request()->routeIs('subcommittee.notice_show') ? 'on' : '' }}"><a href="{{ route('subcommittee.notice', $committee) }}" @if(request()->routeIs('subcommittee.notice') || request()->routeIs('subcommittee.notice_show')) aria-current="page" @endif>공지사항</a></li>
+							<li class="{{ request()->routeIs('subcommittee.discussion') || request()->routeIs('subcommittee.discussion_show') || request()->routeIs('subcommittee.discussion_write') ? 'on' : '' }}"><a href="{{ route('subcommittee.discussion', $committee) }}" @if(request()->routeIs('subcommittee.discussion') || request()->routeIs('subcommittee.discussion_show') || request()->routeIs('subcommittee.discussion_write')) aria-current="page" @endif>토론장</a></li>
+							<li class="{{ request()->routeIs('subcommittee.archives') || request()->routeIs('subcommittee.archives_show') ? 'on' : '' }}"><a href="{{ route('subcommittee.archives', $committee) }}" @if(request()->routeIs('subcommittee.archives') || request()->routeIs('subcommittee.archives_show')) aria-current="page" @endif>자료실</a></li>
 						@endif
 					</ul>
 				</div>
@@ -423,7 +426,13 @@
 	@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'print')
     <!-- 팝업 영역 -->
     @yield('popups')
+    @if(isset($committeePopups) && $committeePopups->isNotEmpty())
+        @include('subcommittee.partials.committee_ad_popups', ['committeePopups' => $committeePopups])
+    @endif
     <script src="{{ asset('js/frontend/popup.js') }}"></script>
+    @if(($gNum ?? '') == '03')
+    <script src="{{ asset('js/frontend/committee-popups.js') }}"></script>
+    @endif
     @stack('scripts')
 	
 	@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'print' && $page_type!== 'academic_conference')

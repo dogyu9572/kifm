@@ -11,138 +11,51 @@
 
 		<div class="board_top">
 			<div class="left">
-				<div class="total">Total <strong class="c_iden">100</strong></div>
+				<div class="total">Total <strong class="c_iden">{{ $posts->total() }}</strong></div>
 			</div>
-			<div class="right flex">
-				<select name="" id="" class="text">
-					<option value="">전체</option>
-					<option value="">제목</option>
-					<option value="">내용</option>
+			<form method="GET" action="{{ route('member_plaza.society_album') }}" class="right flex">
+				<select name="search_type" class="text">
+					<option value="all" @selected(request('search_type', 'all') === 'all')>전체</option>
+					<option value="title" @selected(request('search_type') === 'title')>제목</option>
+					<option value="content" @selected(request('search_type') === 'content')>내용</option>
 				</select>
-				<form class="search_area">
-					<label for="event-search" class="sound_only">대회명 검색</label>
-					<input type="text" id="event-search" class="text" placeholder="대회명을 입력해주세요">
+				<div class="search_area">
+					<label for="board-search" class="sound_only">학회 앨범 검색</label>
+					<input type="text" id="board-search" name="keyword" class="text" value="{{ request('keyword') }}" placeholder="검색어를 입력해주세요">
 					<button type="submit" class="btn_search">검색</button>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
-		
+
 		<ul class="gallery_list">
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
-			<li>
-				<article>
-					<a href="/member_plaza/society_album/view" class="gallery_item">
-						<i class="hover_obj" aria-hidden="true"></i>
-						<div class="img_area" aria-hidden="true"><img src="/images/img_sample_society_album.jpg" alt=""></div>
-						<div class="txt_area">
-							<h2 class="title">제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. 제목입니다. </h2>
-							<time class="date" datetime="2025-02-16">2025.02.16</time>
-						</div>
-					</a>
-				</article>
-			</li>
+			@forelse ($posts as $post)
+				@php
+					$thumbnail = ! empty($post->thumbnail)
+						? asset('storage/'.$post->thumbnail)
+						: asset('images/img_sample_society_album.jpg');
+				@endphp
+				<li>
+					<article>
+						<a href="{{ route('member_plaza.society_album_show', $post->id) }}" class="gallery_item">
+							<i class="hover_obj" aria-hidden="true"></i>
+							<div class="img_area" aria-hidden="true"><img src="{{ $thumbnail }}" alt=""></div>
+							<div class="txt_area">
+								<h2 class="title">{{ $post->title }}</h2>
+								<time class="date" datetime="{{ \Carbon\Carbon::parse($post->created_at)->format('Y-m-d') }}">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</time>
+							</div>
+						</a>
+					</article>
+				</li>
+			@empty
+				<li class="empty">등록된 게시글이 없습니다.</li>
+			@endforelse
 		</ul>
 
-		<nav class="board-pagination" aria-label="게시판 페이지 이동">
-			<ul class="pagination">
-				<li class="page-item arw_item"><a class="page-link" href="#" title="첫 페이지" aria-label="첫 페이지로 이동"><i class="arrow two first" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="이전 페이지" aria-label="이전 페이지로 이동"><i class="arrow one prev" aria-hidden="true"></i></a></li>
-				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="현재 페이지 1">1</span></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="2페이지로 이동">2</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="3페이지로 이동">3</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="4페이지로 이동">4</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="5페이지로 이동">5</a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="다음 페이지" aria-label="다음 페이지로 이동"><i class="arrow one next" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="마지막 페이지" aria-label="마지막 페이지로 이동"><i class="arrow two last" aria-hidden="true"></i></a></li>
-			</ul>
-		</nav>
-		
+		<x-frontend.pagination :paginator="$posts" />
+
 	</div>
 </section>
-	
+
 </main>
 
 @endsection

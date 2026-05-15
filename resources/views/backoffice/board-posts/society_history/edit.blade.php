@@ -30,66 +30,6 @@
                 @csrf
                 @method('PUT')
 
-                @if($board->isNoticeEnabled())
-                <div class="board-form-group">
-                    <div class="board-checkbox-item">
-                        <input type="checkbox" class="board-checkbox-input" id="is_notice" name="is_notice" value="1" @checked($post->is_notice)>
-                        <label for="is_notice" class="board-form-label">공지 등록</label>
-                    </div>                    
-                </div>
-                @endif
-
-                @if($board->isFieldEnabled('category') && $categoryOptions && $categoryOptions->count() > 0)
-                <div class="board-form-group">
-                    <label for="category" class="board-form-label">
-                        카테고리 분류
-                        @if($board->isFieldRequired('category'))
-                            <span class="required">*</span>
-                        @endif
-                    </label>
-                    <select class="board-form-control" id="category" name="category" @if($board->isFieldRequired('category')) required @endif>
-                        <option value="">카테고리를 선택하세요</option>
-                        @foreach($categoryOptions as $category)
-                            <option value="{{ $category->name }}" @selected(old('category', $post->category) == $category->name)>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                @endif
-
-                @if($board->isFieldEnabled('title'))
-                <div class="board-form-group">
-                    <label for="title" class="board-form-label">
-                        제목
-                        @if($board->isFieldRequired('title'))
-                            <span class="required">*</span>
-                        @endif
-                    </label>
-                    <input type="text" class="board-form-control" id="title" name="title" value="{{ $post->title }}" @if($board->isFieldRequired('title')) required @endif>
-                </div>
-                @endif
-
-                @if($board->isFieldEnabled('content'))
-                <div class="board-form-group">
-                    <label for="content" class="board-form-label">
-                        내용
-                        @if($board->isFieldRequired('content'))
-                            <span class="required">*</span>
-                        @endif
-                    </label>
-                    <textarea class="board-form-control board-form-textarea" id="content" name="content" rows="15" data-backoffice-ckeditor data-source-editing="true" @if($board->isFieldRequired('content')) required @endif>{{ $post->content }}</textarea>
-                </div>
-                @endif
-
-                @if($board->enable_sorting)
-                <div class="board-form-group">
-                    <label for="sort_order" class="board-form-label">정렬 순서</label>
-                    <input type="number" class="board-form-control" id="sort_order" name="sort_order" value="{{ old('sort_order', $post->sort_order ?? 0) }}" min="0">
-                    <small class="board-form-text">숫자가 작을수록 위에 표시됩니다. (0이면 자동 정렬)</small>
-                </div>
-                @endif
-
                 <!-- 커스텀 필드 입력 폼 -->
                 @if($board->custom_fields_config && count($board->custom_fields_config) > 0)
                     @foreach($board->custom_fields_config as $fieldConfig)
@@ -216,6 +156,66 @@
                             
                         </div>
                     @endforeach
+                @endif
+
+                @if($board->isNoticeEnabled())
+                <div class="board-form-group">
+                    <div class="board-checkbox-item">
+                        <input type="checkbox" class="board-checkbox-input" id="is_notice" name="is_notice" value="1" @checked($post->is_notice)>
+                        <label for="is_notice" class="board-form-label">공지 등록</label>
+                    </div>                    
+                </div>
+                @endif
+
+                @if($board->isFieldEnabled('category') && $categoryOptions && $categoryOptions->count() > 0)
+                <div class="board-form-group">
+                    <label for="category" class="board-form-label">
+                        카테고리 분류
+                        @if($board->isFieldRequired('category'))
+                            <span class="required">*</span>
+                        @endif
+                    </label>
+                    <select class="board-form-control" id="category" name="category" @if($board->isFieldRequired('category')) required @endif>
+                        <option value="">카테고리를 선택하세요</option>
+                        @foreach($categoryOptions as $category)
+                            <option value="{{ $category->name }}" @selected(old('category', $post->category) == $category->name)>
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
+
+                @if($board->isFieldEnabled('title'))
+                <div class="board-form-group">
+                    <label for="title" class="board-form-label">
+                        제목
+                        @if($board->isFieldRequired('title'))
+                            <span class="required">*</span>
+                        @endif
+                    </label>
+                    <input type="text" class="board-form-control" id="title" name="title" value="{{ $post->title }}" @if($board->isFieldRequired('title')) required @endif>
+                </div>
+                @endif
+
+                @if($board->isFieldEnabled('content'))
+                <div class="board-form-group">
+                    <label for="content" class="board-form-label">
+                        내용
+                        @if($board->isFieldRequired('content'))
+                            <span class="required">*</span>
+                        @endif
+                    </label>
+                    <textarea class="board-form-control board-form-textarea" id="content" name="content" rows="15" data-backoffice-ckeditor data-source-editing="true" @if($board->isFieldRequired('content')) required @endif>{{ $post->content }}</textarea>
+                </div>
+                @endif
+
+                @if($board->enable_sorting)
+                <div class="board-form-group">
+                    <label for="sort_order" class="board-form-label">정렬 순서</label>
+                    <input type="number" class="board-form-control" id="sort_order" name="sort_order" value="{{ old('sort_order', $post->sort_order ?? 0) }}" min="0">
+                    <small class="board-form-text">숫자가 작을수록 위에 표시됩니다. (0이면 자동 정렬)</small>
+                </div>
                 @endif
 
                 @if($board->isFieldEnabled('password'))

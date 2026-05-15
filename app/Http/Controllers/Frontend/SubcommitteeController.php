@@ -3,10 +3,20 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\CommunityCommittee;
+use App\Models\Popup;
+use App\Services\Frontend\PublicBoardService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SubcommitteeController extends Controller
 {
+    public function __construct(
+        private readonly PublicBoardService $publicBoardService,
+    ) {}
+
     public function index(): View
     {
         $page_type = 'professional';
@@ -17,86 +27,178 @@ class SubcommitteeController extends Controller
         $geName = 'Subcommittee';
         $gSlug = 'subcommittee';
 
-        return view('subcommittee.index', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        $base = CommunityCommittee::query()
+            ->where('visibility_yn', 'Y')
+            ->orderBy('sort_order')
+            ->orderBy('name');
+
+        $user = Auth::user();
+        if ($user->isAdmin()) {
+            $committees = (clone $base)->get();
+        } else {
+            $ids = $user->communityCommitteeAccessIdStrings();
+            $committees = $ids === []
+                ? collect()
+                : (clone $base)->whereIn('id', array_map(static fn (string $id): int => (int) $id, $ids))->get();
+        }
+
+        $committeePopups = collect();
+
+        return view('subcommittee.index', compact(
+            'page_type',
+            'gNum',
+            'sNum',
+            'gName',
+            'sName',
+            'geName',
+            'gSlug',
+            'committees',
+            'committeePopups',
+        ));
     }
 
-    public function notice(): View
+    public function notice(Request $request, CommunityCommittee $committee): View
     {
-        return $this->renderNoticeView('notice', 'subcommittee_notice');
+        $this->assertMayAccessCommittee($committee);
+        $posts = $this->publicBoardService->list(
+            'community_committee_notices',
+            $request,
+            10,
+            $committee->name,
+        );
+
+        return view('subcommittee.notice', array_merge(
+            $this->committeePageData($committee, '공지사항', '01', 'community_committee_notices'),
+            compact('posts'),
+        ));
     }
 
-    public function noticeView(): View
+    public function noticeShow(CommunityCommittee $committee, int $id): View
     {
-        return $this->renderNoticeView('notice_view', 'subcommittee_notice_view');
+        $this->assertMayAccessCommittee($committee);
+        $name = $committee->name;
+        $post = $this->publicBoardService->find('community_committee_notices', $id, $name);
+        if ($post === null) {
+            throw new NotFoundHttpException();
+        }
+
+        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('community_committee_notices', $id, $name);
+
+        return view('subcommittee.notice_view', array_merge(
+            $this->committeePageData($committee, '공지사항', '01', 'community_committee_notices'),
+            compact('post', 'prev', 'next'),
+        ));
     }
 
-    public function discussion(): View
+    public function discussion(Request $request, CommunityCommittee $committee): View
     {
-        return $this->renderDiscussionView('discussion', 'subcommittee_discussion');
+        $this->assertMayAccessCommittee($committee);
+        $posts = $this->publicBoardService->list(
+            'community_committee_discussions',
+            $request,
+            10,
+            $committee->name,
+        );
+
+        return view('subcommittee.discussion', array_merge(
+            $this->committeePageData($committee, '토론장', '02', 'community_committee_discussions'),
+            compact('posts'),
+        ));
     }
 
-    public function discussionView(): View
+    public function discussionShow(CommunityCommittee $committee, int $id): View
     {
-        return $this->renderDiscussionView('discussion_view', 'subcommittee_discussion_view');
+        $this->assertMayAccessCommittee($committee);
+        $name = $committee->name;
+        $post = $this->publicBoardService->find('community_committee_discussions', $id, $name);
+        if ($post === null) {
+            throw new NotFoundHttpException();
+        }
+
+        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('community_committee_discussions', $id, $name);
+
+        return view('subcommittee.discussion_view', array_merge(
+            $this->committeePageData($committee, '토론장', '02', 'community_committee_discussions'),
+            compact('post', 'prev', 'next'),
+        ));
     }
 
-    public function discussionWrite(): View
+    public function discussionWrite(CommunityCommittee $committee): View
     {
-        return $this->renderDiscussionView('discussion_write', 'subcommittee_discussion_write');
+        $this->assertMayAccessCommittee($committee);
+
+        return view('subcommittee.discussion_write', $this->committeePageData($committee, '토론 주제 등록', '02', 'community_committee_discussions'));
     }
 
-    public function archives(): View
+    public function archives(Request $request, CommunityCommittee $committee): View
     {
-        return $this->renderArchivesView('archives', 'subcommittee_archives');
+        $this->assertMayAccessCommittee($committee);
+        $posts = $this->publicBoardService->list(
+            'community_committee_archive',
+            $request,
+            10,
+            $committee->name,
+        );
+
+        return view('subcommittee.archives', array_merge(
+            $this->committeePageData($committee, '자료실', '03', 'community_committee_archive'),
+            compact('posts'),
+        ));
     }
 
-    public function archivesView(): View
+    public function archivesShow(CommunityCommittee $committee, int $id): View
     {
-        return $this->renderArchivesView('archives_view', 'subcommittee_archives_view');
+        $this->assertMayAccessCommittee($committee);
+        $name = $committee->name;
+        $post = $this->publicBoardService->find('community_committee_archive', $id, $name);
+        if ($post === null) {
+            throw new NotFoundHttpException();
+        }
+
+        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('community_committee_archive', $id, $name);
+
+        return view('subcommittee.archives_view', array_merge(
+            $this->committeePageData($committee, '자료실', '03', 'community_committee_archive'),
+            compact('post', 'prev', 'next'),
+        ));
     }
 
-    private function renderNoticeView(string $view, string $slug): View
+    /**
+     * @param  string|null  $targetBoardSlug  {@see Popup::COMMITTEE_TARGET_BOARDS} 키, null이면 위원회 팝업 없음
+     * @return array<string, mixed>
+     */
+    private function committeePageData(CommunityCommittee $committee, string $dName, string $dNum, ?string $targetBoardSlug = null): array
     {
-        $page_type = 'professional';
-        $gNum = '03';
-        $sNum = '01';
-        $dNum = '01';
-        $gName = '산하위원회';
-        $sName = '임상 영양 대사 연구회';
-        $dName = '공지사항';
-        $geName = 'Subcommittee';
-        $gSlug = $slug;
+        $committeePopups = $targetBoardSlug !== null
+            ? Popup::activeCommitteePopupsForBoard((int) $committee->id, $targetBoardSlug)
+            : collect();
 
-        return view('subcommittee.' . $view, compact('page_type', 'gNum', 'sNum', 'dNum', 'gName', 'sName', 'dName', 'geName', 'gSlug'));
+        return [
+            'page_type' => 'professional',
+            'gNum' => '03',
+            'sNum' => '02',
+            'dNum' => $dNum,
+            'gName' => '산하위원회',
+            'sName' => $committee->name,
+            'dName' => $dName,
+            'geName' => 'Subcommittee',
+            'gSlug' => 'subcommittee_'.$committee->id,
+            'committee' => $committee,
+            'committeePopups' => $committeePopups,
+        ];
     }
 
-    private function renderDiscussionView(string $view, string $slug): View
+    private function assertMayAccessCommittee(CommunityCommittee $committee): void
     {
-        $page_type = 'professional';
-        $gNum = '03';
-        $sNum = '01';
-        $dNum = '02';
-        $gName = '산하위원회';
-        $sName = '임상 영양 대사 연구회';
-        $dName = '토론장';
-        $geName = 'Subcommittee';
-        $gSlug = $slug;
-
-        return view('subcommittee.' . $view, compact('page_type', 'gNum', 'sNum', 'dNum', 'gName', 'sName', 'dName', 'geName', 'gSlug'));
-    }
-
-    private function renderArchivesView(string $view, string $slug): View
-    {
-        $page_type = 'professional';
-        $gNum = '03';
-        $sNum = '01';
-        $dNum = '03';
-        $gName = '산하위원회';
-        $sName = '임상 영양 대사 연구회';
-        $dName = '자료실';
-        $geName = 'Subcommittee';
-        $gSlug = $slug;
-
-        return view('subcommittee.' . $view, compact('page_type', 'gNum', 'sNum', 'dNum', 'gName', 'sName', 'dName', 'geName', 'gSlug'));
+        $user = Auth::user();
+        if ($user === null) {
+            abort(403);
+        }
+        if ($user->isAdmin()) {
+            return;
+        }
+        if (! $user->canAccessCommunityCommitteeId((string) $committee->id)) {
+            abort(403);
+        }
     }
 }

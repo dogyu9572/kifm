@@ -1,0 +1,33 @@
+---
+description: 사용자(프론트) 공개 페이지 폼·유효성 검사 표시 일관성(필드별 오류, 보조 버튼 알럿)
+globs: "{resources/views/member/**/*.blade.php,resources/views/mypage/**/*.blade.php,resources/views/subcommittee/**/*.blade.php,resources/views/member_plaza/**/*.blade.php,resources/views/home/**/*.blade.php,resources/views/archives/**/*.blade.php,resources/views/introduction/**/*.blade.php,resources/views/terms/**/*.blade.php,resources/views/total_search/**/*.blade.php,resources/views/our_neighborhood_doctor/**/*.blade.php,resources/views/online_academy/**/*.blade.php,resources/views/academic_event/**/*.blade.php,resources/views/academic_conference/**/*.blade.php,public/js/frontend/**/*.js}"
+alwaysApply: false
+---
+
+# 사용자 공개 페이지 폼·유효성 표시
+
+## 적용 범위
+- `resources/views/backoffice/**`는 제외한다. (백오피스는 `25-backoffice-ui-consistency.mdc` 등 기존 규칙을 따른다.)
+- 위 `globs`에 없더라도 **`layouts.frontend` 등 사용자 공개 레이아웃**을 쓰는 신규 폼·입력 화면에는 **동일 원칙**을 적용한다.
+
+## 필드별 서버 검증 메시지 (기본)
+- `FormRequest` 등 서버 검증 실패 시, **페이지 최상단에만** 오류를 모아 두지 않는다.  
+  (예: `@if ($errors->any())` + `gbox`/`ul`로 전체 `$errors->all()` 나열 금지.)
+- 각 입력·라디오·체크·파일 등 **해당 컨트롤 바로 아래**에 Laravel `@error('필드명')` … `@enderror`로 메시지를 둔다.
+- 문구 색상은 **기존 프론트 유틸 클래스**를 쓴다. (예: `default.css`의 `c_red`.)  
+  오류 전용으로 **회색/컬러 배경 박스를 새로 두지 않는다.** (흰 바탕 + 빨간 글씨.)
+- 출력 마크업은 짧게 유지한다. (예: `<p class="c_red" role="alert">{{ $message }}</p>`.)
+- `20-blade-and-assets.mdc` 준수: Blade 내부 인라인 `style=""`, `onclick=""`, `<style>`, `<script>` 금지. 스크립트는 `public/js/frontend/` 등 외부 파일 + `@push('scripts')` 패턴.
+
+## 배열·와일드카드 오류
+- `committee_codes.*`, `items.*.field`처럼 키가 분산되면, **해당 입력 블록(체크박스 영역·반복 행 등)의 직하단**에서만 메시지를 모아 표시한다.
+- Blade에 복잡한 비즈니스 로직을 넣지 않는다. 반복이 과하면 **컨트롤러/뷰 컴포저에서 필드별 첫 메시지 맵**만 넘기는 방식을 검토한다. (`@php` 대량 로직 금지는 `20-blade-and-assets.mdc`와 동일.)
+
+## 보조 버튼·비동기 액션 (알럿)
+- **중복 확인**, **본인인증 단계 호출**, **단발성 확인 API** 등 폼 **제출과 별개**인 버튼 액션의 결과 안내는 기본적으로 **`window.alert`**(또는 이 프로젝트에서 이미 쓰는 동일 패턴)로 처리한다.
+- **폼 제출 후** 서버가 돌려준 검증 오류는 **알럿으로 대체하지 않고** 위의 **필드별 `@error`**로만 보여준다. (동일 실패를 알럿+필드 이중으로 쌓지 않는다.)
+
+## 작업 완료 전 점검
+- 상단 일괄 오류 블록 잔존 여부(정적 검색: `$errors->all()` 루프를 상단에만 쓰는 패턴)
+- `FormRequest` 규칙 키와 뷰의 `@error` 키 대응 누락 여부
+- `style=`, `onclick=`, Blade 내부 `<style>`, `<script>` 잔존 여부 (`20-blade-and-assets.mdc` 점검과 동일 범위)

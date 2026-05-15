@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 class Popup extends Model
 {
@@ -102,5 +103,62 @@ class Popup extends Model
     public function scopeForMenuScope($query, string $menuScope)
     {
         return $query->where('menu_scope', $menuScope);
+    }
+
+    public static function todayHideCookieName(int $popupId): string
+    {
+        return 'popup_hide_'.$popupId;
+    }
+
+    /**
+     * 프론트에서 설정한 "오늘 하루 보지 않기" 쿠키로 숨김 여부
+     * (과거 스크립트가 true 문자열로 저장한 경우도 인식)
+     */
+    public static function isHiddenByTodayCookie(int $popupId): bool
+    {
+        $name = self::todayHideCookieName($popupId);
+        $v = request()->cookie($name);
+        if (($v === null || $v === '') && isset($_COOKIE[$name]) && is_string($_COOKIE[$name])) {
+            $v = $_COOKIE[$name];
+        }
+        if ($v === null || $v === '') {
+            return false;
+        }
+
+        return in_array((string) $v, ['1', 'true'], true);
+    }
+
+    /**
+     * 산하위원회 특정 게시판 화면에 노출할 위원회 팝업(활성·기간·쿠키 반영)
+     */
+    public static function activeCommitteePopupsForBoard(int $communityCommitteeId, string $boardSlug): Collection
+    {
+        if ($boardSlug === '' || ! isset(self::COMMITTEE_TARGET_BOARDS[$boardSlug])) {
+            return collect();
+        }
+
+        return static::query()
+            ->select([
+                'id',
+                'title',
+                'popup_type',
+                'popup_display_type',
+                'popup_image',
+                'popup_content',
+                'url',
+                'url_target',
+                'width',
+                'height',
+                'position_top',
+                'position_left',
+            ])
+            ->forMenuScope(self::MENU_SCOPE_COMMITTEE)
+            ->where('community_committee_id', $communityCommitteeId)
+            ->where('target_board_slug', $boardSlug)
+            ->active()
+            ->inPeriod()
+            ->ordered()
+            ->get()
+            ->filter(static fn (self $popup): bool => ! self::isHiddenByTodayCookie((int) $popup->id));
     }
 }

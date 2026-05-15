@@ -12,6 +12,7 @@ alwaysApply: false
 - `00-global-principles.mdc`
 - `10-laravel-architecture.mdc`
 - `20-blade-and-assets.mdc`
+- `21-frontend-public-forms-validation.mdc`
 - `25-backoffice-ui-consistency.mdc`
 - `26-backoffice-naming-and-shared-crud.mdc`
 - `27-change-preflight-checklist.mdc`

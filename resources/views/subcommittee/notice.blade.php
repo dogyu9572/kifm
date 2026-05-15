@@ -8,43 +8,29 @@
 
 <section class="scon" aria-labelledby="subcommittee-heading">
 	<div class="inner">
-		<h1 class="sub_title" id="subcommittee-heading">임상 영양 대사 연구회</h1>
-		
-		<div class="subcommittee_cont_top"><a href="/subcommittee/" class="btn_back_box">돌아가기</a></div>
-		
-		<div class="subcommittee_list_top">
-			<div class="imgfit"><img src="/images/bg_sample_subcommittee_list_top.jpg" alt=""></div>
-			<p>안녕하세요. 홍길동 선생님</p>
-			<h2><strong class="c_iden">임상 영양 및 대사 의학 연구회</strong>를 찾아주셔서 감사합니다.</h2>
-		</div>
-		
-		<ul class="tabs full_line mb">
-			<li class="{{ ($dNum ?? '') == '01' ? 'on' : '' }}"><a href="/subcommittee/notice" @if(($dNum ?? '') == '01') aria-current="page" @endif>공지사항</a></li>
-			<li class="{{ ($dNum ?? '') == '02' ? 'on' : '' }}"><a href="/subcommittee/discussion" @if(($dNum ?? '') == '02') aria-current="page" @endif>토론장</a></li>
-			<li class="{{ ($dNum ?? '') == '03' ? 'on' : '' }}"><a href="/subcommittee/archives" @if(($dNum ?? '') == '03') aria-current="page" @endif>자료실</a></li>
-		</ul>
-		
+		@include('subcommittee.partials.committee_header', ['useCommitteeH1' => true, 'showCommitteeTabs' => true])
+
 		<div class="board_top">
 			<div class="left">
-				<div class="total">Total <strong class="c_iden">100</strong></div>
+				<div class="total">Total <strong class="c_iden">{{ $posts->total() }}</strong></div>
 			</div>
-			<div class="right flex">
-				<select name="" id="" class="text">
-					<option value="">전체</option>
-					<option value="">제목</option>
-					<option value="">내용</option>
+			<form method="GET" action="{{ route('subcommittee.notice', $committee) }}" class="right flex">
+				<select name="search_type" class="text">
+					<option value="all" @selected(request('search_type', 'all') === 'all')>전체</option>
+					<option value="title" @selected(request('search_type') === 'title')>제목</option>
+					<option value="content" @selected(request('search_type') === 'content')>내용</option>
 				</select>
-				<form class="search_area">
-					<label for="event-search" class="sound_only">대회명 검색</label>
-					<input type="text" id="event-search" class="text" placeholder="대회명을 입력해주세요">
+				<div class="search_area">
+					<label for="subcommittee-notice-search" class="sound_only">공지사항 검색</label>
+					<input type="text" id="subcommittee-notice-search" name="keyword" class="text" value="{{ request('keyword') }}" placeholder="검색어를 입력해주세요">
 					<button type="submit" class="btn_search">검색</button>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
-		
+
 		<div class="board_list">
 			<table>
-				<caption>임상 영양 및 대사 의학 연구회 공지사항 입니다.</caption>
+				<caption>{{ $committee->name }} 공지사항 목록입니다.</caption>
 				<colgroup>
 					<col class="num">
 					<col>
@@ -58,77 +44,30 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td class="num">10</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다. 제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">9</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">8</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">7</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">6</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">5</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">4</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">3</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">2</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">1</td>
-						<td class="tal"><a href="/subcommittee/notice/view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-					</tr>
+					@forelse ($posts as $post)
+						<tr class="{{ $post->is_notice ? 'notice' : '' }}">
+							@if ($post->is_notice)
+								<td class="num" aria-label="공지사항"></td>
+							@else
+								<td class="num">{{ $posts->total() - (($posts->currentPage() - 1) * $posts->perPage()) - $loop->index }}</td>
+							@endif
+							<td class="tal"><a href="{{ route('subcommittee.notice_show', [$committee, $post->id]) }}">{{ $post->title }}</a></td>
+							<td class="date">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</td>
+						</tr>
+					@empty
+						<tr>
+							<td colspan="3" class="tac">등록된 게시글이 없습니다.</td>
+						</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>
 
-		<nav class="board-pagination" aria-label="게시판 페이지 이동">
-			<ul class="pagination">
-				<li class="page-item arw_item"><a class="page-link" href="#" title="첫 페이지" aria-label="첫 페이지로 이동"><i class="arrow two first" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="이전 페이지" aria-label="이전 페이지로 이동"><i class="arrow one prev" aria-hidden="true"></i></a></li>
-				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="현재 페이지 1">1</span></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="2페이지로 이동">2</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="3페이지로 이동">3</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="4페이지로 이동">4</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="5페이지로 이동">5</a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="다음 페이지" aria-label="다음 페이지로 이동"><i class="arrow one next" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="마지막 페이지" aria-label="마지막 페이지로 이동"><i class="arrow two last" aria-hidden="true"></i></a></li>
-			</ul>
-		</nav>
-		
+		<x-frontend.pagination :paginator="$posts" />
+
 	</div>
 </section>
-	
+
 </main>
 
 @endsection

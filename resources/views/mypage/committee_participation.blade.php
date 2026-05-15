@@ -40,7 +40,7 @@
 						<td>위원</td>
 						<td>2022.01.01</td>
 						<td>참여 중</td>
-						<td><a href="/subcommittee/notice" class="btn btn_kwk">워원회 바로가기</a></td>
+						<td><a href="{{ route('subcommittee.index') }}" class="btn btn_kwk">위원회 바로가기</a></td>
 					</tr>
 					<tr>
 						<td>스트레스 및 호르몬 균형 위원회</td>
@@ -54,7 +54,7 @@
 						<td>간사</td>
 						<td>2022.01.01</td>
 						<td>참여 중</td>
-						<td><a href="/subcommittee/notice" class="btn btn_kwk">워원회 바로가기</a></td>
+						<td><a href="{{ route('subcommittee.index') }}" class="btn btn_kwk">위원회 바로가기</a></td>
 					</tr>
 					<tr>
 						<td>환경 의학 및 독소 제거 위원회</td>

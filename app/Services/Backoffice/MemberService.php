@@ -2,6 +2,7 @@
 
 namespace App\Services\Backoffice;
 
+use App\Models\CommunityCommittee;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
@@ -180,11 +181,15 @@ class MemberService
         if (! is_array($raw)) {
             return null;
         }
-        $allowed = array_keys(config('member_committees', []));
+        $allowed = CommunityCommittee::query()
+            ->pluck('id')
+            ->map(static fn ($id): string => (string) $id)
+            ->all();
+        $allowedSet = array_fill_keys($allowed, true);
         $out = [];
         foreach ($raw as $code) {
             $code = (string) $code;
-            if (in_array($code, $allowed, true)) {
+            if (isset($allowedSet[$code])) {
                 $out[] = $code;
             }
         }
@@ -275,6 +280,28 @@ class MemberService
     {
         $phone = User::normalizePhone($phone);
         $query = User::query()->where('phone_number', $phone)->where('role', 'user');
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * 활성(탈퇴하지 않은) 회원 중 동일 의사면허번호 존재 여부
+     */
+    public function checkDuplicateLicenseNumber(string $licenseNumber, ?int $excludeId = null): bool
+    {
+        $licenseNumber = trim($licenseNumber);
+        if ($licenseNumber === '') {
+            return false;
+        }
+
+        $query = User::query()
+            ->where('role', 'user')
+            ->whereNull('withdrawn_at')
+            ->where('license_number', $licenseNumber);
+
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }

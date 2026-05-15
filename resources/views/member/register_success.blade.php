@@ -22,7 +22,7 @@
 			</div>
 			
 			<div class="btns_btm mt48">
-				<a href="/home" class="btn btn_wbb w100p">메인 페이지로</a>
+				<a href="{{ route('home') }}" class="btn btn_wbb w100p">메인 페이지로</a>
 			</div>
 			
 		</div>

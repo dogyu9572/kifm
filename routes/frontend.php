@@ -58,36 +58,38 @@ Route::prefix('academic_event')->name('academic_event.')->group(function () {
     Route::get('/training_course/end', [AcademicEventController::class, 'trainingCourseEnd'])->name('training_course_end');
 });
 
-// 산하위원회
-Route::prefix('subcommittee')->name('subcommittee.')->group(function () {
+// 산하위원회 (로그인 필요, 회원은 백오피스에서 지정한 위원회만 접근)
+Route::prefix('subcommittee')->name('subcommittee.')->middleware('auth')->group(function () {
     Route::get('/', [SubcommitteeController::class, 'index'])->name('index');
-    Route::get('/notice', [SubcommitteeController::class, 'notice'])->name('notice');
-    Route::get('/notice/view', [SubcommitteeController::class, 'noticeView'])->name('notice_view');
-    Route::get('/discussion', [SubcommitteeController::class, 'discussion'])->name('discussion');
-    Route::get('/discussion/view', [SubcommitteeController::class, 'discussionView'])->name('discussion_view');
-    Route::get('/discussion/write', [SubcommitteeController::class, 'discussionWrite'])->name('discussion_write');
-    Route::get('/archives', [SubcommitteeController::class, 'archives'])->name('archives');
-    Route::get('/archives/view', [SubcommitteeController::class, 'archivesView'])->name('archives_view');
+    Route::prefix('{committee}')->whereNumber('committee')->group(function () {
+        Route::get('/notice', [SubcommitteeController::class, 'notice'])->name('notice');
+        Route::get('/notice/{id}', [SubcommitteeController::class, 'noticeShow'])->whereNumber('id')->name('notice_show');
+        Route::get('/discussion', [SubcommitteeController::class, 'discussion'])->name('discussion');
+        Route::get('/discussion/write', [SubcommitteeController::class, 'discussionWrite'])->name('discussion_write');
+        Route::get('/discussion/{id}', [SubcommitteeController::class, 'discussionShow'])->whereNumber('id')->name('discussion_show');
+        Route::get('/archives', [SubcommitteeController::class, 'archives'])->name('archives');
+        Route::get('/archives/{id}', [SubcommitteeController::class, 'archivesShow'])->whereNumber('id')->name('archives_show');
+    });
 });
 
 // 학회 자료실
 Route::prefix('archives')->name('archives.')->group(function () {
     Route::get('/general', [ArchivesController::class, 'general'])->name('general');
-    Route::get('/general/view', [ArchivesController::class, 'generalView'])->name('general_view');
+    Route::get('/general/{id}', [ArchivesController::class, 'generalShow'])->whereNumber('id')->name('general_show');
     Route::get('/academic', [ArchivesController::class, 'academic'])->name('academic');
-    Route::get('/academic/view', [ArchivesController::class, 'academicView'])->name('academic_view');
+    Route::get('/academic/{id}', [ArchivesController::class, 'academicShow'])->whereNumber('id')->name('academic_show');
     Route::get('/members', [ArchivesController::class, 'members'])->name('members');
-    Route::get('/members/view', [ArchivesController::class, 'membersView'])->name('members_view');
+    Route::get('/members/{id}', [ArchivesController::class, 'membersShow'])->whereNumber('id')->name('members_show');
 });
 
 // 회원광장
 Route::prefix('member_plaza')->name('member_plaza.')->group(function () {
     Route::get('/society_notices', [MemberPlazaController::class, 'societyNotices'])->name('society_notices');
-    Route::get('/society_notices/view', [MemberPlazaController::class, 'societyNoticesView'])->name('society_notices_view');
+    Route::get('/society_notices/{id}', [MemberPlazaController::class, 'societyNoticesShow'])->whereNumber('id')->name('society_notices_show');
     Route::get('/other_notices', [MemberPlazaController::class, 'otherNotices'])->name('other_notices');
-    Route::get('/other_notices/view', [MemberPlazaController::class, 'otherNoticesView'])->name('other_notices_view');
+    Route::get('/other_notices/{id}', [MemberPlazaController::class, 'otherNoticesShow'])->whereNumber('id')->name('other_notices_show');
     Route::get('/society_album', [MemberPlazaController::class, 'societyAlbum'])->name('society_album');
-    Route::get('/society_album/view', [MemberPlazaController::class, 'societyAlbumView'])->name('society_album_view');
+    Route::get('/society_album/{id}', [MemberPlazaController::class, 'societyAlbumShow'])->whereNumber('id')->name('society_album_show');
     Route::get('/fee_payment_guide', [MemberPlazaController::class, 'feePaymentGuide'])->name('fee_payment_guide');
 });
 
@@ -121,6 +123,13 @@ Route::prefix('member')->name('member.')->group(function () {
     Route::get('/find_pw', [FrontendMemberController::class, 'findPw'])->name('find_pw');
     Route::get('/new_password', [FrontendMemberController::class, 'newPassword'])->name('new_password');
     Route::get('/register', [FrontendMemberController::class, 'register'])->name('register');
+    Route::post('/register', [FrontendMemberController::class, 'registerStore'])->name('register.store');
+    Route::middleware('throttle:30,1')->group(function () {
+        Route::post('/register/check-login-id', [FrontendMemberController::class, 'registerCheckLoginId'])->name('register.check-login-id');
+        Route::post('/register/check-email', [FrontendMemberController::class, 'registerCheckEmail'])->name('register.check-email');
+        Route::post('/register/check-phone', [FrontendMemberController::class, 'registerCheckPhone'])->name('register.check-phone');
+        Route::post('/register/check-license', [FrontendMemberController::class, 'registerCheckLicense'])->name('register.check-license');
+    });
     Route::get('/register_success', [FrontendMemberController::class, 'registerSuccess'])->name('register_success');
 });
 

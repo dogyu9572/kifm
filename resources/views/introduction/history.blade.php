@@ -25,45 +25,29 @@
 				<li><a href="#history4">2013 ~ 2014</a></li>
 			</ul>
 			
-			<article id="history1">
-				<h3>2023 ~ 현재</h3>
-				<dl>
-					<div><dt>2025. 02</dt><dd>'한국형 기능의학 표준 모델' 제도권 안착 추진 중</dd></div>
-					<div><dt>2024. 01</dt><dd>AI 기반 정밀 영양 및 기능의학 진단 보조 도구 연구 착수</dd></div>
-					<div><dt>2023. 04</dt><dd>학회 창립 10주년 기념 국제 컨퍼런스(ICFM) 개최 (해외 연자 초청 및 아시아 허브 도약)</dd></div>
-				</dl>
-			</article>
-			
-			<article id="history2">
-				<h3>2019 ~ 2022</h3>
-				<dl>
-					<div><dt>2025. 02</dt><dd>'한국형 기능의학 표준 모델' 제도권 안착 추진 중</dd></div>
-					<div><dt>2024. 01</dt><dd>AI 기반 정밀 영양 및 기능의학 진단 보조 도구 연구 착수</dd></div>
-					<div><dt>2023. 04</dt><dd>학회 창립 10주년 기념 국제 컨퍼런스(ICFM) 개최 (해외 연자 초청 및 아시아 허브 도약)</dd></div>
-				</dl>
-			</article>
-			
-			<article id="history3">
-				<h3>2015 ~ 2018</h3>
-				<dl>
-					<div><dt>2025. 02</dt><dd>'한국형 기능의학 표준 모델' 제도권 안착 추진 중</dd></div>
-					<div><dt>2024. 01</dt><dd>AI 기반 정밀 영양 및 기능의학 진단 보조 도구 연구 착수</dd></div>
-					<div><dt>2023. 04</dt><dd>학회 창립 10주년 기념 국제 컨퍼런스(ICFM) 개최 (해외 연자 초청 및 아시아 허브 도약)</dd></div>
-				</dl>
-			</article>
-			
-			<article id="history4">
-				<h3>2015 ~ 2018</h3>
-				<dl>
-					<div><dt>2025. 02</dt><dd>'한국형 기능의학 표준 모델' 제도권 안착 추진 중</dd></div>
-					<div><dt>2024. 01</dt><dd>AI 기반 정밀 영양 및 기능의학 진단 보조 도구 연구 착수</dd></div>
-					<div><dt>2023. 04</dt><dd>학회 창립 10주년 기념 국제 컨퍼런스(ICFM) 개최 (해외 연자 초청 및 아시아 허브 도약)</dd></div>
-					<div><dt>2023. 04</dt><dd>학회 창립 10주년 기념 국제 컨퍼런스(ICFM) 개최 (해외 연자 초청 및 아시아 허브 도약)</dd></div>
-					<div><dt>2023. 04</dt><dd>학회 창립 10주년 기념 국제 컨퍼런스(ICFM) 개최 (해외 연자 초청 및 아시아 허브 도약)</dd></div>
-				</dl>
-			</article>
-			
-			<!-- 데이터 삽입시 최 하단의 div가 최소 5개가 되는 것을 추천 -->
+			@php
+				$historyArticles = [
+					['id' => 'history1', 'label' => '2023 ~ 현재', 'key' => 'history1'],
+					['id' => 'history2', 'label' => '2019 ~ 2022', 'key' => 'history2'],
+					['id' => 'history3', 'label' => '2015 ~ 2018', 'key' => 'history3'],
+					['id' => 'history4', 'label' => '2013 ~ 2014', 'key' => 'history4'],
+				];
+			@endphp
+			@foreach ($historyArticles as $article)
+				<article id="{{ $article['id'] }}">
+					<h3>{{ $article['label'] }}</h3>
+					<dl>
+						@foreach ($historyGroups[$article['key']] ?? [] as $item)
+							<div>
+								<dt>{{ $item['year'] }}. {{ str_pad((string) $item['month'], 2, '0', STR_PAD_LEFT) }}</dt>
+								@foreach ($item['contents'] ?? [] as $content)
+									<dd>{!! $content !!}</dd>
+								@endforeach
+							</div>
+						@endforeach
+					</dl>
+				</article>
+			@endforeach
 		</div>
 	</div>
 </section>

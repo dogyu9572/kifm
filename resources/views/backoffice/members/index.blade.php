@@ -303,17 +303,11 @@
                                 <td>{{ $member->email ?? '-' }}</td>
                                 <td>{{ $member->phone_number }}</td>
                                 <td>
-                                    @php
-                                        $cc = $member->committee_codes ?? [];
-                                        if (! is_array($cc)) {
-                                            $cc = [];
-                                        }
-                                        $cn = [];
-                                        foreach ($cc as $c) {
-                                            $cn[] = $committeeLabels[$c] ?? $c;
-                                        }
-                                    @endphp
-                                    {{ $cn !== [] ? implode(', ', $cn) : '-' }}
+                                    @forelse (\Illuminate\Support\Arr::wrap($member->committee_codes) as $c)
+                                        {{ $committeeNamesById[(string) $c] ?? $c }}@if (! $loop->last), @endif
+                                    @empty
+                                        -
+                                    @endforelse
                                 </td>
                                 <td>{{ $member->created_at->format('Y.m.d') }}</td>
                                 <td>{{ $member->last_login_at ? $member->last_login_at->format('Y.m.d H:i') : '-' }}</td>

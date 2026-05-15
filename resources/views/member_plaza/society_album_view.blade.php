@@ -3,37 +3,65 @@
 @section('gName', $gName)
 @section('sName', $sName)
 @section('content')
+@php
+    $attachments = $post->attachments ? json_decode($post->attachments, true) : [];
+    if (! is_array($attachments)) {
+        $attachments = [];
+    }
+@endphp
 <main class="sub_area">
 
 <section class="scon" aria-labelledby="society-notices-heading">
 	<div class="inner">
 		<div class="sub_title">{{ $sName }}</div>
-		
+
 		<div class="board_view">
 			<div class="tit_area">
-				<h1 class="tit" id="society-notices-heading">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</h1>
-				<div class="date"><strong class="sound_only">등록일</strong><p>2026.03.01</p></div>
-				<button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+				<h1 class="tit" id="society-notices-heading">{{ $post->title }}</h1>
+				<div class="date"><strong class="sound_only">등록일</strong><p>{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</p></div>
+				<button type="button" class="bookmark" aria-label="이 게시글을 북마크에 추가" aria-pressed="false"></button>
 			</div>
-			<div class="file_area">
-				<a href="#this" download><strong>첨부파일이 들어가는 공간입니다.</strong><span>(110.5KB)</span><i class="btn_download flex_center">다운로드</i></a>
-			</div>
+
+			@if (! empty($attachments))
+				<div class="file_area">
+					@foreach ($attachments as $attachment)
+						@continue (! is_array($attachment) || ! isset($attachment['path'], $attachment['name']))
+						<a href="{{ asset('storage/'.$attachment['path']) }}" download="{{ $attachment['name'] }}">
+							<strong>{{ $attachment['name'] }}</strong>
+							@if (isset($attachment['size']))
+								<span>({{ number_format($attachment['size'] / 1024, 1) }}KB)</span>
+							@endif
+							<i class="btn_download flex_center">다운로드</i>
+						</a>
+					@endforeach
+				</div>
+			@endif
+
 			<div class="cont">
-				<img src="/images/img_sample_society_album_view.jpg" alt="">
+				{!! $post->content !!}
 			</div>
+
 			<div class="prev_next">
-				<a href="#this" class="prev"><strong>이전 글</strong><p>이전 글이 없습니다.</p></a>
-				<a href="#this" class="next"><strong>다음 글</strong><p>다음 글이 없습니다.</p></a>
+				@if ($prev)
+					<a href="{{ route('member_plaza.society_album_show', $prev->id) }}" class="prev"><strong>이전 글</strong><p>{{ $prev->title }}</p></a>
+				@else
+					<a href="#this" class="prev" aria-disabled="true"><strong>이전 글</strong><p>이전 글이 없습니다.</p></a>
+				@endif
+				@if ($next)
+					<a href="{{ route('member_plaza.society_album_show', $next->id) }}" class="next"><strong>다음 글</strong><p>{{ $next->title }}</p></a>
+				@else
+					<a href="#this" class="next" aria-disabled="true"><strong>다음 글</strong><p>다음 글이 없습니다.</p></a>
+				@endif
 			</div>
 		</div>
-		
+
 		<div class="board_bottom">
-			<a href="/member_plaza/society_notices" class="btn btn_wkk btn_list">목록</a>
+			<a href="{{ route('member_plaza.society_album') }}" class="btn btn_wkk btn_list">목록</a>
 		</div>
-		
+
 	</div>
 </section>
-	
+
 </main>
 
 @endsection

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Services\Frontend\PublicBoardService;
 use Illuminate\View\View;
 
 class IntroductionController extends Controller
 {
+    public function __construct(private readonly PublicBoardService $publicBoardService) {}
+
     public function overview(): View
     {
         $page_type = 'professional';
@@ -30,7 +33,9 @@ class IntroductionController extends Controller
         $geName = 'introduction';
         $gSlug = 'introduction_greeting';
 
-        return view('introduction.greeting', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        $post = $this->publicBoardService->findSingle('greetings');
+
+        return view('introduction.greeting', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug', 'post'));
     }
 
     public function history(): View
@@ -43,7 +48,117 @@ class IntroductionController extends Controller
         $geName = 'introduction';
         $gSlug = 'introduction_history';
 
-        return view('introduction.history', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        $historyGroups = $this->buildHistoryGroups();
+
+        return view('introduction.history', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug', 'historyGroups'));
+    }
+
+    /**
+     * 학회 연혁 데이터를 4개 그룹(2023~현재 / 2019~2022 / 2015~2018 / 2013~2014)으로 분류한다.
+     * 각 그룹 내부는 연도 DESC → 월 DESC 정렬한다.
+     * 4개 그룹 범위 밖 데이터는 노출하지 않는다.
+     *
+     * @return array{
+     *     history1: array<int, array{year:int, month:int, contents: array<int, string>}>,
+     *     history2: array<int, array{year:int, month:int, contents: array<int, string>}>,
+     *     history3: array<int, array{year:int, month:int, contents: array<int, string>}>,
+     *     history4: array<int, array{year:int, month:int, contents: array<int, string>}>
+     * }
+     */
+    private function buildHistoryGroups(): array
+    {
+        $groups = [
+            'history1' => ['min' => 2023, 'max' => 9999, 'items' => []],
+            'history2' => ['min' => 2019, 'max' => 2022, 'items' => []],
+            'history3' => ['min' => 2015, 'max' => 2018, 'items' => []],
+            'history4' => ['min' => 2013, 'max' => 2014, 'items' => []],
+        ];
+
+        $posts = $this->publicBoardService->listAll('society_history');
+
+        foreach ($posts as $post) {
+            $custom = $this->decodeCustomFields($post->custom_fields ?? null);
+            $year = (int) ($custom['history_year'] ?? 0);
+            $month = (int) ($custom['history_month'] ?? 0);
+            if ($year <= 0 || $month <= 0) {
+                continue;
+            }
+
+            foreach ($groups as $key => &$group) {
+                if ($year >= $group['min'] && $year <= $group['max']) {
+                    $group['items'][] = [
+                        'year' => $year,
+                        'month' => $month,
+                        'content' => (string) ($post->content ?? ''),
+                        'id' => (int) ($post->id ?? 0),
+                    ];
+                    break;
+                }
+            }
+            unset($group);
+        }
+
+        foreach ($groups as &$group) {
+            usort($group['items'], static function (array $a, array $b): int {
+                return $b['year'] <=> $a['year']
+                    ?: $b['month'] <=> $a['month']
+                    ?: $b['id'] <=> $a['id'];
+            });
+            $group['items'] = $this->mergeHistoryItemsByYearMonth($group['items']);
+        }
+        unset($group);
+
+        return [
+            'history1' => $groups['history1']['items'],
+            'history2' => $groups['history2']['items'],
+            'history3' => $groups['history3']['items'],
+            'history4' => $groups['history4']['items'],
+        ];
+    }
+
+    /**
+     * 동일 연·월 행을 하나의 dt 아래 여러 본문으로 묶는다.
+     * 정렬은 연도 DESC → 월 DESC → id DESC 이므로 같은 연·월은 인접한다.
+     *
+     * @param  array<int, array{year:int, month:int, content:string, id:int}>  $items
+     * @return array<int, array{year:int, month:int, contents: array<int, string>}>
+     */
+    private function mergeHistoryItemsByYearMonth(array $items): array
+    {
+        $merged = [];
+        foreach ($items as $item) {
+            $lastIdx = count($merged) - 1;
+            if ($lastIdx >= 0
+                && $merged[$lastIdx]['year'] === $item['year']
+                && $merged[$lastIdx]['month'] === $item['month']
+            ) {
+                $merged[$lastIdx]['contents'][] = $item['content'];
+            } else {
+                $merged[] = [
+                    'year' => $item['year'],
+                    'month' => $item['month'],
+                    'contents' => [$item['content']],
+                ];
+            }
+        }
+
+        return $merged;
+    }
+
+    /**
+     * custom_fields(JSON) 디코드.
+     */
+    private function decodeCustomFields(mixed $raw): array
+    {
+        if (is_array($raw)) {
+            return $raw;
+        }
+        if (! is_string($raw) || $raw === '') {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     public function bylaws(): View

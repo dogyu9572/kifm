@@ -35,7 +35,7 @@
                 const popupId = $(this).data('popup-id');
                 const cookieName = 'popup_hide_' + popupId;
                 
-                if (PopupManager.getCookie(cookieName)) {
+                if (PopupManager.isPopupHiddenForToday(cookieName)) {
                     $(this).addClass('hidden');
                 }
             });
@@ -47,7 +47,12 @@
             const expires = new Date();
             expires.setHours(23, 59, 59, 999);
             
-            document.cookie = cookieName + '=true; expires=' + expires.toUTCString() + '; path=/';
+            document.cookie = cookieName + '=1; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax';
+        },
+
+        isPopupHiddenForToday: function(cookieName) {
+            var v = this.getCookie(cookieName);
+            return v === '1' || v === 'true';
         },
 
         // 쿠키 가져오기

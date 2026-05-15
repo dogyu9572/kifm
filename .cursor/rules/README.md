@@ -11,6 +11,7 @@
 - `00-global-principles.mdc`: 전역 공통 원칙, 협업 게이트 상위 원칙
 - `10-laravel-architecture.mdc`: Laravel 계층 분리(Controller/Service/FormRequest/Model)
 - `20-blade-and-assets.mdc`: Blade 표시 전용, CSS/JS 분리, 인라인 금지
+- `21-frontend-public-forms-validation.mdc`: 사용자 공개 폼 유효성(필드별 오류·보조 버튼 알럿), 백오피스 제외
 - `25-backoffice-ui-consistency.mdc`: 백오피스 UI 레퍼런스 일관성
 - `26-backoffice-naming-and-shared-crud.mdc`: `bo-*` 공용 네이밍, CRUD 공용화
 - `27-change-preflight-checklist.mdc`: 변경 전/후 점검 및 최종 보고 형식

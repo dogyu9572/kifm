@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BackofficeMemberRequest;
+use App\Models\CommunityCommittee;
 use App\Models\User;
 use App\Services\Backoffice\MemberHistoryService;
 use App\Services\Backoffice\MemberService;
@@ -52,7 +53,12 @@ class MemberController extends Controller
 
         $memberLevelLabels = MemberService::memberLevelLabels();
         $jobTypeLabels = MemberService::jobTypeLabels();
-        $committeeLabels = config('member_committees', []);
+        $committeeNamesById = CommunityCommittee::query()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->mapWithKeys(static fn (mixed $name, int|string $id): array => [(string) $id => $name])
+            ->all();
 
         return view('backoffice.members.index', compact(
             'members',
@@ -60,7 +66,7 @@ class MemberController extends Controller
             'perPage',
             'memberLevelLabels',
             'jobTypeLabels',
-            'committeeLabels'
+            'committeeNamesById'
         ));
     }
 
@@ -111,16 +117,22 @@ class MemberController extends Controller
         if (! is_array($selectedCommitteeCodes)) {
             $selectedCommitteeCodes = [];
         }
-        $selectedCommitteeCodes = array_values(array_filter($selectedCommitteeCodes, static function ($code) {
-            return is_string($code) && $code !== '';
-        }));
+        $selectedCommitteeCodes = array_values(array_filter(
+            array_map(static fn ($code): string => is_string($code) || is_int($code) ? (string) $code : '', $selectedCommitteeCodes),
+            static fn (string $code): bool => $code !== ''
+        ));
 
         $medicalDepartmentValue = (string) old('medical_department', $member->medical_department ?? '');
+
+        $committeesForForm = CommunityCommittee::query()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name']);
 
         return [
             'member' => $member,
             'isEdit' => $isEdit,
-            'committeeLabels' => config('member_committees', []),
+            'committeesForForm' => $committeesForForm,
             'memberLevelLabels' => MemberService::memberLevelLabels(),
             'jobTypeLabels' => MemberService::jobTypeLabels(),
             'medicalDepartmentOptions' => config('medical_departments', []),

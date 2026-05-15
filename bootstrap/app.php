@@ -6,8 +6,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use App\Http\Middleware\BackOfficeAuth;
+use App\Http\Middleware\EncryptCookies as AppEncryptCookies;
 use App\Http\Middleware\PreserveReturnUrl;
 use App\Http\Middleware\TrackVisitor;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,6 +18,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->redirectGuestsTo(fn () => route('member.login'));
+
+        $middleware->web(replace: [
+            EncryptCookies::class => AppEncryptCookies::class,
+        ]);
+
         // 백오피스 경로에 대해 BackOfficeAuth 미들웨어 등록
         $middleware->group('backoffice', [
             BackOfficeAuth::class,

@@ -3,10 +3,21 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FrontendMemberRegisterRequest;
+use App\Models\CommunityCommittee;
+use App\Models\User;
+use App\Services\Backoffice\MemberService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class MemberController extends Controller
 {
+    public function __construct(
+        private readonly MemberService $memberService,
+    ) {}
+
     public function login(): View
     {
         return $this->renderMember('login', '01', '로그인', 'login');
@@ -44,7 +55,93 @@ class MemberController extends Controller
 
     public function register(): View
     {
-        return $this->renderMember('register', '04', '회원가입', 'register');
+        $committeesForRegister = CommunityCommittee::query()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name']);
+
+        return $this->renderMember('register', '04', '회원가입', 'register', compact('committeesForRegister'));
+    }
+
+    public function registerStore(FrontendMemberRegisterRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        unset($validated['privacy_agreed'], $validated['terms_agreed'], $validated['password_confirmation']);
+        $validated['join_type'] = 'email';
+        $validated['member_level'] = 'pending';
+
+        $this->memberService->createMember($validated);
+
+        return redirect()->route('member.register_success');
+    }
+
+    public function registerCheckEmail(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ], [
+            'email.required' => '이메일을 입력해주세요.',
+            'email.email' => '올바른 이메일 형식이 아닙니다.',
+        ]);
+
+        $email = (string) $request->input('email');
+        $exists = $this->memberService->checkDuplicateEmail($email, null);
+
+        return response()->json([
+            'available' => ! $exists,
+            'message' => $exists ? '이미 사용 중인 이메일입니다.' : '사용 가능한 이메일입니다.',
+        ]);
+    }
+
+    public function registerCheckPhone(Request $request): JsonResponse
+    {
+        $request->validate([
+            'phone_number' => 'required|string',
+        ], [
+            'phone_number.required' => '휴대폰 번호를 입력해주세요.',
+        ]);
+
+        $phone = (string) $request->input('phone_number');
+        $exists = $this->memberService->checkDuplicatePhone($phone, null);
+
+        return response()->json([
+            'available' => ! $exists,
+            'message' => $exists ? '이미 사용 중인 휴대폰번호입니다.' : '사용 가능한 휴대폰번호입니다.',
+        ]);
+    }
+
+    public function registerCheckLicense(Request $request): JsonResponse
+    {
+        $request->validate([
+            'license_number' => 'required|string',
+        ], [
+            'license_number.required' => '의사면허번호를 입력해주세요.',
+        ]);
+
+        $license = (string) $request->input('license_number');
+        $exists = $this->memberService->checkDuplicateLicenseNumber($license, null);
+
+        return response()->json([
+            'available' => ! $exists,
+            'message' => $exists ? '이미 등록된 의사면허번호입니다.' : '사용 가능한 의사면허번호입니다.',
+        ]);
+    }
+
+    public function registerCheckLoginId(Request $request): JsonResponse
+    {
+        $request->validate([
+            'login_id' => 'required|string|max:80',
+        ], [
+            'login_id.required' => '아이디를 입력해주세요.',
+        ]);
+
+        $loginId = (string) $request->input('login_id');
+        $exists = User::query()->where('login_id', $loginId)->exists();
+
+        return response()->json([
+            'available' => ! $exists,
+            'message' => $exists ? '이미 사용 중인 아이디입니다.' : '사용 가능한 아이디입니다.',
+        ]);
     }
 
     public function registerSuccess(): View
@@ -52,7 +149,10 @@ class MemberController extends Controller
         return $this->renderMember('register_success', '04', '회원가입 완료', 'register_success');
     }
 
-    private function renderMember(string $view, string $sNum, string $sName, string $slug): View
+    /**
+     * @param  array<string, mixed>  $with
+     */
+    private function renderMember(string $view, string $sNum, string $sName, string $slug, array $with = []): View
     {
         $page_type = 'professional';
         $gNum = '00';
@@ -60,6 +160,9 @@ class MemberController extends Controller
         $geName = 'Member';
         $gSlug = $slug;
 
-        return view('member.' . $view, compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        return view('member.'.$view, array_merge(
+            compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'),
+            $with
+        ));
     }
 }

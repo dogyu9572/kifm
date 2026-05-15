@@ -74,6 +74,38 @@
                 </div>
                 @endif
 
+                @if($board->isFieldEnabled('thumbnail'))
+                <div class="board-form-group">
+                    <label for="thumbnail" class="board-form-label">
+                        대표 이미지 (썸네일)
+                        @if($board->isFieldRequired('thumbnail'))
+                            <span class="required">*</span>
+                        @endif
+                    </label>
+                    <div class="board-file-upload">
+                        <div class="board-file-input-wrapper">
+                            <input type="file" class="board-file-input" id="thumbnail" name="thumbnail" accept=".jpg,.jpeg,.png,.gif,.webp" @if($board->isFieldRequired('thumbnail')) required @endif>
+                            <div class="board-file-input-content">
+                                <i class="fas fa-image"></i>
+                                <span class="board-file-input-text">썸네일 이미지를 선택하거나 여기로 드래그하세요</span>
+                                <span class="board-file-input-subtext">JPG, PNG, GIF, WEBP 파일만 가능 (최대 5MB)</span>
+                            </div>
+                        </div>
+                        @if($post->thumbnail)
+                            <input type="hidden" name="existing_thumbnail" value="{{ $post->thumbnail }}">
+                            <div class="board-file-preview" id="thumbnailPreview">
+                                <img src="{{ asset('storage/'.$post->thumbnail) }}" alt="현재 썸네일" class="thumbnail-preview">
+                                <button type="button" class="btn btn-sm btn-outline-danger mt-2 js-board-post-thumb-remove">
+                                    <i class="fas fa-trash"></i> 썸네일 제거
+                                </button>
+                            </div>
+                        @else
+                            <div class="board-file-preview" id="thumbnailPreview"></div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 @if($board->isFieldEnabled('content'))
                 <div class="board-form-group">
                     <label for="content" class="board-form-label">

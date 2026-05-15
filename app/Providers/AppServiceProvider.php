@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\AdminMenu;
+use App\Models\CommunityCommittee;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Request;
@@ -25,6 +27,42 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Route::bind('committee', function (string $value) {
+            if (! ctype_digit($value)) {
+                abort(404);
+            }
+
+            return CommunityCommittee::query()
+                ->whereKey((int) $value)
+                ->where('visibility_yn', 'Y')
+                ->firstOrFail();
+        });
+
+        View::composer('layouts.frontend', function ($view) {
+            $committees = CommunityCommittee::query()
+                ->where('visibility_yn', 'Y')
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->get();
+
+            $authUser = Auth::guard('web')->user();
+            if ($authUser !== null && ! $authUser->isAdmin()) {
+                $allowed = $authUser->communityCommitteeAccessIdStrings();
+                if ($allowed === []) {
+                    $committees = collect();
+                } else {
+                    $committees = $committees
+                        ->filter(static fn (CommunityCommittee $c): bool => in_array((string) $c->id, $allowed, true))
+                        ->values();
+                }
+            }
+
+            $view->with(
+                'navCommittees',
+                $committees,
+            );
+        });
+
         // HTTPS 강제 (.env의 APP_URL이 https://로 시작하는 경우)
         $applicationUrl = config('app.url');
         if (is_string($applicationUrl) && str_starts_with($applicationUrl, 'https://')) {

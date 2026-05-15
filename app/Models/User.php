@@ -124,6 +124,35 @@ class User extends Authenticatable
     }
 
     /**
+     * 산하위원회(community_committees) 접근에 사용하는 위원회 PK 문자열 목록
+     *
+     * @return list<string>
+     */
+    public function communityCommitteeAccessIdStrings(): array
+    {
+        $raw = $this->committee_codes ?? [];
+        if (! is_array($raw)) {
+            return [];
+        }
+        $out = [];
+        foreach ($raw as $id) {
+            $s = trim((string) $id);
+            if ($s !== '' && ctype_digit($s)) {
+                $out[] = $s;
+            }
+        }
+
+        return array_values(array_unique($out));
+    }
+
+    public function canAccessCommunityCommitteeId(int|string $committeeId): bool
+    {
+        $id = trim((string) $committeeId);
+
+        return $id !== '' && in_array($id, $this->communityCommitteeAccessIdStrings(), true);
+    }
+
+    /**
      * 사용자가 활성화된 계정인지 확인
      */
     public function isActive(): bool

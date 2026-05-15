@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\CommunityCommittee;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,7 +20,10 @@ class BackofficeMemberRequest extends FormRequest
         $memberId = $member instanceof User ? $member->id : $member;
         $isUpdate = $this->isMethod('PUT') || $this->isMethod('PATCH');
 
-        $committeeCodes = array_keys(config('member_committees', []));
+        $committeeCodes = CommunityCommittee::query()
+            ->pluck('id')
+            ->map(static fn ($id): string => (string) $id)
+            ->all();
 
         $optionalWhenUpdate = $isUpdate ? 'sometimes|' : '';
 

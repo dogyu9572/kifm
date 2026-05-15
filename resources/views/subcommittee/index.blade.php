@@ -8,7 +8,7 @@
 <section class="scon" aria-labelledby="subcommittee-heading">
 	<div class="inner">
 		<h1 class="sub_title" id="subcommittee-heading">{{ $sName }}</h1>
-		
+
 		<div class="subcommittee_top">
 			<h2>대한기능의학회 <br/><strong class="c_iden">산하위원회</strong></h2>
 			<div class="con">
@@ -19,85 +19,36 @@
 				</ul>
 			</div>
 		</div>
-		
+
 		<ul class="subcommittee_list">
-			<li>
-				<a href="/subcommittee/notice">
-					<span class="imgfit" aria-hidden="true"><img src="/images/bg_sample_subcommittee_list.jpg" alt=""></span>
-					<span class="txt">
-						<h3>임상 영양 및 대사 의학 위원회</h3>
-						<span class="con">
-							<p>현대인의 만성 질환이 잘못된 영양 섭취와 대사 불균형에서 기인한다는 점에 주목하여, 환자 개개인의 영양 상태를 정밀 분석하고 이를 교정함으로써 질병의 근본 원인을 해결하고자 발족되었습니다. 유기산 측정 및 미네랄 분석: 소변 유기산, 모발 미네랄 검사 등 기능의학적 검사 데이터를 기반으로 한 체내 대사 경로 최적화 연구를 수행합니다.</p>
-							<i class="btn btn_wbb">위원회 가입 신청</i>
+			@forelse ($committees as $c)
+				@php
+					$thumbUrl = ! empty($c->thumbnail_path)
+						? asset('storage/'.$c->thumbnail_path)
+						: asset('images/bg_sample_subcommittee_list.jpg');
+				@endphp
+				<li>
+					<a href="{{ route('subcommittee.notice', $c) }}">
+						<span class="imgfit" aria-hidden="true"><img src="{{ $thumbUrl }}" alt=""></span>
+						<span class="txt">
+							<h3>{{ $c->name }}</h3>
+							<span class="con">
+								<p>{{ $c->description ?? '' }}</p>
+								<i class="btn btn_wbb">위원회 가입 신청</i>
+							</span>
 						</span>
-					</span>
-				</a>
-			</li>
-			<li>
-				<a href="/subcommittee/notice">
-					<span class="imgfit" aria-hidden="true"><img src="/images/bg_sample_subcommittee_list.jpg" alt=""></span>
-					<span class="txt">
-						<h3>임상 영양 및 대사 의학 위원회</h3>
-						<span class="con">
-							<p>현대인의 만성 질환이 잘못된 영양 섭취와 대사 불균형에서 기인한다는 점에 주목하여, 환자 개개인의 영양 상태를 정밀 분석하고 이를 교정함으로써 질병의 근본 원인을 해결하고자 발족되었습니다. 유기산 측정 및 미네랄 분석: 소변 유기산, 모발 미네랄 검사 등 기능의학적 검사 데이터를 기반으로 한 체내 대사 경로 최적화 연구를 수행합니다.</p>
-							<i class="btn btn_wbb">위원회 가입 신청</i>
-						</span>
-					</span>
-				</a>
-			</li>
-			<li>
-				<a href="/subcommittee/notice">
-					<span class="imgfit" aria-hidden="true"><img src="/images/bg_sample_subcommittee_list.jpg" alt=""></span>
-					<span class="txt">
-						<h3>임상 영양 및 대사 의학 위원회</h3>
-						<span class="con">
-							<p>현대인의 만성 질환이 잘못된 영양 섭취와 대사 불균형에서 기인한다는 점에 주목하여, 환자 개개인의 영양 상태를 정밀 분석하고 이를 교정함으로써 질병의 근본 원인을 해결하고자 발족되었습니다. 유기산 측정 및 미네랄 분석: 소변 유기산, 모발 미네랄 검사 등 기능의학적 검사 데이터를 기반으로 한 체내 대사 경로 최적화 연구를 수행합니다.</p>
-							<i class="btn btn_wbb">위원회 가입 신청</i>
-						</span>
-					</span>
-				</a>
-			</li>
-			<li>
-				<a href="/subcommittee/notice">
-					<span class="imgfit" aria-hidden="true"><img src="/images/bg_sample_subcommittee_list.jpg" alt=""></span>
-					<span class="txt">
-						<h3>임상 영양 및 대사 의학 위원회</h3>
-						<span class="con">
-							<p>현대인의 만성 질환이 잘못된 영양 섭취와 대사 불균형에서 기인한다는 점에 주목하여, 환자 개개인의 영양 상태를 정밀 분석하고 이를 교정함으로써 질병의 근본 원인을 해결하고자 발족되었습니다. 유기산 측정 및 미네랄 분석: 소변 유기산, 모발 미네랄 검사 등 기능의학적 검사 데이터를 기반으로 한 체내 대사 경로 최적화 연구를 수행합니다.</p>
-							<i class="btn btn_wbb">위원회 가입 신청</i>
-						</span>
-					</span>
-				</a>
-			</li>
-			<li>
-				<a href="/subcommittee/notice">
-					<span class="imgfit" aria-hidden="true"><img src="/images/bg_sample_subcommittee_list.jpg" alt=""></span>
-					<span class="txt">
-						<h3>임상 영양 및 대사 의학 위원회</h3>
-						<span class="con">
-							<p>현대인의 만성 질환이 잘못된 영양 섭취와 대사 불균형에서 기인한다는 점에 주목하여, 환자 개개인의 영양 상태를 정밀 분석하고 이를 교정함으로써 질병의 근본 원인을 해결하고자 발족되었습니다. 유기산 측정 및 미네랄 분석: 소변 유기산, 모발 미네랄 검사 등 기능의학적 검사 데이터를 기반으로 한 체내 대사 경로 최적화 연구를 수행합니다.</p>
-							<i class="btn btn_wbb">위원회 가입 신청</i>
-						</span>
-					</span>
-				</a>
-			</li>
-			<li>
-				<a href="/subcommittee/notice">
-					<span class="imgfit" aria-hidden="true"><img src="/images/bg_sample_subcommittee_list.jpg" alt=""></span>
-					<span class="txt">
-						<h3>임상 영양 및 대사 의학 위원회</h3>
-						<span class="con">
-							<p>현대인의 만성 질환이 잘못된 영양 섭취와 대사 불균형에서 기인한다는 점에 주목하여, 환자 개개인의 영양 상태를 정밀 분석하고 이를 교정함으로써 질병의 근본 원인을 해결하고자 발족되었습니다. 유기산 측정 및 미네랄 분석: 소변 유기산, 모발 미네랄 검사 등 기능의학적 검사 데이터를 기반으로 한 체내 대사 경로 최적화 연구를 수행합니다.</p>
-							<i class="btn btn_wbb">위원회 가입 신청</i>
-						</span>
-					</span>
-				</a>
-			</li>
+					</a>
+				</li>
+			@empty
+				<li>
+					<p class="tac">등록된 산하위원회가 없습니다.</p>
+				</li>
+			@endforelse
 		</ul>
-		
+
 	</div>
 </section>
-	
+
 </main>
 
 @endsection

@@ -3,48 +3,103 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Services\Frontend\PublicBoardService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ArchivesController extends Controller
 {
-    public function general(): View
+    public function __construct(private readonly PublicBoardService $publicBoardService) {}
+
+    public function general(Request $request): View
     {
-        return $this->renderArchive('general', '01', '일반 자료실', 'archives_general');
+        $posts = $this->publicBoardService->list('general_archive', $request, 10);
+
+        return view('archives.general', array_merge(
+            $this->archivesViewData('01', '일반 자료실', 'archives_general'),
+            compact('posts'),
+        ));
     }
 
-    public function generalView(): View
+    public function generalShow(int $id): View
     {
-        return $this->renderArchive('general_view', '01', '일반 자료실', 'archives_general_view');
+        $post = $this->publicBoardService->find('general_archive', $id);
+        if ($post === null) {
+            throw new NotFoundHttpException();
+        }
+
+        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('general_archive', $id);
+
+        return view('archives.general_view', array_merge(
+            $this->archivesViewData('01', '일반 자료실', 'archives_general_view'),
+            compact('post', 'prev', 'next'),
+        ));
     }
 
-    public function academic(): View
+    public function academic(Request $request): View
     {
-        return $this->renderArchive('academic', '02', '학술 자료실', 'archives_academic');
+        $posts = $this->publicBoardService->list('academic_archive', $request, 10);
+
+        return view('archives.academic', array_merge(
+            $this->archivesViewData('02', '학술 자료실', 'archives_academic'),
+            compact('posts'),
+        ));
     }
 
-    public function academicView(): View
+    public function academicShow(int $id): View
     {
-        return $this->renderArchive('academic_view', '02', '학술 자료실', 'archives_academic_view');
+        $post = $this->publicBoardService->find('academic_archive', $id);
+        if ($post === null) {
+            throw new NotFoundHttpException();
+        }
+
+        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('academic_archive', $id);
+
+        return view('archives.academic_view', array_merge(
+            $this->archivesViewData('02', '학술 자료실', 'archives_academic_view'),
+            compact('post', 'prev', 'next'),
+        ));
     }
 
-    public function members(): View
+    public function members(Request $request): View
     {
-        return $this->renderArchive('members', '03', '회원 자료실', 'archives_members');
+        $posts = $this->publicBoardService->list('member_archive', $request, 10);
+
+        return view('archives.members', array_merge(
+            $this->archivesViewData('03', '회원 자료실', 'archives_members'),
+            compact('posts'),
+        ));
     }
 
-    public function membersView(): View
+    public function membersShow(int $id): View
     {
-        return $this->renderArchive('members_view', '03', '회원 자료실', 'archives_members_view');
+        $post = $this->publicBoardService->find('member_archive', $id);
+        if ($post === null) {
+            throw new NotFoundHttpException();
+        }
+
+        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('member_archive', $id);
+
+        return view('archives.members_view', array_merge(
+            $this->archivesViewData('03', '회원 자료실', 'archives_members_view'),
+            compact('post', 'prev', 'next'),
+        ));
     }
 
-    private function renderArchive(string $view, string $sNum, string $sName, string $slug): View
+    /**
+     * 학회 자료실 공통 화면 변수.
+     */
+    private function archivesViewData(string $sNum, string $sName, string $slug): array
     {
-        $page_type = 'professional';
-        $gNum = '04';
-        $gName = '학회 자료실';
-        $geName = 'archives';
-        $gSlug = $slug;
-
-        return view('archives.' . $view, compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        return [
+            'page_type' => 'professional',
+            'gNum' => '04',
+            'gName' => '학회 자료실',
+            'geName' => 'archives',
+            'sNum' => $sNum,
+            'sName' => $sName,
+            'gSlug' => $slug,
+        ];
     }
 }
