@@ -10,20 +10,23 @@
     <div class="inner">
         <div class="inbox">
 			
-			<form action="/payment/process" method="post">
+			<form action="{{ route('mypage.annual_fee.store') }}" method="POST">
+                @csrf
                 <fieldset>
                     <legend class="num_tit"><span>1</span>결제 항목 선택</legend>
                     <ul class="check_box_line">
                         <li>
                             <div class="radio">
-                            	<input type="radio" name="payment_select" id="payment_select1">
-                            	<label for="payment_select1"><i aria-hidden="true"></i><span>정회원 연회비 <strong>100,000원</strong></span></label>
+                            	<input type="radio" name="membership_plan_id" id="payment_select1" value="{{ $plans[0]['id'] ?? '' }}" @checked(true) required>
+                            	<label for="payment_select1"><i aria-hidden="true"></i><span>{{ $plans[0]['label'] ?? '연회비' }} <strong>{{ number_format($plans[0]['amount'] ?? 0) }}원</strong></span></label>
                             </div>
                         </li>
                         <li>
                             <div class="radio">
-                            	<input type="radio" name="payment_select" id="payment_select2">
-                            	<label for="payment_select2"><i aria-hidden="true"></i><span>특별회원 연회비 <strong>100,000원</strong></span></label>
+                            	@if (isset($plans[1]))
+                            	<input type="radio" name="membership_plan_id" id="payment_select2" value="{{ $plans[1]['id'] }}">
+                            	<label for="payment_select2"><i aria-hidden="true"></i><span>{{ $plans[1]['label'] }} <strong>{{ number_format($plans[1]['amount']) }}원</strong></span></label>
+                            	@endif
                             </div>
                         </li>
                     </ul>
@@ -34,7 +37,7 @@
                     <ul class="glbox">
                         <li>
                             <label for="user_name">이름<span class="required">*</span></label>
-                            <input type="text" id="user_name" name="user_name" class="text" placeholder="이름을 입력해주세요" required title="이름 입력 필수">
+                            <input type="text" id="user_name" name="user_name" class="text" placeholder="이름을 입력해주세요" value="{{ $user->name }}" readonly required title="이름 입력 필수">
                         </li>
                         <li>
                             <label for="user_email">이메일<span class="required">*</span></label>
@@ -42,12 +45,12 @@
                         </li>
                         <li>
                             <label for="user_tel">휴대폰번호<span class="required">*</span></label>
-                            <input type="tel" id="user_tel" name="user_tel" class="text" placeholder="휴대폰 번호를 입력해주세요" required>
+                            <input type="tel" id="user_tel" name="user_tel" class="text" placeholder="휴대폰 번호를 입력해주세요" value="{{ $user->phone_number }}" readonly required>
                         </li>
                         <li>
                             <label for="doctor_license">의사면허번호<span class="required">*</span></label>
                             <div class="inbtn">
-                                <input type="text" id="doctor_license" name="doctor_license" class="text" placeholder="의사면허번호를 입력해주세요" required title="의사면허번호 입력 필수">
+                                <input type="text" id="doctor_license" name="doctor_license" class="text" placeholder="의사면허번호를 입력해주세요" value="{{ $user->license_number }}" readonly required title="의사면허번호 입력 필수">
                                 <button type="button" class="btn btn_wkk">중복 확인</button>
                             </div>
                         </li>
@@ -59,11 +62,11 @@
                     <div class="glbox">
                         <ul class="btns_flex">
                             <li class="radio">
-                                <input type="radio" name="payment_type" id="payment_type_card" value="card" checked>
+                                <input type="radio" name="payment_method" id="payment_type_card" value="card" checked>
                                 <label for="payment_type_card"><span>신용카드</span></label>
                             </li>
                             <li class="radio">
-                                <input type="radio" name="payment_type" id="payment_type_bank" value="bank">
+                                <input type="radio" name="payment_method" id="payment_type_bank" value="bank_transfer">
                                 <label for="payment_type_bank"><span>무통장입금</span></label>
                             </li>
                         </ul>

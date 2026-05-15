@@ -140,9 +140,16 @@ Route::prefix('member')->name('member.')->group(function () {
 });
 
 // 마이페이지 (Phase 5 분리: Profile / AnnualFee / History / Inquiry / Print)
-Route::prefix('mypage')->name('mypage.')->group(function () {
+Route::prefix('mypage')->name('mypage.')->middleware(['auth', 'frontend.member'])->group(function () {
     // 개인정보 관리
     Route::get('/profile_edit', [MypageProfileController::class, 'edit'])->name('profile_edit');
+    Route::put('/profile_edit', [MypageProfileController::class, 'update'])->name('profile_edit.update');
+    Route::middleware('throttle:30,1')->group(function () {
+        Route::post('/profile_edit/check-email', [MypageProfileController::class, 'checkEmail'])->name('profile_edit.check-email');
+        Route::post('/profile_edit/check-phone', [MypageProfileController::class, 'checkPhone'])->name('profile_edit.check-phone');
+        Route::post('/profile_edit/check-license', [MypageProfileController::class, 'checkLicense'])->name('profile_edit.check-license');
+    });
+    Route::post('/membership-payment/cancel', [MypageAnnualFeeController::class, 'cancelPending'])->name('membership_payment.cancel');
     Route::get('/secession', [MypageProfileController::class, 'secession'])->name('secession');
     Route::get('/hospital_information', [MypageProfileController::class, 'hospitalInformation'])->name('hospital_information');
     Route::get('/executive_activities', [MypageProfileController::class, 'executiveActivities'])->name('executive_activities');
@@ -151,6 +158,7 @@ Route::prefix('mypage')->name('mypage.')->group(function () {
 
     // 연회비 납부
     Route::get('/annual_fee', [MypageAnnualFeeController::class, 'index'])->name('annual_fee');
+    Route::post('/annual_fee', [MypageAnnualFeeController::class, 'store'])->name('annual_fee.store');
     Route::get('/annual_fee/end', [MypageAnnualFeeController::class, 'end'])->name('annual_fee_end');
 
     // 참가내역·수강·즐겨찾기·북마크
@@ -159,12 +167,18 @@ Route::prefix('mypage')->name('mypage.')->group(function () {
     Route::get('/online_training', [MypageHistoryController::class, 'onlineTraining'])->name('online_training');
     Route::get('/online_training/view', [MypageHistoryController::class, 'onlineTrainingView'])->name('online_training_view');
     Route::get('/favorite', [MypageHistoryController::class, 'favoriteMenu'])->name('favorite_menu');
+    Route::post('/favorite', [MypageHistoryController::class, 'favoriteMenuStore'])->name('favorite_menu.store');
     Route::get('/bookmark', [MypageHistoryController::class, 'bookmark'])->name('bookmark');
+    Route::post('/bookmark/destroy', [MypageHistoryController::class, 'bookmarkDestroy'])->name('bookmark.destroy');
 
     // 1:1 문의
     Route::get('/inquiry', [MypageInquiryController::class, 'index'])->name('inquiry');
     Route::get('/inquiry/view', [MypageInquiryController::class, 'show'])->name('inquiry_view');
     Route::get('/inquiry/write', [MypageInquiryController::class, 'create'])->name('inquiry_write');
+    Route::get('/inquiry/edit', [MypageInquiryController::class, 'edit'])->name('inquiry_edit');
+    Route::post('/inquiry', [MypageInquiryController::class, 'store'])->name('inquiry.store');
+    Route::put('/inquiry/{id}', [MypageInquiryController::class, 'update'])->name('inquiry.update');
+    Route::delete('/inquiry/{id}', [MypageInquiryController::class, 'destroy'])->name('inquiry.destroy');
 
     // 출력(PDF 저장)
     Route::get('/print_receipt', [MypagePrintController::class, 'receipt'])->name('print_receipt');

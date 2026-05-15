@@ -49,83 +49,29 @@
 					</tr>
 				</thead>
 				<tbody>
+					@forelse ($bookmarks as $bookmark)
 					<tr>
-						<td class="page">공지사항</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
+						<td class="page">{{ $bookmark->snapshot_menu_label ?? $bookmark->content_type }}</td>
+						<td class="tal">
+							@if ($bookmark->snapshot_url)
+							<a href="{{ $bookmark->snapshot_url }}">{{ $bookmark->snapshot_title ?? '-' }}</a>
+							@else
+							{{ $bookmark->snapshot_title ?? '-' }}
+							@endif
+						</td>
+						<td class="date">{{ optional($bookmark->bookmarked_at)->format('Y.m.d') }}</td>
+						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="북마크 해제" data-bookmark-id="{{ $bookmark->id }}"></button></td>
 					</tr>
-					<tr>
-						<td class="page">학술자료실</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
+					@empty
+					<tr class="empty">
+						<td colspan="4">북마크한 콘텐츠가 없습니다.</td>
 					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
-					<tr>
-						<td class="page">자유게시판</td>
-						<td class="tal"><a href="#this">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
-						<td class="date">2025.01.01</td>
-						<td class="bookmark_box"><button type="button" class="bookmark on" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button></td>
-					</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>
 
-		<nav class="board-pagination" aria-label="게시판 페이지 이동">
-			<ul class="pagination">
-				<li class="page-item arw_item"><a class="page-link" href="#" title="첫 페이지" aria-label="첫 페이지로 이동"><i class="arrow two first" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="이전 페이지" aria-label="이전 페이지로 이동"><i class="arrow one prev" aria-hidden="true"></i></a></li>
-				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="현재 페이지 1">1</span></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="2페이지로 이동">2</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="3페이지로 이동">3</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="4페이지로 이동">4</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="5페이지로 이동">5</a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="다음 페이지" aria-label="다음 페이지로 이동"><i class="arrow one next" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="마지막 페이지" aria-label="마지막 페이지로 이동"><i class="arrow two last" aria-hidden="true"></i></a></li>
-			</ul>
-		</nav>
+		<x-frontend.pagination :paginator="$bookmarks" />
 		
 	</div>
 </section>

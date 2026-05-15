@@ -32,7 +32,8 @@ class OneOnOneInquiryService
                 $request->filled('search_field') ? (string) $request->get('search_field') : 'all',
                 $request->filled('keyword') ? (string) $request->get('keyword') : null,
             )
-            ->latest('id')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->paginate($perPage)
             ->withQueryString();
     }

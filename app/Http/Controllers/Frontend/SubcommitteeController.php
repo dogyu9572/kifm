@@ -27,20 +27,17 @@ class SubcommitteeController extends Controller
         $geName = 'Subcommittee';
         $gSlug = 'subcommittee';
 
-        $base = CommunityCommittee::query()
+        $committees = CommunityCommittee::query()
             ->where('visibility_yn', 'Y')
             ->orderBy('sort_order')
-            ->orderBy('name');
+            ->orderBy('name')
+            ->get();
 
         $user = Auth::user();
-        if ($user->isAdmin()) {
-            $committees = (clone $base)->get();
-        } else {
-            $ids = $user->communityCommitteeAccessIdStrings();
-            $committees = $ids === []
-                ? collect()
-                : (clone $base)->whereIn('id', array_map(static fn (string $id): int => (int) $id, $ids))->get();
-        }
+        $accessibleCommitteeIds = $user->isAdmin()
+            ? $committees->map(static fn (CommunityCommittee $committee): string => (string) $committee->id)->all()
+            : $user->communityCommitteeAccessIdStrings();
+        $accessibleCommitteeIdSet = array_flip($accessibleCommitteeIds);
 
         $committeePopups = collect();
 
@@ -53,6 +50,7 @@ class SubcommitteeController extends Controller
             'geName',
             'gSlug',
             'committees',
+            'accessibleCommitteeIdSet',
             'committeePopups',
         ));
     }

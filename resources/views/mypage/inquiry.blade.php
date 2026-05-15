@@ -28,7 +28,7 @@
 					<input type="text" id="event-search" class="text" placeholder="제목을 입력해주세요">
 					<button type="submit" class="btn_search">검색</button>
 				</form>
-				<a href="/mypage/inquiry/write" class="btn btn_wkk btn_write">문의하기</a>
+				<a href="{{ route('mypage.inquiry_write') }}" class="btn btn_wkk btn_write">문의하기</a>
 			</div>
 		</div>
 		
@@ -50,83 +50,25 @@
 					</tr>
 				</thead>
 				<tbody>
+					@forelse ($posts as $post)
 					<tr>
-						<td class="num">10</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state ing">답변대기</span></td>
-						<td class="date">2025.01.01</td>
+						<td class="num">{{ $post->id }}</td>
+						<td class="tal"><a href="{{ route('mypage.inquiry_view', ['id' => $post->id]) }}">{{ $post->title }}</a></td>
+						<td class="reply"><span class="state {{ $post->reply_status_class }}">{{ $post->reply_status_label }}</span></td>
+						<td class="date">{{ \Illuminate\Support\Carbon::parse($post->created_at)->format('Y.m.d') }}</td>
 					</tr>
-					<tr>
-						<td class="num">9</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state ing">답변대기</span></td>
-						<td class="date">2025.01.01</td>
+					@empty
+					<tr class="empty">
+						<td colspan="4">등록된 문의가 없습니다.</td>
 					</tr>
-					<tr>
-						<td class="num">8</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state ing">답변대기</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">7</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state end">답변완료</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">6</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state end">답변완료</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">5</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state end">답변완료</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">4</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state end">답변완료</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">3</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state end">답변완료</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">2</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state end">답변완료</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
-					<tr>
-						<td class="num">1</td>
-						<td class="tal"><a href="/mypage/inquiry/view">문의내역 제목이 들어가는 공간입니다.</a></td>
-						<td class="reply"><span class="state end">답변완료</span></td>
-						<td class="date">2025.01.01</td>
-					</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>
 
 		<nav class="board-pagination" aria-label="게시판 페이지 이동">
-			<a href="/mypage/inquiry/write" class="btn_abso btn btn_wkk btn_write">문의하기</a>
-			<ul class="pagination">
-				<li class="page-item arw_item"><a class="page-link" href="#" title="첫 페이지" aria-label="첫 페이지로 이동"><i class="arrow two first" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="이전 페이지" aria-label="이전 페이지로 이동"><i class="arrow one prev" aria-hidden="true"></i></a></li>
-				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="현재 페이지 1">1</span></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="2페이지로 이동">2</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="3페이지로 이동">3</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="4페이지로 이동">4</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="5페이지로 이동">5</a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="다음 페이지" aria-label="다음 페이지로 이동"><i class="arrow one next" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="마지막 페이지" aria-label="마지막 페이지로 이동"><i class="arrow two last" aria-hidden="true"></i></a></li>
-			</ul>
+			<a href="{{ route('mypage.inquiry_write') }}" class="btn_abso btn btn_wkk btn_write">문의하기</a>
+			<x-frontend.pagination :paginator="$posts" embedded />
 		</nav>
 		
 	</div>

@@ -35,34 +35,19 @@
 					</tr>
 				</thead>
 				<tbody>
+					@forelse ($committees as $committee)
 					<tr>
-						<td>임상 영양 및 대사 의학 위원회</td>
+						<td>{{ $committee->name }}</td>
 						<td>위원</td>
 						<td>2022.01.01</td>
 						<td>참여 중</td>
-						<td><a href="{{ route('subcommittee.index') }}" class="btn btn_kwk">위원회 바로가기</a></td>
+						<td><a href="{{ route('subcommittee.notice', ['committee' => $committee->id]) }}" class="btn btn_kwk">위원회 바로가기</a></td>
 					</tr>
-					<tr>
-						<td>스트레스 및 호르몬 균형 위원회</td>
-						<td>위원</td>
-						<td>2022.01.01</td>
-						<td>승인 대기</td>
-						<td><button type="button" class="btn btn_kwk" onclick="layerShow('pop_cancel');">신청 취소</button></td>
+					@empty
+					<tr class="empty">
+						<td colspan="5">참여 중인 위원회가 없습니다.</td>
 					</tr>
-					<tr>
-						<td>환경 의학 및 독소 제거 위원회</td>
-						<td>간사</td>
-						<td>2022.01.01</td>
-						<td>참여 중</td>
-						<td><a href="{{ route('subcommittee.index') }}" class="btn btn_kwk">위원회 바로가기</a></td>
-					</tr>
-					<tr>
-						<td>환경 의학 및 독소 제거 위원회</td>
-						<td>간사</td>
-						<td>2022.01.01</td>
-						<td>반려</td>
-						<td><button type="button" class="btn btn_kwk" onclick="layerShow('pop_rejection');">사유 확인</button></td>
-					</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>

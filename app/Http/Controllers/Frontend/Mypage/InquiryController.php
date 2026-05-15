@@ -3,35 +3,85 @@
 namespace App\Http\Controllers\Frontend\Mypage;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Frontend\Mypage\Concerns\RendersMypageViews;
+use App\Http\Requests\FrontendMypageInquiryStoreRequest;
+use App\Services\Frontend\MypageInquiryService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class InquiryController extends Controller
 {
+    use RendersMypageViews;
+
+    public function __construct(
+        private readonly MypageInquiryService $inquiryService,
+    ) {}
+
     public function index(): View
     {
-        return $this->render('inquiry', 'inquiry_list');
+        $posts = $this->inquiryService->paginateForMember($this->currentMember());
+
+        return $this->renderMypage('inquiry', '04', '1:1 문의', 'inquiry_list', [
+            'posts' => $posts,
+        ]);
     }
 
-    public function show(): View
+    public function show(Request $request): View
     {
-        return $this->render('inquiry_view', 'inquiry_view');
+        $id = (int) $request->query('id', 0);
+        $detail = $this->inquiryService->findDetailForMember($this->currentMember(), $id);
+        abort_if($detail === null, 404);
+
+        return $this->renderMypage('inquiry_view', '04', '1:1 문의', 'inquiry_view', $detail);
     }
 
     public function create(): View
     {
-        return $this->render('inquiry_write', 'inquiry_write');
+        return $this->renderMypage('inquiry_write', '04', '1:1 문의', 'inquiry_write');
     }
 
-    private function render(string $view, string $slug): View
+    public function edit(Request $request): View
     {
-        $page_type = 'professional';
-        $gNum = '99';
-        $sNum = '04';
-        $gName = '마이페이지';
-        $sName = '1:1 문의';
-        $geName = 'My Page';
-        $gSlug = $slug;
+        $id = (int) $request->query('id', 0);
+        $member = $this->currentMember();
+        $post = $this->inquiryService->findForMember($member, $id);
+        abort_if($post === null || ! $this->inquiryService->isEditableByMember($member, $post), 403);
 
-        return view('mypage.' . $view, compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        return $this->renderMypage('inquiry_write', '04', '1:1 문의', 'inquiry_write', [
+            'post' => $post,
+        ]);
+    }
+
+    public function store(FrontendMypageInquiryStoreRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        $id = $this->inquiryService->create(
+            $this->currentMember(),
+            $validated['title'],
+            $validated['content'],
+        );
+
+        return redirect()->route('mypage.inquiry_view', ['id' => $id]);
+    }
+
+    public function update(FrontendMypageInquiryStoreRequest $request, int $id): RedirectResponse
+    {
+        $validated = $request->validated();
+        $this->inquiryService->update(
+            $this->currentMember(),
+            $id,
+            $validated['title'],
+            $validated['content'],
+        );
+
+        return redirect()->route('mypage.inquiry_view', ['id' => $id]);
+    }
+
+    public function destroy(int $id): RedirectResponse
+    {
+        $this->inquiryService->delete($this->currentMember(), $id);
+
+        return redirect()->route('mypage.inquiry');
     }
 }

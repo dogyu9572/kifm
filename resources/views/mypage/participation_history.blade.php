@@ -13,16 +13,24 @@
 
 		<div class="board_top">
 			<div class="left">
-				<div class="total">Total <strong class="c_iden">100</strong></div>
+				<div class="total">Total <strong class="c_iden">{{ $registrations->total() }}</strong></div>
 			</div>
 			<div class="right flex">
-				<select name="" id="" class="text">
-					<option value="">2026년</option>
-				</select>
-				<select name="" id="" class="text">
-					<option value="">02월</option>
-				</select>
-				<button type="submit" class="btn_search_solo">검색</button>
+				<form method="GET" action="{{ route('mypage.participation_history') }}" class="flex">
+					<select name="year" class="text">
+						<option value="">연도</option>
+						@for ($y = (int) now()->format('Y'); $y >= 2010; $y--)
+						<option value="{{ $y }}" @selected((string) $filterYear === (string) $y)>{{ $y }}년</option>
+						@endfor
+					</select>
+					<select name="month" class="text">
+						<option value="">월</option>
+						@for ($m = 1; $m <= 12; $m++)
+						<option value="{{ $m }}" @selected((string) $filterMonth === (string) $m)>{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}월</option>
+						@endfor
+					</select>
+					<button type="submit" class="btn_search_solo">검색</button>
+				</form>
 			</div>
 		</div>
 		
@@ -54,67 +62,49 @@
 					</tr>
 				</thead>
 				<tbody>
+					@forelse ($registrations as $row)
+					@php
+						$statusLabel = $paymentStatusLabels[$row->payment_status] ?? $row->payment_status;
+						$methodLabel = $paymentMethodLabels[$row->payment_method] ?? $row->payment_method;
+						$isCompleted = $row->payment_status === 'completed';
+					@endphp
 					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>300,000원</td>
-						<td>무통장 입금</td>
-						<td>2026.02.05<br/>(결제일: 2026.01.01)</td>
-						<td>등록완료</td>
+						<td>{{ $row->event?->title ?? '-' }}</td>
 						<td>-</td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><a href="/mypage/participation_history/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>300,000원</td>
-						<td>무통장 입금</td>
-						<td>2026.02.05<br/>(결제일: 2026.01.01)</td>
-						<td>등록완료</td>
-						<td><a href="/mypage/print_participation" class="btn btn_kwk" target="_blank">참가 증명서</a></td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><a href="/mypage/participation_history/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>300,000원</td>
-						<td>무통장 입금</td>
-						<td>2026.02.05<br/>(결제일: 2026.01.01)</td>
-						<td>등록완료</td>
-						<td><a href="/mypage/print_participation" class="btn btn_kwk" target="_blank">참가 증명서</a></td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><a href="/mypage/participation_history/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>300,000원</td>
-						<td>무통장 입금</td>
-						<td>2026.02.05<br/>(결제일: 2026.01.01)</td>
-						<td>등록완료</td>
-						<td><a href="/mypage/print_participation" class="btn btn_kwk" target="_blank">참가 증명서</a></td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><a href="/mypage/participation_history/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>300,000원</td>
-						<td>무통장 입금</td>
-						<td>2026.02.05</td>
-						<td>결제 대기<br/><button type="button" class="btn_un c_iden" onclick="layerShow('pop_bank');">입금 계좌번호 보기</button></td>
-						<td>-</td>
-						<td>-</td>
-						<td><button type="button" class="btn btn_kwk">신청 내역 보기</button>
-							<button type="button" class="btn btn_rwr" onclick="layerShow('pop_cancel');">신청 취소</button>
+						<td>{{ number_format((int) $row->total_amount) }}원</td>
+						<td>{{ $methodLabel }}</td>
+						<td>
+							@if ($row->registered_at)
+								{{ $row->registered_at->format('Y.m.d') }}
+							@endif
+							@if ($row->paid_at)
+								<br/>(결제일: {{ $row->paid_at->format('Y.m.d') }})
+							@endif
+						</td>
+						<td>{{ $statusLabel }}</td>
+						<td>
+							@if ($isCompleted)
+								<a href="{{ route('mypage.print_participation', ['registration_id' => $row->id]) }}" class="btn btn_kwk" target="_blank">참가 증명서</a>
+							@else
+								-
+							@endif
+						</td>
+						<td>
+							@if ($isCompleted)
+								<a href="{{ route('mypage.print_receipt_save', ['registration_id' => $row->id]) }}" class="btn btn_kwk" target="_blank">영수증 출력</a>
+							@else
+								-
+							@endif
+						</td>
+						<td>
+							<a href="{{ route('mypage.participation_history_view', ['id' => $row->id]) }}" class="btn btn_kwk">신청 내역 보기</a>
 						</td>
 					</tr>
-					<!-- 내역이 없을 경우 -->
+					@empty
 					<tr class="empty">
 						<td colspan="9">신청하신 내역이 없습니다.</td>
 					</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>

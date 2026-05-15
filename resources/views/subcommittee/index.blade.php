@@ -26,9 +26,14 @@
 					$thumbUrl = ! empty($c->thumbnail_path)
 						? asset('storage/'.$c->thumbnail_path)
 						: asset('images/bg_sample_subcommittee_list.jpg');
+					$canEnter = isset($accessibleCommitteeIdSet[(string) $c->id]);
 				@endphp
-				<li>
+				<li @if (! $canEnter) class="is-locked" @endif>
+					@if ($canEnter)
 					<a href="{{ route('subcommittee.notice', $c) }}">
+					@else
+					<span class="subcommittee_list_card" aria-disabled="true">
+					@endif
 						<span class="imgfit" aria-hidden="true"><img src="{{ $thumbUrl }}" alt=""></span>
 						<span class="txt">
 							<h3>{{ $c->name }}</h3>
@@ -37,7 +42,11 @@
 								<i class="btn btn_wbb">위원회 가입 신청</i>
 							</span>
 						</span>
+					@if ($canEnter)
 					</a>
+					@else
+					</span>
+					@endif
 				</li>
 			@empty
 				<li>

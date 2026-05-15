@@ -14,9 +14,9 @@
 		<div class="board_top">
 			<div class="left" aria-hidden="true">&nbsp;</div>
 			<div class="right flex">
-				<form class="search_area">
+				<form class="search_area" method="GET" action="{{ route('mypage.executive_activities') }}">
 					<label for="event-search" class="sound_only">직책 검색</label>
-					<input type="text" id="event-search" class="text" placeholder="직책으로 검색하세요">
+					<input type="text" id="event-search" name="keyword" class="text" placeholder="직책으로 검색하세요" value="{{ request('keyword') }}">
 					<button type="submit" class="btn_search">검색</button>
 				</form>
 			</div>
@@ -34,36 +34,29 @@
 					</tr>
 				</thead>
 				<tbody>
+					@forelse ($executives as $executive)
+					@php
+						$term = $executive->term_start_date?->format('Y.m.d');
+						if ($executive->is_indefinite) {
+							$termEnd = '무기한';
+						} elseif ($executive->term_end_date) {
+							$termEnd = $executive->term_end_date->format('Y.m.d');
+						} else {
+							$termEnd = '-';
+						}
+						$statusLabel = $executive->termStatusLabel() === '임기중' ? '재직중' : $executive->termStatusLabel();
+					@endphp
 					<tr>
-						<td>학술이사</td>
-						<td>2022.01.01 ~ 2023.12.31</td>
-						<td>재직중</td>
-						<td><a href="/mypage/print_letter_appointment" class="btn btn_kwk" target="_blank">임명장 출력</a></td>
+						<td>{{ $roleLabels[$executive->executive_role] ?? $executive->executive_role }}</td>
+						<td>{{ $term }} ~ {{ $termEnd }}</td>
+						<td>{{ $statusLabel }}</td>
+						<td><a href="{{ route('mypage.print_letter_appointment', ['executive_id' => $executive->id]) }}" class="btn btn_kwk" target="_blank">임명장 출력</a></td>
 					</tr>
-					<tr>
-						<td>학술이사</td>
-						<td>2022.01.01 ~ 2023.12.31</td>
-						<td>재직중</td>
-						<td><a href="/mypage/print_letter_appointment" class="btn btn_kwk" target="_blank">임명장 출력</a></td>
+					@empty
+					<tr class="empty">
+						<td colspan="4">임원 활동 내역이 없습니다.</td>
 					</tr>
-					<tr>
-						<td>학술이사</td>
-						<td>2022.01.01 ~ 2023.12.31</td>
-						<td>재직중</td>
-						<td><a href="/mypage/print_letter_appointment" class="btn btn_kwk" target="_blank">임명장 출력</a></td>
-					</tr>
-					<tr>
-						<td>학술이사</td>
-						<td>2022.01.01 ~ 2023.12.31</td>
-						<td>재직중</td>
-						<td><a href="/mypage/print_letter_appointment" class="btn btn_kwk" target="_blank">임명장 출력</a></td>
-					</tr>
-					<tr>
-						<td>학술이사</td>
-						<td>2022.01.01 ~ 2023.12.31</td>
-						<td>재직중</td>
-						<td><a href="/mypage/print_letter_appointment" class="btn btn_kwk" target="_blank">임명장 출력</a></td>
-					</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>

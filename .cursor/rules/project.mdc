@@ -13,6 +13,7 @@ alwaysApply: false
 - `10-laravel-architecture.mdc`
 - `20-blade-and-assets.mdc`
 - `21-frontend-public-forms-validation.mdc`
+- `22-frontend-pagination-always-visible.mdc`
 - `25-backoffice-ui-consistency.mdc`
 - `26-backoffice-naming-and-shared-crud.mdc`
 - `27-change-preflight-checklist.mdc`
