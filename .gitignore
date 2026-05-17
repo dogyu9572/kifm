@@ -24,12 +24,23 @@ Thumbs.db
 # IDE 및 에디터 관련
 # .cursor 하위는 .cursor/.gitignore에서 제외 (rules, skills는 커밋 대상)
 .cursor-server/
+.vscode-server/
+.dotnet/
 .config/
 .local/
 .ssh/
 .npm/
 .dbclient/
 .cursor/
+
+# Codex 로컬 상태/캐시 제외, 프로젝트용 스킬/서브에이전트만 커밋
+.codex/*
+!.codex/skills/
+!.codex/skills/*/
+!.codex/skills/*/SKILL.md
+.codex/skills/.system/
+!.codex/subagents/
+!.codex/subagents/README.md
 
 # 시스템 파일
 .bash_history
