@@ -12,7 +12,7 @@
 		<div class="view_top">
 			<button type="button" class="btn_back btn_give_up">시험 포기하기</button>
 		</div>
-		
+
 		<div class="test_page">
 			<h2 class="test_title">학습 테스트</h2>
 			<div class="test_state_line">
@@ -30,8 +30,8 @@
 				</ul>
 			</article>
 			<div class="btns_btm flex_center">
-				<button class="btn btn_kwg prev" onclick="history.back()">이전</button>
-				<button class="btn btn_woo2 next" onclick="location.href='/online_academy/end'">다음</button>
+				<button type="button" class="btn btn_kwg prev" data-history-back>이전</button>
+				<a href="{{ route('online_academy.end') }}" class="btn btn_woo2 next">다음</a>
 			</div>
 		</div>
 		
@@ -40,18 +40,3 @@
 
 </main>
 @endsection
-
-@push('scripts')
-<script>
-$(document).ready(function() {
-    var stepText = $('.step').text();
-    var parts = stepText.split('/');
-    var currentStep = parseFloat(parts[0]);
-    var totalSteps = parseFloat(parts[1]);
-    if (totalSteps > 0) {
-        var progressPercent = (currentStep / totalSteps) * 100;
-        $('.test_state_line .bar').css('width', progressPercent + '%');
-    }
-});
-</script>
-@endpush

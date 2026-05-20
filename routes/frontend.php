@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
 use App\Http\Controllers\Frontend\IntroductionController;
 use App\Http\Controllers\Frontend\AcademicEventController;
+use App\Http\Controllers\Frontend\CaptchaController;
 use App\Http\Controllers\Frontend\SubcommitteeController;
 use App\Http\Controllers\Frontend\ArchivesController;
 use App\Http\Controllers\Frontend\MemberPlazaController;
@@ -61,11 +62,13 @@ Route::prefix('academic_event')->name('academic_event.')->group(function () {
 // 산하위원회 (로그인 필요, 회원은 백오피스에서 지정한 위원회만 접근)
 Route::prefix('subcommittee')->name('subcommittee.')->middleware('auth')->group(function () {
     Route::get('/', [SubcommitteeController::class, 'index'])->name('index');
+    Route::get('/captcha/discussion', [CaptchaController::class, 'discussion'])->name('captcha.discussion');
     Route::prefix('{committee}')->whereNumber('committee')->group(function () {
         Route::get('/notice', [SubcommitteeController::class, 'notice'])->name('notice');
         Route::get('/notice/{id}', [SubcommitteeController::class, 'noticeShow'])->whereNumber('id')->name('notice_show');
         Route::get('/discussion', [SubcommitteeController::class, 'discussion'])->name('discussion');
         Route::get('/discussion/write', [SubcommitteeController::class, 'discussionWrite'])->name('discussion_write');
+        Route::post('/discussion/write', [SubcommitteeController::class, 'discussionStore'])->name('discussion_store');
         Route::get('/discussion/{id}', [SubcommitteeController::class, 'discussionShow'])->whereNumber('id')->name('discussion_show');
         Route::get('/archives', [SubcommitteeController::class, 'archives'])->name('archives');
         Route::get('/archives/{id}', [SubcommitteeController::class, 'archivesShow'])->whereNumber('id')->name('archives_show');
@@ -107,6 +110,8 @@ Route::prefix('online_academy')->name('online_academy.')->group(function () {
     Route::get('/view', [OnlineAcademyController::class, 'view'])->name('view');
     Route::get('/test', [OnlineAcademyController::class, 'test'])->name('test');
     Route::get('/end', [OnlineAcademyController::class, 'end'])->name('end');
+    Route::get('/{course}/exam', [OnlineAcademyController::class, 'exam'])->whereNumber('course')->name('exam');
+    Route::get('/{course}', [OnlineAcademyController::class, 'show'])->whereNumber('course')->name('show');
 });
 
 // 약관

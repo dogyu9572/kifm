@@ -176,4 +176,21 @@ $(document).ready(function(){
 			document.body.classList.add('ios_safe');
 		}
 	})();
+
+	const captchaRefreshButton = document.querySelector('[data-captcha-refresh]');
+	const captchaImage = document.querySelector('[data-captcha-image]');
+
+	if (captchaRefreshButton && captchaImage) {
+		captchaRefreshButton.addEventListener('click', function() {
+			const baseUrl = captchaImage.getAttribute('data-src') || captchaImage.getAttribute('src');
+			const separator = baseUrl.indexOf('?') === -1 ? '?' : '&';
+			captchaImage.setAttribute('src', baseUrl + separator + 't=' + Date.now());
+		});
+	}
+
+	if (document.querySelector('.online_academy_wrap')) {
+		const academyScript = document.createElement('script');
+		academyScript.src = '/js/frontend/online-academy.js';
+		document.body.appendChild(academyScript);
+	}
 });

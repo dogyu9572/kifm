@@ -1258,6 +1258,9 @@
 	.state_line .flex .right {display:flex; gap:6px;}
 	.online_academy_view .cont {display:flex; gap:40px;}
 	.online_academy_view .video {width:1000px;}
+	.online_academy_view .video iframe {display:block; width:100%; aspect-ratio:16/9; border:0;}
+	.online_academy_view .video .video_link {position:relative; display:block;}
+	.online_academy_view .video .video_link span {position:absolute; left:50%; bottom:24px; transform:translateX(-50%); color:#fff; font-weight:700; line-height:44px; padding:0 18px; background:#222; border-radius:4px;}
 	.online_academy_view .txt {width:400px; border:#ddd 1px solid; border-radius:8px; padding:24px; font-size:16px;}
 	.online_academy_view .tit {font-size:22px; font-weight:700; margin-bottom:10px;}
 	.online_academy_view .tit ~ .tit {margin-top:20px;}
@@ -1269,8 +1272,10 @@
 	.online_academy_view .btn {display:flex; justify-content:center; align-items:center; gap:8px; border-radius:4px; height:60px; margin-top:44px;}
 	.btn_test {color:#fff; font-weight:700; background:#222;}
 	.btn_test:after {content:""; display:block; width:18px; height:18px; background:#fff; mask:url('/images/icon_write.svg') no-repeat 50% 50% / contain; -webkit-mask:url('/images/icon_write.svg') no-repeat 50% 50% / contain;}
-	.btn_test[disabled] {color:#888; background:#ddd; pointer-events:none;}
-	.btn_test[disabled]:after {background:#888;}
+	.btn_test[disabled],
+	.btn_test.disabled {color:#888; background:#ddd; pointer-events:none;}
+	.btn_test[disabled]:after,
+	.btn_test.disabled:after {background:#888;}
 	.online_academy_view .btn_area {position:relative;}
 	.online_academy_view .btn_area .txtbox {position:absolute; bottom:calc(100% + 14px); left:0; width:100%; font-size:14px; color:#fff; font-weight:600; line-height:1.4; padding:8px; text-align:center; background:#FF7200; border-radius:8px; pointer-events:none; display:none;}
 	.online_academy_view .btn_area .txtbox:after {content:""; position:absolute; top:100%; left:50%; border:transparent 6px solid; border-top-color:#FF7200; transform:translateX(-50%) scaleX(0.8);}

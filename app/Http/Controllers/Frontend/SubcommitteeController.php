@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FrontendSubcommitteeDiscussionStoreRequest;
 use App\Models\CommunityCommittee;
 use App\Models\Popup;
 use App\Services\Frontend\PublicBoardService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -126,6 +128,23 @@ class SubcommitteeController extends Controller
         $this->assertMayAccessCommittee($committee);
 
         return view('subcommittee.discussion_write', $this->committeePageData($committee, '토론 주제 등록', '02', 'community_committee_discussions'));
+    }
+
+    public function discussionStore(FrontendSubcommitteeDiscussionStoreRequest $request, CommunityCommittee $committee): RedirectResponse
+    {
+        $this->assertMayAccessCommittee($committee);
+
+        $user = Auth::user();
+        $postId = $this->publicBoardService->createCommitteeDiscussion(
+            $committee,
+            $request->validated(),
+            (int) $user->id,
+            ($user->name ?: $user->login_id) ?: '회원'
+        );
+
+        $request->session()->forget('captcha.discussion');
+
+        return redirect()->route('subcommittee.discussion_show', [$committee, $postId]);
     }
 
     public function archives(Request $request, CommunityCommittee $committee): View

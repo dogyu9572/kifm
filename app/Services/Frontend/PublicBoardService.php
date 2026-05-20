@@ -3,6 +3,7 @@
 namespace App\Services\Frontend;
 
 use App\Models\Board;
+use App\Models\CommunityCommittee;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -125,6 +126,30 @@ class PublicBoardService
             ->first();
 
         return ['prev' => $prev, 'next' => $next];
+    }
+
+    public function createCommitteeDiscussion(CommunityCommittee $committee, array $data, int $userId, string $authorName): int
+    {
+        $title = trim((string) $data['title']);
+
+        return DB::table($this->table('community_committee_discussions'))->insertGetId([
+            'user_id' => $userId,
+            'title' => $title,
+            'content' => $title,
+            'author_name' => $authorName,
+            'password' => null,
+            'is_notice' => false,
+            'is_secret' => false,
+            'category' => $committee->name,
+            'attachments' => json_encode([]),
+            'view_count' => 0,
+            'sort_order' => 0,
+            'custom_fields' => null,
+            'thumbnail' => null,
+            'is_active' => true,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     private function table(string $slug): string
