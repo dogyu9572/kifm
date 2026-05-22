@@ -3,6 +3,7 @@
 namespace App\Services\Backoffice;
 
 use App\Models\OneOnOneInquiry;
+use App\Support\BackofficeFile;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
@@ -119,7 +120,7 @@ class OneOnOneInquiryService
                 if (! $file instanceof UploadedFile || ! $file->isValid()) {
                     continue;
                 }
-                $storedPath = $file->store(self::ANSWER_ATTACHMENT_DIR, self::ATTACHMENT_DISK);
+                $storedPath = BackofficeFile::storeWithOriginalName($file, self::ANSWER_ATTACHMENT_DIR, self::ATTACHMENT_DISK);
                 $existing[] = [
                     'path' => $storedPath,
                     'original_name' => $file->getClientOriginalName(),

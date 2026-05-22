@@ -51,4 +51,10 @@ return [
         'timestamp' => env('KAKAO_ROUGHMAP_TIMESTAMP', '1776648816237'),
         'key' => env('KAKAO_ROUGHMAP_KEY', 'me5vcjov52w'),
     ],
+
+    /** Kakao Local API / Maps JavaScript API */
+    'kakao' => [
+        'rest_api_key' => env('KAKAO_REST_API_KEY', ''),
+        'javascript_key' => env('KAKAO_MAP_JAVASCRIPT_KEY', ''),
+    ],
 ];

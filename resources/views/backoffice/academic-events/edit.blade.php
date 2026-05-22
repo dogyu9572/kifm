@@ -12,6 +12,18 @@
 @endsection
 
 @section('content')
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <div id="modalHeader" class="modal-header">
+                <span id="modalTitle">알림</span>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <p id="modalMessage"></p>
+            </div>
+        </div>
+    </div>
+
     <div class="board-container">
         <div class="board-header">
             <a href="{{ $cancelUrl }}" class="btn btn-secondary btn-sm">
@@ -21,6 +33,12 @@
 
         <div class="board-card">
             <div class="board-card-body">
+                @if (session('success'))
+                    <div class="alert alert-success hidden-alert">{{ session('success') }}</div>
+                @endif
+                @if (session('error'))
+                    <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
                 @if ($errors->any())
                     <div class="board-alert board-alert-danger">
                         <ul class="mb-0">
@@ -38,6 +56,7 @@
                     data-academic-event-id="{{ $event->getKey() }}">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="return_url" value="{{ request('return_url') }}">
                     @include('backoffice.academic-events._form', ['isEdit' => true])
                     <div class="board-form-actions">
                         <button type="submit" class="btn btn-primary">
@@ -46,6 +65,13 @@
                         <a href="{{ $cancelUrl }}" class="btn btn-secondary">취소</a>
                     </div>
                 </form>
+
+                @foreach ($event->sessions ?? [] as $sessionDeleteForm)
+                    <form id="bo-session-delete-form-{{ $sessionDeleteForm->id }}" method="POST" action="{{ route('backoffice.academic-events.sessions.destroy', [$event, $sessionDeleteForm]) }}" class="d-none js-academic-session-delete-form">
+                        @csrf
+                        @method('DELETE')
+                    </form>
+                @endforeach
             </div>
         </div>
     </div>

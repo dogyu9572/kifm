@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
+use App\Support\BackofficeFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -90,11 +91,11 @@ class BannerController extends Controller
         
         // 이미지 업로드 처리
         if ($request->hasFile('desktop_image')) {
-            $data['desktop_image'] = $request->file('desktop_image')->store('banners', 'public');
+            $data['desktop_image'] = BackofficeFile::storeWithOriginalName($request->file('desktop_image'), 'banners', 'public');
         }
         
         if ($request->hasFile('mobile_image')) {
-            $data['mobile_image'] = $request->file('mobile_image')->store('banners', 'public');
+            $data['mobile_image'] = BackofficeFile::storeWithOriginalName($request->file('mobile_image'), 'banners', 'public');
         }
 
         Banner::create($data);
@@ -170,7 +171,7 @@ class BannerController extends Controller
             if ($banner->desktop_image) {
                 Storage::disk('public')->delete($banner->desktop_image);
             }
-            $data['desktop_image'] = $request->file('desktop_image')->store('banners', 'public');
+            $data['desktop_image'] = BackofficeFile::storeWithOriginalName($request->file('desktop_image'), 'banners', 'public');
         }
         
         if ($request->hasFile('mobile_image')) {
@@ -178,7 +179,7 @@ class BannerController extends Controller
             if ($banner->mobile_image) {
                 Storage::disk('public')->delete($banner->mobile_image);
             }
-            $data['mobile_image'] = $request->file('mobile_image')->store('banners', 'public');
+            $data['mobile_image'] = BackofficeFile::storeWithOriginalName($request->file('mobile_image'), 'banners', 'public');
         }
 
         $banner->update($data);

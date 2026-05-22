@@ -50,5 +50,5 @@
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="{{ asset('js/script_print_down.js') }}"></script>
+<script src="{{ asset('js/frontend/script_print_down.js') }}"></script>
 @endpush

@@ -164,6 +164,7 @@
                                             <form action="{{ route('backoffice.academic-events.destroy', $e) }}" method="POST" class="d-inline js-delete-confirm-form">
                                                 @csrf
                                                 @method('DELETE')
+                                                <input type="hidden" name="confirm_delete" value="1">
                                                 <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> 삭제</button>
                                             </form>
                                         </div>

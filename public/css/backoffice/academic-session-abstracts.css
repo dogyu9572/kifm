@@ -1,0 +1,49 @@
+.bo-session-abstracts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.bo-session-abstracts-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.bo-session-time-fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bo-session-break-row {
+    background: #f7f8f9;
+}
+
+.bo-session-break-row input {
+    border-style: dashed;
+}
+
+.bo-session-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 18px;
+}
+
+.bo-abstract-modal-row-hidden {
+    display: none;
+}
+
+@media (max-width: 991px) {
+    .bo-session-abstracts-header {
+        flex-direction: column;
+    }
+
+    .bo-session-abstracts-actions {
+        justify-content: flex-start;
+    }
+}

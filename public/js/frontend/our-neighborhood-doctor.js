@@ -42,6 +42,7 @@
 
     let lastFocusedElement = null;
     let roughmapLoaderPromise = null;
+    const kakaoMapLoaderPromises = {};
 
     document.addEventListener('DOMContentLoaded', () => {
         const mapRoot = document.getElementById('our-doctor-map-root');
@@ -242,7 +243,7 @@
                 fillPopup(json.data);
                 $(popup).fadeIn(300, () => {
                     popup.querySelector('.btn_close')?.focus();
-                    drawRoughMap(json.data);
+                    drawDoctorMap(json.data);
                 });
             })
             .catch(() => {
@@ -309,7 +310,7 @@
 
     function closeDoctorPopup() {
         const popup = document.getElementById('pop_doctor');
-        const mapContainer = resolveRoughmapContainer(null);
+        const mapContainer = resolveMapContainer(null);
         $(popup).fadeOut(300, () => {
             if (mapContainer) {
                 mapContainer.innerHTML = '';
@@ -320,11 +321,94 @@
         });
     }
 
+    function resolveMapContainer(data) {
+        return resolveRoughmapContainer(data) || document.querySelector('.js-roughmap-container');
+    }
+
+    function drawDoctorMap(data) {
+        const map = data?.map || {};
+        const lat = Number(map.lat);
+        const lng = Number(map.lng);
+        const javascriptKey = String(map.javascript_key || '');
+
+        if (Number.isFinite(lat) && Number.isFinite(lng) && javascriptKey !== '') {
+            drawKakaoMap(data, lat, lng, javascriptKey);
+            return;
+        }
+
+        drawRoughMap(data);
+    }
+
+    function drawKakaoMap(data, lat, lng, javascriptKey) {
+        const mapContainer = resolveMapContainer(data);
+
+        if (!mapContainer) {
+            return;
+        }
+
+        mapContainer.innerHTML = '<div class="js-kakao-map-canvas kakao_map_canvas"></div>';
+        const canvas = mapContainer.querySelector('.js-kakao-map-canvas');
+        if (!canvas) {
+            return;
+        }
+
+        loadKakaoMapScript(javascriptKey)
+            .then(() => {
+                if (typeof kakao === 'undefined' || !kakao.maps) {
+                    drawRoughMap(data);
+                    return;
+                }
+
+                kakao.maps.load(() => {
+                    const center = new kakao.maps.LatLng(lat, lng);
+                    const map = new kakao.maps.Map(canvas, {
+                        center,
+                        level: 3,
+                    });
+                    const marker = new kakao.maps.Marker({
+                        position: center,
+                    });
+                    marker.setMap(map);
+                });
+            })
+            .catch(() => {
+                drawRoughMap(data);
+            });
+    }
+
+    function loadKakaoMapScript(javascriptKey) {
+        if (typeof kakao !== 'undefined' && kakao.maps) {
+            return Promise.resolve();
+        }
+
+        if (kakaoMapLoaderPromises[javascriptKey]) {
+            return kakaoMapLoaderPromises[javascriptKey];
+        }
+
+        kakaoMapLoaderPromises[javascriptKey] = new Promise((resolve, reject) => {
+            const existing = document.querySelector('script[data-kakao-map-sdk]');
+            if (existing) {
+                existing.addEventListener('load', () => resolve());
+                existing.addEventListener('error', () => reject());
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.dataset.kakaoMapSdk = 'true';
+            script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(javascriptKey)}&autoload=false`;
+            script.onload = () => resolve();
+            script.onerror = () => reject();
+            document.body.appendChild(script);
+        });
+
+        return kakaoMapLoaderPromises[javascriptKey];
+    }
+
     function drawRoughMap(data) {
         const popup = document.getElementById('pop_doctor');
         const timestamp = data?.roughmap?.timestamp || popup?.dataset?.roughmapTimestamp || '1776648816237';
         const key = data?.roughmap?.key || popup?.dataset?.roughmapKey || 'me5vcjov52w';
-        const mapContainer = resolveRoughmapContainer(data);
+        const mapContainer = resolveMapContainer(data);
 
         if (!mapContainer) {
             return;

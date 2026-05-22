@@ -25,7 +25,7 @@
 					<a href="#this" target="_blank" title="새창 열림" class="btn btn_wkk btn_outlink">홈페이지 바로가기</a>
 					<a href="#this" target="_blank" title="새창 열림" class="btn btn_wrr btn_outlink">사전등록 바로가기</a>
 				</div>
-				<button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+				<x-frontend.bookmark-button content-type="academic_event_training_course_static" content-id="1" title="2026년 2월 8일 - 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.training_course_view')" label="이 행사를 북마크에 추가" />
 			</div>
 		</div>
 		
@@ -70,7 +70,7 @@ health and Detoxification</p>
                             <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <x-frontend.bookmark-button content-type="academic_event_training_course_static" content-id="2" title="2026년 2월 8일 - 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.training_course_view')" label="이 행사를 북마크에 추가" />
                 </li>
 				<li>
                     <a href="/academic_event/training_course/view">
@@ -82,7 +82,7 @@ health and Detoxification</p>
                             <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <x-frontend.bookmark-button content-type="academic_event_training_course_static" content-id="3" title="2026년 2월 8일 - 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.training_course_view')" label="이 행사를 북마크에 추가" />
                 </li>
 				<li>
                     <a href="/academic_event/training_course/view">
@@ -94,7 +94,7 @@ health and Detoxification</p>
                             <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <x-frontend.bookmark-button content-type="academic_event_training_course_static" content-id="4" title="2026년 2월 8일 - 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.training_course_view')" label="이 행사를 북마크에 추가" />
                 </li>
 				<li>
                     <a href="/academic_event/training_course/view">
@@ -106,7 +106,7 @@ health and Detoxification</p>
                             <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <x-frontend.bookmark-button content-type="academic_event_training_course_static" content-id="5" title="2026년 2월 8일 - 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.training_course_view')" label="이 행사를 북마크에 추가" />
                 </li>
 				<li>
                     <a href="/academic_event/training_course/view">
@@ -118,7 +118,7 @@ health and Detoxification</p>
                             <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <x-frontend.bookmark-button content-type="academic_event_training_course_static" content-id="6" title="2026년 2월 8일 - 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.training_course_view')" label="이 행사를 북마크에 추가" />
                 </li>
 				<li>
                     <a href="/academic_event/training_course/view">
@@ -130,7 +130,7 @@ health and Detoxification</p>
                             <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <x-frontend.bookmark-button content-type="academic_event_training_course_static" content-id="7" title="2026년 2월 8일 - 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.training_course_view')" label="이 행사를 북마크에 추가" />
                 </li>
 			</ul>
 		</div>
@@ -157,5 +157,5 @@ health and Detoxification</p>
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/script_bookmark.js') }}"></script>
+<script src="{{ asset('js/frontend/script_bookmark.js') }}"></script>
 @endpush

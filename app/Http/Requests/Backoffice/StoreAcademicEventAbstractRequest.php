@@ -4,6 +4,7 @@ namespace App\Http\Requests\Backoffice;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Services\Backoffice\AcademicEventAbstractService;
 
 class StoreAcademicEventAbstractRequest extends FormRequest
 {
@@ -33,7 +34,7 @@ class StoreAcademicEventAbstractRequest extends FormRequest
             'author_mobile' => ['nullable', 'string', 'max:30'],
             'author_email' => ['nullable', 'email', 'max:200'],
             'title' => ['required', 'string', 'max:500'],
-            'presentation_type' => ['required', Rule::in(['oral', 'poster', 'special'])],
+            'presentation_type' => ['required', Rule::in(array_keys(AcademicEventAbstractService::presentationTypeLabels()))],
             'academic_event_field_id' => [
                 'nullable',
                 'integer',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use App\Models\CommunityCommittee;
 use App\Models\Popup;
+use App\Support\BackofficeFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -158,7 +159,7 @@ class PopupController extends Controller
         }
 
         if ($request->hasFile('popup_image')) {
-            $data['popup_image'] = $request->file('popup_image')->store('popups', 'public');
+            $data['popup_image'] = BackofficeFile::storeWithOriginalName($request->file('popup_image'), 'popups', 'public');
         }
 
         $data['width'] = $data['width'] ?: 400;
@@ -229,7 +230,7 @@ class PopupController extends Controller
             if ($popup->popup_image) {
                 Storage::disk('public')->delete($popup->popup_image);
             }
-            $data['popup_image'] = $request->file('popup_image')->store('popups', 'public');
+            $data['popup_image'] = BackofficeFile::storeWithOriginalName($request->file('popup_image'), 'popups', 'public');
         }
 
         if ($request->has('remove_popup_image') && $request->remove_popup_image) {

@@ -34,7 +34,7 @@ class MypageParticipationHistoryService
     public function findForMember(User $user, int $id): ?AcademicEventRegistration
     {
         return AcademicEventRegistration::query()
-            ->with(['event', 'items'])
+            ->with(['event', 'items', 'member'])
             ->where('member_id', $user->id)
             ->whereKey($id)
             ->first();

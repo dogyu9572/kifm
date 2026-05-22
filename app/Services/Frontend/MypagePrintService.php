@@ -28,9 +28,19 @@ class MypagePrintService
     public function registrationReceipt(User $user, int $registrationId): ?AcademicEventRegistration
     {
         return AcademicEventRegistration::query()
-            ->with('event')
+            ->with(['event', 'items'])
             ->where('member_id', $user->id)
             ->whereKey($registrationId)
+            ->where('payment_status', 'completed')
+            ->first();
+    }
+
+    public function courseReceipt(User $user, int $enrollmentId): ?EduCourseEnrollment
+    {
+        return EduCourseEnrollment::query()
+            ->with('course')
+            ->where('member_id', $user->id)
+            ->whereKey($enrollmentId)
             ->where('payment_status', 'completed')
             ->first();
     }

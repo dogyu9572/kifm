@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const formData = new FormData();
+        formData.append('confirm_delete', '1');
         selectedIds.forEach((id) => formData.append('event_ids[]', id));
 
         const response = await fetch(bulkUrl, {

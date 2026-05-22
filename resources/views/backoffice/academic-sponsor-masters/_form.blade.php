@@ -41,7 +41,7 @@
                         <input type="hidden" name="existing_logo" value="{{ $master->logo_path }}">
                         <i class="fas fa-file"></i>
                         <a href="{{ asset('storage/' . $master->logo_path) }}" target="_blank" rel="noopener">
-                            <span class="board-attachment-name">{{ basename($master->logo_path) }}</span>
+                            <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($master->logo_path) }}</span>
                         </a>
                         <button type="button" class="board-attachment-remove" data-existing-logo-remove="1">
                             <i class="fas fa-times"></i>

@@ -154,7 +154,7 @@
                                     <div class="board-attachment-item existing-file" id="bo-doctor-photo-existing-item">
                                         <i class="fas fa-file-image"></i>
                                         <a href="{{ $photoUrl }}" target="_blank" rel="noopener">
-                                            <span class="board-attachment-name">{{ basename($doc->photo_path) }}</span>
+                                            <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($doc->photo_path) }}</span>
                                         </a>
                                         <button type="button" class="board-attachment-remove" data-remove-existing-target="doctor_photo">
                                             <i class="fas fa-times"></i>

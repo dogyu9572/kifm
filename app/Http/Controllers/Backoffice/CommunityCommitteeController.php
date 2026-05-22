@@ -8,6 +8,7 @@ use App\Models\CommunityCommittee;
 use App\Models\CommunityCommitteeApplication;
 use App\Models\User;
 use App\Services\Backoffice\CommunityCommitteeService;
+use App\Support\BackofficeFile;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -59,10 +60,10 @@ class CommunityCommitteeController extends Controller
             $committee->fill($this->payload($data));
 
             if ($request->hasFile('thumbnail')) {
-                $committee->thumbnail_path = $request->file('thumbnail')->store('backoffice/community-committees', 'public');
+                $committee->thumbnail_path = BackofficeFile::storeWithOriginalName($request->file('thumbnail'), 'backoffice/community-committees', 'public');
             }
             if ($request->hasFile('banner')) {
-                $committee->banner_path = $request->file('banner')->store('backoffice/community-committees/banners', 'public');
+                $committee->banner_path = BackofficeFile::storeWithOriginalName($request->file('banner'), 'backoffice/community-committees/banners', 'public');
             }
             $committee->save();
             $this->syncCommitteeMembers($committee, $data);
@@ -104,13 +105,13 @@ class CommunityCommitteeController extends Controller
                 if ($communityCommittee->thumbnail_path) {
                     Storage::disk('public')->delete($communityCommittee->thumbnail_path);
                 }
-                $communityCommittee->thumbnail_path = $request->file('thumbnail')->store('backoffice/community-committees', 'public');
+                $communityCommittee->thumbnail_path = BackofficeFile::storeWithOriginalName($request->file('thumbnail'), 'backoffice/community-committees', 'public');
             }
             if ($request->hasFile('banner')) {
                 if ($communityCommittee->banner_path) {
                     Storage::disk('public')->delete($communityCommittee->banner_path);
                 }
-                $communityCommittee->banner_path = $request->file('banner')->store('backoffice/community-committees/banners', 'public');
+                $communityCommittee->banner_path = BackofficeFile::storeWithOriginalName($request->file('banner'), 'backoffice/community-committees/banners', 'public');
             }
 
             $communityCommittee->save();
@@ -460,4 +461,3 @@ class CommunityCommitteeController extends Controller
         return $base . '?' . ltrim($query, '?');
     }
 }
-

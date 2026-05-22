@@ -4,11 +4,13 @@ namespace App\Services\Backoffice;
 
 use App\Models\AcademicEventAbstract;
 use App\Models\AcademicEventAbstractFile;
+use App\Support\CategoryOptions;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class AcademicEventAbstractService
@@ -58,11 +60,11 @@ class AcademicEventAbstractService
     /** @return array<string, string> */
     public static function presentationTypeLabels(): array
     {
-        return [
+        return CategoryOptions::labelsByGroupCode(CategoryOptions::ABSTRACT_PRESENTATION_TYPE_GROUP_CODE, [
             'oral' => '구연 발표',
             'poster' => '포스터 발표',
             'special' => '특별 강연',
-        ];
+        ]);
     }
 
     public function paginateIndex(Request $request): LengthAwarePaginator
@@ -182,7 +184,11 @@ class AcademicEventAbstractService
      */
     public function canDeleteAbstract(AcademicEventAbstract $abstract): bool
     {
-        return true;
+        if (! Schema::hasTable('academic_event_session_items')) {
+            return true;
+        }
+
+        return ! $abstract->sessionItems()->exists();
     }
 
     /**

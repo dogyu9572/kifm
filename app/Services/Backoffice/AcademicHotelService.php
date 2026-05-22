@@ -3,6 +3,7 @@
 namespace App\Services\Backoffice;
 
 use App\Models\AcademicHotel;
+use App\Support\BackofficeFile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -43,7 +44,7 @@ class AcademicHotelService
     {
         $path = null;
         if ($imageFile) {
-            $path = $imageFile->store('backoffice/academic-hotels/images', 'public');
+            $path = BackofficeFile::storeWithOriginalName($imageFile, 'backoffice/academic-hotels/images', 'public');
         }
 
         return AcademicHotel::create([
@@ -79,7 +80,7 @@ class AcademicHotelService
             if ($hotel->image_path) {
                 Storage::disk('public')->delete($hotel->image_path);
             }
-            $updates['image_path'] = $imageFile->store('backoffice/academic-hotels/images', 'public');
+            $updates['image_path'] = BackofficeFile::storeWithOriginalName($imageFile, 'backoffice/academic-hotels/images', 'public');
         } elseif ($removeImage) {
             if ($hotel->image_path) {
                 Storage::disk('public')->delete($hotel->image_path);

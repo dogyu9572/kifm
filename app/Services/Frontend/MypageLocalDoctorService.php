@@ -6,6 +6,7 @@ use App\Models\DoctorCategory;
 use App\Models\LocalDoctor;
 use App\Models\User;
 use App\Services\Backoffice\LocalDoctorRegionNormalizer;
+use App\Services\LocalDoctorGeocoder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -17,6 +18,7 @@ class MypageLocalDoctorService
 {
     public function __construct(
         private readonly PublicLocalDoctorService $publicLocalDoctorService,
+        private readonly LocalDoctorGeocoder $geocoder,
     ) {}
 
     public function findForMember(User $user): ?LocalDoctor
@@ -74,7 +76,7 @@ class MypageLocalDoctorService
             throw new AccessDeniedHttpException();
         }
 
-        return DB::transaction(function () use ($request, $validated, $doctor): LocalDoctor {
+        $doctor = DB::transaction(function () use ($request, $validated, $doctor): LocalDoctor {
             $doctor->doctor_name = (string) $validated['doctor_name'];
             $doctor->license_no = (string) $validated['license_no'];
             $doctor->introduction = $validated['introduction'] ?? null;
@@ -103,6 +105,13 @@ class MypageLocalDoctorService
             $doctor->doctorCategories()->sync($validated['category_ids'] ?? []);
             return $doctor->fresh(['doctorCategories']);
         });
+
+        if ($this->geocoder->hasApiKey()) {
+            $this->geocoder->syncForDoctor($doctor);
+            $doctor = $doctor->fresh(['doctorCategories']);
+        }
+
+        return $doctor;
     }
 
     protected function replacePhoto(LocalDoctor $doctor, UploadedFile $file): void

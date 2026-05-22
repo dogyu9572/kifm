@@ -27,6 +27,7 @@ use App\Http\Controllers\Frontend\AcademicConference\AbstractController as Acade
 use App\Http\Controllers\Frontend\AcademicConference\NoticeController as AcademicConferenceNoticeController;
 use App\Http\Controllers\Frontend\AcademicConference\EtcController as AcademicConferenceEtcController;
 use App\Http\Controllers\Frontend\AcademicConference\OnsiteController as AcademicConferenceOnsiteController;
+use App\Http\Controllers\Frontend\AcademicConferenceSiteController;
 
 // =============================================================================
 // 사용자(프론트) 라우트 파일
@@ -60,7 +61,7 @@ Route::prefix('academic_event')->name('academic_event.')->group(function () {
 });
 
 // 산하위원회 (로그인 필요, 회원은 백오피스에서 지정한 위원회만 접근)
-Route::prefix('subcommittee')->name('subcommittee.')->middleware('auth')->group(function () {
+Route::prefix('subcommittee')->name('subcommittee.')->middleware(['auth', 'frontend.member'])->group(function () {
     Route::get('/', [SubcommitteeController::class, 'index'])->name('index');
     Route::get('/captcha/discussion', [CaptchaController::class, 'discussion'])->name('captcha.discussion');
     Route::prefix('{committee}')->whereNumber('committee')->group(function () {
@@ -128,7 +129,7 @@ Route::prefix('member')->name('member.')->group(function () {
         ->middleware('throttle:15,1')
         ->name('login.store');
     Route::post('/logout', [FrontendMemberController::class, 'logout'])
-        ->middleware(['auth', 'throttle:30,1'])
+        ->middleware(['auth', 'frontend.member', 'throttle:30,1'])
         ->name('logout');
     Route::get('/dormant_auth', [FrontendMemberController::class, 'dormantAuth'])->name('dormant_auth');
     Route::get('/password_reset', [FrontendMemberController::class, 'passwordReset'])->name('password_reset');
@@ -178,6 +179,7 @@ Route::prefix('mypage')->name('mypage.')->middleware(['auth', 'frontend.member']
     Route::get('/favorite', [MypageHistoryController::class, 'favoriteMenu'])->name('favorite_menu');
     Route::post('/favorite', [MypageHistoryController::class, 'favoriteMenuStore'])->name('favorite_menu.store');
     Route::get('/bookmark', [MypageHistoryController::class, 'bookmark'])->name('bookmark');
+    Route::post('/bookmark/toggle', [MypageHistoryController::class, 'bookmarkToggle'])->name('bookmark.toggle');
     Route::post('/bookmark/destroy', [MypageHistoryController::class, 'bookmarkDestroy'])->name('bookmark.destroy');
 
     // 1:1 문의
@@ -266,4 +268,50 @@ Route::prefix('academic_conference')->name('academic_conference.')->group(functi
     Route::get('/onsite_check_registration', [AcademicConferenceOnsiteController::class, 'checkRegistration'])->name('onsite_check_registration');
     Route::get('/onsite_check_non_registration', [AcademicConferenceOnsiteController::class, 'checkNonRegistration'])->name('onsite_check_non_registration');
     Route::get('/onsite_confirmation_complete', [AcademicConferenceOnsiteController::class, 'confirmationComplete'])->name('onsite_confirmation_complete');
+
+    Route::post('/{folderName}/registration/form', [AcademicConferenceSiteController::class, 'storeRegistration'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.registration.store');
+    Route::post('/{folderName}/registration/form_non_member', [AcademicConferenceSiteController::class, 'storeNonMemberRegistration'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.registration.store_non_member');
+    Route::post('/{folderName}/registration/coupon', [AcademicConferenceSiteController::class, 'applyRegistrationCoupon'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.registration.coupon');
+    Route::post('/{folderName}/registration/check_non_member', [AcademicConferenceSiteController::class, 'checkNonMemberRegistration'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.registration.check_non_member');
+    Route::post('/{folderName}/abstract/form_member', [AcademicConferenceSiteController::class, 'storeMemberAbstract'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.abstract.store_member');
+    Route::post('/{folderName}/abstract/form_non_member', [AcademicConferenceSiteController::class, 'storeNonMemberAbstract'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.abstract.store_non_member');
+    Route::post('/{folderName}/abstract/check_non_member', [AcademicConferenceSiteController::class, 'checkNonMemberAbstract'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.abstract.check_non_member');
+    Route::get('/{folderName}/abstract/{abstract}/modify', [AcademicConferenceSiteController::class, 'editAbstract'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->whereNumber('abstract')
+        ->name('site.abstract.modify');
+    Route::match(['post', 'put'], '/{folderName}/abstract/{abstract}/modify', [AcademicConferenceSiteController::class, 'updateAbstract'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->whereNumber('abstract')
+        ->name('site.abstract.update');
+    Route::post('/{folderName}/registration/{registration}/cancel', [AcademicConferenceSiteController::class, 'cancelRegistration'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->whereNumber('registration')
+        ->name('site.registration.cancel');
+    Route::get('/{folderName}/registration/{registration}/print-participation', [AcademicConferenceSiteController::class, 'printParticipation'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->whereNumber('registration')
+        ->name('site.registration.print_participation');
+    Route::get('/{folderName}/registration/{registration}/print-receipt', [AcademicConferenceSiteController::class, 'printReceipt'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->whereNumber('registration')
+        ->name('site.registration.print_receipt');
+    Route::get('/{folderName}/{pagePath?}', [AcademicConferenceSiteController::class, 'show'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->where('pagePath', '.*')
+        ->name('site');
 });

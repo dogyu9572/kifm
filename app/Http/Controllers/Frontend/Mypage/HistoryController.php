@@ -57,7 +57,10 @@ class HistoryController extends Controller
         return $this->renderMypage('online_training', '03', '온라인 교육 수강내역', 'online_training', [
             'enrollments' => $enrollments,
             'statusLabels' => $this->onlineTrainingService->enrollmentStatusLabels(),
+            'paymentStatusLabels' => $this->onlineTrainingService->paymentStatusLabels(),
             'filterYear' => $request->get('year'),
+            'filterStatus' => $request->get('status', 'all'),
+            'filterKeyword' => $request->get('keyword'),
         ]);
     }
 
@@ -70,6 +73,8 @@ class HistoryController extends Controller
         return $this->renderMypage('online_training_view', '03', '온라인 교육 수강내역', 'online_training_view', [
             'enrollment' => $enrollment,
             'statusLabels' => $this->onlineTrainingService->enrollmentStatusLabels(),
+            'paymentStatusLabels' => $this->onlineTrainingService->paymentStatusLabels(),
+            'paymentMethodLabels' => $this->onlineTrainingService->paymentMethodLabels(),
         ]);
     }
 
@@ -105,10 +110,14 @@ class HistoryController extends Controller
 
     public function bookmark(Request $request): View
     {
-        $bookmarks = $this->bookmarkService->paginate($this->currentMember(), $request);
+        $user = $this->currentMember();
+        $bookmarks = $this->bookmarkService->paginate($user, $request);
 
         return $this->renderMypage('bookmark', '06', '북마크', 'bookmark', [
             'bookmarks' => $bookmarks,
+            'contentTypeOptions' => $this->bookmarkService->contentTypes($user),
+            'filterContentType' => $request->get('content_type', 'all'),
+            'filterKeyword' => $request->get('keyword'),
         ]);
     }
 
@@ -124,6 +133,32 @@ class HistoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => $count.'건이 삭제되었습니다.',
+        ]);
+    }
+
+    public function bookmarkToggle(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'content_type' => ['required', 'string', 'max:40'],
+            'content_id' => ['required', 'integer', 'min:1'],
+            'title' => ['nullable', 'string', 'max:500'],
+            'menu_label' => ['nullable', 'string', 'max:120'],
+            'url' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $bookmarked = $this->bookmarkService->toggle(
+            $this->currentMember(),
+            (string) $validated['content_type'],
+            (int) $validated['content_id'],
+            $validated['title'] ?? null,
+            $validated['menu_label'] ?? null,
+            $validated['url'] ?? null,
+        );
+
+        return response()->json([
+            'success' => true,
+            'bookmarked' => $bookmarked,
+            'message' => $bookmarked ? '북마크에 저장되었습니다.' : '북마크가 해제되었습니다.',
         ]);
     }
 }

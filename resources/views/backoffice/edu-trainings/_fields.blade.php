@@ -133,7 +133,7 @@
                         <div class="board-attachment-item existing-file">
                             <i class="fas fa-file"></i>
                             <a href="{{ asset('storage/' . $eduTraining->textbook_file_path) }}" target="_blank" rel="noopener">
-                                <span class="board-attachment-name">{{ basename($eduTraining->textbook_file_path) }}</span>
+                                <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($eduTraining->textbook_file_path) }}</span>
                             </a>
                             <button type="button" class="board-attachment-remove" data-existing-textbook-remove="1">
                                 <i class="fas fa-times"></i>
@@ -367,7 +367,7 @@
                                 <div class="board-attachment-item existing-file" data-index="{{ $att->id }}">
                                     <i class="fas fa-file"></i>
                                     <a href="{{ asset('storage/' . $att->file_path) }}" target="_blank" rel="noopener">
-                                        <span class="board-attachment-name">{{ $att->original_name ?: basename($att->file_path) }}</span>
+                                        <span class="board-attachment-name">{{ $att->original_name ?: \App\Support\BackofficeFile::displayName($att->file_path) }}</span>
                                     </a>
                                     <button type="button" class="board-attachment-remove" data-existing-attachment-id="{{ $att->id }}">
                                         <i class="fas fa-times"></i>

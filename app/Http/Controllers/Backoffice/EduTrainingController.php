@@ -7,6 +7,7 @@ use App\Http\Requests\Backoffice\EduTrainingRequest;
 use App\Models\EduTraining;
 use App\Models\EduTrainingAttachment;
 use App\Services\Backoffice\EduTrainingService;
+use App\Support\BackofficeFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -160,7 +161,7 @@ class EduTrainingController extends Controller
             return;
         }
 
-        $path = $request->file('textbook_file')->store('backoffice/edu-trainings/textbooks', 'public');
+        $path = BackofficeFile::storeWithOriginalName($request->file('textbook_file'), 'backoffice/edu-trainings/textbooks', 'public');
         $this->eduTrainingService->replaceTextbookFile($training->fresh(), $path);
     }
 
@@ -193,7 +194,7 @@ class EduTrainingController extends Controller
             if (! $file || ! $file->isValid()) {
                 continue;
             }
-            $path = $file->store('backoffice/edu-trainings/attachments', 'public');
+            $path = BackofficeFile::storeWithOriginalName($file, 'backoffice/edu-trainings/attachments', 'public');
             $training->attachments()->create([
                 'file_path' => $path,
                 'original_name' => $file->getClientOriginalName(),

@@ -19,7 +19,7 @@
 			<div class="tit_area">
 				<h1 class="tit" id="society-notices-heading">{{ $post->title }}</h1>
 				<div class="date"><strong class="sound_only">등록일</strong><p>{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</p></div>
-				<button type="button" class="bookmark" aria-label="이 게시글을 북마크에 추가" aria-pressed="false"></button>
+				<x-frontend.bookmark-button content-type="general_archive" :content-id="$post->id" :title="$post->title" :menu-label="$sName" :url="route('archives.general_show', $post->id)" />
 			</div>
 
 			@if (! empty($attachments))
@@ -67,5 +67,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/script_bookmark.js') }}"></script>
+<script src="{{ asset('js/frontend/script_bookmark.js') }}"></script>
 @endpush

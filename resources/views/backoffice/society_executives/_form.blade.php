@@ -62,7 +62,7 @@
                         <input type="hidden" name="existing_photo" value="{{ $societyExecutive->photo_path }}">
                         <i class="fas fa-file"></i>
                         <a href="{{ asset('storage/' . $societyExecutive->photo_path) }}" target="_blank" rel="noopener">
-                            <span class="board-attachment-name">{{ basename($societyExecutive->photo_path) }}</span>
+                            <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($societyExecutive->photo_path) }}</span>
                         </a>
                         <button type="button" class="board-attachment-remove" data-existing-photo-remove="1">
                             <i class="fas fa-times"></i>

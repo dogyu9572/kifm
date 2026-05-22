@@ -59,7 +59,7 @@
                             <div class="board-attachment-item existing-file" id="bo-thumbnail-existing-item">
                                 <i class="fas fa-image"></i>
                                 <a href="{{ asset('storage/' . $committee->thumbnail_path) }}" target="_blank" rel="noopener">
-                                    <span class="board-attachment-name">{{ basename($committee->thumbnail_path) }}</span>
+                                    <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($committee->thumbnail_path) }}</span>
                                 </a>
                                 <button type="button" class="board-attachment-remove" data-remove-existing-target="thumbnail">
                                     <i class="fas fa-times"></i>
@@ -90,7 +90,7 @@
                             <div class="board-attachment-item existing-file" id="bo-banner-existing-item">
                                 <i class="fas fa-file-image"></i>
                                 <a href="{{ asset('storage/' . $committee->banner_path) }}" target="_blank" rel="noopener">
-                                    <span class="board-attachment-name">{{ basename($committee->banner_path) }}</span>
+                                    <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($committee->banner_path) }}</span>
                                 </a>
                                 <button type="button" class="board-attachment-remove" data-remove-existing-target="banner">
                                     <i class="fas fa-times"></i>

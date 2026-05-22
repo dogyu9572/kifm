@@ -16,6 +16,12 @@ class AuthController extends Controller
      */
     public function showLoginForm()
     {
+        if (Auth::check() && Auth::user()?->is_active && Auth::user()?->isAdmin()) {
+            return redirect('/backoffice');
+        }
+
+        request()->session()->forget('url.intended');
+
         // 로그인 페이지 진입 시 CSRF 토큰을 새로 발급해 만료 이슈를 완화
         request()->session()->regenerateToken();
 
@@ -58,6 +64,11 @@ class AuthController extends Controller
         }
 
         // 로그인 성공
+        $request->session()->forget([
+            'url.intended',
+            'member_login_popup',
+            'academic_conference_registration_lookup_id',
+        ]);
         \Illuminate\Support\Facades\Auth::login($user);
         
         // 마지막 로그인 시간 업데이트
@@ -81,7 +92,7 @@ class AuthController extends Controller
         
         $request->session()->regenerate();
         
-        return redirect()->intended('/backoffice');
+        return redirect('/backoffice');
     }
 
     /**

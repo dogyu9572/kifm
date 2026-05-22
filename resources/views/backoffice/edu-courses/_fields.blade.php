@@ -104,7 +104,7 @@
                         <div class="board-attachment-item existing-file" id="bo-thumbnail-existing-item">
                             <i class="fas fa-file-image"></i>
                             <a href="{{ asset('storage/' . $course->thumbnail_path) }}" target="_blank" rel="noopener">
-                                <span class="board-attachment-name">{{ basename($course->thumbnail_path) }}</span>
+                                <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($course->thumbnail_path) }}</span>
                             </a>
                             <button type="button" class="board-attachment-remove" data-remove-existing-target="thumbnail">
                                 <i class="fas fa-times"></i>
@@ -177,7 +177,7 @@
                         <div class="board-attachment-item existing-file" id="bo-lecture-existing-item">
                             <i class="fas fa-file"></i>
                             <a href="{{ asset('storage/' . $course->lecture_file_path) }}" target="_blank" rel="noopener">
-                                <span class="board-attachment-name">{{ basename($course->lecture_file_path) }}</span>
+                                <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($course->lecture_file_path) }}</span>
                             </a>
                             <button type="button" class="board-attachment-remove" data-remove-existing-target="lecture">
                                 <i class="fas fa-times"></i>

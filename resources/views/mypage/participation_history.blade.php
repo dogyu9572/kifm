@@ -108,7 +108,9 @@
 				</tbody>
 			</table>
 		</div>
-		
+
+		<x-frontend.pagination :paginator="$registrations" />
+
 		<div class="gbox excl_wrap">
 			<div class="tt excl">꼭 확인해 주세요!</div>
 			<ul class="dots_list">
@@ -123,83 +125,6 @@
 	</div>
 </section>
 
-<div class="popup pop_account" id="pop_bank">
-	<div class="dm" onclick="layerHide('pop_bank');"></div>
-	<div class="inbox">
-		<button type="button" class="btn_close" onclick="layerHide('pop_bank');">Close</button>
-		<div class="ptit">입금계좌확인</div>
-		<div class="con">
-			<div class="gbox">사무국에서 온라인 입금 확인 후 납부 처리를 완료합니다.</div>
-			<div class="payment">
-				<dl>
-					<div>
-						<dt>결제 수단</dt>
-						<dd>무통장 입금</dd>
-					</div>
-					<div>
-						<dt>환불 받으실 계좌</dt>
-						<dd>
-							<p>홍길동</p>
-							<p>국민은행</p>
-							<p>111111-22-333333</p>
-						</dd>
-					</div>
-				</dl>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="popup pop_account" id="pop_cancel">
-	<div class="dm" onclick="layerHide('pop_cancel');"></div>
-	<div class="inbox">
-		<button type="button" class="btn_close" onclick="layerHide('pop_cancel');">Close</button>
-		<div class="ptit">신청 취소</div>
-		<div class="con">
-			<div class="gbox">
-				신청을 취소하실 경우, 기존 신청 내용은 모두 삭제됩니다.
-				<p class="c_iden">*무통장 입금의 경우 영업일 기준 2~3일내로 환불됩니다.</p>
-			</div>
-			<div class="payment">
-				<dl>
-					<div>
-						<dt>결제 수단</dt>
-						<dd>무통장 입금</dd>
-					</div>
-					<div>
-						<dt>환불 받으실 계좌</dt>
-						<dd>
-							<p>홍길동</p>
-							<p>국민은행</p>
-							<p>111111-22-333333</p>
-						</dd>
-					</div>
-				</dl>
-			</div>
-		</div>
-		<div class="btns flex_center">
-			<button type="button" class="btn btn_wkk" onclick="layerHide('pop_cancel');">닫기</button>
-			<button type="button" class="btn btn_kwg" id="btnCancel">신청 취소</button>
-		</div>
-	</div>
-</div>
-	
 </main>
 
 @endsection
-
-@push('scripts')
-<script src="{{ asset('js/script_popup.js') }}"></script>
-<script>
-//신청 취소
-	$('#btnCancel').on('click', function(e) {
-        e.preventDefault();
-        if (confirm("정말로 신청을 취소하시겠습니까?")) {
-            alert("신청취소가 완료되었습니다.");
-            // $(this).closest('form').submit();
-            // location.href = '/logout';
-			$(".popup").fadeOut("fast");
-        }
-    });
-</script>
-@endpush

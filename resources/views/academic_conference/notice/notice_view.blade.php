@@ -44,5 +44,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/script_bookmark.js') }}"></script>
+<script src="{{ asset('js/frontend/script_bookmark.js') }}"></script>
 @endpush

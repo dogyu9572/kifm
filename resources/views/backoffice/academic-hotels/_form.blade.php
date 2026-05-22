@@ -85,7 +85,7 @@
                         <input type="hidden" name="existing_image" value="{{ $hotel->image_path }}">
                         <i class="fas fa-file"></i>
                         <a href="{{ asset('storage/' . $hotel->image_path) }}" target="_blank" rel="noopener">
-                            <span class="board-attachment-name">{{ basename($hotel->image_path) }}</span>
+                            <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($hotel->image_path) }}</span>
                         </a>
                         <button type="button" class="board-attachment-remove" data-existing-hotel-image-remove="1">
                             <i class="fas fa-times"></i>

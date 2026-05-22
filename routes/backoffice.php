@@ -336,6 +336,10 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.academic-events.sessions.edit');
     Route::put('academic-events/{academic_event}/sessions/{academic_event_session}', [AcademicEventSessionController::class, 'update'])
         ->name('backoffice.academic-events.sessions.update');
+    Route::get('academic-events/{academic_event}/sessions/{academic_event_session}/abstracts', [AcademicEventSessionController::class, 'manageAbstracts'])
+        ->name('backoffice.academic-events.sessions.abstracts');
+    Route::put('academic-events/{academic_event}/sessions/{academic_event_session}/abstracts', [AcademicEventSessionController::class, 'updateAbstracts'])
+        ->name('backoffice.academic-events.sessions.abstracts.update');
     Route::delete('academic-events/{academic_event}/sessions/{academic_event_session}', [AcademicEventSessionController::class, 'destroy'])
         ->name('backoffice.academic-events.sessions.destroy');
 

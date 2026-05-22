@@ -7,6 +7,7 @@ use App\Http\Requests\Backoffice\StoreAcademicSponsorMasterPageRequest;
 use App\Http\Requests\Backoffice\UpdateAcademicSponsorMasterPageRequest;
 use App\Models\AcademicSponsorMaster;
 use App\Services\Backoffice\AcademicSponsorMasterService;
+use App\Support\BackofficeFile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -157,7 +158,7 @@ class AcademicSponsorMasterController extends Controller
 
         $path = null;
         if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('backoffice/academic-sponsor-masters/logos', 'public');
+            $path = BackofficeFile::storeWithOriginalName($request->file('logo'), 'backoffice/academic-sponsor-masters/logos', 'public');
         }
 
         $nextOrder = (int) (AcademicSponsorMaster::query()->max('sort_order') ?? 0) + 1;

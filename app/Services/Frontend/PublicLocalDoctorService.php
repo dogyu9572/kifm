@@ -91,6 +91,11 @@ class PublicLocalDoctorService
             'homepage' => $doctor->homepage,
             'photo_url' => $this->photoUrl($doctor),
             'introduction_html' => $doctor->introduction ?? '',
+            'map' => [
+                'lat' => $doctor->map_lat,
+                'lng' => $doctor->map_lng,
+                'javascript_key' => config('local_doctor_map.kakao.javascript_key'),
+            ],
             'roughmap' => [
                 'timestamp' => config('local_doctor_map.roughmap.timestamp'),
                 'key' => config('local_doctor_map.roughmap.key'),

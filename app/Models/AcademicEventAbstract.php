@@ -11,6 +11,8 @@ class AcademicEventAbstract extends Model
     protected $fillable = [
         'academic_event_id',
         'member_id',
+        'abstract_no',
+        'lookup_password',
         'registered_by',
         'status',
         'file_receipt_status',
@@ -58,5 +60,10 @@ class AcademicEventAbstract extends Model
     public function files(): HasMany
     {
         return $this->hasMany(AcademicEventAbstractFile::class, 'academic_event_abstract_id')->orderBy('id');
+    }
+
+    public function sessionItems(): HasMany
+    {
+        return $this->hasMany(AcademicEventSessionItem::class, 'academic_event_abstract_id');
     }
 }

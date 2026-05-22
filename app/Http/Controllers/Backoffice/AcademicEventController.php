@@ -8,9 +8,11 @@ use App\Models\AcademicEvent;
 use App\Models\User;
 use App\Services\Backoffice\AcademicEventAbstractService;
 use App\Services\Backoffice\AcademicEventService;
+use App\Support\BackofficeFile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class AcademicEventController extends Controller
@@ -101,12 +103,37 @@ class AcademicEventController extends Controller
         $fresh = AcademicEvent::query()->findOrFail($academic_event->id);
         $this->syncUploadedFiles($request, $fresh);
 
-        return redirect()->route('backoffice.academic-events.index')
+        $activeTab = (string) $request->input('active_tab', 'base');
+        if (! in_array($activeTab, ['base', 'prereg', 'abstract', 'speakers', 'sponsors', 'sessions'], true)) {
+            $activeTab = 'base';
+        }
+
+        return redirect()->route('backoffice.academic-events.edit', [
+            'academic_event' => $academic_event,
+            'tab' => $activeTab,
+            'return_url' => $request->input('return_url', $request->query('return_url')),
+        ])
             ->with('success', '학술행사가 수정되었습니다.');
     }
 
-    public function destroy(AcademicEvent $academic_event): RedirectResponse
+    public function destroy(Request $request, AcademicEvent $academic_event): RedirectResponse
     {
+        if ((string) $request->input('confirm_delete') !== '1') {
+            Log::warning('Blocked academic event delete without explicit confirmation.', [
+                'event_id' => $academic_event->id,
+                'path' => $request->path(),
+                'ip' => $request->ip(),
+            ]);
+
+            return back()->with('error', '삭제 확인 값이 없어 학술행사 삭제를 중단했습니다.');
+        }
+
+        Log::warning('Academic event delete requested.', [
+            'event_id' => $academic_event->id,
+            'title' => $academic_event->title,
+            'path' => $request->path(),
+            'ip' => $request->ip(),
+        ]);
         $this->deleteEventFiles($academic_event);
         $academic_event->delete();
 
@@ -116,12 +143,29 @@ class AcademicEventController extends Controller
 
     public function bulkDestroy(Request $request): JsonResponse
     {
+        if ((string) $request->input('confirm_delete') !== '1') {
+            Log::warning('Blocked bulk academic event delete without explicit confirmation.', [
+                'path' => $request->path(),
+                'ip' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => '삭제 확인 값이 없어 학술행사 삭제를 중단했습니다.',
+            ], 422);
+        }
+
         $validated = $request->validate([
             'event_ids' => ['required', 'array'],
             'event_ids.*' => ['integer', 'exists:academic_events,id'],
         ]);
 
         $events = AcademicEvent::query()->findMany($validated['event_ids']);
+        Log::warning('Bulk academic event delete requested.', [
+            'event_ids' => $events->pluck('id')->all(),
+            'path' => $request->path(),
+            'ip' => $request->ip(),
+        ]);
         foreach ($events as $event) {
             $this->deleteEventFiles($event);
         }
@@ -274,7 +318,7 @@ class AcademicEventController extends Controller
                     Storage::disk($disk)->delete($event->{$col});
                 }
                 $dir = 'backoffice/academic-events/' . str_replace('_path', '', $col);
-                $event->{$col} = $request->file($input)->store($dir, $disk);
+                $event->{$col} = BackofficeFile::storeWithOriginalName($request->file($input), $dir, $disk);
                 $dirty = true;
             }
         }
@@ -293,7 +337,7 @@ class AcademicEventController extends Controller
                 if ($floor->file_path) {
                     Storage::disk($disk)->delete($floor->file_path);
                 }
-                $floor->file_path = $file->store('backoffice/academic-events/venue-floors', $disk);
+                $floor->file_path = BackofficeFile::storeWithOriginalName($file, 'backoffice/academic-events/venue-floors', $disk);
                 $floor->save();
             }
             $dirty = true;
@@ -306,14 +350,14 @@ class AcademicEventController extends Controller
                 if (! $file || ! $file->isValid()) {
                     continue;
                 }
-                $sp = $speakers->get($idx);
+                $sp = $speakers->firstWhere('sort_order', ((int) $idx) + 1) ?: $speakers->get((int) $idx);
                 if (! $sp) {
                     continue;
                 }
                 if ($sp->image_path) {
                     Storage::disk($disk)->delete($sp->image_path);
                 }
-                $sp->image_path = $file->store('backoffice/academic-events/speakers', $disk);
+                $sp->image_path = BackofficeFile::storeWithOriginalName($file, 'backoffice/academic-events/speakers', $disk);
                 $sp->save();
             }
             $dirty = true;
@@ -326,14 +370,14 @@ class AcademicEventController extends Controller
                 if (! $file || ! $file->isValid()) {
                     continue;
                 }
-                $sp = $sponsors->get($idx);
+                $sp = $sponsors->firstWhere('sort_order', ((int) $idx) + 1) ?: $sponsors->get((int) $idx);
                 if (! $sp) {
                     continue;
                 }
                 if ($sp->logo_path) {
                     Storage::disk($disk)->delete($sp->logo_path);
                 }
-                $sp->logo_path = $file->store('backoffice/academic-events/sponsors', $disk);
+                $sp->logo_path = BackofficeFile::storeWithOriginalName($file, 'backoffice/academic-events/sponsors', $disk);
                 $sp->save();
             }
             $dirty = true;

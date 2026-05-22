@@ -3,6 +3,7 @@
 namespace App\Services\Backoffice;
 
 use App\Models\Board;
+use App\Support\BackofficeFile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -432,7 +433,7 @@ class BoardPostService
 
         // 새 썸네일이 업로드된 경우
         if ($request->hasFile('thumbnail')) {
-            return $request->file('thumbnail')->store('thumbnails/'.$slug, 'public');
+            return BackofficeFile::storeWithOriginalName($request->file('thumbnail'), 'thumbnails/'.$slug, 'public');
         }
 
         // 기존 썸네일이 있는 경우 보존
@@ -474,7 +475,7 @@ class BoardPostService
             foreach ($request->file('attachments') as $file) {
                 $attachments[] = [
                     'name' => $file->getClientOriginalName(),
-                    'path' => $file->store('uploads/'.$slug, 'public'),
+                    'path' => BackofficeFile::storeWithOriginalName($file, 'uploads/'.$slug, 'public'),
                     'size' => $file->getSize(),
                     'type' => $file->getMimeType(),
                 ];

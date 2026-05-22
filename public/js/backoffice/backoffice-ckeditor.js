@@ -4,6 +4,7 @@
  * 사용법:
  * - textarea에 data-backoffice-ckeditor 속성 추가
  * - (선택) data-upload-url, data-upload-field 로 업로드 엔드포인트·필드명 지정
+ * - (선택) data-source-editing="false" 로 소스 보기 버튼 숨김
  * - 서브디렉터리 배포 시: window.BACKOFFICE_CKEDITOR_UPLOAD_URL 설정
  * - 동적 추가 후: window.initBackofficeCKEditors(컨테이너 요소 또는 document)
  * - 폼 제출 전: window.syncBackofficeCKEditorFields(폼 요소) 로 textarea 값 반영
@@ -123,7 +124,7 @@
             : '';
         const uploadUrl = (element.dataset.uploadUrl || globalDefault || FALLBACK_UPLOAD_URL).trim();
         const fieldName = (element.dataset.uploadField || DEFAULT_UPLOAD_FIELD).trim() || DEFAULT_UPLOAD_FIELD;
-        const enableSourceEditing = element.dataset.sourceEditing === 'true';
+        const enableSourceEditing = element.dataset.sourceEditing !== 'false';
         const toolbarItems = [
             'heading', '|',
             'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',

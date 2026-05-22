@@ -3,6 +3,7 @@
 namespace App\Services\Backoffice;
 
 use App\Models\Setting;
+use App\Support\BackofficeFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Schema;
@@ -77,7 +78,7 @@ class SettingService
                 $this->deleteFile($currentSetting->logo_path);
             }
 
-            $logoPath = $request->file('logo')->store('settings', 'public');
+            $logoPath = BackofficeFile::storeWithOriginalName($request->file('logo'), 'settings', 'public');
             $data['logo_path'] = Storage::url($logoPath);
         }
 
@@ -102,7 +103,7 @@ class SettingService
                 $this->deleteFile($currentSetting->favicon_path);
             }
 
-            $faviconPath = $request->file('favicon')->store('settings', 'public');
+            $faviconPath = BackofficeFile::storeWithOriginalName($request->file('favicon'), 'settings', 'public');
             $data['favicon_path'] = Storage::url($faviconPath);
         }
 

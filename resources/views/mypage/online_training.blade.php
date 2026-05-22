@@ -8,27 +8,46 @@
 <section class="scon participation_history_wrap" aria-labelledby="participation-history-heading">
 	<div class="inner">
 		<h1 class="sub_title" id="participation-history-heading">{{ $sName }}</h1>
-		
+
 		@include('mypage.mypage_tab')
 
 		<div class="board_top">
-			<div class="left">
-				<select name="" id="" class="text">
-					<option value="">전체보기</option>
+			<form method="GET" action="{{ route('mypage.online_training') }}" class="left">
+				<select name="status" class="text">
+					<option value="all" @selected(($filterStatus ?? 'all') === 'all')>전체보기</option>
+					@foreach ($statusLabels as $status => $label)
+					<option value="{{ $status }}" @selected(($filterStatus ?? 'all') === $status)>{{ $label }}</option>
+					@endforeach
 				</select>
-			</div>
-			<div class="right flex">
-				<form class="search_area">
-					<label for="event-search" class="sound_only">강의명 검색</label>
-					<input type="text" id="event-search" class="text" placeholder="강의명으로 검색해 주세요.">
+				@if (! empty($filterYear))
+				<input type="hidden" name="year" value="{{ $filterYear }}">
+				@endif
+				@if (! empty($filterKeyword))
+				<input type="hidden" name="keyword" value="{{ $filterKeyword }}">
+				@endif
+				<button type="submit" class="btn_search_solo">검색</button>
+			</form>
+			<form method="GET" action="{{ route('mypage.online_training') }}" class="right flex">
+				<label for="event-search" class="sound_only">강의명 검색</label>
+				<select name="year" class="text">
+					<option value="">연도</option>
+					@for ($y = (int) now()->format('Y'); $y >= 2010; $y--)
+					<option value="{{ $y }}" @selected((string) $filterYear === (string) $y)>{{ $y }}년</option>
+					@endfor
+				</select>
+				@if (($filterStatus ?? 'all') !== 'all')
+				<input type="hidden" name="status" value="{{ $filterStatus }}">
+				@endif
+				<div class="search_area">
+					<input type="text" id="event-search" name="keyword" class="text" placeholder="강의명으로 검색해 주세요." value="{{ $filterKeyword }}">
 					<button type="submit" class="btn_search">검색</button>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
-		
+
 		<div class="board_list tac">
 			<table>
-				<caption>임상 영양 및 대사 의학 연구회 공지사항 입니다.</caption>
+				<caption>온라인 교육 수강내역입니다.</caption>
 				<colgroup>
 					<col>
 					<col class="online80">
@@ -52,156 +71,82 @@
 					</tr>
 				</thead>
 				<tbody>
+					@forelse ($enrollments as $enrollment)
+					@php
+						$isCompleted = $enrollment->enrollment_status === 'completed';
+						$isExpired = $enrollment->enrollment_status === 'expired';
+						$isPaymentCompleted = $enrollment->payment_status === 'completed';
+						$statusLabel = $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status;
+						$periodStart = $enrollment->applied_at;
+						$periodEnd = $enrollment->expire_at ?: $enrollment->course?->period_end;
+					@endphp
 					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>2026.03.01 ~ 2026.05.31</td>
-						<td>수강 완료</td>
-						<td><a href="/mypage/print_completion" class="btn btn_kwk" target="_blank">이수증</a></td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><a href="#this" class="btn btn_kwk">강의보기</a></td>
-						<td><a href="/mypage/online_training/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>2026.03.01 ~ 2026.05.31</td>
-						<td>수강 가능</td>
+						<td>{{ $enrollment->course?->title ?? '-' }}</td>
 						<td>-</td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><a href="#this" class="btn btn_kwk">강의보기</a></td>
-						<td><a href="/mypage/online_training/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>-</td>
-						<td>결제 대기<br/><button type="button" class="btn_un c_iden" onclick="layerShow('pop_bank');">입금 계좌번호 보기</button></td>
-						<td>-</td>
-						<td>-</td>
-						<td><a href="#this" class="btn btn_kwk">강의보기</a></td>
-						<td><a href="/mypage/online_training/view" type="button" class="btn btn_kwk">신청 내역 보기</a>
-							<button type="button" class="btn btn_rwr" onclick="layerShow('pop_cancel');">신청 취소</button>
+						<td>
+							@if ($periodStart || $periodEnd)
+							{{ optional($periodStart)->format('Y.m.d') ?: '-' }} ~ {{ optional($periodEnd)->format('Y.m.d') ?: '-' }}
+							@else
+							-
+							@endif
 						</td>
+						<td>
+							@if ($isExpired)
+							<span class="c_red">{{ $statusLabel }}</span>
+							@else
+							{{ $statusLabel }}
+							@endif
+							@if (! $isPaymentCompleted && isset($paymentStatusLabels[$enrollment->payment_status]))
+							<br/>({{ $paymentStatusLabels[$enrollment->payment_status] }})
+							@endif
+						</td>
+						<td>
+							@if ($isCompleted)
+							<a href="{{ route('mypage.print_completion', ['enrollment_id' => $enrollment->id]) }}" class="btn btn_kwk" target="_blank">이수증</a>
+							@else
+							-
+							@endif
+						</td>
+						<td>
+							@if ($isPaymentCompleted)
+							<a href="{{ route('mypage.print_receipt_save', ['enrollment_id' => $enrollment->id]) }}" class="btn btn_kwk" target="_blank">영수증 출력</a>
+							@else
+							-
+							@endif
+						</td>
+						<td>
+							@if ($enrollment->course)
+							<a href="{{ route('online_academy.show', $enrollment->course) }}" class="btn btn_kwk">강의보기</a>
+							@else
+							-
+							@endif
+						</td>
+						<td><a href="{{ route('mypage.online_training_view', ['id' => $enrollment->id]) }}" class="btn btn_kwk">신청 내역 보기</a></td>
 					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>-</td>
-						<td><span class="c_red">기간 만료<br/>(수강 완료)</span></td>
-						<td><a href="/mypage/print_completion" class="btn btn_kwk" target="_blank">이수증</a></td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><button type="button" class="btn btn_rrr">재결제</button></td>
-						<td><a href="/mypage/online_training/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<tr>
-						<td>2025년 대한기능의학회 추계학술대회</td>
-						<td>10점</td>
-						<td>-</td>
-						<td><span class="c_red">기간 만료<br/>(수강 완료)</span></td>
-						<td>-</td>
-						<td><a href="/mypage/print_receipt_save" class="btn btn_kwk" target="_blank">영수증 출력</a></td>
-						<td><button type="button" class="btn btn_rrr">재결제</button></td>
-						<td><a href="/mypage/online_training/view" type="button" class="btn btn_kwk">신청 내역 보기</a></td>
-					</tr>
-					<!-- 내역이 없을 경우 -->
-					<!-- <tr class="empty">
+					@empty
+					<tr class="empty">
 						<td colspan="8">수강 내역이 없습니다.</td>
-					</tr> -->
+					</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>
-		
+
+		<x-frontend.pagination :paginator="$enrollments" />
+
 		<div class="gbox excl_wrap">
 			<div class="tt excl">온라인 아카데미 안내</div>
 			<ul class="dots_list">
 				<li>수강 완료: 모든 강의를 100% 시청한 상태이며 이수증(수료증) 출력이 가능합니다.</li>
 				<li>기간 만료: 수강 가능 기간이 종료되었습니다. 학습이 끝나지 않은 경우 '재결제'를 통해 기간을 연장할 수 있습니다.</li>
-				<li>개인 사정으로 인해 부득이하게 기간 내 수강을 완료하지 못한 경우, 사무국(02-1234-5678)으로 유선 문의 주시면 예외 규정에 따라 연장 검토가 가능합니다.</li>
+				<li>개인 사정으로 인해 부득이하게 기간 내 수강을 완료하지 못한 경우, 사무국(02-1234-5678)으로 유선 문의 주시면 예외 규정에 따라 연장 검토가 가능합니다.</li>
 				<li>이수증은 학습 기간 종료 후에도 '나의 강의실'에서 언제든지 재출력할 수 있습니다.</li>
 			</ul>
 		</div>
-		
+
 	</div>
 </section>
 
-<div class="popup pop_account" id="pop_bank">
-	<div class="dm" onclick="layerHide('pop_bank');"></div>
-	<div class="inbox">
-		<button type="button" class="btn_close" onclick="layerHide('pop_bank');">Close</button>
-		<div class="ptit">입금계좌확인</div>
-		<div class="con">
-			<div class="gbox">사무국에서 온라인 입금 확인 후 납부 처리를 완료합니다.</div>
-			<div class="payment">
-				<dl>
-					<div>
-						<dt>결제 수단</dt>
-						<dd>무통장 입금</dd>
-					</div>
-					<div>
-						<dt>환불 받으실 계좌</dt>
-						<dd>
-							<p>홍길동</p>
-							<p>국민은행</p>
-							<p>111111-22-333333</p>
-						</dd>
-					</div>
-				</dl>
-			</div>
-		</div>
-	</div>
-</div>
-
-<div class="popup pop_account" id="pop_cancel">
-	<div class="dm" onclick="layerHide('pop_cancel');"></div>
-	<div class="inbox">
-		<button type="button" class="btn_close" onclick="layerHide('pop_cancel');">Close</button>
-		<div class="ptit">신청 취소</div>
-		<div class="con">
-			<div class="gbox">
-				신청을 취소하실 경우, 기존 신청 내용은 모두 삭제됩니다.
-				<p class="c_iden">*무통장 입금의 경우 영업일 기준 2~3일내로 환불됩니다.</p>
-			</div>
-			<div class="payment">
-				<dl>
-					<div>
-						<dt>결제 수단</dt>
-						<dd>무통장 입금</dd>
-					</div>
-					<div>
-						<dt>환불 받으실 계좌</dt>
-						<dd>
-							<p>홍길동</p>
-							<p>국민은행</p>
-							<p>111111-22-333333</p>
-						</dd>
-					</div>
-				</dl>
-			</div>
-		</div>
-		<div class="btns flex_center">
-			<button type="button" class="btn btn_wkk" onclick="layerHide('pop_cancel');">닫기</button>
-			<button type="button" class="btn btn_kwg" id="btnCancel">신청 취소</button>
-		</div>
-	</div>
-</div>
-	
 </main>
 
 @endsection
-
-@push('scripts')
-<script src="{{ asset('js/script_popup.js') }}"></script>
-<script>
-//신청 취소
-	$('#btnCancel').on('click', function(e) {
-        e.preventDefault();
-        if (confirm("정말로 신청을 취소하시겠습니까?")) {
-            alert("신청취소가 완료되었습니다.");
-            // $(this).closest('form').submit();
-            // location.href = '/logout';
-			$(".popup").fadeOut("fast");
-        }
-    });
-</script>
-@endpush

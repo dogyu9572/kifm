@@ -13,25 +13,37 @@
 
 		<div class="board_top">
 			<div class="left">
-				<select name="" id="" class="text">
-					<option value="">전체보기</option>
-				</select>
+				<form method="GET" action="{{ route('mypage.bookmark') }}">
+					<select name="content_type" class="text">
+						<option value="all" @selected(($filterContentType ?? 'all') === 'all')>전체보기</option>
+						@foreach ($contentTypeOptions as $contentType)
+						<option value="{{ $contentType }}" @selected(($filterContentType ?? 'all') === $contentType)>{{ $contentType }}</option>
+						@endforeach
+					</select>
+					@if (! empty($filterKeyword))
+					<input type="hidden" name="keyword" value="{{ $filterKeyword }}">
+					@endif
+					<button type="submit" class="btn_search_solo">검색</button>
+				</form>
 			</div>
 			<div class="right flex">
-				<select name="" id="" class="text">
+				<select name="" id="" class="text" disabled>
 					<option value="">전체</option>
 					<option value="">제목</option>
 					<option value="">내용</option>
 				</select>
-				<form class="search_area">
+				<form method="GET" action="{{ route('mypage.bookmark') }}" class="search_area">
 					<label for="event-search" class="sound_only">검색어 검색</label>
-					<input type="text" id="event-search" class="text" placeholder="검색어를 입력해주세요">
+					@if (($filterContentType ?? 'all') !== 'all')
+					<input type="hidden" name="content_type" value="{{ $filterContentType }}">
+					@endif
+					<input type="text" id="event-search" name="keyword" class="text" placeholder="검색어를 입력해주세요" value="{{ $filterKeyword }}">
 					<button type="submit" class="btn_search">검색</button>
 				</form>
 			</div>
 		</div>
 		
-		<div class="board_list">
+		<div class="board_list" data-mypage-bookmark data-destroy-url="{{ route('mypage.bookmark.destroy') }}">
 			<table>
 				<caption>임상 영양 및 대사 의학 연구회 공지사항 입니다.</caption>
 				<colgroup>
@@ -81,5 +93,5 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/script_bookmark.js') }}"></script>
+<script src="{{ asset('js/frontend/mypage-bookmark.js') }}"></script>
 @endpush

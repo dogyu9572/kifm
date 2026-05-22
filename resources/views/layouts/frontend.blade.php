@@ -231,30 +231,31 @@
     @endif
 	@if(isset($gNum) && $page_type == 'academic_conference' && $gNum !== 'intro')
 	<!-- 학술대회 -->
+	@php $academicConferenceBaseUrl = $conferenceBaseUrl ?? url('/academic_conference'); @endphp
 	<header class="header {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }}">
 		<div class="inner">
-			<a href="/academic_conference" class="logo" aria-label="대한기능의학회 학술대회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+			<a href="{{ $academicConferenceBaseUrl }}" class="logo" aria-label="대한기능의학회 학술대회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
 			<ul class="gnb">
 				<li class="menu {{ ($gNum ?? '') == '01' ? 'on' : '' }}">
-					<a href="/academic_conference/invitation" id="academic-menu-01" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01') aria-current="page" @endif>KIFM</a>
+					<a href="{{ $academicConferenceBaseUrl }}/invitation" id="academic-menu-01" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01') aria-current="page" @endif>KIFM</a>
 				</li>
 				<li class="menu {{ ($gNum ?? '') == '02' ? 'on' : '' }}">
-					<a href="/academic_conference/program" id="academic-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>Program</a>
+					<a href="{{ $academicConferenceBaseUrl }}/program" id="academic-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>Program</a>
 				</li>
 				<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}">
-					<a href="/academic_conference/registration" id="academic-menu-03" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '03' ? 'true' : 'false' }}" @if(($gNum ?? '') == '03') aria-current="page" @endif>Registration</a>
+					<a href="{{ $academicConferenceBaseUrl }}/registration" id="academic-menu-03" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '03' ? 'true' : 'false' }}" @if(($gNum ?? '') == '03') aria-current="page" @endif>Registration</a>
 				</li>
 				<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}">
-					<a href="/academic_conference/abstract" id="academic-menu-04" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>Abstract</a>
+					<a href="{{ $academicConferenceBaseUrl }}/abstract" id="academic-menu-04" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>Abstract</a>
 				</li>
 				<li class="menu {{ ($gNum ?? '') == '05' ? 'on' : '' }}">
-					<a href="/academic_conference/notice" id="academic-menu-05" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '05' ? 'true' : 'false' }}" @if(($gNum ?? '') == '05') aria-current="page" @endif>Notice</a>
+					<a href="{{ $academicConferenceBaseUrl }}/notice" id="academic-menu-05" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '05' ? 'true' : 'false' }}" @if(($gNum ?? '') == '05') aria-current="page" @endif>Notice</a>
 				</li>
 				<li class="menu {{ ($gNum ?? '') == '06' ? 'on' : '' }}">
-					<a href="/academic_conference/sponsors" id="academic-menu-06" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '06' ? 'true' : 'false' }}" @if(($gNum ?? '') == '06') aria-current="page" @endif>Sponsors</a>
+					<a href="{{ $academicConferenceBaseUrl }}/sponsors" id="academic-menu-06" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '06' ? 'true' : 'false' }}" @if(($gNum ?? '') == '06') aria-current="page" @endif>Sponsors</a>
 				</li>
 				<li class="menu {{ ($gNum ?? '') == '07' ? 'on' : '' }}">
-					<a href="/academic_conference/exhibition" id="academic-menu-07" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '07' ? 'true' : 'false' }}" @if(($gNum ?? '') == '07') aria-current="page" @endif>Exhibition</a>
+					<a href="{{ $academicConferenceBaseUrl }}/exhibition" id="academic-menu-07" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '07' ? 'true' : 'false' }}" @if(($gNum ?? '') == '07') aria-current="page" @endif>Exhibition</a>
 				</li>
 			</ul>
 			<div class="member">
@@ -400,38 +401,38 @@
 		<nav class="sub_menu_area inner">
 			<ul id="sub-snb-list">
 				@if(isset($gNum) && $gNum == '01')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/invitation" @if(($sNum ?? '') == '01') aria-current="page" @endif>초대의 글</a></li>
-					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_conference/committee" @if(($sNum ?? '') == '02') aria-current="page" @endif>조직위원회</a></li>
-					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/academic_conference/venue" @if(($sNum ?? '') == '03') aria-current="page" @endif>행사장 안내</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/invitation" @if(($sNum ?? '') == '01') aria-current="page" @endif>초대의 글</a></li>
+					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/committee" @if(($sNum ?? '') == '02') aria-current="page" @endif>조직위원회</a></li>
+					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/venue" @if(($sNum ?? '') == '03') aria-current="page" @endif>행사장 안내</a></li>
 				@endif
 				@if(isset($gNum) && $gNum == '02')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/program" @if(($sNum ?? '') == '01') aria-current="page" @endif>program</a></li>
-					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_conference/speakers" @if(($sNum ?? '') == '02') aria-current="page" @endif>speakers</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/program" @if(($sNum ?? '') == '01') aria-current="page" @endif>program</a></li>
+					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/speakers" @if(($sNum ?? '') == '02') aria-current="page" @endif>speakers</a></li>
 				@endif
 				@if(isset($gNum) && $gNum == '03')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/registration" @if(($sNum ?? '') == '01') aria-current="page" @endif>Information</a></li>
-					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_conference/registration/reg" @if(($sNum ?? '') == '02') aria-current="page" @endif>Registration</a></li>
-					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/academic_conference/registration/check_member" @if(($sNum ?? '') == '03') aria-current="page" @endif>Registration Check</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/registration" @if(($sNum ?? '') == '01') aria-current="page" @endif>Information</a></li>
+					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/registration/reg" @if(($sNum ?? '') == '02') aria-current="page" @endif>Registration</a></li>
+					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/registration/check_member" @if(($sNum ?? '') == '03') aria-current="page" @endif>Registration Check</a></li>
 				@endif
 				@if(isset($gNum) && $gNum == '04')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/abstract" @if(($sNum ?? '') == '01') aria-current="page" @endif>Information</a></li>
-					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_conference/abstract/submission" @if(($sNum ?? '') == '02') aria-current="page" @endif>Abstract Submission</a></li>
-					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/academic_conference/abstract/check" @if(($sNum ?? '') == '03') aria-current="page" @endif>Abstract Check</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/abstract" @if(($sNum ?? '') == '01') aria-current="page" @endif>Information</a></li>
+					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/abstract/submission" @if(($sNum ?? '') == '02') aria-current="page" @endif>Abstract Submission</a></li>
+					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/abstract/check" @if(($sNum ?? '') == '03') aria-current="page" @endif>Abstract Check</a></li>
 				@endif
 				@if(isset($gNum) && $gNum == '05')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/notice" @if(($sNum ?? '') == '01') aria-current="page" @endif>Notice</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/notice" @if(($sNum ?? '') == '01') aria-current="page" @endif>Notice</a></li>
 				@endif
 				@if(isset($gNum) && $gNum == '06')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/sponsors" @if(($sNum ?? '') == '01') aria-current="page" @endif>Sponsors</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/sponsors" @if(($sNum ?? '') == '01') aria-current="page" @endif>Sponsors</a></li>
 				@endif
 				@if(isset($gNum) && $gNum == '07')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/exhibition" @if(($sNum ?? '') == '01') aria-current="page" @endif>Exhibition</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/exhibition" @if(($sNum ?? '') == '01') aria-current="page" @endif>Exhibition</a></li>
 				@endif
-				
+
 				@if(isset($gNum) && $gNum == 'academic_conference')
-					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_conference/onsite_info" @if(($sNum ?? '') == '01') aria-current="page" @endif>Information</a></li>
-					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_conference/onsite_member_registration" @if(($sNum ?? '') == '02') aria-current="page" @endif>Registration</a></li>
-					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/academic_conference/onsite_check_registration" @if(($sNum ?? '') == '03') aria-current="page" @endif>Registration Check</a></li>
+					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/onsite_info" @if(($sNum ?? '') == '01') aria-current="page" @endif>Information</a></li>
+					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/onsite_member_registration" @if(($sNum ?? '') == '02') aria-current="page" @endif>Registration</a></li>
+					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/onsite_check_registration" @if(($sNum ?? '') == '03') aria-current="page" @endif>Registration Check</a></li>
 				@endif
 			</ul>
 		</nav>
@@ -545,6 +546,9 @@
 	<!-- //학술대회 -->
 	@endif
 	
+	@endif
+	@if(($gNum ?? '') == 'print')
+	@stack('scripts')
 	@endif
 </body>
 </html>

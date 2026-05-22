@@ -3,6 +3,7 @@
 namespace App\Services\Backoffice;
 
 use App\Models\AcademicEvent;
+use App\Support\CategoryOptions;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,12 +36,12 @@ class AcademicEventService
     /** @return array<string, string> */
     public static function presentationTypeLabels(): array
     {
-        return [
+        return CategoryOptions::labelsByGroupCode(CategoryOptions::ABSTRACT_PRESENTATION_TYPE_GROUP_CODE, [
             'oral' => '구연 발표',
             'poster' => '포스터 발표',
             'video' => '비디오 발표',
             'designated_discussion' => '지정 토론',
-        ];
+        ]);
     }
 
     /** @return array<string, string> */
@@ -192,6 +193,7 @@ class AcademicEventService
     {
         $keys = [
             'legacy_post_id', 'year', 'season', 'folder_name', 'title',
+            'main_title_1', 'main_title_2',
             'event_material_path', 'event_material_description',
             'event_type', 'online_url', 'is_public', 'main_exposure', 'venue',
             'start_at', 'end_at', 'start_time_omit', 'end_time_omit',
@@ -260,21 +262,27 @@ class AcademicEventService
             $sponsorIdsInOrder[] = $s->id;
         }
 
+        $mainSponsorSlotKeys = [];
         foreach ($v['main_sponsor_slots'] ?? [] as $i => $row) {
             $activeRaw = $row['active'] ?? '1';
             $isActive = $activeRaw === '1' || $activeRaw === 1 || $activeRaw === true;
             if (! $isActive) {
                 continue;
             }
-            $placement = (string) ($row['placement'] ?? '');
+            $idx = isset($row['sponsor_index']) ? (int) $row['sponsor_index'] : -1;
+            $placement = (string) ($v['sponsors'][$idx]['level'] ?? ($row['placement'] ?? ''));
             if ($placement === '' || ! isset(self::mainPlacementLabels()[$placement])) {
                 continue;
             }
-            $idx = isset($row['sponsor_index']) ? (int) $row['sponsor_index'] : -1;
             $sponsorId = $idx >= 0 && $idx < count($sponsorIdsInOrder) ? $sponsorIdsInOrder[$idx] : null;
             if (! $sponsorId) {
                 continue;
             }
+            $slotKey = $sponsorId . '|' . $placement;
+            if (isset($mainSponsorSlotKeys[$slotKey])) {
+                continue;
+            }
+            $mainSponsorSlotKeys[$slotKey] = true;
             $event->mainSponsorSlots()->create([
                 'academic_event_sponsor_id' => $sponsorId,
                 'placement' => $placement,

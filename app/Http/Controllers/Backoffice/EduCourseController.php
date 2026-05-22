@@ -9,6 +9,7 @@ use App\Models\EduCourse;
 use App\Models\EduTraining;
 use App\Models\User;
 use App\Services\Backoffice\EduCourseService;
+use App\Support\BackofficeFile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -185,13 +186,13 @@ class EduCourseController extends Controller
             if ($course->thumbnail_path) {
                 Storage::disk('public')->delete($course->thumbnail_path);
             }
-            $course->thumbnail_path = $request->file('thumbnail')->store('backoffice/edu-courses/thumbnails', 'public');
+            $course->thumbnail_path = BackofficeFile::storeWithOriginalName($request->file('thumbnail'), 'backoffice/edu-courses/thumbnails', 'public');
         }
         if ($request->hasFile('lecture_file')) {
             if ($course->lecture_file_path) {
                 Storage::disk('public')->delete($course->lecture_file_path);
             }
-            $course->lecture_file_path = $request->file('lecture_file')->store('backoffice/edu-courses/lectures', 'public');
+            $course->lecture_file_path = BackofficeFile::storeWithOriginalName($request->file('lecture_file'), 'backoffice/edu-courses/lectures', 'public');
         }
         $course->save();
     }
@@ -252,4 +253,3 @@ class EduCourseController extends Controller
         return $fallback;
     }
 }
-

@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Mypage\Concerns\RendersMypageViews;
 use App\Http\Requests\FrontendMypageLocalDoctorUpdateRequest;
 use App\Http\Requests\FrontendMypageProfileUpdateRequest;
+use App\Models\CommunityCommittee;
+use App\Models\CommunityCommitteeApplication;
+use App\Models\CommunityCommitteeMember;
 use App\Models\MemberExecutive;
 use App\Models\User;
 use App\Services\Backoffice\MemberService;
@@ -170,10 +173,22 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function committeeParticipationAdmin(): View
+    public function committeeParticipationAdmin(Request $request): View
     {
+        abort_unless($this->currentMember()->isAdmin(), 403);
+
+        $applications = $this->committeeApplicationsForAdmin($request);
+
         return $this->renderMypage('committee_participation_admin', '10', '위원회 참여 현황', 'committee_participation_admin', [
-            'committees' => $this->resolveCommitteesForMember(true),
+            'applications' => $applications,
+            'committeeStats' => $this->committeeApplicationStats(),
+            'filterStatus' => $request->get('status', 'all'),
+            'filterKeyword' => $request->get('keyword'),
+            'statusLabels' => [
+                'PENDING' => '승인 대기',
+                'APPROVED' => '참여 중',
+                'REJECTED' => '반려',
+            ],
         ]);
     }
 
@@ -182,7 +197,7 @@ class ProfileController extends Controller
     {
         $user = $this->currentMember();
         if ($adminView && $user->isAdmin()) {
-            return \App\Models\CommunityCommittee::query()
+            return CommunityCommittee::query()
                 ->orderBy('sort_order')
                 ->orderBy('name')
                 ->get();
@@ -193,11 +208,54 @@ class ProfileController extends Controller
             return collect();
         }
 
-        return \App\Models\CommunityCommittee::query()
+        return CommunityCommittee::query()
             ->whereIn('id', array_map('intval', $codes))
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
+    }
+
+    /** @return \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, CommunityCommitteeApplication> */
+    private function committeeApplicationsForAdmin(Request $request): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $status = strtoupper(trim((string) $request->get('status', '')));
+        $keyword = trim((string) $request->get('keyword', ''));
+
+        return CommunityCommitteeApplication::query()
+            ->with('committee:id,name')
+            ->when(in_array($status, ['PENDING', 'APPROVED', 'REJECTED'], true), fn ($query) => $query->where('status', $status))
+            ->when($keyword !== '', function ($query) use ($keyword) {
+                $like = '%'.$keyword.'%';
+                $query->where(function ($q) use ($like) {
+                    $q->where('applicant_name', 'like', $like)
+                        ->orWhere('email', 'like', $like)
+                        ->orWhere('phone', 'like', $like);
+                });
+            })
+            ->orderByDesc('applied_at')
+            ->orderByDesc('id')
+            ->paginate(20)
+            ->withQueryString();
+    }
+
+    /** @return array{committee_capacity:int, member_count:int, total:int, pending:int, approved:int, rejected:int} */
+    private function committeeApplicationStats(): array
+    {
+        $capacity = (int) CommunityCommittee::query()->sum('member_limit');
+        $memberCount = CommunityCommitteeMember::query()->count();
+        $statusCounts = CommunityCommitteeApplication::query()
+            ->selectRaw('status, COUNT(*) as aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+
+        return [
+            'committee_capacity' => $capacity,
+            'member_count' => $memberCount,
+            'total' => (int) $statusCounts->sum(),
+            'pending' => (int) ($statusCounts['PENDING'] ?? 0),
+            'approved' => (int) ($statusCounts['APPROVED'] ?? 0),
+            'rejected' => (int) ($statusCounts['REJECTED'] ?? 0),
+        ];
     }
 
     private function formatPhoneDisplay(?string $phone): string

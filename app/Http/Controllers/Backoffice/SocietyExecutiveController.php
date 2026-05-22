@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SocietyExecutiveRequest;
 use App\Models\SocietyExecutive;
+use App\Support\BackofficeFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -152,7 +153,7 @@ class SocietyExecutiveController extends Controller
             if ($societyExecutive instanceof SocietyExecutive) {
                 $this->deletePhotoFile($societyExecutive->photo_path);
             }
-            $validated['photo_path'] = $request->file('photo')->store('uploads/society-executives', 'public');
+            $validated['photo_path'] = BackofficeFile::storeWithOriginalName($request->file('photo'), 'uploads/society-executives', 'public');
         } elseif ((bool) $request->input('remove_photo', false) === true) {
             if ($societyExecutive instanceof SocietyExecutive) {
                 $this->deletePhotoFile($societyExecutive->photo_path);

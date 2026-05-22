@@ -21,8 +21,13 @@ class MemberController extends Controller
         private readonly MemberService $memberService,
     ) {}
 
-    public function login(): View
+    public function login(Request $request): View
     {
+        $intended = (string) $request->query('intended', '');
+        if ($this->isSafeIntendedUrl($intended)) {
+            $request->session()->put('url.intended', $intended);
+        }
+
         $loginPopup = Session::pull('member_login_popup');
 
         return $this->renderMember('login', '01', '로그인', 'login', compact('loginPopup'));
@@ -30,6 +35,11 @@ class MemberController extends Controller
 
     public function loginStore(FrontendMemberLoginRequest $request): RedirectResponse
     {
+        $intended = (string) $request->input('intended', '');
+        if ($this->isSafeIntendedUrl($intended)) {
+            $request->session()->put('url.intended', $intended);
+        }
+
         $credentials = [
             'login_id' => $request->validated('login_id'),
             'password' => $request->validated('password'),
@@ -75,6 +85,15 @@ class MemberController extends Controller
         $user->forceFill(['last_login_at' => now()])->save();
 
         return redirect()->intended(route('home'));
+    }
+
+    private function isSafeIntendedUrl(string $url): bool
+    {
+        if ($url === '') {
+            return false;
+        }
+
+        return str_starts_with($url, '/') || str_starts_with($url, url('/'));
     }
 
     public function logout(Request $request): RedirectResponse

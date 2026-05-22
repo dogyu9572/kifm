@@ -3,6 +3,7 @@
 namespace App\Services\Backoffice;
 
 use App\Models\AcademicSponsorMaster;
+use App\Support\BackofficeFile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -42,7 +43,7 @@ class AcademicSponsorMasterService
      */
     public function store(array $data, UploadedFile $logoFile): AcademicSponsorMaster
     {
-        $path = $logoFile->store('backoffice/academic-sponsor-masters/logos', 'public');
+        $path = BackofficeFile::storeWithOriginalName($logoFile, 'backoffice/academic-sponsor-masters/logos', 'public');
 
         return AcademicSponsorMaster::create([
             'name' => $data['name'],
@@ -69,7 +70,7 @@ class AcademicSponsorMasterService
             if ($master->logo_path) {
                 Storage::disk('public')->delete($master->logo_path);
             }
-            $updates['logo_path'] = $logoFile->store('backoffice/academic-sponsor-masters/logos', 'public');
+            $updates['logo_path'] = BackofficeFile::storeWithOriginalName($logoFile, 'backoffice/academic-sponsor-masters/logos', 'public');
         } elseif ($removeLogo) {
             if ($master->logo_path) {
                 Storage::disk('public')->delete($master->logo_path);

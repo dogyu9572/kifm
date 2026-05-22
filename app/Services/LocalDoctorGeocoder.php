@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Log;
 
 class LocalDoctorGeocoder
 {
+    public function hasApiKey(): bool
+    {
+        return (string) config('local_doctor_map.kakao.rest_api_key', '') !== '';
+    }
+
     /**
      * 주소 필드(시/도·시군구·도로명·상세)를 합쳐 지오코딩 검색어로 만든다.
      */
@@ -23,6 +28,17 @@ class LocalDoctorGeocoder
         return implode(' ', $parts);
     }
 
+    public function buildAddressQuery(LocalDoctor $doctor): string
+    {
+        $parts = array_filter([
+            trim((string) ($doctor->sido ?? '')),
+            trim((string) ($doctor->sigungu ?? '')),
+            trim((string) ($doctor->address ?? '')),
+        ]);
+
+        return implode(' ', $parts);
+    }
+
     /**
      * @return array{lat: float, lng: float}|null
      */
@@ -33,10 +49,11 @@ class LocalDoctorGeocoder
             return null;
         }
 
-        $apiKey = (string) config('local_doctor_map.kakao.rest_api_key', '');
-        if ($apiKey === '') {
+        if (! $this->hasApiKey()) {
             return null;
         }
+
+        $apiKey = (string) config('local_doctor_map.kakao.rest_api_key');
 
         $response = Http::withHeaders([
             'Authorization' => 'KakaoAK ' . $apiKey,
@@ -92,7 +109,12 @@ class LocalDoctorGeocoder
 
     public function syncForDoctor(LocalDoctor $doctor): bool
     {
-        $coords = $this->geocode($this->buildQuery($doctor));
+        if (! $this->hasApiKey()) {
+            return false;
+        }
+
+        $coords = $this->geocode($this->buildQuery($doctor))
+            ?? $this->geocode($this->buildAddressQuery($doctor));
         if ($coords === null) {
             $doctor->map_lat = null;
             $doctor->map_lng = null;

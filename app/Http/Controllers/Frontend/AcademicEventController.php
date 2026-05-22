@@ -3,11 +3,17 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Services\Frontend\PublicAcademicEventService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AcademicEventController extends Controller
 {
-    public function conference(): View
+    public function __construct(
+        private readonly PublicAcademicEventService $academicEventService,
+    ) {}
+
+    public function conference(Request $request): View
     {
         $page_type = 'professional';
         $gNum = '02';
@@ -16,8 +22,26 @@ class AcademicEventController extends Controller
         $sName = '학술대회';
         $geName = 'Academic Event';
         $gSlug = 'academic_event_conference';
+        $featuredConference = $this->academicEventService->featuredConference();
+        $conferences = $this->academicEventService->paginateConferences($request);
+        $statusLabels = $this->academicEventService->statusLabels();
+        $yearOptions = $this->academicEventService->yearOptions();
+        $filters = $this->academicEventService->filters($request);
 
-        return view('academic_event.conference', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        return view('academic_event.conference', compact(
+            'page_type',
+            'gNum',
+            'sNum',
+            'gName',
+            'sName',
+            'geName',
+            'gSlug',
+            'featuredConference',
+            'conferences',
+            'statusLabels',
+            'yearOptions',
+            'filters',
+        ));
     }
 
     public function conferenceView(): View

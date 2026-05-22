@@ -3,6 +3,8 @@
 namespace App\Services\Backoffice;
 
 use App\Models\LocalDoctor;
+use App\Services\LocalDoctorGeocoder;
+use App\Support\BackofficeFile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -12,6 +14,10 @@ use Illuminate\Support\Facades\Storage;
 
 class LocalDoctorService
 {
+    public function __construct(
+        private readonly LocalDoctorGeocoder $geocoder,
+    ) {}
+
     public static function statusLabels(): array
     {
         return [
@@ -69,7 +75,7 @@ class LocalDoctorService
      */
     public function create(Request $request, array $validated): LocalDoctor
     {
-        return DB::transaction(function () use ($request, $validated) {
+        $doctor = DB::transaction(function () use ($request, $validated) {
             $doctor = new LocalDoctor;
             $this->fillDoctor($doctor, $validated);
             if ($request->hasFile('photo')) {
@@ -79,6 +85,10 @@ class LocalDoctorService
             $this->syncCategories($doctor, $validated['category_ids'] ?? []);
             return $doctor->fresh(['doctorCategories']);
         });
+
+        $this->syncCoordinatesIfConfigured($doctor);
+
+        return $doctor->fresh(['doctorCategories']);
     }
 
     /**
@@ -98,6 +108,8 @@ class LocalDoctorService
             $localDoctor->save();
             $this->syncCategories($localDoctor, $validated['category_ids'] ?? []);
         });
+
+        $this->syncCoordinatesIfConfigured($localDoctor);
     }
 
     public function destroy(LocalDoctor $localDoctor): void
@@ -160,7 +172,7 @@ class LocalDoctorService
     {
         $dir = 'local_doctors/photos';
 
-        return $file->store($dir, 'public');
+        return BackofficeFile::storeWithOriginalName($file, $dir, 'public');
     }
 
     protected function deleteStoredPhoto(?string $path): void
@@ -168,5 +180,14 @@ class LocalDoctorService
         if ($path && ! str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
+    }
+
+    protected function syncCoordinatesIfConfigured(LocalDoctor $doctor): void
+    {
+        if (! $this->geocoder->hasApiKey()) {
+            return;
+        }
+
+        $this->geocoder->syncForDoctor($doctor);
     }
 }

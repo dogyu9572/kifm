@@ -54,6 +54,24 @@ document.addEventListener('DOMContentLoaded', () => {
         setActiveTab(activeTabInput.value);
     }
 
+    document.querySelectorAll('.js-academic-session-delete-form').forEach((deleteForm) => {
+        deleteForm.addEventListener('submit', (event) => {
+            if (!window.confirm('정말 이 세션을 삭제하시겠습니까?')) {
+                event.preventDefault();
+            }
+        });
+    });
+    document.querySelectorAll('.js-academic-session-delete-btn').forEach((button) => {
+        button.addEventListener('click', () => {
+            const deleteFormId = button.dataset.deleteFormId || '';
+            const deleteForm = deleteFormId ? document.getElementById(deleteFormId) : null;
+            if (!deleteForm || !window.confirm('정말 이 세션을 삭제하시겠습니까?')) {
+                return;
+            }
+            deleteForm.submit();
+        });
+    });
+
     document.querySelector('[data-remove-existing-target="event_material"]')?.addEventListener('click', () => {
         const del = document.getElementById('delete_event_material');
         if (del) {
@@ -124,6 +142,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const reindexSponsorRows = () => {
+        const tbody = document.getElementById('bo-sponsors-body');
+        if (!tbody) {
+            return;
+        }
+        const rows = tbody.querySelectorAll('tr.bo-sponsor-row');
+        rows.forEach((tr, i) => {
+            tr.querySelectorAll('input[name^="sponsors["], select[name^="sponsors["]').forEach((el) => {
+                const n = el.getAttribute('name');
+                if (n) {
+                    el.setAttribute('name', n.replace(/^sponsors\[\d+\]/, `sponsors[${i}]`));
+                }
+            });
+            tr.querySelectorAll('input[name^="sponsor_logos["]').forEach((el) => {
+                const n = el.getAttribute('name');
+                if (n) {
+                    el.setAttribute('name', n.replace(/^sponsor_logos\[\d+\]/, `sponsor_logos[${i}]`));
+                }
+            });
+            const hiddenSort = tr.querySelector('input[name$="[sort_order]"]');
+            if (hiddenSort) {
+                hiddenSort.value = String(i + 1);
+            }
+        });
+    };
+
+    const reindexSpeakerRows = () => {
+        const tbody = document.getElementById('bo-speakers-body');
+        if (!tbody) {
+            return;
+        }
+        const rows = tbody.querySelectorAll('tr.bo-speaker-row');
+        rows.forEach((tr, i) => {
+            tr.querySelectorAll('input[name^="speakers["], textarea[name^="speakers["], select[name^="speakers["]').forEach((el) => {
+                const n = el.getAttribute('name');
+                if (n) {
+                    el.setAttribute('name', n.replace(/^speakers\[\d+\]/, `speakers[${i}]`));
+                }
+            });
+            tr.querySelectorAll('input[name^="speaker_images["]').forEach((el) => {
+                const n = el.getAttribute('name');
+                if (n) {
+                    el.setAttribute('name', n.replace(/^speaker_images\[\d+\]/, `speaker_images[${i}]`));
+                }
+            });
+            const hiddenSort = tr.querySelector('input[name$="[sort_order]"]');
+            if (hiddenSort) {
+                hiddenSort.value = String(i + 1);
+            }
+        });
+    };
+
     const abstractFieldsBody = document.getElementById('bo-abstract-fields-body');
     if (abstractFieldsBody && typeof Sortable !== 'undefined') {
         new Sortable(abstractFieldsBody, {
@@ -143,6 +213,174 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const mainSlotsBody = document.getElementById('bo-main-slots-body');
+    const mainSlotsTable = document.getElementById('bo-main-slots-table');
+    let mainSponsorOptions = [];
+    if (mainSlotsTable?.dataset.sponsorOptions) {
+        try {
+            mainSponsorOptions = JSON.parse(mainSlotsTable.dataset.sponsorOptions);
+        } catch (e) {
+            mainSponsorOptions = [];
+        }
+    }
+    const ensureMainSlotsEmptyRow = () => {
+        if (!mainSlotsBody) {
+            return;
+        }
+        if (mainSlotsBody.querySelector('tr.bo-repeat-row')) {
+            mainSlotsBody.querySelector('.bo-main-slots-empty-row')?.closest('tr')?.remove();
+            return;
+        }
+        if (!mainSlotsBody.querySelector('.bo-main-slots-empty-row')) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 4;
+            td.className = 'text-center text-muted bo-main-slots-empty-row';
+            td.textContent = '노출 스폰서가 없습니다.';
+            tr.appendChild(td);
+            mainSlotsBody.appendChild(tr);
+        }
+    };
+    const selectedMainSponsorIndexes = () => Array.from(mainSlotsBody?.querySelectorAll('.bo-main-sponsor-select') || [])
+        .map((select) => String(select.value));
+    const refreshMainSponsorOptions = () => {
+        const sponsorRows = Array.from(document.querySelectorAll('#bo-sponsors-body tr.bo-sponsor-row'));
+        mainSponsorOptions = sponsorRows
+            .map((row, index) => {
+                const name = (row.querySelector('.bo-sponsor-name')?.value || '').trim();
+                if (name === '') {
+                    return null;
+                }
+                const levelSelect = row.querySelector('select[name^="sponsors["][name$="[level]"]');
+                const level = levelSelect?.value || 'exhibitors';
+                const levelLabel = levelSelect?.selectedOptions?.[0]?.textContent || level;
+
+                return {
+                    sponsor_index: index,
+                    name,
+                    placement: level,
+                    placement_label: levelLabel,
+                };
+            })
+            .filter(Boolean);
+
+        if (mainSlotsTable) {
+            mainSlotsTable.dataset.sponsorOptions = JSON.stringify(mainSponsorOptions);
+        }
+    };
+    const rebuildMainSponsorSelect = (select, selectedSponsorIndex) => {
+        if (!select) {
+            return;
+        }
+        const selectedValue = selectedSponsorIndex !== undefined ? String(selectedSponsorIndex) : String(select.value || '');
+        select.innerHTML = '';
+        mainSponsorOptions.forEach((option) => {
+            const opt = document.createElement('option');
+            opt.value = String(option.sponsor_index);
+            opt.textContent = option.name;
+            opt.dataset.placement = option.placement;
+            opt.dataset.placementLabel = option.placement_label;
+            if (String(option.sponsor_index) === selectedValue) {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        });
+    };
+    const rebuildAllMainSponsorSelects = () => {
+        refreshMainSponsorOptions();
+        mainSlotsBody?.querySelectorAll('.bo-main-sponsor-select').forEach((select) => {
+            rebuildMainSponsorSelect(select);
+            const row = select.closest('tr');
+            if (row) {
+                syncMainSponsorPlacement(row);
+            }
+        });
+    };
+    const syncMainSponsorPlacement = (tr) => {
+        const select = tr.querySelector('.bo-main-sponsor-select');
+        const option = select?.selectedOptions?.[0];
+        const cell = tr.querySelector('.bo-main-sponsor-placement-cell');
+        const hidden = cell?.querySelector('input[name$="[placement]"]');
+        if (!option || !cell || !hidden) {
+            if (cell && hidden) {
+                hidden.value = '';
+                cell.childNodes.forEach((node) => {
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        node.remove();
+                    }
+                });
+                cell.insertBefore(document.createTextNode('- '), hidden);
+            }
+            return;
+        }
+        const label = option.dataset.placementLabel || '';
+        hidden.value = option.dataset.placement || '';
+        cell.childNodes.forEach((node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                node.remove();
+            }
+        });
+        cell.insertBefore(document.createTextNode(label + ' '), hidden);
+    };
+    const addMainSponsorSlotRow = (selectedSponsorIndex) => {
+        if (!mainSlotsBody) {
+            return;
+        }
+        const i = nextIndex(mainSlotsBody);
+        const tr = document.createElement('tr');
+        tr.className = 'bo-repeat-row';
+
+        const sponsorCell = document.createElement('td');
+        const inactiveInput = document.createElement('input');
+        inactiveInput.type = 'hidden';
+        inactiveInput.name = `main_sponsor_slots[${i}][active]`;
+        inactiveInput.value = '0';
+        const activeInput = document.createElement('input');
+        activeInput.type = 'hidden';
+        activeInput.name = `main_sponsor_slots[${i}][active]`;
+        activeInput.value = '1';
+        const select = document.createElement('select');
+        select.name = `main_sponsor_slots[${i}][sponsor_index]`;
+        select.className = 'board-form-control bo-main-sponsor-select';
+        rebuildMainSponsorSelect(select, selectedSponsorIndex);
+        sponsorCell.appendChild(inactiveInput);
+        sponsorCell.appendChild(activeInput);
+        sponsorCell.appendChild(select);
+
+        const placementCell = document.createElement('td');
+        placementCell.className = 'bo-main-sponsor-placement-cell';
+        const placementInput = document.createElement('input');
+        placementInput.type = 'hidden';
+        placementInput.name = `main_sponsor_slots[${i}][placement]`;
+        placementCell.appendChild(placementInput);
+
+        const sortCell = document.createElement('td');
+        sortCell.className = 'text-center sort-handle-cell';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-grip-vertical sort-handle';
+        icon.title = '드래그하여 순서 변경';
+        const sortInput = document.createElement('input');
+        sortInput.type = 'hidden';
+        sortInput.name = `main_sponsor_slots[${i}][sort_order]`;
+        sortInput.value = String(i + 1);
+        sortCell.appendChild(icon);
+        sortCell.appendChild(sortInput);
+
+        const actionCell = document.createElement('td');
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'btn btn-sm btn-secondary bo-remove-row-btn';
+        removeButton.textContent = '삭제';
+        actionCell.appendChild(removeButton);
+
+        tr.appendChild(sponsorCell);
+        tr.appendChild(placementCell);
+        tr.appendChild(sortCell);
+        tr.appendChild(actionCell);
+        mainSlotsBody.querySelector('.bo-main-slots-empty-row')?.closest('tr')?.remove();
+        mainSlotsBody.appendChild(tr);
+        syncMainSponsorPlacement(tr);
+        reindexMainSponsorSlotRows();
+    };
     if (mainSlotsBody && typeof Sortable !== 'undefined') {
         new Sortable(mainSlotsBody, {
             handle: '.sort-handle',
@@ -159,6 +397,37 @@ document.addEventListener('DOMContentLoaded', () => {
             },
         });
     }
+    document.getElementById('bo-add-main-slot-btn')?.addEventListener('click', () => {
+        refreshMainSponsorOptions();
+        const selectedIndexes = selectedMainSponsorIndexes();
+        const option = mainSponsorOptions.find((item) => !selectedIndexes.includes(String(item.sponsor_index)));
+        if (!option && mainSponsorOptions.length > 0) {
+            window.alert('등록된 스폰서가 모두 추가되어 있습니다.');
+            return;
+        }
+        addMainSponsorSlotRow(option?.sponsor_index ?? '');
+    });
+    mainSlotsBody?.addEventListener('change', (event) => {
+        const select = event.target.closest('.bo-main-sponsor-select');
+        if (!select) {
+            return;
+        }
+        const tr = select.closest('tr');
+        if (tr) {
+            syncMainSponsorPlacement(tr);
+        }
+    });
+    mainSlotsBody?.addEventListener('click', (event) => {
+        if (!event.target.closest('.bo-remove-row-btn')) {
+            return;
+        }
+        setTimeout(() => {
+            reindexMainSponsorSlotRows();
+            ensureMainSlotsEmptyRow();
+        }, 0);
+    });
+    mainSlotsBody?.querySelectorAll('tr.bo-repeat-row').forEach(syncMainSponsorPlacement);
+    ensureMainSlotsEmptyRow();
 
     document.getElementById('bo-add-venue-floor-btn')?.addEventListener('click', () => {
         const tbody = document.getElementById('bo-venue-floors-body');
@@ -201,27 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reindexAbstractFieldRows();
     });
 
-    document.getElementById('bo-add-main-slot-btn')?.addEventListener('click', () => {
-        const tbody = document.getElementById('bo-main-slots-body');
-        const tpl = document.getElementById('bo-template-main-sponsor-slot');
-        if (!tbody || !tpl) {
-            return;
-        }
-        const i = nextIndex(tbody);
-        const tr = tpl.cloneNode(true);
-        tr.removeAttribute('id');
-        tr.classList.remove('bo-template');
-        tr.classList.add('bo-repeat-row');
-        tr.querySelectorAll('input, select').forEach((el) => {
-            const n = el.getAttribute('name');
-            if (n) {
-                el.setAttribute('name', n.replaceAll('__I__', String(i)));
-            }
-        });
-        tbody.appendChild(tr);
-        reindexMainSponsorSlotRows();
-    });
-
     const bindRemove = (root) => {
         root.querySelectorAll('.bo-remove-row-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -236,6 +484,10 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('click', (e) => {
         const t = e.target;
         if (t && t.classList && t.classList.contains('bo-remove-row-btn')) {
+            const tr = t.closest('tr');
+            if (tr && tr.parentNode) {
+                tr.parentNode.removeChild(tr);
+            }
             bindRemove(form);
         }
     });
@@ -340,12 +592,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const hidden = speakerBioRow.querySelector('.bo-speaker-bio');
-        const label = speakerBioRow.querySelector('.bo-speaker-bio-label');
+        const button = speakerBioRow.querySelector('.bo-speaker-bio-btn');
         if (hidden) {
             hidden.value = bioTextarea.value;
         }
-        if (label) {
-            label.textContent = bioTextarea.value.trim() ? '입력됨' : '';
+        if (button) {
+            button.textContent = bioTextarea.value.trim() ? '약력 수정' : '약력 입력';
         }
         hideBsModal(bioModal);
     });
@@ -364,16 +616,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="hidden" name="speakers[${i}][source]" class="bo-speaker-source" value="manual">
                 <input type="hidden" name="speakers[${i}][member_id]" class="bo-speaker-member-id" value="">
                 <input type="hidden" name="speakers[${i}][academic_event_abstract_id]" class="bo-speaker-abstract-id" value="">
+                <input type="hidden" name="speakers[${i}][sort_order]" value="${i + 1}">
+                <input type="hidden" name="speakers[${i}][image_path]" value="">
                 <input type="text" name="speakers[${i}][name]" class="board-form-control bo-speaker-name" value="">
             </td>
             <td><input type="text" name="speakers[${i}][affiliation]" class="board-form-control bo-speaker-affiliation" value=""></td>
             <td><input type="text" name="speakers[${i}][position]" class="board-form-control bo-speaker-position" value=""></td>
-            <td><input type="file" name="speaker_images[]" class="board-form-control" accept="image/*"></td>
+            <td><input type="file" name="speaker_images[${i}]" class="board-form-control" accept="image/*"></td>
             <td><input type="text" name="speakers[${i}][abstract_title]" class="board-form-control" value=""></td>
             <td>
                 <input type="hidden" name="speakers[${i}][bio]" class="bo-speaker-bio" value="">
                 <button type="button" class="btn btn-sm btn-outline-primary bo-speaker-bio-btn">약력 입력</button>
-                <span class="bo-speaker-bio-label board-form-help"></span>
             </td>
             <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>`;
         tr.querySelector('.bo-speaker-source').value = p.source || 'manual';
@@ -385,9 +638,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.querySelector('input[name$="[abstract_title]"]').value = p.abstract_title || '';
         tr.querySelector('.bo-speaker-bio').value = p.bio || '';
         if (p.bio && p.bio.trim()) {
-            tr.querySelector('.bo-speaker-bio-label').textContent = '입력됨';
+            tr.querySelector('.bo-speaker-bio-btn').textContent = '약력 수정';
         }
         tbody.appendChild(tr);
+        reindexSpeakerRows();
     };
 
     document.getElementById('bo-speaker-add-manual-btn')?.addEventListener('click', () => addSpeakerRow({ source: 'manual' }));
@@ -646,7 +900,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addSponsorRow = (preset) => {
         const tbody = document.getElementById('bo-sponsors-body');
         if (!tbody) {
-            return;
+            return null;
         }
         const p = preset || {};
         const filterEl = document.getElementById('bo-sponsor-level-filter');
@@ -658,6 +912,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tr.innerHTML = `
             <td>
                 <input type="hidden" name="sponsors[${i}][academic_sponsor_master_id]" class="bo-sponsor-master-id" value="">
+                <input type="hidden" name="sponsors[${i}][sort_order]" value="${i + 1}">
+                <input type="hidden" name="sponsors[${i}][logo_path]" value="">
                 <input type="text" name="sponsors[${i}][name]" class="board-form-control bo-sponsor-name" value="">
             </td>
             <td>
@@ -666,7 +922,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <option value="silver">Silver</option><option value="exhibitors" selected>Exhibitors</option>
                 </select>
             </td>
-            <td><input type="file" name="sponsor_logos[]" class="board-form-control" accept="image/*"></td>
+            <td><input type="file" name="sponsor_logos[${i}]" class="board-form-control" accept="image/*"></td>
             <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>`;
         tr.querySelector('.bo-sponsor-master-id').value = p.master_id || '';
         tr.querySelector('.bo-sponsor-name').value = p.name || '';
@@ -675,7 +931,11 @@ document.addEventListener('DOMContentLoaded', () => {
             levelSelect.value = p.level || defaultLevel;
         }
         tbody.appendChild(tr);
+        reindexSponsorRows();
         applySponsorLevelFilter();
+        rebuildAllMainSponsorSelects();
+
+        return tr;
     };
 
     const applySponsorLevelFilter = () => {
@@ -741,7 +1001,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         applySponsorLevelFilter();
+        rebuildAllMainSponsorSelects();
     });
+    document.getElementById('bo-sponsors-body')?.addEventListener('click', (e) => {
+        if (!e.target.closest('.bo-remove-row-btn')) {
+            return;
+        }
+        setTimeout(() => {
+            reindexSponsorRows();
+            applySponsorLevelFilter();
+        }, 0);
+    });
+    document.getElementById('bo-speakers-body')?.addEventListener('click', (e) => {
+        if (!e.target.closest('.bo-remove-row-btn')) {
+            return;
+        }
+        setTimeout(() => {
+            reindexSpeakerRows();
+        }, 0);
+    });
+    form.addEventListener('submit', () => {
+        reindexSpeakerRows();
+        reindexSponsorRows();
+    });
+    reindexSpeakerRows();
+    reindexSponsorRows();
     applySponsorLevelFilter();
 
     if (typeof window.initBoardImageFilePreview === 'function') {

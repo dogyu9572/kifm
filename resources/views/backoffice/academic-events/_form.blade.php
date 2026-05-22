@@ -16,6 +16,7 @@
             'abstract_title' => $s->abstract_title,
             'bio' => $s->bio,
             'image_path' => $s->image_path,
+            'sort_order' => $s->sort_order,
         ])->toArray() ?? [];
     }
     if ($speakerRowsForForm === []) {
@@ -28,27 +29,67 @@
             'name' => $s->name,
             'level' => $s->level,
             'logo_path' => $s->logo_path,
+            'sort_order' => $s->sort_order,
         ])->toArray() ?? [];
     }
     if ($sponsorRowsForForm === []) {
         $sponsorRowsForForm = [['name' => '', 'level' => 'exhibitors']];
     }
-    $mainSlotsForForm = old('main_sponsor_slots', null);
-    if ($mainSlotsForForm === null && $e->exists && $e->relationLoaded('mainSponsorSlots') && $e->mainSponsorSlots?->isNotEmpty()) {
+    $mainSponsorOptionsForForm = [];
+    foreach ($sponsorRowsForForm as $si => $sponsorRow) {
+        $sponsorName = trim((string) ($sponsorRow['name'] ?? ''));
+        if ($sponsorName === '') {
+            continue;
+        }
+        $placement = (string) ($sponsorRow['level'] ?? 'exhibitors');
+        $mainSponsorOptionsForForm[] = [
+            'sponsor_index' => (int) $si,
+            'name' => $sponsorName,
+            'placement' => $placement,
+            'placement_label' => $sponsorLevelLabels[$placement] ?? $placement,
+        ];
+    }
+    $mainSponsorOptionByIndex = collect($mainSponsorOptionsForForm)->keyBy('sponsor_index');
+    $submittedMainSlots = old('main_sponsor_slots', null);
+    $mainSlotsForForm = [];
+    if (is_array($submittedMainSlots)) {
+        foreach ($submittedMainSlots as $slot) {
+            $sponsorIndex = isset($slot['sponsor_index']) ? (int) $slot['sponsor_index'] : null;
+            $option = $sponsorIndex !== null ? $mainSponsorOptionByIndex->get($sponsorIndex) : null;
+            if (! $option) {
+                continue;
+            }
+            $mainSlotsForForm[] = [
+                'sponsor_index' => (int) $option['sponsor_index'],
+                'name' => $option['name'],
+                'placement' => $option['placement'],
+                'placement_label' => $option['placement_label'],
+                'active' => (string) ($slot['active'] ?? '0'),
+                'sort_order' => (int) ($slot['sort_order'] ?? ($sponsorIndex + 1)),
+            ];
+        }
+    } elseif ($e->exists && $e->relationLoaded('mainSponsorSlots') && $e->mainSponsorSlots?->isNotEmpty()) {
         $idxBySponsorId = [];
         foreach ($e->sponsors ?? [] as $idx => $sp) {
             $idxBySponsorId[$sp->id] = $idx;
         }
-        $mainSlotsForForm = $e->mainSponsorSlots->map(function ($slot) use ($idxBySponsorId) {
-            return [
-                'placement' => $slot->placement,
-                'sponsor_index' => $idxBySponsorId[$slot->academic_event_sponsor_id] ?? 0,
+        foreach ($e->mainSponsorSlots as $slot) {
+            $sponsorIndex = $idxBySponsorId[$slot->academic_event_sponsor_id] ?? null;
+            $option = $sponsorIndex !== null ? $mainSponsorOptionByIndex->get($sponsorIndex) : null;
+            if (! $option) {
+                continue;
+            }
+            $mainSlotsForForm[] = [
+                'sponsor_index' => (int) $option['sponsor_index'],
+                'name' => $option['name'],
+                'placement' => $option['placement'],
+                'placement_label' => $option['placement_label'],
                 'sort_order' => (int) $slot->sort_order,
                 'active' => '1',
             ];
-        })->toArray();
+        }
     }
-    $mainSlotsForForm = is_array($mainSlotsForForm) ? $mainSlotsForForm : [];
+    usort($mainSlotsForForm, fn ($a, $b) => ((int) $a['sort_order'] <=> (int) $b['sort_order']) ?: ((int) $a['sponsor_index'] <=> (int) $b['sponsor_index']));
     $sessionCategoryLabels = [
         'oral' => '구연 발표',
         'poster' => '포스터 발표',
@@ -119,6 +160,18 @@
         <label class="board-form-label">행사명 <span class="required">*</span></label>
         <input type="text" name="title" class="board-form-control @error('title') is-invalid @enderror" value="{{ old('title', $e->title) }}" required>
         @error('title')<span class="bo-inline-error">{{ $message }}</span>@enderror
+    </div>
+    <div class="bo-edu-form-row">
+        <div class="board-form-group mb-0">
+            <label class="board-form-label">타이틀 1</label>
+            <input type="text" name="main_title_1" class="board-form-control @error('main_title_1') is-invalid @enderror" value="{{ old('main_title_1', $e->main_title_1) }}" maxlength="255">
+            @error('main_title_1')<span class="bo-inline-error">{{ $message }}</span>@enderror
+        </div>
+        <div class="board-form-group mb-0">
+            <label class="board-form-label">타이틀 2</label>
+            <input type="text" name="main_title_2" class="board-form-control @error('main_title_2') is-invalid @enderror" value="{{ old('main_title_2', $e->main_title_2) }}" maxlength="255">
+            @error('main_title_2')<span class="bo-inline-error">{{ $message }}</span>@enderror
+        </div>
     </div>
     <div class="board-form-group">
         <label class="board-form-label">행사 자료 설명</label>
@@ -374,15 +427,14 @@
     <div class="bo-form-section mt-5">
         <h3 class="bo-section-title">메인 페이지 노출 스폰서</h3>
     </div>
-    <p class="board-form-help">홈페이지 메인에 노출할 스폰서와 노출 순서를 설정합니다. 스폰서는 「스폰서」 탭에서 먼저 등록한 뒤, 여기서 노출 대상·배치·순서를 지정하세요.</p>
+    <p class="board-form-help">홈페이지 메인에 노출할 스폰서를 「스폰서」 탭에 등록된 항목 중에서 선택하고 노출 순서를 설정합니다.</p>
     <div class="d-flex justify-content-end mb-2">
         <button type="button" class="btn btn-sm btn-outline-secondary" id="bo-add-main-slot-btn">스폰서 추가</button>
     </div>
     <div class="board-form-group">
-        <table class="board-table sortable-table" id="bo-main-slots-table">
+        <table class="board-table sortable-table" id="bo-main-slots-table" data-sponsor-options="{{ e(json_encode($mainSponsorOptionsForForm, JSON_UNESCAPED_UNICODE)) }}">
             <thead>
                 <tr>
-                    <th class="text-center">노출</th>
                     <th>스폰서</th>
                     <th>배치</th>
                     <th class="text-center">순서</th>
@@ -390,37 +442,32 @@
                 </tr>
             </thead>
             <tbody id="bo-main-slots-body">
-                @foreach ($mainSlotsForForm as $mi => $row)
+                @forelse ($mainSlotsForForm as $mi => $row)
                     <tr class="bo-repeat-row">
-                        <td class="text-center">
+                        <td>
                             <input type="hidden" name="main_sponsor_slots[{{ $mi }}][active]" value="0">
-                            <input type="checkbox" name="main_sponsor_slots[{{ $mi }}][active]" value="1" class="bo-row-checkbox" @checked((string) old('main_sponsor_slots.' . $mi . '.active', $row['active'] ?? '1') === '1')>
-                        </td>
-                        <td>
-                            <select name="main_sponsor_slots[{{ $mi }}][sponsor_index]" class="board-form-control">
-                                @foreach ($sponsorRowsForForm as $si => $srow)
-                                    @php
-                                        $sname = trim((string) ($srow['name'] ?? ''));
-                                        $slabel = $sname !== '' ? $sname : '스폰서 행 ' . ((int) $si + 1);
-                                    @endphp
-                                    <option value="{{ $si }}" @selected((int) ($row['sponsor_index'] ?? 0) === (int) $si)>{{ $slabel }}</option>
+                            <input type="hidden" name="main_sponsor_slots[{{ $mi }}][active]" value="1">
+                            <select name="main_sponsor_slots[{{ $mi }}][sponsor_index]" class="board-form-control bo-main-sponsor-select">
+                                @foreach ($mainSponsorOptionsForForm as $option)
+                                    <option value="{{ $option['sponsor_index'] }}" data-placement="{{ $option['placement'] }}" data-placement-label="{{ $option['placement_label'] }}" @selected((int) ($row['sponsor_index'] ?? 0) === (int) $option['sponsor_index'])>{{ $option['name'] }}</option>
                                 @endforeach
                             </select>
                         </td>
-                        <td>
-                            <select name="main_sponsor_slots[{{ $mi }}][placement]" class="board-form-control">
-                                @foreach ($mainPlacementLabels as $code => $label)
-                                    <option value="{{ $code }}" @selected(($row['placement'] ?? '') === $code)>{{ $label }}</option>
-                                @endforeach
-                            </select>
+                        <td class="bo-main-sponsor-placement-cell">
+                            {{ $row['placement_label'] }}
+                            <input type="hidden" name="main_sponsor_slots[{{ $mi }}][placement]" value="{{ $row['placement'] }}">
                         </td>
                         <td class="text-center sort-handle-cell">
                             <i class="fas fa-grip-vertical sort-handle" title="드래그하여 순서 변경"></i>
-                            <input type="hidden" name="main_sponsor_slots[{{ $mi }}][sort_order]" value="{{ (int) old('main_sponsor_slots.' . $mi . '.sort_order', $row['sort_order'] ?? ((int) $mi + 1)) }}">
+                            <input type="hidden" name="main_sponsor_slots[{{ $mi }}][sort_order]" value="{{ (int) ($row['sort_order'] ?? ((int) $mi + 1)) }}">
                         </td>
                         <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="4" class="text-center text-muted bo-main-slots-empty-row">노출 스폰서가 없습니다.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -617,21 +664,22 @@
                         <input type="hidden" name="speakers[{{ $si }}][source]" class="bo-speaker-source" value="{{ $row['source'] ?? 'manual' }}">
                         <input type="hidden" name="speakers[{{ $si }}][member_id]" class="bo-speaker-member-id" value="{{ $row['member_id'] ?? '' }}">
                         <input type="hidden" name="speakers[{{ $si }}][academic_event_abstract_id]" class="bo-speaker-abstract-id" value="{{ $row['academic_event_abstract_id'] ?? '' }}">
+                        <input type="hidden" name="speakers[{{ $si }}][sort_order]" value="{{ (int) ($row['sort_order'] ?? ((int) $si + 1)) }}">
+                        <input type="hidden" name="speakers[{{ $si }}][image_path]" value="{{ $row['image_path'] ?? '' }}">
                         <input type="text" name="speakers[{{ $si }}][name]" class="board-form-control bo-speaker-name" value="{{ $row['name'] ?? '' }}">
                     </td>
                     <td><input type="text" name="speakers[{{ $si }}][affiliation]" class="board-form-control bo-speaker-affiliation" value="{{ $row['affiliation'] ?? '' }}"></td>
                     <td><input type="text" name="speakers[{{ $si }}][position]" class="board-form-control bo-speaker-position" value="{{ $row['position'] ?? '' }}"></td>
                     <td>
-                        <input type="file" name="speaker_images[]" class="board-form-control" accept="image/*">
+                        <input type="file" name="speaker_images[{{ $si }}]" class="board-form-control" accept="image/*">
                         @if (! empty($row['image_path']))
-                            <span class="board-form-help">등록됨</span>
+                            <span class="board-form-help">{{ basename($row['image_path']) }}</span>
                         @endif
                     </td>
                     <td><input type="text" name="speakers[{{ $si }}][abstract_title]" class="board-form-control" value="{{ $row['abstract_title'] ?? '' }}"></td>
                     <td>
                         <input type="hidden" name="speakers[{{ $si }}][bio]" class="bo-speaker-bio" value="{{ $row['bio'] ?? '' }}">
-                        <button type="button" class="btn btn-sm btn-outline-primary bo-speaker-bio-btn">약력 입력</button>
-                        <span class="bo-speaker-bio-label board-form-help">{{ ! empty($row['bio']) ? '입력됨' : '' }}</span>
+                        <button type="button" class="btn btn-sm btn-outline-primary bo-speaker-bio-btn">{{ ! empty($row['bio']) ? '약력 수정' : '약력 입력' }}</button>
                     </td>
                     <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
                 </tr>
@@ -668,6 +716,8 @@
                 <tr class="bo-repeat-row bo-sponsor-row">
                     <td>
                         <input type="hidden" name="sponsors[{{ $si }}][academic_sponsor_master_id]" class="bo-sponsor-master-id" value="{{ $row['academic_sponsor_master_id'] ?? '' }}">
+                        <input type="hidden" name="sponsors[{{ $si }}][sort_order]" value="{{ (int) ($row['sort_order'] ?? ((int) $si + 1)) }}">
+                        <input type="hidden" name="sponsors[{{ $si }}][logo_path]" value="{{ $row['logo_path'] ?? '' }}">
                         <input type="text" name="sponsors[{{ $si }}][name]" class="board-form-control bo-sponsor-name" value="{{ $row['name'] ?? '' }}">
                     </td>
                     <td>
@@ -678,9 +728,9 @@
                         </select>
                     </td>
                     <td>
-                        <input type="file" name="sponsor_logos[]" class="board-form-control" accept="image/*">
+                        <input type="file" name="sponsor_logos[{{ $si }}]" class="board-form-control" accept="image/*">
                         @if (! empty($row['logo_path']))
-                            <span class="board-form-help">등록됨</span>
+                            <span class="board-form-help">{{ basename($row['logo_path']) }}</span>
                         @endif
                     </td>
                     <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
@@ -718,11 +768,7 @@
                         <td>{{ substr((string) $sess->start_time, 0, 5) }}~{{ substr((string) $sess->end_time, 0, 5) }}</td>
                         <td>
                             <a href="{{ route('backoffice.academic-events.sessions.edit', [$e, $sess]) }}" class="btn btn-sm btn-primary">수정</a>
-                            <form action="{{ route('backoffice.academic-events.sessions.destroy', [$e, $sess]) }}" method="POST" class="d-inline js-delete-confirm-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">삭제</button>
-                            </form>
+                            <button type="button" class="btn btn-sm btn-danger js-academic-session-delete-btn" data-delete-form-id="bo-session-delete-form-{{ $sess->id }}">삭제</button>
                         </td>
                     </tr>
                 @empty
@@ -753,35 +799,6 @@
             <td class="text-center">
                 <button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button>
             </td>
-        </tr>
-        <tr id="bo-template-main-sponsor-slot" class="bo-template">
-            <td class="text-center">
-                <input type="hidden" name="main_sponsor_slots[__I__][active]" value="0">
-                <input type="checkbox" name="main_sponsor_slots[__I__][active]" value="1" class="bo-row-checkbox" checked>
-            </td>
-            <td>
-                <select name="main_sponsor_slots[__I__][sponsor_index]" class="board-form-control">
-                    @foreach ($sponsorRowsForForm as $si => $srow)
-                        @php
-                            $sname = trim((string) ($srow['name'] ?? ''));
-                            $slabel = $sname !== '' ? $sname : '스폰서 행 ' . ((int) $si + 1);
-                        @endphp
-                        <option value="{{ $si }}">{{ $slabel }}</option>
-                    @endforeach
-                </select>
-            </td>
-            <td>
-                <select name="main_sponsor_slots[__I__][placement]" class="board-form-control">
-                    @foreach ($mainPlacementLabels as $code => $label)
-                        <option value="{{ $code }}">{{ $label }}</option>
-                    @endforeach
-                </select>
-            </td>
-            <td class="text-center sort-handle-cell">
-                <i class="fas fa-grip-vertical sort-handle" title="드래그하여 순서 변경"></i>
-                <input type="hidden" name="main_sponsor_slots[__I__][sort_order]" value="">
-            </td>
-            <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
         </tr>
     </tbody>
 </table>

@@ -57,7 +57,7 @@
                                 <div class="board-attachment-list">
                                     <div class="board-attachment-item">
                                         <i class="fas fa-image"></i>
-                                        <span class="board-attachment-name">{{ basename($post->thumbnail) }}</span>
+                                        <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($post->thumbnail) }}</span>
                                         <input type="hidden" name="existing_thumbnail" value="{{ $post->thumbnail }}">
                                     </div>
                                 </div>

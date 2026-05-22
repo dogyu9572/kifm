@@ -6,6 +6,7 @@ use App\Models\MemberBookmark;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class MypageBookmarkService
 {
@@ -25,6 +26,26 @@ class MypageBookmarkService
         }
 
         return $query->paginate(20)->withQueryString();
+    }
+
+    /** @return Collection<int, string> */
+    public function contentTypes(User $user): Collection
+    {
+        return MemberBookmark::query()
+            ->where('user_id', $user->id)
+            ->whereNotNull('content_type')
+            ->distinct()
+            ->orderBy('content_type')
+            ->pluck('content_type');
+    }
+
+    public function isBookmarked(User $user, string $contentType, int $contentId): bool
+    {
+        return MemberBookmark::query()
+            ->where('user_id', $user->id)
+            ->where('content_type', $contentType)
+            ->where('content_id', $contentId)
+            ->exists();
     }
 
     public function toggle(User $user, string $contentType, int $contentId, ?string $title, ?string $menuLabel, ?string $url): bool

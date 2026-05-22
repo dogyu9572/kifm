@@ -15,7 +15,7 @@
 			Cardiometabolic health and Detoxification <br class="pc_vw" aria-hidden="true">
 			기능의학 입문자를 위한 심화 학습코스 II - 면역, 심혈관-대사, 해독 모듈
 		</p>
-		<button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+		<x-frontend.bookmark-button content-type="academic_event_conference_static" content-id="1" title="2026년 2월 8일 심화 연수강좌" :menu-label="$sName" :url="route('academic_event.conference_view')" label="이 행사를 북마크에 추가" />
 	</div>
 </section>
 
@@ -135,7 +135,7 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/script_bookmark.js') }}"></script>
+<script src="{{ asset('js/frontend/script_bookmark.js') }}"></script>
 <script>
 // 탭
 	const $tabButtons = $('.tabs [role="tab"]');
