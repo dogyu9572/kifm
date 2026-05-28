@@ -1,6 +1,6 @@
 <svg width="664" height="538" viewBox="0 0 664 538" fill="none" xmlns="http://www.w3.org/2000/svg" class="map_svg map_svg06">
 
-<!-- 지도 -->
+<!-- 충남 지도 -->
 <g class="map">
 	<!-- 금산군 -->
 	<g class="map15">

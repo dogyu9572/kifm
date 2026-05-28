@@ -277,6 +277,8 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.edu-course-enrollments.bulk-destroy');
     Route::get('edu-course-enrollments/export', [EduCourseEnrollmentController::class, 'export'])
         ->name('backoffice.edu-course-enrollments.export');
+    Route::get('edu-course-enrollments/{edu_course_enrollment}/certificate', [EduCourseEnrollmentController::class, 'certificate'])
+        ->name('backoffice.edu-course-enrollments.certificate');
     Route::resource('edu-course-enrollments', EduCourseEnrollmentController::class, [
         'names' => 'backoffice.edu-course-enrollments',
         'parameters' => ['edu-course-enrollments' => 'edu_course_enrollment'],
@@ -351,6 +353,10 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
         ->name('backoffice.academic-event-registrations.search-members');
     Route::get('academic-event-registrations/search-payment-plans', [AcademicEventRegistrationController::class, 'searchPaymentPlans'])
         ->name('backoffice.academic-event-registrations.search-payment-plans');
+    Route::get('academic-event-registrations/{academic_event_registration}/print-receipt', [AcademicEventRegistrationController::class, 'printReceipt'])
+        ->name('backoffice.academic-event-registrations.print-receipt');
+    Route::get('academic-event-registrations/{academic_event_registration}/print-participation', [AcademicEventRegistrationController::class, 'printParticipation'])
+        ->name('backoffice.academic-event-registrations.print-participation');
     Route::resource('academic-event-registrations', AcademicEventRegistrationController::class, [
         'names' => 'backoffice.academic-event-registrations',
         'parameters' => ['academic-event-registrations' => 'academic_event_registration'],
@@ -459,12 +465,12 @@ Route::prefix('backoffice')->middleware(['backoffice'])->group(function () {
     Route::get('members/export', [MemberController::class, 'export'])->name('backoffice.members.export');
     Route::resource('member-executives', MemberExecutiveController::class, [
         'names' => 'backoffice.member-executives',
-    ])->only(['index', 'create', 'store', 'edit', 'update']);
+    ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::get('member-executives/search-members', [MemberExecutiveController::class, 'searchMembers'])
         ->name('backoffice.member-executives.search-members');
     Route::resource('certified-members', CertifiedMemberController::class, [
         'names' => 'backoffice.certified-members',
-    ])->only(['index', 'create', 'store', 'edit', 'update']);
+    ])->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     Route::get('certified-members/search-members', [CertifiedMemberController::class, 'searchMembers'])
         ->name('backoffice.certified-members.search-members');
     Route::get('community-committee-applicants', [CommunityCommitteeController::class, 'applicants'])

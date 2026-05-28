@@ -1,6 +1,6 @@
 <svg width="664" height="589" viewBox="0 0 664 589" fill="none" xmlns="http://www.w3.org/2000/svg" class="map_svg map_svg04">
 
-<!-- 지도 -->
+<!-- 강원 지도 -->
 <g class="map">
 	<!-- 태백시 -->
 	<g class="map18">

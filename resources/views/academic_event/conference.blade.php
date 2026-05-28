@@ -14,15 +14,13 @@
 			<div class="academic_event_head">
 				<div class="imgfit" aria-hidden="true"><img src="{{ $publicAcademicEvent->imageUrl($featuredConference->pc_banner_path) }}" alt=""></div>
 				<div class="txt">
-					<a href="{{ $publicAcademicEvent->eventUrl($featuredConference) }}">
-						<p class="eng_title c_iden">{{ $publicAcademicEvent->headlineText($featuredConference) }}</p>
-						<h2>{{ $featuredConference->title }}</h2>
-						<ul class="info_list">
-							<li class="i1"><strong>일시</strong>{{ $publicAcademicEvent->eventDateText($featuredConference) }}</li>
-							<li class="i2"><strong>사전등록</strong>{{ $publicAcademicEvent->preRegistrationText($featuredConference) }}</li>
-							<li class="i3"><strong>장소</strong>{{ $featuredConference->venue ?: '-' }}</li>
-						</ul>
-					</a>
+					<p class="eng_title c_iden">{{ $publicAcademicEvent->headlineText($featuredConference) }}</p>
+					<h2>{{ $featuredConference->title }}</h2>
+					<ul class="info_list">
+						<li class="i1"><strong>일시</strong>{{ $publicAcademicEvent->eventDateText($featuredConference) }}</li>
+						<li class="i2"><strong>사전등록</strong>{{ $publicAcademicEvent->preRegistrationText($featuredConference) }}</li>
+						<li class="i3"><strong>장소</strong>{{ $featuredConference->venue ?: '-' }}</li>
+					</ul>
 					<div class="btns">
 						<a href="{{ $publicAcademicEvent->eventUrl($featuredConference) }}" target="_blank" title="새창 열림" class="btn btn_wkk btn_outlink">홈페이지 바로가기</a>
 						<a href="{{ $publicAcademicEvent->registrationUrl($featuredConference) }}" target="_blank" title="새창 열림" class="btn btn_wrr btn_outlink">사전등록 바로가기</a>
@@ -72,9 +70,11 @@
 			<ul class="list">
 				@forelse ($conferences as $conference)
 					@php $status = $publicAcademicEvent->status($conference); @endphp
-					<li>
+					<li class="{{ $status['class'] }}">
 						<a href="{{ $publicAcademicEvent->eventUrl($conference) }}">
-							<span class="state {{ $status['class'] }}"><span class="sound_only">상태:</span>{{ $status['label'] }}</span>
+							<span class="states_area flex">
+								<span class="state {{ $status['class'] }}"><span class="sound_only">상태:</span>{{ $status['label'] }}</span>
+							</span>
 							<h4>{{ $conference->title }}</h4>
 							<p class="summary">{{ $publicAcademicEvent->headlineText($conference) }}</p>
 							<ul class="details">

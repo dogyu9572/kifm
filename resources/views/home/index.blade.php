@@ -34,7 +34,7 @@
 		</div>
 		<div class="right">
 			<!-- 로그인 전 -->
-			<div class="log_area before">
+			<!-- <div class="log_area before">
 				<h2><strong>로그인 후</strong> 맞춤정보를 확인해보세요</h2>
 				<div class="inputs">
 					<input type="text" class="text w100p" placeholder="아이디">
@@ -46,9 +46,9 @@
 						<li><a href="/auth/register">회원가입</a></li>
 					</ul>
 				</div>
-			</div>
+			</div> -->
 			<!-- 로그인 후-->
-			<!-- <div class="log_area after">
+			<div class="log_area after">
 				<ul class="member_type">
 					<li class="t1">정회원</li>
 					<li class="t2">고문</li>
@@ -58,22 +58,69 @@
 					<h2>안녕하세요, 홍길동 선생님!</h2>
 					<a href="#this" class="more"></a>
 				</div>
+				<!-- 로그인 후(기본))-->
 				<div class="member_info">
 					<div class="tit">
 						<strong>인증의 자격 정보</strong>
 						<div class="date">2026.03.01 ~ 2027.03.01</div>
 					</div>
+					<dl class="flex flex_between">
+						<dt>참석 현황</dt>
+						<dd><strong class="c_iden">1</strong>/3회</dd>
+					</dl>
 					<div class="state_line"><div class="bar"></div></div>
-					<div class="info">
-						<div class="l">참석 현황 <strong class="c_iden">1</strong>/3회</div>
+					<div class="info flex_end">
 						<div class="r"><p class="excl">2회 부족</p></div>
 					</div>
 				</div>
+				<!-- 로그인 후(인증의 미습득))-->
+				<!-- <div class="member_info">
+					<div class="tit">
+						<strong>인증의 취득 요건 현황</strong>
+						<p>인증의 취득을 위해 아래 조건을 충족해주세요</p>
+					</div>
+					<div class="slice_half">
+						<div class="box">
+							<div class="tt">정기 연수강좌(2회)</div>
+							<div class="flex">
+								<a href="#this" class="btn btn_wbb">짝수년</a>
+								<a href="#this" class="btn btn_ggg">홀수년</a>
+							</div>
+						</div>
+						<div class="box">
+							<div class="tt">동계 연수강좌(1회)</div>
+							<a href="#this" class="btn btn_wrr w100p">미수료</a>
+						</div>
+					</div>
+				</div> -->
+				<!-- 로그인 후(인증의 습득))-->
+				<!-- <div class="member_info">
+					<div class="tit">
+						<div class="flex">
+							<strong>자격 유효기간</strong>
+							<div class="date">2026.04 - 2031.03</div>
+							<div class="d_day btn_wbb">D-1240</div>
+						</div>
+						<p>갱신을 위해 아래 조건을 충족해주세요</p>
+					</div>
+					<div class="slice_half ptb6">
+						<div class="box">
+							<div class="tt mb0">학술 행사 참여</div>
+							<div class="state_line blue_line"><div class="bar"></div></div>
+							<div class="count"><strong class="c_iden">2</strong>/4회</div>
+						</div>
+						<div class="box">
+							<div class="tt mb0">동계 연수강좌</div>
+							<div class="state_line red_line"><div class="bar"></div></div>
+							<div class="count"><strong class="c_iden">1</strong>/3차시</div>
+						</div>
+					</div>
+				</div> -->
 				<div class="btns">
 					<a href="/mypage/profile_edit" class="btn btn_wbb">마이페이지</a>
 					<a href="/mypage/online_training" class="btn btn_wkk">강의실 입장</a>
 				</div>
-			</div> -->
+			</div>
 			<ul class="page_links">
 				<li class="i1"><a href="#this">회원가입 안내</a></li>
 				<li class="i2"><a href="/academic_event/conference">학술대회</a></li>
@@ -209,6 +256,38 @@
 		</div>
 	</div>
 </section>
+
+<!-- 달력 클릭시 팝업 -->
+<div class="popup calendar_event_popup">
+	<div class="dm"></div>
+	<div class="inbox">
+		<div class="event_tit">2026년 4월 27일(월요일)</div>
+		<ul class="schedule_list scroll auto">
+			<li><strong>KIFM 춘계학술대회 및 정기 총회</strong><div class="timebox"><span><time datetime="09:00">09:00</time> - <time datetime="18:00">18:00</time></span><span>서울 코엑스 D홀</span></div></li>
+			<li><strong>제 2차 기능의학 인증의 실무 교육</strong><div class="timebox"><span><time datetime="18:30">18:30</time> - <time datetime="20:30">20:30</time></span><span>코엑스 세미나실 203호</span></div></li>
+		</ul>
+		<div class="btns_btm">
+			<button type="button" class="btn btn_wkk btn_close_btm">닫기</button>
+		</div>
+	</div>
+</div>
+
+<!-- 로그인시 팝업 - 위원회 미가입 -->
+@if(auth()->user()?->role === 'user')
+<div class="popup popup_login_start" data-target="popup_login_start" style="display:block;">
+	<div class="dm"></div>
+	<div class="inbox">
+		<div class="tit_center">회원님의 더 깊이 있는 연구와 교류를 응원합니다</div>
+		<div class="gbox tac">대한기능의학회의 학술적 발전을 위해 산하 위원회 활동을 권장해 드립니다.<br/>지금 바로 회원님께 꼭 맞는 위원회를 확인해 보세요.</div>
+		<div class="flex_center">
+			<a href="/subcommittee" class="btn btn_sanha_link">산하위원회 가기</a>
+		</div>
+		<div class="btns_btm mt0">
+			<button type="button" class="btn btn_wkk btn_close_btm">닫기</button>
+		</div>
+	</div>
+</div>
+@endif
 	
 </main>
 
@@ -301,7 +380,7 @@ $(document).ready(function () {
     });
 // 학술대회 일정
     const scheduleSwiper = new Swiper('.schedule_slide', {
-        slice: true,
+        loop: true,
 		spaceBetween: 8,
         slidesPerView: 2, 
         breakpoints: {
@@ -345,7 +424,7 @@ $(document).ready(function () {
 			const isToday = viewYear === realToday.getFullYear() && viewMonth === realToday.getMonth() && d === realToday.getDate() && condition === 'this';
 			const hasEvent = condition === 'this' && eventDates.includes(dateStr) ? 'event' : '';
 			if (i % 7 === 0) html += '<tr>';
-			html += `<td class="${condition} ${isToday ? 'today' : ''} ${hasEvent}"><button type="button"><span>${d}</span></button></td>`;
+			html += `<td class="${condition} ${isToday ? 'today' : ''} ${hasEvent}" data-date="${dateStr}"><button type="button"><span>${d}</span></button></td>`;
 			if (i % 7 === 6) html += '</tr>';
 		});
 		$('.month tbody').html(html);
@@ -358,19 +437,66 @@ $(document).ready(function () {
 		if (targetTd.hasClass('disabled')) return;
 		$('.month tbody td').removeClass('click');
 		targetTd.addClass('click');
+		if (targetTd.hasClass('event')) {
+			const selectedDateStr = targetTd.attr('data-date');
+			const dayNames = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+			const clickDate = new Date(selectedDateStr);
+			const year = clickDate.getFullYear();
+			const month = clickDate.getMonth() + 1;
+			const day = clickDate.getDate();
+			const dayName = dayNames[clickDate.getDay()];
+			$('.calendar_event_popup .tit').text(`${year}년 ${month}월 ${day}일(${dayName})`);
+			$('.calendar_event_popup').fadeIn(200);
+		}
+	});
+	$(document).on('click', '.calendar_event_popup .btn_close_btm, .calendar_event_popup .dm', function() {
+		$('.calendar_event_popup').fadeOut(200);
 	});
 	$('.month li').first().addClass('on');
 // 로그인 후 인증의 참석 현황 게이지바
 	$('.member_info').each(function() {
-        const text = $(this).find('.info .l').text();
-        const matches = text.match(/\d+/g);
+		const $flexBetween = $(this).find('.flex_between dd');
+		if ($flexBetween.length > 0) {
+			const text = $flexBetween.text();
+			const matches = text.match(/\d+/g);
 
-        if (matches && matches.length >= 2) {
-            const current = parseInt(matches[0]);
-            const total = parseInt(matches[1]);
-            const percentage = (current / total) * 100;
+			if (matches && matches.length >= 2) {
+				const current = parseInt(matches[0]);
+				const total = parseInt(matches[1]);
+				const percentage = (current / total) * 100;
 
-            $(this).find('.state_line .bar').css('width', percentage + '%');
+				$(this).find('.state_line .bar').css('width', percentage + '%');
+			}
+		}
+		const $boxes = $(this).find('.slice_half .box');
+		if ($boxes.length > 0) {
+			$boxes.each(function() {
+				const text = $(this).find('.count').text();
+				const matches = text.match(/\d+/g);
+
+				if (matches && matches.length >= 2) {
+					const current = parseInt(matches[0]);
+					const total = parseInt(matches[1]);
+					const percentage = (current / total) * 100;
+					$(this).find('.state_line .bar').css('width', percentage + '%');
+				}
+			});
+		}
+	});
+// 로그인시 팝업 닫기
+    $('.popup').on('click', '.dm, .btn_close_btm', function() {
+        var $popup = $(this).closest('.popup');
+        $popup.fadeOut(300, function() {
+            if (lastFocusedElement) {
+                lastFocusedElement.focus();
+            }
+        });
+    });
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            $('.popup:visible').fadeOut(300, function() {
+                if (lastFocusedElement) lastFocusedElement.focus();
+            });
         }
     });
 });

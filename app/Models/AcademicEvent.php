@@ -32,6 +32,7 @@ class AcademicEvent extends Model
         'committee_content',
         'pc_banner_path',
         'thumbnail_path',
+        'exhibition_image_path',
         'address',
         'address_detail',
         'address_lat',

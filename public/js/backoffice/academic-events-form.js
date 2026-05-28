@@ -1050,6 +1050,13 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteCheckboxId: 'delete_greeting_image',
             existingItemId: 'bo-academic-greeting-existing-item',
         });
+        window.initBoardImageFilePreview({
+            inputId: 'academic_exhibition_image_file',
+            previewId: 'academicExhibitionImageFilePreview',
+            removeExistingSelector: '[data-remove-existing-target="exhibition_image"]',
+            deleteCheckboxId: 'delete_exhibition_image',
+            existingItemId: 'bo-academic-exhibition-existing-item',
+        });
     }
 
     const initAcademicSingleFilePreview = ({ inputId, previewId, deleteCheckboxId, existingItemId }) => {

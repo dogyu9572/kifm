@@ -23,6 +23,8 @@
 					class="root_daum_roughmap root_daum_roughmap_landing"
 					data-kifm-roughmap
 					data-kifm-map-address="{{ $fullAddress }}"
+					data-kifm-map-lat="{{ $event->address_lat }}"
+					data-kifm-map-lng="{{ $event->address_lng }}"
 					data-kifm-map-key="{{ $kakaoJavascriptKey }}"
 					data-timestamp="1777006266657"
 					data-key="2aspkv7dzuzp"

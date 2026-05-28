@@ -13,30 +13,14 @@ class LocalDoctorGeocoder
         return (string) config('local_doctor_map.kakao.rest_api_key', '') !== '';
     }
 
-    /**
-     * 주소 필드(시/도·시군구·도로명·상세)를 합쳐 지오코딩 검색어로 만든다.
-     */
     public function buildQuery(LocalDoctor $doctor): string
     {
-        $parts = array_filter([
-            trim((string) ($doctor->sido ?? '')),
-            trim((string) ($doctor->sigungu ?? '')),
-            trim((string) ($doctor->address ?? '')),
-            trim((string) ($doctor->address_detail ?? '')),
-        ]);
-
-        return implode(' ', $parts);
+        return trim((string) ($doctor->address ?? ''));
     }
 
     public function buildAddressQuery(LocalDoctor $doctor): string
     {
-        $parts = array_filter([
-            trim((string) ($doctor->sido ?? '')),
-            trim((string) ($doctor->sigungu ?? '')),
-            trim((string) ($doctor->address ?? '')),
-        ]);
-
-        return implode(' ', $parts);
+        return $this->buildQuery($doctor);
     }
 
     /**
@@ -113,8 +97,7 @@ class LocalDoctorGeocoder
             return false;
         }
 
-        $coords = $this->geocode($this->buildQuery($doctor))
-            ?? $this->geocode($this->buildAddressQuery($doctor));
+        $coords = $this->geocode($this->buildQuery($doctor));
         if ($coords === null) {
             $doctor->map_lat = null;
             $doctor->map_lng = null;

@@ -21,7 +21,7 @@
 				</select>
 				<div class="search_area">
 					<label for="board-search" class="sound_only">학회 공지 검색</label>
-					<input type="text" id="board-search" name="keyword" class="text" value="{{ request('keyword') }}" placeholder="검색어를 입력해주세요">
+					<input type="text" id="board-search" name="keyword" class="text" value="{{ request('keyword') }}" placeholder="검색어를 입력해 주세요">
 					<button type="submit" class="btn_search">검색</button>
 				</div>
 			</form>

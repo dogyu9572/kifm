@@ -53,10 +53,15 @@ Route::prefix('introduction')->name('introduction.')->group(function () {
 
 // 학술행사
 Route::prefix('academic_event')->name('academic_event.')->group(function () {
+    Route::get('/annual_schedule', [AcademicEventController::class, 'annualSchedule'])->name('annual_schedule');
+    Route::get('/academic_history', [AcademicEventController::class, 'academicHistory'])->name('academic_history');
     Route::get('/conference', [AcademicEventController::class, 'conference'])->name('conference');
     Route::get('/conference/view', [AcademicEventController::class, 'conferenceView'])->name('conference_view');
     Route::get('/training_course', [AcademicEventController::class, 'trainingCourse'])->name('training_course');
     Route::get('/training_course/view', [AcademicEventController::class, 'trainingCourseView'])->name('training_course_view');
+    Route::get('/training_course/payment', [AcademicEventController::class, 'trainingCoursePayment'])->name('training_course_payment');
+    Route::post('/training_course/payment', [AcademicEventController::class, 'storeTrainingCoursePayment'])->name('training_course_payment.store');
+    Route::post('/training_course/payment/coupon', [AcademicEventController::class, 'applyTrainingCourseCoupon'])->name('training_course_payment.coupon');
     Route::get('/training_course/end', [AcademicEventController::class, 'trainingCourseEnd'])->name('training_course_end');
 });
 
@@ -111,6 +116,12 @@ Route::prefix('online_academy')->name('online_academy.')->group(function () {
     Route::get('/view', [OnlineAcademyController::class, 'view'])->name('view');
     Route::get('/test', [OnlineAcademyController::class, 'test'])->name('test');
     Route::get('/end', [OnlineAcademyController::class, 'end'])->name('end');
+    Route::get('/payment', [OnlineAcademyController::class, 'payment'])->name('payment');
+    Route::post('/payment', [OnlineAcademyController::class, 'storePayment'])->name('payment.store');
+    Route::get('/payment/checkout', [OnlineAcademyController::class, 'checkout'])->name('payment.checkout');
+    Route::post('/payment/checkout', [OnlineAcademyController::class, 'completePayment'])->name('payment.complete');
+    Route::get('/payment/end', [OnlineAcademyController::class, 'paymentEnd'])->name('payment.end');
+    Route::post('/payment/coupon', [OnlineAcademyController::class, 'applyCoupon'])->name('payment.coupon');
     Route::get('/{course}/exam', [OnlineAcademyController::class, 'exam'])->whereNumber('course')->name('exam');
     Route::get('/{course}', [OnlineAcademyController::class, 'show'])->whereNumber('course')->name('show');
 });

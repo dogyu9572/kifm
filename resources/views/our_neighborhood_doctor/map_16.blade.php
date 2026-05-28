@@ -1,6 +1,6 @@
 <svg width="624" height="514" viewBox="0 0 624 514" fill="none" xmlns="http://www.w3.org/2000/svg" class="map_svg map_svg16">
 
-<!-- 지도 -->
+<!-- 제주 지도 -->
 <g class="map">
 	<!-- 서귀포시 -->
 	<g class="map02">

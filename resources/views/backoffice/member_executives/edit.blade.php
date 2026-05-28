@@ -22,7 +22,7 @@
 
 <div class="board-container">
     <div class="board-header">
-        <a href="{{ route('backoffice.member-executives.index') }}" class="btn btn-secondary btn-sm">
+        <a href="{{ $returnUrl }}" class="btn btn-secondary btn-sm">
             <i class="fas fa-arrow-left"></i> 목록으로
         </a>
     </div>
@@ -31,12 +31,13 @@
             <form action="{{ route('backoffice.member-executives.update', $executive) }}" method="POST" id="memberExecutiveForm" class="bo-member-form">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="return_url" value="{{ $returnUrl }}">
                 @include('backoffice.member_executives._form')
                 <div class="board-form-actions board-form-actions--member-footer">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> 저장
                     </button>
-                    <a href="{{ route('backoffice.member-executives.index') }}" class="btn btn-secondary">취소</a>
+                    <a href="{{ $returnUrl }}" class="btn btn-secondary">취소</a>
                 </div>
             </form>
         </div>
@@ -47,4 +48,3 @@
 @section('scripts')
 <script src="{{ asset('js/backoffice/member-selector-modal.js') }}"></script>
 @endsection
-

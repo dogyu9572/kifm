@@ -119,7 +119,7 @@
 						<a href="javascript:alert('준비중입니다.')" role="tab" aria-selected="{{ $page_type == 'general' ? 'true' : 'false' }}" {!! $page_type == 'general' ? 'aria-current="page"' : '' !!}>일반인</a>
 					</li>
 					<li role="presentation" class="c2 {{ $page_type == 'professional' ? 'on' : '' }}">
-						<a href="/home" role="tab" aria-selected="{{ $page_type == 'professional' ? 'true' : 'false' }}" {!! $page_type == 'professional' ? 'aria-current="page"' : '' !!}>전문인</a>
+						<a href="/" role="tab" aria-selected="{{ $page_type == 'professional' ? 'true' : 'false' }}" {!! $page_type == 'professional' ? 'aria-current="page"' : '' !!}>전문인</a>
 					</li>
 					<li role="presentation" class="c3 {{ $page_type == 'online_academy' ? 'on' : '' }}">
 						<a href="/online_academy/" role="tab" aria-selected="{{ $page_type == 'online_academy' ? 'true' : 'false' }}" {!! $page_type == 'online_academy' ? 'aria-current="page"' : '' !!}>온라인 아카데미</a>
@@ -149,7 +149,7 @@
 		<div class="btm">
 			<div class="inner">
 				<div class="left">
-					<a href="/home" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+					<a href="/" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
 				</div>
 				<div class="center">
 					<search class="search_area">
@@ -197,8 +197,10 @@
 					<li class="menu {{ ($gNum ?? '') == '02' ? 'on' : '' }}">
 						<a href="/academic_event/conference" id="main-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>학술행사</a>
 						<ul class="snb" aria-labelledby="main-menu-02">
-							<li><a href="/academic_event/conference" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>학술대회</a></li>
-							<li><a href="/academic_event/training_course" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>연수강좌</a></li>
+							<li><a href="/academic_event/annual_schedule" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>KIFM 연간일정</a></li>
+							<li><a href="/academic_event/academic_history" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>학술대회 연혁</a></li>
+							<li><a href="/academic_event/conference" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>학술대회</a></li>
+							<li><a href="/academic_event/training_course" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>연수강좌</a></li>
 						</ul>
 					</li>
 					<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}"><a href="/subcommittee" id="main-menu-03" @if(($gNum ?? '') == '03') aria-current="page" @endif>산하위원회</a></li>
@@ -285,103 +287,14 @@
 				@if(isset($geName) && $geName)
 					<span>{{ str_replace(['_view', '_list'], '', $geName) }}</span>
 				@endif
+				<div class="location">
+					<a href="/home" class="home" aria-label="홈으로 이동">홈으로</a>
+					<span>{{ $gName }}</span>
+					<span>{{ $sName }}</span>
+				</div>
 				@yield('svisual_other')
 			</div>
-			@if(isset($gNum) && $gNum !== '98' && $page_type !== 'academic_conference')
-			<nav class="sub_menu_area" id="sub-navi" aria-label="서브 메뉴">
-				<a href="/home" class="home" aria-label="홈으로 이동">홈으로</a>
-				<div class="menu">
-					<button type="button" class="btn" aria-expanded="false" aria-controls="sub-gnb-list">{{ $gName }}</button>
-					<ul id="sub-gnb-list">
-						<li class="{{ ($gNum ?? '') == '01' ? 'on' : '' }}"><a href="/introduction/overview" @if(($gNum ?? '') == '01') aria-current="page" @endif>학회소개</a></li>
-						<li class="{{ ($gNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_event/conference" @if(($gNum ?? '') == '02') aria-current="page" @endif>학술행사</a></li>
-						<li class="{{ ($gNum ?? '') == '03' ? 'on' : '' }}"><a href="/subcommittee" @if(($gNum ?? '') == '03') aria-current="page" @endif>산하위원회</a></li>
-						<li class="{{ ($gNum ?? '') == '04' ? 'on' : '' }}"><a href="/archives/general" @if(($gNum ?? '') == '04') aria-current="page" @endif>학회 자료실</a></li>
-						<li class="{{ ($gNum ?? '') == '05' ? 'on' : '' }}"><a href="/member_plaza/society_notices" @if(($gNum ?? '') == '05') aria-current="page" @endif>회원광장</a></li>
-						<li class="{{ ($gNum ?? '') == '06' ? 'on' : '' }}"><a href="/our_neighborhood_doctor" @if(($gNum ?? '') == '06') aria-current="page" @endif>우리동네 주치의</a></li>
-						<li class="{{ ($gNum ?? '') == '07' ? 'on' : '' }}"><a href="/online_academy" @if(($gNum ?? '') == '07') aria-current="page" @endif>온라인 아카데미</a></li>
-					</ul>
-				</div>
-				<div class="menu">
-					<button type="button" class="btn" aria-expanded="false" aria-controls="sub-snb-list" >{{ $sName }}</button>
-					<ul id="sub-snb-list">
-						@if(isset($gNum) && $gNum == '01')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/introduction/overview" @if(($sNum ?? '') == '01') aria-current="page" @endif>학회개요</a></li>
-							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/introduction/greeting" @if(($sNum ?? '') == '02') aria-current="page" @endif>인사말</a></li>
-							<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/introduction/history" @if(($sNum ?? '') == '03') aria-current="page" @endif>학회 연혁</a></li>
-							<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/introduction/bylaws" @if(($sNum ?? '') == '04') aria-current="page" @endif>회칙</a></li>
-							<li class="{{ ($sNum ?? '') == '05' ? 'on' : '' }}"><a href="/introduction/officers" @if(($sNum ?? '') == '05') aria-current="page" @endif>임원진</a></li>
-							<li class="{{ ($sNum ?? '') == '06' ? 'on' : '' }}"><a href="/introduction/location" @if(($sNum ?? '') == '06') aria-current="page" @endif>오시는 길</a></li>
-						@endif
-						@if(isset($gNum) && $gNum == '02')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_event/conference" @if(($sNum ?? '') == '01') aria-current="page" @endif>학술대회</a></li>
-							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_event/training_course" @if(($sNum ?? '') == '02') aria-current="page" @endif>연수강좌</a></li>
-						@endif
-						@if(isset($gNum) && $gNum == '03')
-							<li class="{{ request()->routeIs('subcommittee.index') ? 'on' : '' }}"><a href="{{ route('subcommittee.index') }}" @if(request()->routeIs('subcommittee.index')) aria-current="page" @endif>산하위원회</a></li>
-							@foreach ($navCommittees ?? [] as $navC)
-								<li class="{{ isset($committee) && $committee->id === $navC->id ? 'on' : '' }}"><a href="{{ route('subcommittee.notice', $navC) }}" @if(isset($committee) && $committee->id === $navC->id) aria-current="page" @endif>{{ $navC->name }}</a></li>
-							@endforeach
-						@endif
-						@if(isset($gNum) && $gNum == '04')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/archives/general" @if(($sNum ?? '') == '01') aria-current="page" @endif>일반 자료실</a></li>
-							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/archives/academic" @if(($sNum ?? '') == '02') aria-current="page" @endif>학술 자료실</a></li>
-							<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/archives/members" @if(($sNum ?? '') == '03') aria-current="page" @endif>회원 자료실</a></li>
-						@endif
-						@if(isset($gNum) && $gNum == '05')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/member_plaza/society_notices" @if(($sNum ?? '') == '01') aria-current="page" @endif>학회 공지</a></li>
-							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/member_plaza/other_notices" @if(($sNum ?? '') == '02') aria-current="page" @endif>기타 공지</a></li>
-							<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/member_plaza/society_album" @if(($sNum ?? '') == '03') aria-current="page" @endif>학회 앨범</a></li>
-							<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/member_plaza/fee_payment_guide" @if(($sNum ?? '') == '04') aria-current="page" @endif>회비 납부 안내</a></li>
-						@endif
-						@if(isset($gNum) && $gNum == '06')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/our_neighborhood_doctor" @if(($sNum ?? '') == '01') aria-current="page" @endif>우리동네 주치의</a></li>
-						@endif
-						@if(isset($gNum) && $gNum == '07')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/online_academy/" @if(($sNum ?? '') == '01') aria-current="page" @endif>온라인 아카데미</a></li>
-						@endif
-						@if(isset($gNum) && $gNum == '00')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/member/login" @if(($sNum ?? '') == '01') aria-current="page" @endif>로그인</a></li>
-							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/member/find_id" @if(($sNum ?? '') == '02') aria-current="page" @endif>아이디 찾기</a></li>
-							<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/member/find_pw" @if(($sNum ?? '') == '03') aria-current="page" @endif>비밀번호 찾기</a></li>
-							<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/member/register" @if(($sNum ?? '') == '04') aria-current="page" @endif>회원가입</a></li>
-							
-						@endif
-						@if(isset($gNum) && $gNum == '99')
-							<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/mypage/profile_edit" @if(($sNum ?? '') == '01') aria-current="page" @endif>개인정보 관리</a></li>
-							<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/mypage/participation_history" @if(($sNum ?? '') == '02') aria-current="page" @endif>참가내역 관리</a></li>
-							<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/mypage/online_training" @if(($sNum ?? '') == '03') aria-current="page" @endif>온라인 교육 수강내역</a></li>
-							<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/mypage/inquiry" @if(($sNum ?? '') == '04') aria-current="page" @endif>1:1 문의</a></li>
-							<li class="{{ ($sNum ?? '') == '05' ? 'on' : '' }}"><a href="/mypage/favorite" @if(($sNum ?? '') == '05') aria-current="page" @endif>즐겨찾는 메뉴</a></li>
-							<li class="{{ ($sNum ?? '') == '06' ? 'on' : '' }}"><a href="/mypage/bookmark" @if(($sNum ?? '') == '06') aria-current="page" @endif>북마크</a></li>
-							<li class="{{ ($sNum ?? '') == '07' ? 'on' : '' }}"><a href="/mypage/hospital_information" @if(($sNum ?? '') == '07') aria-current="page" @endif>병원 정보 관리</a></li>
-							<li class="{{ ($sNum ?? '') == '08' ? 'on' : '' }}"><a href="/mypage/executive_activities" @if(($sNum ?? '') == '08') aria-current="page" @endif>회원 활동(임원)</a></li>
-							<li class="{{ ($sNum ?? '') == '09' ? 'on' : '' }}"><a href="/mypage/committee_participation" @if(($sNum ?? '') == '09') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 일반회원 -->
-							<li class="{{ ($sNum ?? '') == '10' ? 'on' : '' }}"><a href="/mypage/committee_participation_admin" @if(($sNum ?? '') == '10') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 관리자 회원 -->
-						@endif
-					</ul>
-				</div>
-
-				{{-- 3단계: 상세메뉴 (있을 때만) --}}
-				@if(isset($dNum) && $dNum)
-				<div class="menu">
-					<button type="button" class="btn" aria-expanded="false" aria-controls="sub-dnb-list">{{ $dName }}</button>
-					<ul id="sub-dnb-list" class="depth3_menu">
-						@if(isset($gNum) && $gNum == '01' && ($sNum ?? '') == '04')
-							<li class="{{ ($dNum ?? '') == '01' ? 'on' : '' }}"><a href="/introduction/bylaws" @if(($dNum ?? '') == '01') aria-current="page" @endif>대한기능의학회 회칙</a></li>
-							<li class="{{ ($dNum ?? '') == '02' ? 'on' : '' }}"><a href="/introduction/bylaws_operation" @if(($dNum ?? '') == '02') aria-current="page" @endif>업무 및 운영 내규</a></li>
-							<li class="{{ ($dNum ?? '') == '03' ? 'on' : '' }}"><a href="/introduction/bylaws_protocol" @if(($dNum ?? '') == '03') aria-current="page" @endif>업무 프로토콜</a></li>
-						@endif
-						@if(isset($gNum) && $gNum == '03' && isset($committee))
-							<li class="{{ request()->routeIs('subcommittee.notice') || request()->routeIs('subcommittee.notice_show') ? 'on' : '' }}"><a href="{{ route('subcommittee.notice', $committee) }}" @if(request()->routeIs('subcommittee.notice') || request()->routeIs('subcommittee.notice_show')) aria-current="page" @endif>공지사항</a></li>
-							<li class="{{ request()->routeIs('subcommittee.discussion') || request()->routeIs('subcommittee.discussion_show') || request()->routeIs('subcommittee.discussion_write') ? 'on' : '' }}"><a href="{{ route('subcommittee.discussion', $committee) }}" @if(request()->routeIs('subcommittee.discussion') || request()->routeIs('subcommittee.discussion_show') || request()->routeIs('subcommittee.discussion_write')) aria-current="page" @endif>토론장</a></li>
-							<li class="{{ request()->routeIs('subcommittee.archives') || request()->routeIs('subcommittee.archives_show') ? 'on' : '' }}"><a href="{{ route('subcommittee.archives', $committee) }}" @if(request()->routeIs('subcommittee.archives') || request()->routeIs('subcommittee.archives_show')) aria-current="page" @endif>자료실</a></li>
-						@endif
-					</ul>
-				</div>
-				@endif
-			</nav>
-			@endif
+			
 			
 			@endif
 			@if(isset($gNum) && $gNum == 'online_academy')
@@ -395,6 +308,103 @@
 			</div>
 			@endif
 		</div>
+		@endif
+		
+		@if(isset($gNum) && $gNum !== '98' && $page_type !== 'academic_conference')
+		<nav class="sub_menu_area inner" id="sub-navi" aria-label="서브 메뉴">
+			<div class="menu set_g">
+				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-gnb-list">{{ $gName }}</button>
+				<ul id="sub-gnb-list">
+					<li class="{{ ($gNum ?? '') == '01' ? 'on' : '' }}"><a href="/introduction/overview" @if(($gNum ?? '') == '01') aria-current="page" @endif>학회소개</a></li>
+					<li class="{{ ($gNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_event/conference" @if(($gNum ?? '') == '02') aria-current="page" @endif>학술행사</a></li>
+					<li class="{{ ($gNum ?? '') == '03' ? 'on' : '' }}"><a href="/subcommittee" @if(($gNum ?? '') == '03') aria-current="page" @endif>산하위원회</a></li>
+					<li class="{{ ($gNum ?? '') == '04' ? 'on' : '' }}"><a href="/archives/general" @if(($gNum ?? '') == '04') aria-current="page" @endif>학회 자료실</a></li>
+					<li class="{{ ($gNum ?? '') == '05' ? 'on' : '' }}"><a href="/member_plaza/society_notices" @if(($gNum ?? '') == '05') aria-current="page" @endif>회원광장</a></li>
+					<li class="{{ ($gNum ?? '') == '06' ? 'on' : '' }}"><a href="/our_neighborhood_doctor" @if(($gNum ?? '') == '06') aria-current="page" @endif>우리동네 주치의</a></li>
+					<li class="{{ ($gNum ?? '') == '07' ? 'on' : '' }}"><a href="/online_academy" @if(($gNum ?? '') == '07') aria-current="page" @endif>온라인 아카데미</a></li>
+				</ul>
+			</div>
+			<div class="menu set_s">
+				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-snb-list" >{{ $sName }}</button>
+				<ul id="sub-snb-list">
+					@if(isset($gNum) && $gNum == '01')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/introduction/overview" @if(($sNum ?? '') == '01') aria-current="page" @endif>학회개요</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/introduction/greeting" @if(($sNum ?? '') == '02') aria-current="page" @endif>인사말</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/introduction/history" @if(($sNum ?? '') == '03') aria-current="page" @endif>학회 연혁</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/introduction/bylaws" @if(($sNum ?? '') == '04') aria-current="page" @endif>회칙</a></li>
+						<li class="{{ ($sNum ?? '') == '05' ? 'on' : '' }}"><a href="/introduction/officers" @if(($sNum ?? '') == '05') aria-current="page" @endif>임원진</a></li>
+						<li class="{{ ($sNum ?? '') == '06' ? 'on' : '' }}"><a href="/introduction/location" @if(($sNum ?? '') == '06') aria-current="page" @endif>오시는 길</a></li>
+					@endif
+					@if(isset($gNum) && $gNum == '02')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/academic_event/annual_schedule" @if(($sNum ?? '') == '01') aria-current="page" @endif>KIFM 연간일정</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_event/academic_history" @if(($sNum ?? '') == '02') aria-current="page" @endif>학술대회 연혁</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/academic_event/conference" @if(($sNum ?? '') == '03') aria-current="page" @endif>학술대회</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/academic_event/training_course" @if(($sNum ?? '') == '04') aria-current="page" @endif>연수강좌</a></li>
+					@endif
+					@if(isset($gNum) && $gNum == '03')
+						<li class="{{ request()->routeIs('subcommittee.index') ? 'on' : '' }}"><a href="{{ route('subcommittee.index') }}" @if(request()->routeIs('subcommittee.index')) aria-current="page" @endif>산하위원회</a></li>
+						@foreach ($navCommittees ?? [] as $navC)
+							<li class="{{ isset($committee) && $committee->id === $navC->id ? 'on' : '' }}"><a href="{{ route('subcommittee.notice', $navC) }}" @if(isset($committee) && $committee->id === $navC->id) aria-current="page" @endif>{{ $navC->name }}</a></li>
+						@endforeach
+					@endif
+					@if(isset($gNum) && $gNum == '04')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/archives/general" @if(($sNum ?? '') == '01') aria-current="page" @endif>일반 자료실</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/archives/academic" @if(($sNum ?? '') == '02') aria-current="page" @endif>학술 자료실</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/archives/members" @if(($sNum ?? '') == '03') aria-current="page" @endif>회원 자료실</a></li>
+					@endif
+					@if(isset($gNum) && $gNum == '05')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/member_plaza/society_notices" @if(($sNum ?? '') == '01') aria-current="page" @endif>학회 공지</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/member_plaza/other_notices" @if(($sNum ?? '') == '02') aria-current="page" @endif>기타 공지</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/member_plaza/society_album" @if(($sNum ?? '') == '03') aria-current="page" @endif>학회 앨범</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/member_plaza/fee_payment_guide" @if(($sNum ?? '') == '04') aria-current="page" @endif>회비 납부 안내</a></li>
+					@endif
+					@if(isset($gNum) && $gNum == '06')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/our_neighborhood_doctor" @if(($sNum ?? '') == '01') aria-current="page" @endif>우리동네 주치의</a></li>
+					@endif
+					@if(isset($gNum) && $gNum == '07')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/online_academy/" @if(($sNum ?? '') == '01') aria-current="page" @endif>온라인 아카데미</a></li>
+					@endif
+					@if(isset($gNum) && $gNum == '00')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/member/login" @if(($sNum ?? '') == '01') aria-current="page" @endif>로그인</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/member/find_id" @if(($sNum ?? '') == '02') aria-current="page" @endif>아이디 찾기</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/member/find_pw" @if(($sNum ?? '') == '03') aria-current="page" @endif>비밀번호 찾기</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/member/register" @if(($sNum ?? '') == '04') aria-current="page" @endif>회원가입</a></li>
+						
+					@endif
+					@if(isset($gNum) && $gNum == '99')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/mypage/profile_edit" @if(($sNum ?? '') == '01') aria-current="page" @endif>개인정보 관리</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/mypage/participation_history" @if(($sNum ?? '') == '02') aria-current="page" @endif>참가내역 관리</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/mypage/online_training" @if(($sNum ?? '') == '03') aria-current="page" @endif>온라인 교육 수강내역</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/mypage/inquiry" @if(($sNum ?? '') == '04') aria-current="page" @endif>1:1 문의</a></li>
+						<li class="{{ ($sNum ?? '') == '05' ? 'on' : '' }}"><a href="/mypage/favorite" @if(($sNum ?? '') == '05') aria-current="page" @endif>즐겨찾는 메뉴</a></li>
+						<li class="{{ ($sNum ?? '') == '06' ? 'on' : '' }}"><a href="/mypage/bookmark" @if(($sNum ?? '') == '06') aria-current="page" @endif>북마크</a></li>
+						<li class="{{ ($sNum ?? '') == '07' ? 'on' : '' }}"><a href="/mypage/hospital_information" @if(($sNum ?? '') == '07') aria-current="page" @endif>병원 정보 관리</a></li>
+						<li class="{{ ($sNum ?? '') == '08' ? 'on' : '' }}"><a href="/mypage/executive_activities" @if(($sNum ?? '') == '08') aria-current="page" @endif>회원 활동(임원)</a></li>
+						<li class="{{ ($sNum ?? '') == '09' ? 'on' : '' }}"><a href="/mypage/committee_participation" @if(($sNum ?? '') == '09') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 일반회원 -->
+						<li class="{{ ($sNum ?? '') == '10' ? 'on' : '' }}"><a href="/mypage/committee_participation_admin" @if(($sNum ?? '') == '10') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 관리자 회원 -->
+					@endif
+				</ul>
+			</div>
+
+			{{-- 3단계: 상세메뉴 (있을 때만) --}}
+			@if(isset($dNum) && $dNum)
+			<div class="menu set_d">
+				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-dnb-list">{{ $dName }}</button>
+				<ul id="sub-dnb-list" class="depth3_menu">
+					@if(isset($gNum) && $gNum == '01' && ($sNum ?? '') == '04')
+						<li class="{{ ($dNum ?? '') == '01' ? 'on' : '' }}"><a href="/introduction/bylaws" @if(($dNum ?? '') == '01') aria-current="page" @endif>대한기능의학회 회칙</a></li>
+						<li class="{{ ($dNum ?? '') == '02' ? 'on' : '' }}"><a href="/introduction/bylaws_operation" @if(($dNum ?? '') == '02') aria-current="page" @endif>업무 및 운영 내규</a></li>
+						<li class="{{ ($dNum ?? '') == '03' ? 'on' : '' }}"><a href="/introduction/bylaws_protocol" @if(($dNum ?? '') == '03') aria-current="page" @endif>업무 프로토콜</a></li>
+					@endif
+					@if(isset($gNum) && $gNum == '03' && isset($committee))
+						<li class="{{ request()->routeIs('subcommittee.notice') || request()->routeIs('subcommittee.notice_show') ? 'on' : '' }}"><a href="{{ route('subcommittee.notice', $committee) }}" @if(request()->routeIs('subcommittee.notice') || request()->routeIs('subcommittee.notice_show')) aria-current="page" @endif>공지사항</a></li>
+						<li class="{{ request()->routeIs('subcommittee.discussion') || request()->routeIs('subcommittee.discussion_show') || request()->routeIs('subcommittee.discussion_write') ? 'on' : '' }}"><a href="{{ route('subcommittee.discussion', $committee) }}" @if(request()->routeIs('subcommittee.discussion') || request()->routeIs('subcommittee.discussion_show') || request()->routeIs('subcommittee.discussion_write')) aria-current="page" @endif>토론장</a></li>
+						<li class="{{ request()->routeIs('subcommittee.archives') || request()->routeIs('subcommittee.archives_show') ? 'on' : '' }}"><a href="{{ route('subcommittee.archives', $committee) }}" @if(request()->routeIs('subcommittee.archives') || request()->routeIs('subcommittee.archives_show')) aria-current="page" @endif>자료실</a></li>
+					@endif
+				</ul>
+			</div>
+			@endif
+		</nav>
 		@endif
 		
 		@if(isset($gNum) && $page_type == 'academic_conference' && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '05' && $gNum !== '06' && $gNum !== '07')
@@ -458,11 +468,11 @@
 	<footer class="footer">
 		<div class="point" aria-hidden="true"></div>
 		<div class="quick">
-			<a href="#this" class="btn btn_youtube">대한기능의학회 유튜브로 이동</a>
+			<a href="https://www.youtube.com/@%EB%8C%80%ED%95%9C%EA%B8%B0%EB%8A%A5%EC%9D%98%ED%95%99%ED%9A%8C" target="_blank" aria-label="새창으로 이동" class="btn btn_youtube">대한기능의학회 유튜브로 이동</a>
 			<button type="button" class="btn gotop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="페이지 맨 위로 이동" aria-hidden="true">TOP</button>
 		</div>
 	
-		<section class="fbanner" aria-label="배너 슬라이드">
+		<section class="fbanner {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'mt0' : '' }}" aria-label="배너 슬라이드">
 			<div class="inner">
 				<div class="fbanner_slide" id="fbanner-swiper">
 					<ul class="swiper-wrapper" role="list">

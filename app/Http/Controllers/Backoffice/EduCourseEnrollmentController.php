@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use App\Models\EduCourse;
 use App\Models\EduCourseEnrollment;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -74,6 +75,19 @@ class EduCourseEnrollmentController extends Controller
             'paymentStatusLabels' => $this->paymentStatusLabels(),
             'paymentMethodLabels' => $this->paymentMethodLabels(),
             'examStatusLabels' => $this->examStatusLabels(),
+        ]);
+    }
+
+    public function certificate(EduCourseEnrollment $eduCourseEnrollment): View
+    {
+        abort_unless($eduCourseEnrollment->certificate_status === 'issued', 404);
+
+        $eduCourseEnrollment->load(['course', 'member']);
+
+        return view('mypage.print_completion', [
+            'gName' => '이수증',
+            'enrollment' => $eduCourseEnrollment,
+            'user' => $eduCourseEnrollment->member,
         ]);
     }
 
@@ -237,4 +251,3 @@ class EduCourseEnrollmentController extends Controller
         ];
     }
 }
-

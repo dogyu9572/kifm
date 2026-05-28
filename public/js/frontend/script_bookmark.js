@@ -36,55 +36,66 @@
         };
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('[data-bookmark-toggle]').forEach(function (button) {
-            button.addEventListener('click', function () {
-                var toggleUrl = button.getAttribute('data-bookmark-url');
-                var data = payload(button);
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest('[data-bookmark-toggle]');
+        if (!button) {
+            return;
+        }
+        event.preventDefault();
 
-                if (!toggleUrl || !data.content_type || !data.content_id) {
-                    window.alert('북마크할 수 없는 항목입니다.');
+        var toggleUrl = button.getAttribute('data-bookmark-url');
+        var data = payload(button);
+
+        if (!toggleUrl || !data.content_type || !data.content_id) {
+            window.alert('북마크할 수 없는 항목입니다.');
+            return;
+        }
+
+        fetch(toggleUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrfToken(),
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(function (response) {
+                if (response.status === 401 || response.status === 403) {
+                    var loginUrl = button.getAttribute('data-login-url') || '/member/login';
+                    if (window.confirm('로그인 후 북마크를 이용할 수 있습니다. 로그인하시겠습니까?')) {
+                        window.location.href = loginUrl;
+                    }
+                    return null;
+                }
+
+                return response.json().then(function (json) {
+                    return { ok: response.ok, data: json };
+                }).catch(function () {
+                    return {
+                        ok: false,
+                        data: { message: '로그인 후 북마크를 이용할 수 있습니다.' },
+                    };
+                });
+            })
+            .then(function (result) {
+                if (!result) {
+                    return;
+                }
+                if (!result.ok) {
+                    window.alert(result.data.message || '북마크 처리에 실패했습니다.');
                     return;
                 }
 
-                fetch(toggleUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Accept: 'application/json',
-                        'X-CSRF-TOKEN': csrfToken(),
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then(function (response) {
-                        if (response.status === 401 || response.status === 403) {
-                            var loginUrl = button.getAttribute('data-login-url') || '/member/login';
-                            if (window.confirm('로그인 후 북마크를 이용할 수 있습니다. 로그인하시겠습니까?')) {
-                                window.location.href = loginUrl;
-                            }
-                            return null;
-                        }
-
-                        return response.json().then(function (json) {
-                            return { ok: response.ok, data: json };
-                        });
-                    })
-                    .then(function (result) {
-                        if (!result) {
-                            return;
-                        }
-                        if (!result.ok) {
-                            window.alert(result.data.message || '북마크 처리에 실패했습니다.');
-                            return;
-                        }
-
-                        syncSameButtons(button, !!result.data.bookmarked);
-                    })
-                    .catch(function () {
-                        window.alert('북마크 처리 중 오류가 발생했습니다.');
-                    });
+                var isBookmarked = !!result.data.bookmarked;
+                syncSameButtons(button, isBookmarked);
+                if (isBookmarked) {
+                    window.alert('북마크로 추가되었습니다.');
+                }
+            })
+            .catch(function () {
+                window.alert('북마크 처리 중 오류가 발생했습니다.');
             });
-        });
     });
 })();

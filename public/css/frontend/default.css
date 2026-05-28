@@ -54,6 +54,7 @@ span.br {display:block;}
 .flex_center {display:flex; justify-content:center; align-items:center;}
 .flex_aic {align-items:center;}
 .flex_colm {flex-direction:column;}
+.flex_end {display:flex; justify-content:flex-end; align-items:flex-end;}
 .colm {flex-direction:column}
 /* 높이값 설정 */
 .height_vh {height:100vh; max-height:calc(var(--vh, 1vh) * 100);}
@@ -158,6 +159,7 @@ body{
 	.excl {position:relative; font-size:15px; color:#E60012 !important; line-height:1.4 !important; padding-left:22px;}
 	.excl:before {content:""; position:absolute; top:3px; left:0; width:14px; aspect-ratio:1/1; border-radius:50%; background:url('/images/icon_excl.svg') no-repeat 50% 50% / contain;}
 	.excl > * {color:inherit !important;}
+	.excl.c_iden:before {background-image:url('/images/icon_excl_iden.svg');}
 /* 색상 */
 	.c_iden {color:#0088B8 !important;}
 	.c_red {color:#E60012 !important;}
@@ -178,8 +180,10 @@ body{
 	.btn_kwg:hover {background:#f8f8f8 !important;}
 	.btn_kwg_line8 {border-color:#888 !important;}
 	.btn_kwg:after {background:#222;}
+	.btn_gwg {color:#666 !important; background:#fff !important; border-color:#ddd !important;}
 	.btn_woo {color:#fff !important; background-color:#FF8400 !important; border-color:#FF8400 !important;}
 	.btn_woo2 {color:#fff !important; background-color:#FF6A04 !important; border-color:#FF6A04 !important;}
+	.btn_ggg {color:#888 !important; background:#EBEBEB !important; border-color:#EBEBEB !important;}
 /* 체크박스/라디오박스 */
 	.checkbox,
 	.radio {position:relative;}

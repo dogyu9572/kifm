@@ -148,7 +148,16 @@
                                     <td>{{ $paymentStatusLabels[$r->payment_status] ?? $r->payment_status }}</td>
                                     <td>
                                         @if ($r->payment_status === 'completed')
-                                            <span class="board-form-help">영수증·증명서</span>
+                                            <div class="board-btn-group">
+                                                <a href="{{ route('backoffice.academic-event-registrations.print-receipt', $r) }}" class="btn btn-secondary btn-sm" target="_blank" rel="noopener">
+                                                    영수증
+                                                </a>
+                                                @if ($r->cancelled_at === null)
+                                                    <a href="{{ route('backoffice.academic-event-registrations.print-participation', $r) }}" class="btn btn-primary btn-sm" target="_blank" rel="noopener">
+                                                        참가증명서
+                                                    </a>
+                                                @endif
+                                            </div>
                                         @else
                                             -
                                         @endif

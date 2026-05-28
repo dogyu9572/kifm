@@ -354,12 +354,17 @@
 
         loadKakaoMapScript(javascriptKey)
             .then(() => {
-                if (typeof kakao === 'undefined' || !kakao.maps) {
-                    drawRoughMap(data);
+                if (!hasKakaoMapLoader()) {
+                    clearMapContainer(data);
                     return;
                 }
 
                 kakao.maps.load(() => {
+                    if (!hasKakaoMapSdk()) {
+                        clearMapContainer(data);
+                        return;
+                    }
+
                     const center = new kakao.maps.LatLng(lat, lng);
                     const map = new kakao.maps.Map(canvas, {
                         center,
@@ -372,12 +377,31 @@
                 });
             })
             .catch(() => {
-                drawRoughMap(data);
+                clearMapContainer(data);
             });
     }
 
+    function clearMapContainer(data) {
+        const mapContainer = resolveMapContainer(data);
+        if (mapContainer) {
+            mapContainer.innerHTML = '';
+        }
+    }
+
+    function hasKakaoMapLoader() {
+        return typeof kakao !== 'undefined'
+            && kakao.maps
+            && typeof kakao.maps.load === 'function';
+    }
+
+    function hasKakaoMapSdk() {
+        return hasKakaoMapLoader()
+            && typeof kakao.maps.Map === 'function'
+            && typeof kakao.maps.LatLng === 'function';
+    }
+
     function loadKakaoMapScript(javascriptKey) {
-        if (typeof kakao !== 'undefined' && kakao.maps) {
+        if (hasKakaoMapLoader()) {
             return Promise.resolve();
         }
 
@@ -388,6 +412,10 @@
         kakaoMapLoaderPromises[javascriptKey] = new Promise((resolve, reject) => {
             const existing = document.querySelector('script[data-kakao-map-sdk]');
             if (existing) {
+                if (hasKakaoMapLoader()) {
+                    resolve();
+                    return;
+                }
                 existing.addEventListener('load', () => resolve());
                 existing.addEventListener('error', () => reject());
                 return;

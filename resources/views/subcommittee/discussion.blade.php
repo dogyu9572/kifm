@@ -10,7 +10,7 @@
 	<div class="inner">
 		@include('subcommittee.partials.committee_header', ['useCommitteeH1' => true, 'showCommitteeTabs' => true])
 
-		<p class="tar mb10"><a href="{{ route('subcommittee.discussion_write', $committee) }}" class="btn btn_wbb">토론 주제 등록</a></p>
+		<p class="flex_end tar mb10"><a href="{{ route('subcommittee.discussion_write', $committee) }}" class="btn btn_wbb btn_small">토론 주제 등록</a></p>
 
 		<div class="board_top">
 			<div class="left">
@@ -24,7 +24,7 @@
 				</select>
 				<div class="search_area">
 					<label for="subcommittee-discussion-search" class="sound_only">토론장 검색</label>
-					<input type="text" id="subcommittee-discussion-search" name="keyword" class="text" value="{{ request('keyword') }}" placeholder="검색어를 입력해주세요">
+					<input type="text" id="subcommittee-discussion-search" name="keyword" class="text" value="{{ request('keyword') }}" placeholder="검색어를 입력해 주세요">
 					<button type="submit" class="btn_search">검색</button>
 				</div>
 			</form>

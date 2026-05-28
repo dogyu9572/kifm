@@ -496,3 +496,23 @@ form#memberForm.bo-member-form .bo-readonly-box {
     margin-top: 1.5rem;
     padding-top: 1rem;
 }
+
+.bo-section-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.bo-section-heading-row .bo-section-title {
+    margin-bottom: 0;
+}
+
+.bo-history-filter {
+    margin-bottom: 1rem;
+}
+
+.bo-member-history-section .d-none {
+    display: none !important;
+}

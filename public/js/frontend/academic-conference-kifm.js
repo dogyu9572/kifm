@@ -80,20 +80,36 @@
         function renderKakaoMap() {
             var address = String($map.data('kifmMapAddress') || '').trim();
             var javascriptKey = String($map.data('kifmMapKey') || '').trim();
+            var lat = Number($map.data('kifmMapLat'));
+            var lng = Number($map.data('kifmMapLng'));
 
-            if (! address || ! javascriptKey) {
+            if (! javascriptKey) {
                 renderRoughMap();
                 return;
             }
 
             loadKakaoMapScript(javascriptKey)
                 .then(function () {
-                    if (! window.kakao || ! window.kakao.maps || ! window.kakao.maps.services) {
-                        renderRoughMap();
+                    if (! hasKakaoMapLoader()) {
+                        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                            clearMap();
+                        } else {
+                            renderRoughMap();
+                        }
                         return;
                     }
 
                     window.kakao.maps.load(function () {
+                        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                            renderMapAt(lat, lng);
+                            return;
+                        }
+
+                        if (! address || ! hasKakaoMapServices()) {
+                            renderRoughMap();
+                            return;
+                        }
+
                         var geocoder = new window.kakao.maps.services.Geocoder();
                         geocoder.addressSearch(address, function (result, status) {
                             if (status !== window.kakao.maps.services.Status.OK || ! result.length) {
@@ -101,27 +117,62 @@
                                 return;
                             }
 
-                            var coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
-                            $map.empty().append('<div class="kifm_kakao_map_canvas"></div>');
-
-                            var map = new window.kakao.maps.Map($map.find('.kifm_kakao_map_canvas')[0], {
-                                center: coords,
-                                level: 3
-                            });
-                            var marker = new window.kakao.maps.Marker({
-                                position: coords
-                            });
-                            marker.setMap(map);
+                            renderMapAt(Number(result[0].y), Number(result[0].x));
                         });
                     });
                 })
                 .catch(function () {
-                    renderRoughMap();
+                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+                        clearMap();
+                    } else {
+                        renderRoughMap();
+                    }
                 });
         }
 
+        function renderMapAt(lat, lng) {
+            if (! hasKakaoMapSdk()) {
+                clearMap();
+                return;
+            }
+
+            var coords = new window.kakao.maps.LatLng(lat, lng);
+            $map.empty().append('<div class="kifm_kakao_map_canvas"></div>');
+
+            var map = new window.kakao.maps.Map($map.find('.kifm_kakao_map_canvas')[0], {
+                center: coords,
+                level: 3
+            });
+            var marker = new window.kakao.maps.Marker({
+                position: coords
+            });
+            marker.setMap(map);
+        }
+
+        function clearMap() {
+            $map.empty();
+        }
+
+        function hasKakaoMapLoader() {
+            return window.kakao
+                && window.kakao.maps
+                && typeof window.kakao.maps.load === 'function';
+        }
+
+        function hasKakaoMapSdk() {
+            return hasKakaoMapLoader()
+                && typeof window.kakao.maps.Map === 'function'
+                && typeof window.kakao.maps.LatLng === 'function';
+        }
+
+        function hasKakaoMapServices() {
+            return hasKakaoMapSdk()
+                && window.kakao.maps.services
+                && typeof window.kakao.maps.services.Geocoder === 'function';
+        }
+
         function loadKakaoMapScript(javascriptKey) {
-            if (window.kakao && window.kakao.maps && window.kakao.maps.services) {
+            if (hasKakaoMapLoader()) {
                 return Promise.resolve();
             }
 
@@ -129,6 +180,10 @@
                 var existing = document.querySelector('script[data-kakao-map-sdk]');
 
                 if (existing) {
+                    if (hasKakaoMapLoader()) {
+                        resolve();
+                        return;
+                    }
                     existing.addEventListener('load', resolve);
                     existing.addEventListener('error', reject);
                     return;

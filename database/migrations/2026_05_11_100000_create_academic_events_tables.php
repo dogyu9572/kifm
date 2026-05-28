@@ -41,6 +41,7 @@ return new class extends Migration
             $table->longText('committee_content')->nullable();
             $table->string('pc_banner_path')->nullable();
             $table->string('thumbnail_path')->nullable();
+            $table->string('exhibition_image_path')->nullable();
             $table->string('address', 500)->nullable();
             $table->string('address_detail', 300)->nullable();
             $table->decimal('address_lat', 10, 7)->nullable();

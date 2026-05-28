@@ -6,7 +6,7 @@
 <meta name="Author" content="">
 <meta name="Keywords" content="">
 <meta name="Description" content="">
-<title>인증의 만료 안내</title>
+<title>인정의 만료 안내</title>
 </head>
 <style>
 @font-face {font-family: 'Pretendard';src: url('//cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');font-weight: 400;font-display: swap;}
@@ -24,10 +24,10 @@ html,body {margin:0; padding:0;}
 		</tr>
 		<tr>
 			<td style="padding:0 40px 48px;">
-				<div style="font-size:24px; color:#222; font-weight:700; line-height:1.4; letter-spacing:-.02em;">인증의 만료 안내</div>
+				<div style="font-size:24px; color:#222; font-weight:700; line-height:1.4; letter-spacing:-.02em;">인정의 만료 안내</div>
 				<p style="font-size:16px; color:#222; line-height:1.5; letter-spacing:-.02em; margin:16px 0 40px;">
 					안녕하세요, 대한기능의학회입니다.<br>
-					회원님의 원활한 서비스 이용을 위하 인증의 유효기간을<br>
+					회원님의 원활한 서비스 이용을 위하 인정의 유효기간을<br>
 					확인해주시기 바랍니다.
 				</p>
 				<div style="background:#f8f8f8; border-radius:8px; padding:20px 24px;">
@@ -35,7 +35,7 @@ html,body {margin:0; padding:0;}
 						<tbody>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">인증 구분</th>
-								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">인증의</td>
+								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">인정의</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">만료 예정일</th>

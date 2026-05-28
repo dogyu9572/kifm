@@ -75,7 +75,17 @@ class CertifiedMemberController extends Controller
 
     public function create(Request $request): View
     {
-        return view('backoffice.certified_members.create', $this->buildPayload($request));
+        $certifiedMember = new CertifiedMember();
+        $member = $this->memberFromRequest($request);
+        if ($member) {
+            $certifiedMember->member_id = $member->id;
+            $certifiedMember->setRelation('member', $member);
+        }
+
+        return view('backoffice.certified_members.create', array_merge(
+            $this->buildPayload($request),
+            ['certifiedMember' => $certifiedMember]
+        ));
     }
 
     public function store(CertifiedMemberRequest $request): RedirectResponse
@@ -97,7 +107,7 @@ class CertifiedMemberController extends Controller
 
         User::query()->whereKey($certifiedMember->member_id)->update(['certified_instructor' => true]);
 
-        return redirect()->route('backoffice.certified-members.edit', $certifiedMember)
+        return redirect($this->safeBackofficeReturnUrl($request, route('backoffice.certified-members.edit', $certifiedMember)))
             ->with('success', '인정의 정보가 저장되었습니다.');
     }
 
@@ -126,8 +136,20 @@ class CertifiedMemberController extends Controller
 
         User::query()->whereKey($certifiedMember->member_id)->update(['certified_instructor' => true]);
 
-        return redirect()->route('backoffice.certified-members.edit', $certifiedMember)
+        return redirect($this->safeBackofficeReturnUrl($request, route('backoffice.certified-members.edit', $certifiedMember)))
             ->with('success', '인정의 정보가 수정되었습니다.');
+    }
+
+    public function destroy(Request $request, CertifiedMember $certifiedMember): RedirectResponse
+    {
+        $memberId = $certifiedMember->member_id;
+        $certifiedMember->delete();
+
+        $hasRemaining = CertifiedMember::query()->where('member_id', $memberId)->exists();
+        User::query()->whereKey($memberId)->update(['certified_instructor' => $hasRemaining]);
+
+        return redirect($this->safeBackofficeReturnUrl($request, route('backoffice.certified-members.index')))
+            ->with('success', '인정의 정보가 삭제되었습니다.');
     }
 
     public function searchMembers(Request $request): JsonResponse
@@ -192,8 +214,31 @@ class CertifiedMemberController extends Controller
     private function buildPayload(Request $request): array
     {
         return [
-            'returnUrl' => $request->input('return_url', route('backoffice.certified-members.index')),
+            'returnUrl' => $this->safeBackofficeReturnUrl($request, route('backoffice.certified-members.index')),
         ];
+    }
+
+    private function memberFromRequest(Request $request): ?User
+    {
+        $memberId = $request->integer('member_id');
+        if ($memberId <= 0) {
+            return null;
+        }
+
+        return User::query()
+            ->where('role', 'user')
+            ->whereNull('withdrawn_at')
+            ->find($memberId);
+    }
+
+    private function safeBackofficeReturnUrl(Request $request, string $fallback): string
+    {
+        $returnUrl = (string) $request->input('return_url', '');
+        if ($returnUrl !== '' && str_starts_with($returnUrl, '/backoffice/') && ! str_starts_with($returnUrl, '//')) {
+            return $returnUrl;
+        }
+
+        return $fallback;
     }
 
     private function remainingPeriodDays(string $period): ?int
@@ -209,4 +254,3 @@ class CertifiedMemberController extends Controller
         };
     }
 }
-

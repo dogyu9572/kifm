@@ -3,6 +3,7 @@
 namespace App\Services\Backoffice;
 
 use App\Models\AcademicEvent;
+use App\Services\LocalDoctorGeocoder;
 use App\Support\CategoryOptions;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 class AcademicEventService
 {
+    public function __construct(
+        private readonly LocalDoctorGeocoder $geocoder,
+    ) {}
+
     /** @return array<string, string> */
     public static function seasonLabels(): array
     {
@@ -113,7 +118,7 @@ class AcademicEventService
 
     public function create(array $validated): AcademicEvent
     {
-        return DB::transaction(function () use ($validated) {
+        $event = DB::transaction(function () use ($validated) {
             $event = new AcademicEvent();
             $this->fillEventAttributes($event, $validated);
             $event->save();
@@ -127,11 +132,21 @@ class AcademicEventService
                 'speakers',
             ]);
         });
+
+        $this->syncCoordinatesIfConfigured($event);
+
+        return $event->fresh([
+            'venueFloors',
+            'fields',
+            'sponsors',
+            'mainSponsorSlots',
+            'speakers',
+        ]);
     }
 
     public function update(AcademicEvent $event, array $validated): AcademicEvent
     {
-        return DB::transaction(function () use ($event, $validated) {
+        $event = DB::transaction(function () use ($event, $validated) {
             $this->fillEventAttributes($event, $validated);
             $event->save();
             $this->syncChildData($event, $validated);
@@ -144,6 +159,16 @@ class AcademicEventService
                 'speakers',
             ]);
         });
+
+        $this->syncCoordinatesIfConfigured($event);
+
+        return $event->fresh([
+            'venueFloors',
+            'fields',
+            'sponsors',
+            'mainSponsorSlots',
+            'speakers',
+        ]);
     }
 
     public function deleteMany(array $ids): int
@@ -198,7 +223,7 @@ class AcademicEventService
             'event_type', 'online_url', 'is_public', 'main_exposure', 'venue',
             'start_at', 'end_at', 'start_time_omit', 'end_time_omit',
             'greeting_title', 'greeting_content', 'greeting_image_path',
-            'committee_content', 'pc_banner_path', 'thumbnail_path',
+            'committee_content', 'pc_banner_path', 'thumbnail_path', 'exhibition_image_path',
             'address', 'address_detail', 'address_lat', 'address_lng',
             'walking_guide', 'shuttle_guide',
             'pre_reg_start', 'pre_reg_end', 'onsite_reg_start', 'onsite_reg_end',
@@ -212,6 +237,35 @@ class AcademicEventService
                 $event->{$key} = $v[$key];
             }
         }
+    }
+
+    protected function syncCoordinatesIfConfigured(AcademicEvent $event): void
+    {
+        if ((string) $event->event_type === 'online') {
+            $event->address_lat = null;
+            $event->address_lng = null;
+            $event->save();
+
+            return;
+        }
+
+        $address = trim((string) ($event->address ?? ''));
+        if ($address === '') {
+            $event->address_lat = null;
+            $event->address_lng = null;
+            $event->save();
+
+            return;
+        }
+
+        if (! $this->geocoder->hasApiKey()) {
+            return;
+        }
+
+        $coords = $this->geocoder->geocode($address);
+        $event->address_lat = $coords['lat'] ?? null;
+        $event->address_lng = $coords['lng'] ?? null;
+        $event->save();
     }
 
     protected function syncChildData(AcademicEvent $event, array $v): void

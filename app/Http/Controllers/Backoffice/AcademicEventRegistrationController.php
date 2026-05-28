@@ -181,6 +181,35 @@ class AcademicEventRegistrationController extends Controller
             ->with('success', '삭제되었습니다.');
     }
 
+    public function printReceipt(AcademicEventRegistration $academic_event_registration): View
+    {
+        $registration = AcademicEventRegistration::query()
+            ->with(['event', 'items'])
+            ->whereKey($academic_event_registration->id)
+            ->where('payment_status', 'completed')
+            ->firstOrFail();
+
+        return $this->renderPrint('print_receipt_save', '영수증', 'print_receipt_save', [
+            'registration' => $registration,
+            'methodLabels' => AcademicEventRegistrationService::paymentMethodLabels(),
+        ]);
+    }
+
+    public function printParticipation(AcademicEventRegistration $academic_event_registration): View
+    {
+        $registration = AcademicEventRegistration::query()
+            ->with(['event', 'items'])
+            ->whereKey($academic_event_registration->id)
+            ->where('payment_status', 'completed')
+            ->whereNull('cancelled_at')
+            ->firstOrFail();
+
+        return $this->renderPrint('print_participation', '참가증명서', 'print_participation', [
+            'registration' => $registration,
+            'user' => $registration->member,
+        ]);
+    }
+
     public function bulkDestroy(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -338,5 +367,20 @@ class AcademicEventRegistrationController extends Controller
     private function escapeCsv(string $value): string
     {
         return '"' . str_replace('"', '""', $value) . '"';
+    }
+
+    /**
+     * @param  array<string, mixed>  $with
+     */
+    private function renderPrint(string $view, string $gName, string $slug, array $with = []): View
+    {
+        return view('mypage.' . $view, array_merge([
+            'page_type' => 'professional',
+            'gNum' => 'print',
+            'sNum' => '00',
+            'gName' => $gName,
+            'sName' => $gName,
+            'gSlug' => $slug,
+        ], $with));
     }
 }

@@ -79,6 +79,72 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    function parseDateValue(value) {
+        if (!value) {
+            return null;
+        }
+        const parsed = new Date(value + 'T00:00:00');
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    function applyMembershipPaymentFilter() {
+        const filter = document.querySelector('[data-history-filter="membership-payments"]');
+        if (!filter) {
+            return;
+        }
+
+        const start = parseDateValue(filter.querySelector('.bo-history-date-start')?.value || '');
+        const end = parseDateValue(filter.querySelector('.bo-history-date-end')?.value || '');
+        document.querySelectorAll('[data-membership-payment-row]').forEach(function (row) {
+            const rowDate = parseDateValue(row.getAttribute('data-history-date') || '');
+            const visible = !rowDate || ((!start || rowDate >= start) && (!end || rowDate <= end));
+            row.classList.toggle('d-none', !visible);
+        });
+    }
+
+    document.querySelectorAll('.bo-history-preset').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const filter = this.closest('[data-history-filter="membership-payments"]');
+            if (!filter) {
+                return;
+            }
+            const months = Number(this.getAttribute('data-months') || '0');
+            const end = new Date();
+            const start = new Date(end);
+            start.setMonth(start.getMonth() - months);
+            const startInput = filter.querySelector('.bo-history-date-start');
+            const endInput = filter.querySelector('.bo-history-date-end');
+            if (startInput) {
+                startInput.value = toYmd(start);
+            }
+            if (endInput) {
+                endInput.value = toYmd(end);
+            }
+        });
+    });
+
+    document.querySelectorAll('.bo-history-filter-apply').forEach(function (btn) {
+        btn.addEventListener('click', applyMembershipPaymentFilter);
+    });
+
+    document.querySelectorAll('.bo-history-filter-reset').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const filter = this.closest('[data-history-filter="membership-payments"]');
+            if (!filter) {
+                return;
+            }
+            const startInput = filter.querySelector('.bo-history-date-start');
+            const endInput = filter.querySelector('.bo-history-date-end');
+            if (startInput) {
+                startInput.value = '';
+            }
+            if (endInput) {
+                endInput.value = '';
+            }
+            applyMembershipPaymentFilter();
+        });
+    });
+
     $(document).on('click', '#btnSearchAddress', function () {
         if (typeof daum === 'undefined') return;
         new daum.Postcode({

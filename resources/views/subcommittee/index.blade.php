@@ -9,7 +9,7 @@
 	<div class="inner">
 		<h1 class="sub_title" id="subcommittee-heading">{{ $sName }}</h1>
 
-		<div class="subcommittee_top">
+		<div class="subcommittee_top flex_center">
 			<h2>대한기능의학회 <br/><strong class="c_iden">산하위원회</strong></h2>
 			<div class="con">
 				<p>대한기능의학회는 관련된 다양한 연구와 정보교환, 협업을 토대로 국내외 환자들의 치료에 기여하고자 합니다.<br/>위원회 참석 및 기타 문의는 대한기능의학회로 문의 바랍니다.</p>

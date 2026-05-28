@@ -1,6 +1,6 @@
 <svg width="504" height="574" viewBox="0 0 504 574" fill="none" xmlns="http://www.w3.org/2000/svg" class="map_svg map_svg05">
 
-<!-- 지도 -->
+<!-- 충북 지도 -->
 <g class="map">
 	<!-- 영동군 -->
 	<g class="map11">

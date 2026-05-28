@@ -390,6 +390,39 @@
             <small class="board-form-text d-block mt-1">※ 기존 썸네일은 x 버튼 클릭 시 삭제됩니다.</small>
         @endif
     </div>
+    <div class="board-form-group">
+        <label class="board-form-label">Exhibition 이미지</label>
+        <div class="board-file-upload">
+            <div class="board-file-input-wrapper">
+                <input type="file" name="exhibition_image" id="academic_exhibition_image_file" class="board-file-input" accept=".jpg,.jpeg,.png,.gif" data-max-file-size-mb="20">
+                <div class="board-file-input-content">
+                    <i class="fas fa-image"></i>
+                    <span class="board-file-input-text">Exhibition 이미지를 선택하거나 여기로 드래그하세요</span>
+                    <span class="board-file-input-subtext">JPG, PNG, GIF 파일만 가능 (최대 20MB)</span>
+                </div>
+            </div>
+            @if ($isEdit && $e->exhibition_image_path)
+                <div class="board-existing-files mt-2">
+                    <div class="board-attachment-list">
+                        <div class="board-attachment-item existing-file" id="bo-academic-exhibition-existing-item">
+                            <i class="fas fa-file-image"></i>
+                            <a href="{{ asset('storage/' . $e->exhibition_image_path) }}" target="_blank" rel="noopener">
+                                <span class="board-attachment-name">{{ basename($e->exhibition_image_path) }}</span>
+                            </a>
+                            <button type="button" class="board-attachment-remove" data-remove-existing-target="exhibition_image">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <input type="checkbox" name="delete_exhibition_image" id="delete_exhibition_image" value="1" class="bo-hidden">
+                        </div>
+                    </div>
+                </div>
+            @endif
+            <div class="board-file-preview" id="academicExhibitionImageFilePreview"></div>
+        </div>
+        @if ($isEdit && $e->exhibition_image_path)
+            <small class="board-form-text d-block mt-1">※ 기존 Exhibition 이미지는 x 버튼 클릭 시 삭제됩니다.</small>
+        @endif
+    </div>
     <div class="bo-form-section mt-5">
         <h3 class="bo-section-title">오시는 길 설정</h3>
     </div>

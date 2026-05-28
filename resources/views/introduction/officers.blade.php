@@ -11,22 +11,22 @@
 		
 		<ul class="officers_head">
 			<li>
-				<div class="imgfit" aria-hidden="true"><img src="/images/img_officers01.png" alt=""></div>
-				<div class="txt">
-					<h2 class="name"><strong>김범택</strong><span class="c_iden">이사장</span></h2>
-					<div class="con">
-						<p class="i1"><span class="sound_only">이메일</span><a href="mailto:lovesong@ajou.ac.kr">lovesong@ajou.ac.kr</a></p>
-						<p class="i2">아주대학교병원</p>
-					</div>
-				</div>
-			</li>
-			<li>
 				<div class="imgfit" aria-hidden="true"><img src="/images/img_officers02.png" alt=""></div>
 				<div class="txt">
 					<h2 class="name"><strong>박진규</strong><span class="c_iden">회장</span></h2>
 					<div class="con">
 						<p class="i1"><span class="sound_only">이메일</span><a href="mailto:jinkyupark@hotmail.com">jinkyupark@hotmail.com</a></p>
 						<p class="i2">PMC박병원</p>
+					</div>
+				</div>
+			</li>
+			<li>
+				<div class="imgfit" aria-hidden="true"><img src="/images/img_officers01.png" alt=""></div>
+				<div class="txt">
+					<h2 class="name"><strong>김범택</strong><span class="c_iden">이사장</span></h2>
+					<div class="con">
+						<p class="i1"><span class="sound_only">이메일</span><a href="mailto:lovesong@ajou.ac.kr">lovesong@ajou.ac.kr</a></p>
+						<p class="i2">아주대학교병원</p>
 					</div>
 				</div>
 			</li>

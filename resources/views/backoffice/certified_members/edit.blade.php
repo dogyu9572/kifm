@@ -31,6 +31,7 @@
             <form action="{{ route('backoffice.certified-members.update', $certifiedMember) }}" method="POST" class="bo-member-form">
                 @csrf
                 @method('PUT')
+                <input type="hidden" name="return_url" value="{{ $returnUrl }}">
                 @include('backoffice.certified_members._form')
                 <div class="board-form-actions board-form-actions--member-footer">
                     <button type="submit" class="btn btn-primary">
@@ -47,4 +48,3 @@
 @section('scripts')
 <script src="{{ asset('js/backoffice/member-selector-modal.js') }}"></script>
 @endsection
-

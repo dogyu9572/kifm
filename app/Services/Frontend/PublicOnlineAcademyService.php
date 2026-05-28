@@ -3,10 +3,14 @@
 namespace App\Services\Frontend;
 
 use App\Models\EduCourse;
+use App\Models\EduCourseEnrollment;
+use App\Models\Coupon;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -67,7 +71,7 @@ class PublicOnlineAcademyService
 
     public function findVisible(int $id): EduCourse
     {
-        $query = EduCourse::query()->with(['professorMember', 'examQuestions']);
+        $query = EduCourse::query()->with(['professorMember', 'examQuestions', 'gradePrices']);
         $this->applyVisibleScope($query);
 
         return $query->findOrFail($id);
@@ -182,6 +186,205 @@ class PublicOnlineAcademyService
         return Storage::disk('public')->url($course->lecture_file_path);
     }
 
+    public function entryUrl(EduCourse $course, ?User $user): string
+    {
+        if ($user !== null && $this->hasActiveEnrollment($course, $user)) {
+            return route('online_academy.show', $course);
+        }
+
+        return route('online_academy.payment', ['course' => $course->id]);
+    }
+
+    public function canViewCourse(EduCourse $course, ?User $user): bool
+    {
+        return $user !== null && $this->hasActiveEnrollment($course, $user);
+    }
+
+    public function hasActiveEnrollment(EduCourse $course, ?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->activeEnrollment($course, $user) !== null;
+    }
+
+    public function activeEnrollment(EduCourse $course, User $user): ?EduCourseEnrollment
+    {
+        return EduCourseEnrollment::query()
+            ->where('edu_course_id', $course->id)
+            ->where('member_id', $user->id)
+            ->whereNotIn('payment_status', ['cancel_requested', 'cancelled'])
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * @return array{eligible: bool, price: int, grade_label: string, message: string}
+     */
+    public function priceForUser(EduCourse $course, User $user): array
+    {
+        $grade = trim((string) $user->member_level);
+        $gradeLabels = \App\Services\Backoffice\MemberService::memberLevelLabels();
+        $gradeLabel = $gradeLabels[$grade] ?? ($grade !== '' ? $grade : '회원');
+
+        if ($this->isFreeCourse($course)) {
+            return [
+                'eligible' => true,
+                'price' => 0,
+                'grade_label' => $gradeLabel,
+                'message' => '',
+            ];
+        }
+
+        $course->loadMissing('gradePrices');
+        $gradePrice = $course->gradePrices->firstWhere('grade_code', $grade);
+        if (! $gradePrice || ! $gradePrice->is_enabled) {
+            return [
+                'eligible' => false,
+                'price' => 0,
+                'grade_label' => $gradeLabel,
+                'message' => '현재 회원 등급으로 신청할 수 없는 강좌입니다.',
+            ];
+        }
+
+        return [
+            'eligible' => true,
+            'price' => (int) ($gradePrice->price ?? 0),
+            'grade_label' => $gradeLabel,
+            'message' => '',
+        ];
+    }
+
+    public function createOrRefreshEnrollment(EduCourse $course, User $user): EduCourseEnrollment
+    {
+        return $this->createOrRefreshEnrollmentWithPayment($course, $user, []);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function createOrRefreshEnrollmentWithPayment(EduCourse $course, User $user, array $data): EduCourseEnrollment
+    {
+        $pricing = $this->priceForUser($course, $user);
+        if (! $pricing['eligible']) {
+            throw new \RuntimeException($pricing['message']);
+        }
+
+        $subtotal = (int) $pricing['price'];
+        $couponResult = $this->resolveCoupon($data['coupon_code'] ?? null, $subtotal);
+        $discount = (int) ($couponResult['discount'] ?? 0);
+        $coupon = $couponResult['coupon'] ?? null;
+        $amount = max(0, $subtotal - $discount);
+        $paymentMethod = (string) ($data['payment_method'] ?? 'bank_transfer');
+        $isFree = $amount <= 0;
+        $isCompletedPayment = $isFree || $paymentMethod === 'card';
+
+        return DB::transaction(function () use ($course, $user, $data, $subtotal, $discount, $coupon, $amount, $paymentMethod, $isFree, $isCompletedPayment) {
+            $enrollment = $this->activeEnrollment($course, $user) ?: new EduCourseEnrollment([
+                'edu_course_id' => $course->id,
+                'member_id' => $user->id,
+            ]);
+
+            if ($enrollment->exists && $this->canViewCourse($course, $user)) {
+                return $enrollment;
+            }
+
+            $enrollment->fill([
+                'member_name' => (string) ($user->name ?? ''),
+                'member_grade_at' => (string) ($user->member_level ?? ''),
+                'enrollment_status' => $isCompletedPayment ? 'in_progress' : 'payment_pending',
+                'progress_rate' => $enrollment->progress_rate ?? 0,
+                'exam_status' => $enrollment->exam_status ?? 'not_attempted',
+                'total_study_min' => $enrollment->total_study_min ?? 0,
+                'certificate_status' => $enrollment->certificate_status ?? 'not_issued',
+                'payment_no' => $enrollment->payment_no ?: $this->generatePaymentNo(),
+                'payment_status' => $isCompletedPayment ? 'completed' : 'pending',
+                'payment_method' => $isFree ? null : $paymentMethod,
+                'payment_item_name' => $course->title . ' 수강료',
+                'payment_amount' => $amount,
+                'paid_at' => $isCompletedPayment ? now() : null,
+                'bank_depositor' => $paymentMethod === 'bank_transfer' ? ($data['bank_depositor'] ?? null) : null,
+                'bank_deposit_date' => $paymentMethod === 'bank_transfer' ? ($data['bank_deposit_date'] ?? null) : null,
+                'receipt_issue' => (string) ($data['receipt_issue'] ?? 'NO'),
+                'receipt_type' => ($data['receipt_issue'] ?? 'NO') === 'YES' ? ($data['receipt_type'] ?? null) : null,
+                'receipt_number' => ($data['receipt_issue'] ?? 'NO') === 'YES' ? ($data['receipt_number'] ?? null) : null,
+                'admin_memo' => $this->paymentMemo($subtotal, $discount, $coupon?->coupon_code),
+                'applied_at' => $enrollment->applied_at ?: now(),
+                'expire_at' => $this->resolveExpireAt($course),
+            ]);
+            $enrollment->save();
+
+            if ($coupon) {
+                $coupon->increment('usage_count');
+            }
+
+            return $enrollment->fresh(['course']);
+        });
+    }
+
+    /**
+     * @return array{coupon: Coupon, discount: int, final_amount: int}|null
+     */
+    public function resolveCoupon(mixed $code, int $subtotal): ?array
+    {
+        $code = strtoupper(trim((string) $code));
+        if ($code === '' || $subtotal <= 0) {
+            return null;
+        }
+
+        $coupon = Coupon::query()
+            ->with('paymentCategories')
+            ->where('coupon_code', $code)
+            ->where('status', 'ACTIVE')
+            ->whereDate('valid_from', '<=', now()->toDateString())
+            ->whereDate('valid_to', '>=', now()->toDateString())
+            ->first();
+
+        if (! $coupon) {
+            return null;
+        }
+
+        $categories = $coupon->paymentCategories->pluck('payment_category')->all();
+        if (! in_array('education', $categories, true)) {
+            return null;
+        }
+
+        $discount = $coupon->discount_type === 'RATE'
+            ? (int) floor($subtotal * ((float) $coupon->discount_value / 100))
+            : (int) $coupon->discount_value;
+        $discount = max(0, min($subtotal, $discount));
+
+        return [
+            'coupon' => $coupon,
+            'discount' => $discount,
+            'final_amount' => max(0, $subtotal - $discount),
+        ];
+    }
+
+    /**
+     * @return array{subtotal: int, discount: int, final_amount: int, coupon_code: string}
+     */
+    public function paymentSummary(EduCourse $course, User $user, ?EduCourseEnrollment $enrollment = null): array
+    {
+        $pricing = $this->priceForUser($course, $user);
+        $subtotal = (int) ($pricing['price'] ?? 0);
+        $final = $enrollment ? (int) $enrollment->payment_amount : $subtotal;
+        $discount = max(0, $subtotal - $final);
+        $couponCode = '';
+
+        if ($enrollment && preg_match('/coupon=([A-Z0-9_-]+)/', (string) $enrollment->admin_memo, $matches)) {
+            $couponCode = $matches[1];
+        }
+
+        return [
+            'subtotal' => $subtotal,
+            'discount' => $discount,
+            'final_amount' => $final,
+            'coupon_code' => $couponCode,
+        ];
+    }
+
     public function periodText(EduCourse $course): string
     {
         if ($course->period_type === 'range' && $course->period_start && $course->period_end) {
@@ -189,6 +392,23 @@ class PublicOnlineAcademyService
         }
 
         return ((int) ($course->duration_days ?: 0)) . '일 수강';
+    }
+
+    public function isFreeCourse(EduCourse $course): bool
+    {
+        if ($course->free_yn !== 'Y') {
+            return false;
+        }
+
+        $today = now()->toDateString();
+        if ($course->free_start_date && $course->free_start_date->toDateString() > $today) {
+            return false;
+        }
+        if ($course->free_end_date && $course->free_end_date->toDateString() < $today) {
+            return false;
+        }
+
+        return true;
     }
 
     public function professorText(EduCourse $course): string
@@ -308,5 +528,34 @@ class PublicOnlineAcademyService
         $items = preg_split('/\s*,\s*/', (string) $value, -1, PREG_SPLIT_NO_EMPTY);
 
         return array_values(array_unique(array_map('trim', $items ?: [])));
+    }
+
+    private function resolveExpireAt(EduCourse $course): ?\Illuminate\Support\Carbon
+    {
+        if ($course->period_type === 'range') {
+            return $course->period_end?->copy()->endOfDay();
+        }
+
+        $days = max(1, (int) ($course->duration_days ?: 30));
+
+        return now()->addDays($days)->endOfDay();
+    }
+
+    private function generatePaymentNo(): string
+    {
+        do {
+            $no = 'OA-' . now()->format('YmdHis') . '-' . random_int(1000, 9999);
+        } while (EduCourseEnrollment::query()->where('payment_no', $no)->exists());
+
+        return $no;
+    }
+
+    private function paymentMemo(int $subtotal, int $discount, ?string $couponCode): ?string
+    {
+        if ($discount <= 0 && ! $couponCode) {
+            return null;
+        }
+
+        return 'subtotal=' . $subtotal . ';discount=' . $discount . ';coupon=' . ($couponCode ?: '');
     }
 }

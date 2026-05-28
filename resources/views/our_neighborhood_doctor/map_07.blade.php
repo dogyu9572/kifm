@@ -1,6 +1,6 @@
 <svg width="385" height="555" viewBox="0 0 385 555" fill="none" xmlns="http://www.w3.org/2000/svg" class="map_svg map_svg07">
 
-<!-- 지도 -->
+<!-- 세종 지도 -->
 <g class="map">
 	<!-- 금남면 -->
 	<g class="map19">

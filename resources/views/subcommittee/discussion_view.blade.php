@@ -19,7 +19,10 @@
 		<div class="board_view">
 			<div class="tit_area">
 				<h1 class="tit" id="subcommittee-post-heading">{{ $post->title }}</h1>
-				<div class="date"><strong class="sound_only">등록일</strong><p>{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</p></div>
+				<div class="date">
+					<strong class="tt">등록일</strong><p>{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</p>
+					<strong class="tt">조회수</strong><p>128</p>
+				</div>
 				<x-frontend.bookmark-button content-type="community_committee_discussions" :content-id="$post->id" :title="$post->title" :menu-label="$dName" :url="route('subcommittee.discussion_show', [$committee, $post->id])" />
 			</div>
 

@@ -8,6 +8,7 @@ use App\Models\MemberExecutive;
 use App\Models\User;
 use App\Services\Backoffice\MemberService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class MemberExecutiveController extends Controller
@@ -63,31 +64,42 @@ class MemberExecutiveController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $executive = new MemberExecutive([
+            'is_active' => true,
+        ]);
+        $member = $this->memberFromRequest($request);
+        if ($member) {
+            $executive->member_id = $member->id;
+            $executive->setRelation('member', $member);
+        }
+
         return view('backoffice.member_executives.create', [
-            'executive' => new MemberExecutive(),
+            'executive' => $executive,
             'roleLabels' => MemberExecutive::roleLabels(),
+            'returnUrl' => $this->safeBackofficeReturnUrl($request, route('backoffice.member-executives.index')),
         ]);
     }
 
-    public function store(MemberExecutiveRequest $request)
+    public function store(MemberExecutiveRequest $request): RedirectResponse
     {
         $payload = $this->buildPayload($request->validated());
         MemberExecutive::query()->create($payload);
 
         return redirect()
-            ->route('backoffice.member-executives.index')
+            ->to($this->safeBackofficeReturnUrl($request, route('backoffice.member-executives.index')))
             ->with('success', '임원 정보가 등록되었습니다.');
     }
 
-    public function edit(MemberExecutive $memberExecutive)
+    public function edit(Request $request, MemberExecutive $memberExecutive)
     {
         $memberExecutive->load('member');
 
         return view('backoffice.member_executives.edit', [
             'executive' => $memberExecutive,
             'roleLabels' => MemberExecutive::roleLabels(),
+            'returnUrl' => $this->safeBackofficeReturnUrl($request, route('backoffice.member-executives.index')),
         ]);
     }
 
@@ -147,14 +159,22 @@ class MemberExecutiveController extends Controller
         ]);
     }
 
-    public function update(MemberExecutiveRequest $request, MemberExecutive $memberExecutive)
+    public function update(MemberExecutiveRequest $request, MemberExecutive $memberExecutive): RedirectResponse
     {
         $payload = $this->buildPayload($request->validated());
         $memberExecutive->update($payload);
 
         return redirect()
-            ->route('backoffice.member-executives.index')
+            ->to($this->safeBackofficeReturnUrl($request, route('backoffice.member-executives.index')))
             ->with('success', '임원 정보가 수정되었습니다.');
+    }
+
+    public function destroy(Request $request, MemberExecutive $memberExecutive): RedirectResponse
+    {
+        $memberExecutive->delete();
+
+        return redirect($this->safeBackofficeReturnUrl($request, route('backoffice.member-executives.index')))
+            ->with('success', '임원 정보가 삭제되었습니다.');
     }
 
     private function buildPayload(array $validated): array
@@ -168,5 +188,27 @@ class MemberExecutiveController extends Controller
         return $validated;
     }
 
-}
+    private function memberFromRequest(Request $request): ?User
+    {
+        $memberId = $request->integer('member_id');
+        if ($memberId <= 0) {
+            return null;
+        }
 
+        return User::query()
+            ->where('role', 'user')
+            ->whereNull('withdrawn_at')
+            ->find($memberId);
+    }
+
+    private function safeBackofficeReturnUrl(Request $request, string $fallback): string
+    {
+        $returnUrl = (string) $request->input('return_url', '');
+        if ($returnUrl !== '' && str_starts_with($returnUrl, '/backoffice/') && ! str_starts_with($returnUrl, '//')) {
+            return $returnUrl;
+        }
+
+        return $fallback;
+    }
+
+}

@@ -189,7 +189,7 @@ class AdminMenuSeeder extends Seeder
     {
         "id": 39,
         "parent_id": 2,
-        "name": "카테고리 관리",
+        "name": "코드 관리",
         "url": "/backoffice/categories",
         "icon": null,
         "order": 4,

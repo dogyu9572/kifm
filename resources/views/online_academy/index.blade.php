@@ -4,6 +4,9 @@
 @section('gName', $gName)
 @section('sName', $sName)
 @section('content')
+@php
+	$currentMember = auth()->user();
+@endphp
 <main class="sub_area">
 
 @if ($featuredCourses->isNotEmpty())
@@ -16,7 +19,7 @@
 					<div class="swiper-wrapper">
 						@foreach ($featuredCourses as $featuredCourse)
 							<div class="swiper-slide">
-								<a href="{{ route('online_academy.show', $featuredCourse) }}">
+								<a href="{{ $onlineAcademy->entryUrl($featuredCourse, $currentMember) }}">
 									<span class="course">COURSE</span>
 									<h2 class="tit">{{ $featuredCourse->title }}</h2>
 									<p>{{ $onlineAcademy->summaryText($featuredCourse, 140) }}</p>
@@ -29,7 +32,7 @@
 					<div class="swiper-wrapper">
 						@foreach ($featuredCourses as $featuredCourse)
 							<div class="swiper-slide">
-								<a href="{{ route('online_academy.show', $featuredCourse) }}">
+								<a href="{{ $onlineAcademy->entryUrl($featuredCourse, $currentMember) }}">
 									<img src="{{ $onlineAcademy->imageUrl($featuredCourse->thumbnail_path, $onlineAcademy::FALLBACK_HEAD_IMAGE) }}" alt="">
 								</a>
 							</div>
@@ -119,7 +122,7 @@
 		<ul class="gallery_list gallery_academy">
 			@forelse ($courses as $course)
 				<li>
-					<a href="{{ route('online_academy.show', $course) }}">
+					<a href="{{ $onlineAcademy->entryUrl($course, $currentMember) }}">
 						<span class="imgfit" aria-hidden="true"><img src="{{ $onlineAcademy->imageUrl($course->thumbnail_path, $onlineAcademy::FALLBACK_LIST_IMAGE) }}" alt=""></span>
 						<span class="txt">
 							<span class="type">{{ $courseTypeLabels[$course->course_type] ?? $course->course_type }}<span class="time">{{ $onlineAcademy->periodText($course) }}</span></span>

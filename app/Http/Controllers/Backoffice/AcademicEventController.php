@@ -304,6 +304,7 @@ class AcademicEventController extends Controller
             'greeting_image' => 'greeting_image_path',
             'pc_banner' => 'pc_banner_path',
             'thumbnail' => 'thumbnail_path',
+            'exhibition_image' => 'exhibition_image_path',
             'event_material' => 'event_material_path',
             'abstract_book' => 'abstract_book_path',
         ] as $input => $col) {
@@ -395,6 +396,7 @@ class AcademicEventController extends Controller
             'greeting_image_path',
             'pc_banner_path',
             'thumbnail_path',
+            'exhibition_image_path',
             'event_material_path',
             'abstract_book_path',
         ] as $col) {
