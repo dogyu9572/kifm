@@ -272,7 +272,7 @@
 	</header>
 	<!-- //학술대회 -->
 	@endif
-	<div class="container_wrap g{{ $gNum }} {{ (isset($gNum) && $gNum !== 'main') ? 'sub_wrap' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'g'.$gNum : '' }} {{ (isset($gNum) && $gNum == 'intro') ? 'mt0' : '' }} {{ (isset($gNum) && $gNum == 'print') ? 'print_wrap' : '' }} {{ (isset($page_type) && $page_type == 'online_academy') ? 'online_academy_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference') ? 'academic_conference_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference' && $gNum == 'main') ? 'main' : '' }}">
+	<div class="container_wrap {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'sub_wrap' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'g'.$gNum : '' }} {{ (isset($gNum) && $gNum == 'intro') ? 'mt0' : '' }} {{ (isset($gNum) && $gNum == 'print') ? 'print_wrap' : '' }} {{ (isset($page_type) && $page_type == 'online_academy') ? 'online_academy_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference') ? 'academic_conference_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference' && $gNum == 'main') ? 'main' : '' }}">
 		@if(isset($gNum) && $gNum !== 'main' && $gNum !== 'intro' && $gNum !== 'print' && $gNum !== 'total_search')
 		<div class="svisual g{{ $gNum }} s{{ $sNum }} {{ ($gNum == 'online_academy' && $sNum != '00') ? 'hide' : '' }}">
 			@if(isset($gNum) && $gNum !== 'online_academy')
@@ -305,7 +305,7 @@
 		</div>
 		@endif
 		
-		@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '98' && $page_type !== 'academic_conference')
+		@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '98' && $gNum !== 'total_search' && $page_type !== 'academic_conference')
 		<nav class="sub_menu_area inner" id="sub-navi" aria-label="서브 메뉴">
 			<div class="menu set_g">
 				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-gnb-list">{{ $gName }}</button>

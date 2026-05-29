@@ -147,7 +147,7 @@
 	.footer .footer_menus a {display:block; font-size:16px; color:#fff; line-height:46px; width:200px; text-align:center;}
 
 /* main */
-	.container_wrap.gmain {overflow:visible;}
+	.container_wrap.main {overflow:visible;}
 	.main_wrap {color:#222;}
 	.main_visual_wrap {padding:41px 0 48px;}
 	.main_visual_wrap .inner {gap:60px;}
@@ -375,7 +375,7 @@
 	.tabs.mb48 {margin-bottom:48px;}
 	.tabs li {display:flex;}
 	.tabs a,
-	.tabs button {position:relative; color:#888; font-weight:600; line-height:1.5; padding-bottom:9px;}
+	.tabs button {position:relative; color:#888; font-weight:600; line-height:1.5; padding-bottom:9px; display:flex; justify-content:center; align-items:center; text-align:center;}
 	.tabs a:after,
 	.tabs button:after {content:""; position:absolute; bottom:0; left:50%; width:0; height:2px; background:#E60012; transform:translateX(-50%); transition:.2s linear;}
 	.tabs .on a,
@@ -508,6 +508,8 @@
 	.popup .gbox {padding:40px;}
 	.popup .btns {margin-top:32px; display:flex; gap:10px;}
 	.popup .btns .btn {width:calc(50% - 5px); font-weight:600; border-radius:8px;}
+	.popup .btns form {width:calc(50% - 5px);}
+	.popup .btns form .btn {width:100%;}
 	.popup .btn_close {position:absolute; top:0; right:0; width:60px; aspect-ratio:1/1; background:url('/images/btn_close.svg') no-repeat 50% 50%; font-size:0;}
 	.popup .scroll {width:calc(100% + 16px); padding-right:16px; overflow:hidden scroll; max-height:calc(100vh - 146px);}
 	.popup .scroll.auto {overflow:hidden auto;}
@@ -971,6 +973,7 @@
 	.dots_list li {position:relative; font-size:16px; color:inherit; padding-left:16px;}
 	.dots_list p:before,
 	.dots_list li:before {content:""; position:absolute; top:10px; left:0; width:4px; height:4px; background:#222; border-radius:50%;}
+
 /** 우리동네 주치의 **/
 	.search_wrap {background:#f8f8f8; padding:26px; justify-content:center; gap:16px;}
 	.search_wrap fieldset {display:flex; gap:inherit; overflow:visible;}
@@ -1033,6 +1036,7 @@
 	.pop_doctor .doctor_top .btm p:before {content:""; position:absolute; top:0; left:0; width:16px; height:27px; background:no-repeat 50% 50% / contain;}
 	.pop_doctor .doctor_top .btm .i1:before {background-image:url('/images/icon_hospital_list02.svg');}
 	.pop_doctor .doctor_top .btm .i2:before {background-image:url('/images/icon_hospital_list03.svg');}
+	.pop_doctor .doctor_con .tit {margin-top:24px;}
 
 /* 회원서비스 */
 	.member_inbox {width:100%; max-width:560px; margin:0 auto; line-height:1.5;}
@@ -1125,6 +1129,7 @@
 	.txt_scroll_area .txt_scroll {height:120px; overflow:hidden auto; padding-right:16px;}
 
 /** 마이페이지 **/
+	.g99 .sub_menu_area .menu {display:none;}
 	.g99 .tabs_wrap {margin-bottom:60px;}
 /* 개인정보 관리 */
 	.mytit {font-size:28px; font-weight:700; line-height:1.5; margin-bottom:16px;}
@@ -1359,7 +1364,9 @@
 	.online_academy_slide_wrap .tit {font-size:36px; font-weight:700; line-height:1.4; margin:16px 0;}
 	.online_academy_slide_wrap p {font-size:20px; line-height:1.5;}
 	.online_academy_slide_wrap .slide_img {width:567px;}
-	.online_academy_slide_wrap .slide_img a {display:block; width:100%; height:auto; aspect-ratio:166/89;}
+	.online_academy_slide_wrap .slide_img .swiper-slide {aspect-ratio:166/89;}
+	.online_academy_slide_wrap .slide_img a {display:block; width:100%; height:auto; aspect-ratio:166/89; overflow: hidden;}
+	.online_academy_slide_wrap .slide_img a img {width:100%; height:100%; object-fit:cover;}
 	.online_academy_slide_wrap .navi {position:absolute; bottom:48px; left:60px; display:flex; align-items:center; gap:8px;}
 	.online_academy_slide_wrap .navi .arrow {width:30px; height:30px; background:url('/images/arrow_slide3.svg') no-repeat 50% 50%; font-size:0;}
 	.online_academy_slide_wrap .navi .next {transform:scaleX(-1);}

@@ -56,14 +56,18 @@ class PublicBoardService
      * 인사말·회칙·약관·연혁 등 single page 보드에서 사용한다.
      * view_count 는 증분하지 않는다.
      */
-    public function findSingle(string $slug): ?object
+    public function findSingle(string $slug, ?int $id = null): ?object
     {
-        return DB::table($this->table($slug))
+        $query = DB::table($this->table($slug))
             ->whereNull('deleted_at')
             ->where('is_active', true)
-            ->where('is_secret', false)
-            ->orderBy('id', 'desc')
-            ->first();
+            ->where('is_secret', false);
+
+        if ($id !== null) {
+            $query->where('id', $id);
+        }
+
+        return $query->orderBy('id', 'desc')->first();
     }
 
     /**

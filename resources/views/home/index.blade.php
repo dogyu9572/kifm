@@ -34,7 +34,7 @@
 		</div>
 		<div class="right">
 			<!-- 로그인 전 -->
-			<div class="log_area before">
+			<!-- <div class="log_area before">
 				<h2><strong>로그인 후</strong> 맞춤정보를 확인해보세요</h2>
 				<div class="inputs">
 					<input type="text" class="text w100p" placeholder="아이디">
@@ -46,7 +46,7 @@
 						<li><a href="/auth/register">회원가입</a></li>
 					</ul>
 				</div>
-			</div>
+			</div> -->
 			<!-- 로그인 후-->
 			<div class="log_area after">
 				<ul class="member_type">
@@ -74,7 +74,7 @@
 					</div>
 				</div>
 				<!-- 로그인 후(인정의 미습득))-->
-				<div class="member_info">
+				<!-- <div class="member_info">
 					<div class="tit">
 						<strong>인정의 취득 요건 현황</strong>
 						<p>인정의 취득을 위해 아래 조건을 충족해주세요</p>
@@ -92,9 +92,9 @@
 							<a href="#this" class="btn btn_wrr w100p">미수료</a>
 						</div>
 					</div>
-				</div>
+				</div> -->
 				<!-- 로그인 후(인정의 습득))-->
-				<div class="member_info">
+				<!-- <div class="member_info">
 					<div class="tit">
 						<div class="flex">
 							<strong>자격 유효기간</strong>
@@ -115,7 +115,7 @@
 							<div class="count"><strong class="c_iden">1</strong>/3차시</div>
 						</div>
 					</div>
-				</div>
+				</div> -->
 				<div class="btns">
 					<a href="/mypage/profile_edit" class="btn btn_wbb">마이페이지</a>
 					<a href="/mypage/online_training" class="btn btn_wkk">강의실 입장</a>

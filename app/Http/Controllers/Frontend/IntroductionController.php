@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\CommunityCommittee;
 use App\Services\Frontend\PublicBoardService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class IntroductionController extends Controller
@@ -173,10 +175,12 @@ class IntroductionController extends Controller
         $geName = 'introduction';
         $gSlug = 'introduction_bylaws';
 
-        return view('introduction.bylaws', compact('page_type', 'gNum', 'sNum', 'dNum', 'gName', 'sName', 'dName', 'geName', 'gSlug'));
+        $post = $this->publicBoardService->findSingle('society_rules', 1);
+
+        return view('introduction.bylaws', compact('page_type', 'gNum', 'sNum', 'dNum', 'gName', 'sName', 'dName', 'geName', 'gSlug', 'post'));
     }
 
-    public function bylawsOperation(): View
+    public function bylawsOperation(Request $request): View
     {
         $page_type = 'professional';
         $gNum = '01';
@@ -188,10 +192,34 @@ class IntroductionController extends Controller
         $geName = 'introduction';
         $gSlug = 'introduction_bylaws_operation';
 
-        return view('introduction.bylaws_operation', compact('page_type', 'gNum', 'sNum', 'dNum', 'gName', 'sName', 'dName', 'geName', 'gSlug'));
+        $committees = CommunityCommittee::query()
+            ->where('visibility_yn', 'Y')
+            ->orderBy('name', 'asc')
+            ->orderByDesc('id')
+            ->get(['id', 'name', 'regulation']);
+
+        $selectedCommitteeId = (int) $request->query('committee_id', 0);
+        $selectedCommittee = $selectedCommitteeId > 0
+            ? $committees->firstWhere('id', $selectedCommitteeId)
+            : null;
+
+        return view('introduction.bylaws_operation', compact(
+            'page_type',
+            'gNum',
+            'sNum',
+            'dNum',
+            'gName',
+            'sName',
+            'dName',
+            'geName',
+            'gSlug',
+            'committees',
+            'selectedCommittee',
+            'selectedCommitteeId'
+        ));
     }
 
-    public function bylawsProtocol(): View
+    public function bylawsProtocol(Request $request): View
     {
         $page_type = 'professional';
         $gNum = '01';
@@ -203,7 +231,31 @@ class IntroductionController extends Controller
         $geName = 'introduction';
         $gSlug = 'introduction_bylaws_protocol';
 
-        return view('introduction.bylaws_protocol', compact('page_type', 'gNum', 'sNum', 'dNum', 'gName', 'sName', 'dName', 'geName', 'gSlug'));
+        $committees = CommunityCommittee::query()
+            ->where('visibility_yn', 'Y')
+            ->orderBy('name', 'asc')
+            ->orderByDesc('id')
+            ->get(['id', 'name', 'protocol']);
+
+        $selectedCommitteeId = (int) $request->query('committee_id', 0);
+        $selectedCommittee = $selectedCommitteeId > 0
+            ? $committees->firstWhere('id', $selectedCommitteeId)
+            : null;
+
+        return view('introduction.bylaws_protocol', compact(
+            'page_type',
+            'gNum',
+            'sNum',
+            'dNum',
+            'gName',
+            'sName',
+            'dName',
+            'geName',
+            'gSlug',
+            'committees',
+            'selectedCommittee',
+            'selectedCommitteeId'
+        ));
     }
 
     public function officers(): View

@@ -118,6 +118,10 @@
 @push('scripts')
 <script src="{{ asset('js/frontend/script_bookmark.js') }}"></script>
 <script>
+window.addEventListener('DOMContentLoaded', () => {
+    const chatArea = document.querySelector('.chat_area');
+    if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
+});
 document.addEventListener("DOMContentLoaded", function () {
     const fileInputs = document.querySelectorAll('.input_attach input[type="file"]');
 
