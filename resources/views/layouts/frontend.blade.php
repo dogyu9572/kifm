@@ -128,17 +128,17 @@
 				@if(isset($gNum) && $gNum !== 'online_academy')
 				<ul class="member" aria-label="회원 메뉴">
 					@guest
-					<li><a href="{{ route('member.login') }}">로그인</a></li>
-					<li><a href="{{ route('member.register') }}">회원가입</a></li>
+					<li class="i1"><a href="{{ route('member.login') }}">로그인</a></li>
+					<li class="i2"><a href="{{ route('member.register') }}">회원가입</a></li>
 					@else
-					<li>
+					<li class="i1">
 						<form action="{{ route('member.logout') }}" method="POST" class="member-nav-logout-form">
 							@csrf
 							<button type="submit" class="member-nav-link">로그아웃</button>
 						</form>
 					</li>
 					@if(auth()->user()?->role === 'user')
-					<li><a href="{{ route('mypage.profile_edit') }}">마이페이지</a></li>
+					<li class="i2"><a href="{{ route('mypage.profile_edit') }}">마이페이지</a></li>
 					@endif
 					@endguest
 				</ul>
@@ -159,12 +159,7 @@
 					</search>
 				</div>
 				<div class="right">
-					<!-- <div class="book">
-						<p class="book_label">학회지</p>
-						<p class="book_title">
-							<a href="/archives/academic">장내 미생물과 대사 질환: 기능의학회</a>
-						</p>
-					</div> -->
+					<button type="button" class="btn_search_mobile mo_vw" aria-label="모바일 검색창 열기">검색</button>
 					<button type="button" class="btn_chatbot" aria-label="챗봇 열기">챗봇</button>
 					<button type="button" class="btn_menu" aria-label="전체 메뉴 열기" aria-controls="main-navi" aria-expanded="false">
 						<span class="line t" aria-hidden="true"></span>
@@ -195,7 +190,7 @@
 						</ul>
 					</li>
 					<li class="menu {{ ($gNum ?? '') == '02' ? 'on' : '' }}">
-						<a href="/academic_event/conference" id="main-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>학술행사</a>
+						<a href="/academic_event/annual_schedule" id="main-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>학술행사</a>
 						<ul class="snb" aria-labelledby="main-menu-02">
 							<li><a href="/academic_event/annual_schedule" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>KIFM 연간일정</a></li>
 							<li><a href="/academic_event/academic_history" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>학술대회 연혁</a></li>
@@ -277,7 +272,7 @@
 	</header>
 	<!-- //학술대회 -->
 	@endif
-	<div class="container_wrap {{ (isset($gNum) && $gNum !== 'main') ? 'sub_wrap' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'g'.$gNum : '' }} {{ (isset($gNum) && $gNum == 'intro') ? 'mt0' : '' }} {{ (isset($gNum) && $gNum == 'print') ? 'print_wrap' : '' }} {{ (isset($page_type) && $page_type == 'online_academy') ? 'online_academy_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference') ? 'academic_conference_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference' && $gNum == 'main') ? 'main' : '' }}">
+	<div class="container_wrap g{{ $gNum }} {{ (isset($gNum) && $gNum !== 'main') ? 'sub_wrap' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'g'.$gNum : '' }} {{ (isset($gNum) && $gNum == 'intro') ? 'mt0' : '' }} {{ (isset($gNum) && $gNum == 'print') ? 'print_wrap' : '' }} {{ (isset($page_type) && $page_type == 'online_academy') ? 'online_academy_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference') ? 'academic_conference_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference' && $gNum == 'main') ? 'main' : '' }}">
 		@if(isset($gNum) && $gNum !== 'main' && $gNum !== 'intro' && $gNum !== 'print' && $gNum !== 'total_search')
 		<div class="svisual g{{ $gNum }} s{{ $sNum }} {{ ($gNum == 'online_academy' && $sNum != '00') ? 'hide' : '' }}">
 			@if(isset($gNum) && $gNum !== 'online_academy')
@@ -310,13 +305,13 @@
 		</div>
 		@endif
 		
-		@if(isset($gNum) && $gNum !== '98' && $page_type !== 'academic_conference')
+		@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '98' && $page_type !== 'academic_conference')
 		<nav class="sub_menu_area inner" id="sub-navi" aria-label="서브 메뉴">
 			<div class="menu set_g">
 				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-gnb-list">{{ $gName }}</button>
 				<ul id="sub-gnb-list">
 					<li class="{{ ($gNum ?? '') == '01' ? 'on' : '' }}"><a href="/introduction/overview" @if(($gNum ?? '') == '01') aria-current="page" @endif>학회소개</a></li>
-					<li class="{{ ($gNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_event/conference" @if(($gNum ?? '') == '02') aria-current="page" @endif>학술행사</a></li>
+					<li class="{{ ($gNum ?? '') == '02' ? 'on' : '' }}"><a href="/academic_event/annual_schedule" @if(($gNum ?? '') == '02') aria-current="page" @endif>학술행사</a></li>
 					<li class="{{ ($gNum ?? '') == '03' ? 'on' : '' }}"><a href="/subcommittee" @if(($gNum ?? '') == '03') aria-current="page" @endif>산하위원회</a></li>
 					<li class="{{ ($gNum ?? '') == '04' ? 'on' : '' }}"><a href="/archives/general" @if(($gNum ?? '') == '04') aria-current="page" @endif>학회 자료실</a></li>
 					<li class="{{ ($gNum ?? '') == '05' ? 'on' : '' }}"><a href="/member_plaza/society_notices" @if(($gNum ?? '') == '05') aria-current="page" @endif>회원광장</a></li>
@@ -504,13 +499,13 @@
 						</ul>
 					</address>
 					<p class="copyright">Copyright ⓒ Korean Society for Functional Medicine. All rights reserved.</p>
+					<nav class="footer_menus" aria-label="푸터 메뉴">
+						<ul class="flex">
+							<li><a href="/terms/privacy_policy">개인정보처리방침</a></li>
+							<li><a href="/terms/email_collection_refusal">이메일무단수집거부</a></li>
+						</ul>
+					</nav>
 				</div>
-				<nav class="footer_menus" aria-label="푸터 메뉴">
-					<ul class="flex">
-						<li><a href="/terms/privacy_policy">개인정보처리방침</a></li>
-						<li><a href="/terms/email_collection_refusal">이메일무단수집거부</a></li>
-					</ul>
-				</nav>
 			</div>
 		</section>
 	</footer>

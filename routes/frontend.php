@@ -59,8 +59,12 @@ Route::prefix('academic_event')->name('academic_event.')->group(function () {
     Route::get('/conference/view', [AcademicEventController::class, 'conferenceView'])->name('conference_view');
     Route::get('/training_course', [AcademicEventController::class, 'trainingCourse'])->name('training_course');
     Route::get('/training_course/view', [AcademicEventController::class, 'trainingCourseView'])->name('training_course_view');
+    Route::get('/training_course/textbook/{training}/download', [AcademicEventController::class, 'downloadTrainingTextbook'])->name('training_course_textbook.download');
+    Route::get('/training_course/attachment/{attachment}/download', [AcademicEventController::class, 'downloadTrainingAttachment'])->name('training_course_attachment.download');
     Route::get('/training_course/payment', [AcademicEventController::class, 'trainingCoursePayment'])->name('training_course_payment');
     Route::post('/training_course/payment', [AcademicEventController::class, 'storeTrainingCoursePayment'])->name('training_course_payment.store');
+    Route::get('/training_course/payment/toss/success', [AcademicEventController::class, 'confirmTrainingCourseTossPayment'])->name('training_course_payment.toss_success');
+    Route::get('/training_course/payment/toss/fail', [AcademicEventController::class, 'failTrainingCourseTossPayment'])->name('training_course_payment.toss_fail');
     Route::post('/training_course/payment/coupon', [AcademicEventController::class, 'applyTrainingCourseCoupon'])->name('training_course_payment.coupon');
     Route::get('/training_course/end', [AcademicEventController::class, 'trainingCourseEnd'])->name('training_course_end');
 });
@@ -120,6 +124,8 @@ Route::prefix('online_academy')->name('online_academy.')->group(function () {
     Route::post('/payment', [OnlineAcademyController::class, 'storePayment'])->name('payment.store');
     Route::get('/payment/checkout', [OnlineAcademyController::class, 'checkout'])->name('payment.checkout');
     Route::post('/payment/checkout', [OnlineAcademyController::class, 'completePayment'])->name('payment.complete');
+    Route::get('/payment/toss/success', [OnlineAcademyController::class, 'confirmTossPayment'])->name('payment.toss_success');
+    Route::get('/payment/toss/fail', [OnlineAcademyController::class, 'failTossPayment'])->name('payment.toss_fail');
     Route::get('/payment/end', [OnlineAcademyController::class, 'paymentEnd'])->name('payment.end');
     Route::post('/payment/coupon', [OnlineAcademyController::class, 'applyCoupon'])->name('payment.coupon');
     Route::get('/{course}/exam', [OnlineAcademyController::class, 'exam'])->whereNumber('course')->name('exam');
@@ -289,6 +295,12 @@ Route::prefix('academic_conference')->name('academic_conference.')->group(functi
     Route::post('/{folderName}/registration/coupon', [AcademicConferenceSiteController::class, 'applyRegistrationCoupon'])
         ->where('folderName', '[A-Za-z0-9_-]+')
         ->name('site.registration.coupon');
+    Route::get('/{folderName}/registration/toss/success', [AcademicConferenceSiteController::class, 'confirmTossRegistrationPayment'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.registration.toss_success');
+    Route::get('/{folderName}/registration/toss/fail', [AcademicConferenceSiteController::class, 'failTossRegistrationPayment'])
+        ->where('folderName', '[A-Za-z0-9_-]+')
+        ->name('site.registration.toss_fail');
     Route::post('/{folderName}/registration/check_non_member', [AcademicConferenceSiteController::class, 'checkNonMemberRegistration'])
         ->where('folderName', '[A-Za-z0-9_-]+')
         ->name('site.registration.check_non_member');

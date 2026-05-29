@@ -38,7 +38,7 @@
                             @endphp
                             <li @class(['end' => ! $canApply])>
                                 <div class="checkbox">
-                                    <input type="checkbox" name="round_ids[]" id="training_round_{{ $round->id }}" value="{{ $round->id }}" data-price="{{ $pricing['price'] }}" data-label="{{ $round->round_label }}" @checked(in_array((string) $round->id, old('round_ids', []), true)) @disabled(! $canApply)>
+                                    <input type="checkbox" name="round_ids[]" id="training_round_{{ $round->id }}" value="{{ $round->id }}" data-price="{{ $pricing['price'] }}" data-label="{{ $training->title }} - {{ $round->round_label }}" @checked(in_array((string) $round->id, old('round_ids', []), true)) @disabled(! $canApply)>
                                     <label for="training_round_{{ $round->id }}">
                                         <i aria-hidden="true"></i>
                                         <span>
@@ -109,7 +109,8 @@
                                 <label for="training-payment-bank"><span>무통장입금</span></label>
                             </li>
                         </ul>
-                        <p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
+                        <p class="c_red type_card" role="alert">* 신용카드 결제는 토스페이먼츠 테스트 결제창으로 진행됩니다.</p>
+                        @error('payment')<span class="c_red">{{ $message }}</span>@enderror
                         <p class="c_red type_bank_hide" role="alert">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
                         <div class="type_bank_hide">
                             <ul class="long_label">
@@ -127,7 +128,7 @@
                                 </li>
                                 <li>
                                     <label for="training-bank-date">입금 예정일<span class="required">*</span></label>
-                                    <input type="date" id="training-bank-date" name="bank_deposit_date" class="text" value="{{ old('bank_deposit_date') }}">
+                                    <input type="text" id="training-bank-date" name="bank_deposit_date" class="text" value="{{ old('bank_deposit_date') }}" placeholder="2026-02-15">
                                     @error('bank_deposit_date')<span class="c_red">{{ $message }}</span>@enderror
                                 </li>
                             </ul>

@@ -103,6 +103,7 @@ class EduTrainingService
         $training->use_round = (bool) ($validated['use_round'] ?? true);
         $training->status = (string) $validated['status'];
         $training->overview = isset($validated['overview']) ? (string) $validated['overview'] : null;
+        $training->program = isset($validated['program']) ? (string) $validated['program'] : null;
         $training->registration_info = isset($validated['registration_info']) ? (string) $validated['registration_info'] : null;
         $training->introduction = isset($validated['introduction']) ? (string) $validated['introduction'] : null;
 

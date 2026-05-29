@@ -42,6 +42,7 @@ $(document).ready(function(){
 		$(".header").removeClass("on");
 		setSitemapTabindex(false);
 		$(".btn_menu").attr("aria-expanded", false).attr("aria-label", "전체 메뉴 열기");
+		$(".header .btm .center").removeClass("on");
 	});
 
 //footer
@@ -154,6 +155,16 @@ $(document).ready(function(){
 		}
 	});
 
+//mobile
+	$(".header .sitemap .menu > a").click(function(e){
+		if (window.matchMedia("(max-width: 1023px)").matches && $(this).next(".snb").length > 0) {
+			e.preventDefault();
+			$(this).next(".snb").stop(true,true).toggle().parent().stop(true,true).toggleClass("open").siblings().removeClass("on open").children(".snb").hide();
+		}
+	});
+	$(".btn_search_mobile").click(function(){
+		$(".header .btm .center").fadeToggle("fast");
+	});
 //브라우저 사이즈
 	let vh = window.innerHeight * 0.01; 
 	document.documentElement.style.setProperty('--vh', `${vh}px`);

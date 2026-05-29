@@ -94,6 +94,17 @@
 
 <div class="bo-edu-form-row">
     <div class="board-form-group bo-edu-form-row-full mb-0">
+        <label for="program" class="board-form-label">프로그램</label>
+        <textarea name="program" id="program" class="board-form-control board-form-textarea" rows="10"
+            data-backoffice-ckeditor data-source-editing="true">{{ old('program', optional($eduTraining)->program ?? '') }}</textarea>
+        @error('program')
+            <span class="bo-inline-error">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
+<div class="bo-edu-form-row">
+    <div class="board-form-group bo-edu-form-row-full mb-0">
         <label for="registration_info" class="board-form-label">사전등록 안내 및 인정의 제도</label>
         <textarea name="registration_info" id="registration_info" class="board-form-control board-form-textarea" rows="10"
             data-backoffice-ckeditor data-source-editing="true">{{ old('registration_info', optional($eduTraining)->registration_info ?? '') }}</textarea>

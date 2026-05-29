@@ -36,30 +36,22 @@
     }
 
     function initProgressBar() {
-        document.querySelectorAll('.participation_area').forEach(function (area) {
-            var percent = parseFloat(area.getAttribute('data-progress-percent') || '');
-            if (!isNaN(percent)) {
-                var bar = area.querySelector('.state_line .bar');
-                if (bar) {
-                    bar.style.width = Math.min(100, Math.max(0, percent)) + '%';
-                }
-                return;
-            }
-            var text = area.querySelector('.info .l');
-            if (!text) {
-                return;
-            }
-            var matches = text.textContent.match(/\d+/g);
-            if (matches && matches.length >= 2) {
-                var current = parseInt(matches[0], 10);
-                var total = parseInt(matches[1], 10);
-                var barEl = area.querySelector('.state_line .bar');
-                if (barEl && total > 0) {
-                    barEl.style.width = (current / total) * 100 + '%';
-                }
-            }
-        });
-    }
+		document.querySelectorAll('.participation_area .box').forEach(function(box) {
+			var countEl = box.querySelector('.count');
+			if (!countEl) return;
+
+			var nums = countEl.textContent.match(/\d+/g);
+			if (!nums || nums.length < 2) return;
+
+			var current = parseInt(nums[0], 10);
+			var total   = parseInt(nums[1], 10);
+			var barEl   = box.querySelector('.state_line .bar');
+
+			if (barEl && total > 0) {
+				barEl.style.width = (current / total) * 100 + '%';
+			}
+		});
+	}
 
     function postJson(url, body) {
         return fetch(url, {

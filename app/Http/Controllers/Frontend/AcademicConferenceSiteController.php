@@ -19,6 +19,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use RuntimeException;
 
 class AcademicConferenceSiteController extends Controller
 {
@@ -327,7 +328,7 @@ class AcademicConferenceSiteController extends Controller
             ->with('success', '초록이 수정되었습니다.');
     }
 
-    public function storeRegistration(AcademicConferenceRegistrationRequest $request, string $folderName): RedirectResponse
+    public function storeRegistration(AcademicConferenceRegistrationRequest $request, string $folderName): JsonResponse|RedirectResponse
     {
         $event = $this->conferenceService->findPublicEventByFolder($folderName);
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
@@ -346,6 +347,20 @@ class AcademicConferenceSiteController extends Controller
                 ->withErrors(['coupon_code' => '사용 가능한 쿠폰이 아닙니다.']);
         }
 
+        if ($request->validated('payment_method') === 'card') {
+            if (! $this->hasTossKeys()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '토스페이먼츠 테스트 키가 설정되어 있지 않습니다.',
+                    'errors' => ['payment' => ['토스페이먼츠 테스트 키가 설정되어 있지 않습니다.']],
+                ], 422);
+            }
+
+            $registration = $this->registrationService->createCardPendingRegistration($event, $user, $plans, $request->validated());
+
+            return response()->json($this->tossPaymentPayload($event, $registration));
+        }
+
         $registration = $this->registrationService->createBankTransferRegistration($event, $user, $plans, $request->validated());
 
         return redirect()->to($conferenceBaseUrl . '/registration/end')
@@ -353,7 +368,7 @@ class AcademicConferenceSiteController extends Controller
             ->with('success', '사전등록 신청이 접수되었습니다. 입금 확인 후 승인 처리됩니다.');
     }
 
-    public function storeNonMemberRegistration(AcademicConferenceNonMemberRegistrationRequest $request, string $folderName): RedirectResponse
+    public function storeNonMemberRegistration(AcademicConferenceNonMemberRegistrationRequest $request, string $folderName): JsonResponse|RedirectResponse
     {
         $event = $this->conferenceService->findPublicEventByFolder($folderName);
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
@@ -370,12 +385,70 @@ class AcademicConferenceSiteController extends Controller
                 ->withErrors(['coupon_code' => '사용 가능한 쿠폰이 아닙니다.']);
         }
 
+        if ($request->validated('payment_method') === 'card') {
+            if (! $this->hasTossKeys()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '토스페이먼츠 테스트 키가 설정되어 있지 않습니다.',
+                    'errors' => ['payment' => ['토스페이먼츠 테스트 키가 설정되어 있지 않습니다.']],
+                ], 422);
+            }
+
+            $registration = $this->registrationService->createCardPendingNonMemberRegistration($event, $plans, $request->validated());
+
+            return response()->json($this->tossPaymentPayload($event, $registration));
+        }
+
         $registration = $this->registrationService->createBankTransferNonMemberRegistration($event, $plans, $request->validated());
 
         return redirect()->to($conferenceBaseUrl . '/registration/end')
             ->with('academic_conference_registration_id', $registration->id)
             ->with('academic_conference_registration_lookup_id', $registration->id)
             ->with('success', '사전등록 신청이 접수되었습니다. 입금 확인 후 승인 처리됩니다.');
+    }
+
+    public function confirmTossRegistrationPayment(Request $request, string $folderName): RedirectResponse
+    {
+        $event = $this->conferenceService->findPublicEventByFolder($folderName);
+        $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
+
+        $validated = $request->validate([
+            'paymentKey' => ['required', 'string'],
+            'orderId' => ['required', 'string'],
+            'amount' => ['required', 'integer', 'min:0'],
+        ]);
+
+        try {
+            $registration = $this->registrationService->confirmTossPayment(
+                $event,
+                $validated['orderId'],
+                $validated['paymentKey'],
+                (int) $validated['amount']
+            );
+        } catch (RuntimeException $e) {
+            $formPath = $this->isFrontendMemberLoggedIn() ? '/registration/form' : '/registration/form_non_member';
+
+            return redirect()->to($conferenceBaseUrl . $formPath)
+                ->withErrors(['payment' => $e->getMessage()]);
+        }
+
+        session(['academic_conference_registration_id' => $registration->id]);
+        if (! $registration->member_id) {
+            session(['academic_conference_registration_lookup_id' => $registration->id]);
+        }
+
+        return redirect()->to($conferenceBaseUrl . '/registration/end')
+            ->with('success', '토스페이먼츠 결제가 완료되었습니다.');
+    }
+
+    public function failTossRegistrationPayment(Request $request, string $folderName): RedirectResponse
+    {
+        $event = $this->conferenceService->findPublicEventByFolder($folderName);
+        $message = trim((string) $request->query('message'));
+        $formPath = $this->isFrontendMemberLoggedIn() ? '/registration/form' : '/registration/form_non_member';
+
+        return redirect()->to($this->conferenceService->baseUrl($event) . $formPath)
+            ->withErrors(['payment' => $message !== '' ? $message : '토스페이먼츠 결제가 취소되었거나 실패했습니다.']);
     }
 
     public function applyRegistrationCoupon(Request $request, string $folderName): JsonResponse
@@ -521,5 +594,33 @@ class AcademicConferenceSiteController extends Controller
             'sName' => $title,
             'gSlug' => 'academic_conference_registration_print',
         ], $with));
+    }
+
+    private function hasTossKeys(): bool
+    {
+        return (string) config('services.toss.client_key') !== ''
+            && (string) config('services.toss.secret_key') !== '';
+    }
+
+    private function tossPaymentPayload(AcademicEvent $event, AcademicEventRegistration $registration): array
+    {
+        $summary = $this->registrationService->registrationSummary($registration->loadMissing('items'));
+        $baseUrl = $this->conferenceService->baseUrl($event);
+
+        return [
+            'success' => true,
+            'clientKey' => (string) config('services.toss.client_key'),
+            'orderId' => $registration->registration_no,
+            'orderName' => mb_substr($summary['item_names'] ?: $event->title, 0, 100),
+            'amount' => (int) $registration->total_amount,
+            'customerName' => $registration->name,
+            'customerEmail' => $registration->email,
+            'customerMobilePhone' => $registration->phone,
+            'customerKey' => $registration->member_id
+                ? 'kifm-member-' . $registration->member_id
+                : 'kifm-guest-' . $registration->id,
+            'successUrl' => $baseUrl . '/registration/toss/success',
+            'failUrl' => $baseUrl . '/registration/toss/fail',
+        ];
     }
 }

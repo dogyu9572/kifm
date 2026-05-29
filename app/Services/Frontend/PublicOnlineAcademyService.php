@@ -11,8 +11,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class PublicOnlineAcademyService
 {
@@ -278,9 +280,10 @@ class PublicOnlineAcademyService
         $amount = max(0, $subtotal - $discount);
         $paymentMethod = (string) ($data['payment_method'] ?? 'bank_transfer');
         $isFree = $amount <= 0;
-        $isCompletedPayment = $isFree || $paymentMethod === 'card';
+        $isCompletedPayment = $isFree;
+        $isPendingCardPayment = ! $isFree && $paymentMethod === 'card';
 
-        return DB::transaction(function () use ($course, $user, $data, $subtotal, $discount, $coupon, $amount, $paymentMethod, $isFree, $isCompletedPayment) {
+        return DB::transaction(function () use ($course, $user, $data, $subtotal, $discount, $coupon, $amount, $paymentMethod, $isFree, $isCompletedPayment, $isPendingCardPayment) {
             $enrollment = $this->activeEnrollment($course, $user) ?: new EduCourseEnrollment([
                 'edu_course_id' => $course->id,
                 'member_id' => $user->id,
@@ -299,7 +302,7 @@ class PublicOnlineAcademyService
                 'total_study_min' => $enrollment->total_study_min ?? 0,
                 'certificate_status' => $enrollment->certificate_status ?? 'not_issued',
                 'payment_no' => $enrollment->payment_no ?: $this->generatePaymentNo(),
-                'payment_status' => $isCompletedPayment ? 'completed' : 'pending',
+                'payment_status' => $isCompletedPayment ? 'completed' : ($isPendingCardPayment ? 'pending_payment' : 'pending'),
                 'payment_method' => $isFree ? null : $paymentMethod,
                 'payment_item_name' => $course->title . ' 수강료',
                 'payment_amount' => $amount,
@@ -315,12 +318,72 @@ class PublicOnlineAcademyService
             ]);
             $enrollment->save();
 
-            if ($coupon) {
+            if ($coupon && ! $isPendingCardPayment) {
                 $coupon->increment('usage_count');
             }
 
             return $enrollment->fresh(['course']);
         });
+    }
+
+    public function confirmTossPayment(string $orderId, string $paymentKey, int $amount, User $user): EduCourseEnrollment
+    {
+        $enrollment = EduCourseEnrollment::query()
+            ->with('course')
+            ->where('member_id', $user->id)
+            ->where('payment_no', $orderId)
+            ->where('payment_method', 'card')
+            ->first();
+
+        if (! $enrollment) {
+            throw new RuntimeException('확인할 온라인 아카데미 카드 결제 신청 내역이 없습니다.');
+        }
+        if ((int) $enrollment->payment_amount !== $amount) {
+            throw new RuntimeException('결제 금액이 신청 금액과 일치하지 않습니다.');
+        }
+        if ($enrollment->payment_status === 'completed') {
+            return $enrollment;
+        }
+
+        $payload = $this->requestTossConfirm($paymentKey, $orderId, $amount);
+        $isCompleted = ($payload['status'] ?? null) === 'DONE';
+        $memo = (string) ($enrollment->admin_memo ?? '');
+        if ($isCompleted && preg_match('/coupon=([A-Z0-9_-]+)/', $memo, $matches) && ! str_contains($memo, 'coupon_counted=1')) {
+            Coupon::query()->where('coupon_code', $matches[1])->increment('usage_count');
+            $memo = trim($memo . ';coupon_counted=1', ';');
+        }
+
+        $enrollment->update([
+            'enrollment_status' => $isCompleted ? 'in_progress' : 'payment_pending',
+            'payment_status' => $isCompleted ? 'completed' : 'pending_payment',
+            'paid_at' => $isCompleted ? now() : null,
+            'admin_memo' => trim($memo . ';toss_payment_key=' . $paymentKey, ';'),
+        ]);
+
+        return $enrollment->refresh()->loadMissing('course');
+    }
+
+    private function requestTossConfirm(string $paymentKey, string $orderId, int $amount): array
+    {
+        $secretKey = (string) config('services.toss.secret_key');
+        if ($secretKey === '') {
+            throw new RuntimeException('토스페이먼츠 시크릿 키가 설정되어 있지 않습니다.');
+        }
+
+        $response = Http::withBasicAuth($secretKey, '')
+            ->acceptJson()
+            ->post('https://api.tosspayments.com/v1/payments/confirm', [
+                'paymentKey' => $paymentKey,
+                'orderId' => $orderId,
+                'amount' => $amount,
+            ]);
+
+        $payload = $response->json();
+        if (! $response->successful()) {
+            throw new RuntimeException((string) ($payload['message'] ?? '토스페이먼츠 결제 승인에 실패했습니다.'));
+        }
+
+        return is_array($payload) ? $payload : [];
     }
 
     /**

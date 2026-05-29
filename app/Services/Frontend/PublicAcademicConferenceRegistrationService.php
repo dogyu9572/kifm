@@ -12,6 +12,8 @@ use App\Services\Backoffice\AcademicEventRegistrationService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use RuntimeException;
 
 class PublicAcademicConferenceRegistrationService
 {
@@ -226,13 +228,25 @@ class PublicAcademicConferenceRegistrationService
     /** @param Collection<int, PaymentPlan> $plans */
     public function createBankTransferRegistration(AcademicEvent $event, User $user, Collection $plans, array $data): AcademicEventRegistration
     {
+        return $this->createMemberRegistration($event, $user, $plans, $data, 'bank_transfer', 'pending');
+    }
+
+    /** @param Collection<int, PaymentPlan> $plans */
+    public function createCardPendingRegistration(AcademicEvent $event, User $user, Collection $plans, array $data): AcademicEventRegistration
+    {
+        return $this->createMemberRegistration($event, $user, $plans, $data, 'card', 'pending_payment');
+    }
+
+    /** @param Collection<int, PaymentPlan> $plans */
+    private function createMemberRegistration(AcademicEvent $event, User $user, Collection $plans, array $data, string $paymentMethod, string $paymentStatus): AcademicEventRegistration
+    {
         $subtotal = $this->totalForPlans($plans);
         $couponResult = $this->resolveCoupon($data['coupon_code'] ?? null, $plans);
         $discount = (int) ($couponResult['discount'] ?? 0);
         $coupon = $couponResult['coupon'] ?? null;
         $finalAmount = max(0, $subtotal - $discount);
 
-        return DB::transaction(function () use ($event, $user, $plans, $data, $subtotal, $discount, $coupon, $finalAmount) {
+        return DB::transaction(function () use ($event, $user, $plans, $data, $subtotal, $discount, $coupon, $finalAmount, $paymentMethod, $paymentStatus) {
             $registration = AcademicEventRegistration::query()->create([
                 'registration_no' => $this->registrationService->nextRegistrationNo($event),
                 'academic_event_id' => $event->id,
@@ -242,14 +256,14 @@ class PublicAcademicConferenceRegistrationService
                 'phone' => preg_replace('/\D+/', '', (string) ($data['phone'] ?? $user->phone_number)),
                 'email' => (string) ($data['email'] ?? $user->email),
                 'reg_type' => 'pre',
-                'payment_method' => 'bank_transfer',
-                'payment_status' => 'pending',
+                'payment_method' => $paymentMethod,
+                'payment_status' => $paymentStatus,
                 'total_amount' => $finalAmount,
                 'registered_at' => now(),
                 'applied_at' => now(),
-                'bank_depositor' => $data['bank_depositor'] ?? null,
-                'bank_deposit_date' => $data['bank_deposit_date'] ?? null,
-                'bank_account_text' => $data['bank_account_text'] ?? null,
+                'bank_depositor' => $paymentMethod === 'bank_transfer' ? ($data['bank_depositor'] ?? null) : null,
+                'bank_deposit_date' => $paymentMethod === 'bank_transfer' ? ($data['bank_deposit_date'] ?? null) : null,
+                'bank_account_text' => $paymentMethod === 'bank_transfer' ? ($data['bank_account_text'] ?? null) : null,
                 'receipt_issue' => (string) ($data['receipt_issue'] ?? 'NO'),
                 'receipt_type' => $data['receipt_type'] ?? null,
                 'receipt_number' => $data['receipt_number'] ?? null,
@@ -258,8 +272,17 @@ class PublicAcademicConferenceRegistrationService
                     'coupon_code' => $coupon?->coupon_code,
                     'coupon_name' => $coupon?->coupon_name,
                     'discount_amount' => $discount,
+                    'toss_order_id' => null,
+                    'coupon_usage_counted' => $paymentMethod === 'bank_transfer',
                 ],
             ]);
+
+            if ($paymentMethod === 'card') {
+                $source = $registration->source_row_json ?? [];
+                $source['toss_order_id'] = $registration->registration_no;
+                $registration->source_row_json = $source;
+                $registration->save();
+            }
 
             $items = $plans->map(fn (PaymentPlan $plan) => [
                 'payment_plan_id' => $plan->id,
@@ -270,7 +293,7 @@ class PublicAcademicConferenceRegistrationService
             ])->all();
             $this->registrationService->syncItems($registration, $items);
 
-            if ($coupon) {
+            if ($coupon && $paymentMethod === 'bank_transfer') {
                 $coupon->increment('usage_count');
             }
 
@@ -281,13 +304,25 @@ class PublicAcademicConferenceRegistrationService
     /** @param Collection<int, PaymentPlan> $plans */
     public function createBankTransferNonMemberRegistration(AcademicEvent $event, Collection $plans, array $data): AcademicEventRegistration
     {
+        return $this->createNonMemberRegistration($event, $plans, $data, 'bank_transfer', 'pending');
+    }
+
+    /** @param Collection<int, PaymentPlan> $plans */
+    public function createCardPendingNonMemberRegistration(AcademicEvent $event, Collection $plans, array $data): AcademicEventRegistration
+    {
+        return $this->createNonMemberRegistration($event, $plans, $data, 'card', 'pending_payment');
+    }
+
+    /** @param Collection<int, PaymentPlan> $plans */
+    private function createNonMemberRegistration(AcademicEvent $event, Collection $plans, array $data, string $paymentMethod, string $paymentStatus): AcademicEventRegistration
+    {
         $subtotal = $this->totalForPlans($plans);
         $couponResult = $this->resolveCoupon($data['coupon_code'] ?? null, $plans);
         $discount = (int) ($couponResult['discount'] ?? 0);
         $coupon = $couponResult['coupon'] ?? null;
         $finalAmount = max(0, $subtotal - $discount);
 
-        return DB::transaction(function () use ($event, $plans, $data, $subtotal, $discount, $coupon, $finalAmount) {
+        return DB::transaction(function () use ($event, $plans, $data, $subtotal, $discount, $coupon, $finalAmount, $paymentMethod, $paymentStatus) {
             $registration = AcademicEventRegistration::query()->create([
                 'registration_no' => $this->registrationService->nextRegistrationNo($event),
                 'academic_event_id' => $event->id,
@@ -297,14 +332,14 @@ class PublicAcademicConferenceRegistrationService
                 'phone' => preg_replace('/\D+/', '', (string) ($data['phone'] ?? '')),
                 'email' => (string) ($data['email'] ?? ''),
                 'reg_type' => 'pre',
-                'payment_method' => 'bank_transfer',
-                'payment_status' => 'pending',
+                'payment_method' => $paymentMethod,
+                'payment_status' => $paymentStatus,
                 'total_amount' => $finalAmount,
                 'registered_at' => now(),
                 'applied_at' => now(),
-                'bank_depositor' => $data['bank_depositor'] ?? null,
-                'bank_deposit_date' => $data['bank_deposit_date'] ?? null,
-                'bank_account_text' => $data['bank_account_text'] ?? null,
+                'bank_depositor' => $paymentMethod === 'bank_transfer' ? ($data['bank_depositor'] ?? null) : null,
+                'bank_deposit_date' => $paymentMethod === 'bank_transfer' ? ($data['bank_deposit_date'] ?? null) : null,
+                'bank_account_text' => $paymentMethod === 'bank_transfer' ? ($data['bank_account_text'] ?? null) : null,
                 'receipt_issue' => (string) ($data['receipt_issue'] ?? 'NO'),
                 'receipt_type' => $data['receipt_type'] ?? null,
                 'receipt_number' => $data['receipt_number'] ?? null,
@@ -320,8 +355,17 @@ class PublicAcademicConferenceRegistrationService
                     'coupon_code' => $coupon?->coupon_code,
                     'coupon_name' => $coupon?->coupon_name,
                     'discount_amount' => $discount,
+                    'toss_order_id' => null,
+                    'coupon_usage_counted' => $paymentMethod === 'bank_transfer',
                 ],
             ]);
+
+            if ($paymentMethod === 'card') {
+                $source = $registration->source_row_json ?? [];
+                $source['toss_order_id'] = $registration->registration_no;
+                $registration->source_row_json = $source;
+                $registration->save();
+            }
 
             $items = $plans->map(fn (PaymentPlan $plan) => [
                 'payment_plan_id' => $plan->id,
@@ -332,12 +376,67 @@ class PublicAcademicConferenceRegistrationService
             ])->all();
             $this->registrationService->syncItems($registration, $items);
 
-            if ($coupon) {
+            if ($coupon && $paymentMethod === 'bank_transfer') {
                 $coupon->increment('usage_count');
             }
 
             return $registration;
         });
+    }
+
+    public function confirmTossPayment(AcademicEvent $event, string $orderId, string $paymentKey, int $amount): AcademicEventRegistration
+    {
+        $registration = AcademicEventRegistration::query()
+            ->with(['items', 'member'])
+            ->where('academic_event_id', $event->id)
+            ->where('registration_no', $orderId)
+            ->where('payment_method', 'card')
+            ->first();
+
+        if (! $registration) {
+            throw new RuntimeException('확인할 카드 결제 신청 내역이 없습니다.');
+        }
+        if ((int) $registration->total_amount !== $amount) {
+            throw new RuntimeException('결제 금액이 신청 금액과 일치하지 않습니다.');
+        }
+        if ($registration->payment_status === 'completed') {
+            return $registration;
+        }
+
+        $secretKey = (string) config('services.toss.secret_key');
+        if ($secretKey === '') {
+            throw new RuntimeException('토스페이먼츠 시크릿 키가 설정되어 있지 않습니다.');
+        }
+
+        $response = Http::withBasicAuth($secretKey, '')
+            ->acceptJson()
+            ->post('https://api.tosspayments.com/v1/payments/confirm', [
+                'paymentKey' => $paymentKey,
+                'orderId' => $orderId,
+                'amount' => $amount,
+            ]);
+
+        $payload = $response->json();
+        if (! $response->successful()) {
+            throw new RuntimeException((string) ($payload['message'] ?? '토스페이먼츠 결제 승인에 실패했습니다.'));
+        }
+
+        $isCompleted = ($payload['status'] ?? null) === 'DONE';
+        $source = $registration->source_row_json ?? [];
+        if ($isCompleted && ! empty($source['coupon_code']) && empty($source['coupon_usage_counted'])) {
+            Coupon::query()
+                ->where('coupon_code', (string) $source['coupon_code'])
+                ->increment('usage_count');
+            $source['coupon_usage_counted'] = true;
+        }
+        $source['toss_payment'] = $payload;
+        $registration->update([
+            'payment_status' => $isCompleted ? 'completed' : 'pending_payment',
+            'paid_at' => $isCompleted ? (! empty($payload['approvedAt']) ? Carbon::parse($payload['approvedAt']) : now()) : null,
+            'source_row_json' => $source,
+        ]);
+
+        return $registration->refresh()->loadMissing(['items', 'member']);
     }
 
     private function isExecutive(User $user): bool

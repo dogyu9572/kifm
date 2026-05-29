@@ -34,7 +34,7 @@
 		</div>
 		<div class="right">
 			<!-- 로그인 전 -->
-			<!-- <div class="log_area before">
+			<div class="log_area before">
 				<h2><strong>로그인 후</strong> 맞춤정보를 확인해보세요</h2>
 				<div class="inputs">
 					<input type="text" class="text w100p" placeholder="아이디">
@@ -46,7 +46,7 @@
 						<li><a href="/auth/register">회원가입</a></li>
 					</ul>
 				</div>
-			</div> -->
+			</div>
 			<!-- 로그인 후-->
 			<div class="log_area after">
 				<ul class="member_type">
@@ -61,7 +61,7 @@
 				<!-- 로그인 후(기본))-->
 				<div class="member_info">
 					<div class="tit">
-						<strong>인증의 자격 정보</strong>
+						<strong>인정의 자격 정보</strong>
 						<div class="date">2026.03.01 ~ 2027.03.01</div>
 					</div>
 					<dl class="flex flex_between">
@@ -73,11 +73,11 @@
 						<div class="r"><p class="excl">2회 부족</p></div>
 					</div>
 				</div>
-				<!-- 로그인 후(인증의 미습득))-->
-				<!-- <div class="member_info">
+				<!-- 로그인 후(인정의 미습득))-->
+				<div class="member_info">
 					<div class="tit">
-						<strong>인증의 취득 요건 현황</strong>
-						<p>인증의 취득을 위해 아래 조건을 충족해주세요</p>
+						<strong>인정의 취득 요건 현황</strong>
+						<p>인정의 취득을 위해 아래 조건을 충족해주세요</p>
 					</div>
 					<div class="slice_half">
 						<div class="box">
@@ -92,9 +92,9 @@
 							<a href="#this" class="btn btn_wrr w100p">미수료</a>
 						</div>
 					</div>
-				</div> -->
-				<!-- 로그인 후(인증의 습득))-->
-				<!-- <div class="member_info">
+				</div>
+				<!-- 로그인 후(인정의 습득))-->
+				<div class="member_info">
 					<div class="tit">
 						<div class="flex">
 							<strong>자격 유효기간</strong>
@@ -115,7 +115,7 @@
 							<div class="count"><strong class="c_iden">1</strong>/3차시</div>
 						</div>
 					</div>
-				</div> -->
+				</div>
 				<div class="btns">
 					<a href="/mypage/profile_edit" class="btn btn_wbb">마이페이지</a>
 					<a href="/mypage/online_training" class="btn btn_wkk">강의실 입장</a>
@@ -127,6 +127,21 @@
 				<li class="i3"><a href="/online_academy">온라인 아카데미</a></li>
 				<li class="i4"><a href="#this">대한기능의학 위원회</a></li>
 			</ul>
+		</div>
+	</div>
+	<div class="inner">
+		<div class="book_area">
+			<h3 class="book_label">학술지</h3>
+			<div class="book_slide swiper">
+				<div class="swiper-wrapper">
+					<div class="swiper-slide"><a href="/archives/academic">장내 미생물과 대사 질환: 기능의학회</a></div>
+					<div class="swiper-slide"><a href="/archives/academic">장내 미생물과 대사 질환: 기능의학회</a></div>
+				</div>
+			</div>
+			<div class="book_control">
+				<button type="button" class="arrow prev" aria-label="이전 슬라이드"></button>
+				<button type="button" class="arrow next" aria-label="다음 슬라이드"></button>
+			</div>
 		</div>
 	</div>
 </section>
@@ -264,7 +279,7 @@
 		<div class="event_tit">2026년 4월 27일(월요일)</div>
 		<ul class="schedule_list scroll auto">
 			<li><strong>KIFM 춘계학술대회 및 정기 총회</strong><div class="timebox"><span><time datetime="09:00">09:00</time> - <time datetime="18:00">18:00</time></span><span>서울 코엑스 D홀</span></div></li>
-			<li><strong>제 2차 기능의학 인증의 실무 교육</strong><div class="timebox"><span><time datetime="18:30">18:30</time> - <time datetime="20:30">20:30</time></span><span>코엑스 세미나실 203호</span></div></li>
+			<li><strong>제 2차 기능의학 인정의 실무 교육</strong><div class="timebox"><span><time datetime="18:30">18:30</time> - <time datetime="20:30">20:30</time></span><span>코엑스 세미나실 203호</span></div></li>
 		</ul>
 		<div class="btns_btm">
 			<button type="button" class="btn btn_wkk btn_close_btm">닫기</button>
@@ -277,7 +292,7 @@
 <div class="popup popup_login_start" data-target="popup_login_start" style="display:block;">
 	<div class="dm"></div>
 	<div class="inbox">
-		<div class="tit_center">회원님의 더 깊이 있는 연구와 교류를 응원합니다</div>
+		<div class="tit_center">회원님의 더 깊이 있는 <br class="mo_vw">연구와 교류를 응원합니다</div>
 		<div class="gbox tac">대한기능의학회의 학술적 발전을 위해 산하 위원회 활동을 권장해 드립니다.<br/>지금 바로 회원님께 꼭 맞는 위원회를 확인해 보세요.</div>
 		<div class="flex_center">
 			<a href="/subcommittee" class="btn btn_sanha_link">산하위원회 가기</a>
@@ -288,7 +303,7 @@
 	</div>
 </div>
 @endif
-	
+
 </main>
 
 @endsection
@@ -307,12 +322,12 @@
             </script>
         @else
             {{-- 레이어팝업 (오버레이) --}}
-            <div class="popup-layer popup-fixed" 
+            <div class="popup-layer popup-fixed"
                  id="popup-{{ $popup->id }}"
                  data-popup-id="{{ $popup->id }}"
                  data-display-type="layer"
                  style="position: absolute !important; width: {{ $popup->width }}px; height: auto; top: {{ $popup->position_top }}px; left: {{ $popup->position_left }}px; z-index: 99999;">
-                
+
                 <div class="popup-body">
                     @if($popup->popup_type === 'image' && $popup->popup_image)
                         @if($popup->url)
@@ -326,7 +341,7 @@
                         {!! $popup->popup_content !!}
                     @endif
                 </div>
-                
+
                 <div class="popup-footer">
                     <label class="popup-today-label" data-popup-id="{{ $popup->id }}">
                         <input type="checkbox" class="popup-today-close" data-popup-id="{{ $popup->id }}">
@@ -378,11 +393,26 @@ $(document).ready(function () {
             $(this).addClass('stop');
         }
     });
+// 학술지
+	const bookSwiper = new Swiper('.book_slide', {
+		direction: 'vertical',
+        loop: true,
+		spaceBetween: 8,
+        slidesPerView: 1,
+        navigation: {
+            nextEl: '.book_area .next',
+            prevEl: '.book_area .prev',
+        },
+		autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+    });
 // 학술대회 일정
     const scheduleSwiper = new Swiper('.schedule_slide', {
         loop: true,
 		spaceBetween: 8,
-        slidesPerView: 2, 
+        slidesPerView: 'auto',
         breakpoints: {
             768: {
                 slidesPerView: 3,
@@ -432,7 +462,7 @@ $(document).ready(function () {
 	renderCalendar();
 	$('.select_month .prev').on('click', () => { date.setMonth(date.getMonth() - 1); renderCalendar(); });
 	$('.select_month .next').on('click', () => { date.setMonth(date.getMonth() + 1); renderCalendar(); });
-	$('.month tbody').on('click', 'button', function () {
+	$(document).on('click', '.month tbody button', function () {
 		const targetTd = $(this).parent('td');
 		if (targetTd.hasClass('disabled')) return;
 		$('.month tbody td').removeClass('click');
@@ -446,14 +476,14 @@ $(document).ready(function () {
 			const day = clickDate.getDate();
 			const dayName = dayNames[clickDate.getDay()];
 			$('.calendar_event_popup .tit').text(`${year}년 ${month}월 ${day}일(${dayName})`);
-			$('.calendar_event_popup').fadeIn(200);
+			$('.calendar_event_popup').stop().fadeIn(200);
 		}
 	});
 	$(document).on('click', '.calendar_event_popup .btn_close_btm, .calendar_event_popup .dm', function() {
-		$('.calendar_event_popup').fadeOut(200);
+		$('.calendar_event_popup').stop().fadeOut(200);
 	});
 	$('.month li').first().addClass('on');
-// 로그인 후 인증의 참석 현황 게이지바
+// 로그인 후 인정의 참석 현황 게이지바
 	$('.member_info').each(function() {
 		const $flexBetween = $(this).find('.flex_between dd');
 		if ($flexBetween.length > 0) {

@@ -37,6 +37,7 @@ class EduTrainingRequest extends FormRequest
             ],
             'status' => ['required', Rule::in(['PUBLIC', 'PRIVATE'])],
             'overview' => ['nullable', 'string'],
+            'program' => ['nullable', 'string'],
             'registration_info' => ['nullable', 'string'],
             'introduction' => ['nullable', 'string'],
             'textbook_file' => ['nullable', 'file', 'mimes:pdf,ppt,pptx,hwp', 'max:20480'],

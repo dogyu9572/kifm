@@ -21,8 +21,10 @@
     const receiptRadios = Array.from(form.querySelectorAll('input[name="receipt_issue"]'));
     const addressSearchButton = document.getElementById('academic-registration-address-search');
     const phoneInput = document.getElementById('user_tel');
+    const submitButton = form.querySelector('button[type="submit"]');
     let appliedDiscount = 0;
     let appliedCouponCode = '';
+    let tossSdkPromise = null;
 
     function formatPhoneKoreaDisplay(raw) {
         const d = String(raw || '').replace(/\D/g, '').slice(0, 11);
@@ -285,6 +287,75 @@
         });
     }
 
+    function loadTossSdk() {
+        if (window.TossPayments) {
+            return Promise.resolve(window.TossPayments);
+        }
+        if (tossSdkPromise) {
+            return tossSdkPromise;
+        }
+
+        tossSdkPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://js.tosspayments.com/v2/standard';
+            script.async = true;
+            script.onload = function () {
+                if (window.TossPayments) {
+                    resolve(window.TossPayments);
+                    return;
+                }
+                reject(new Error('TossPayments SDK is not available.'));
+            };
+            script.onerror = function () {
+                reject(new Error('Failed to load TossPayments SDK.'));
+            };
+            document.head.appendChild(script);
+        });
+
+        return tossSdkPromise;
+    }
+
+    async function requestTossPayment() {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken(),
+            },
+            body: new FormData(form),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || !data.success) {
+            const errors = data.errors || {};
+            const firstError = Object.keys(errors).length > 0 ? errors[Object.keys(errors)[0]][0] : null;
+            window.alert(firstError || data.message || '입력 내용을 확인해주세요.');
+            return;
+        }
+        if (!data.clientKey) {
+            window.alert('토스페이먼츠 테스트 클라이언트 키가 설정되어 있지 않습니다.');
+            return;
+        }
+
+        const TossPayments = await loadTossSdk();
+        const tossPayments = TossPayments(data.clientKey);
+        const payment = tossPayments.payment({ customerKey: data.customerKey });
+        await payment.requestPayment({
+            method: 'CARD',
+            amount: {
+                value: Number(data.amount) || 0,
+                currency: 'KRW',
+            },
+            orderId: data.orderId,
+            orderName: data.orderName,
+            customerName: data.customerName,
+            customerEmail: data.customerEmail,
+            customerMobilePhone: String(data.customerMobilePhone || '').replace(/\D/g, ''),
+            successUrl: data.successUrl,
+            failUrl: data.failUrl,
+        });
+    }
+
     paymentInputs.forEach((input) => {
         input.addEventListener('change', function () {
             if (appliedCouponCode) {
@@ -298,10 +369,23 @@
     if (couponButton) {
         couponButton.addEventListener('click', applyCoupon);
     }
-    form.addEventListener('submit', function (event) {
-        if (selectedPaymentMethod() !== 'bank') {
-            event.preventDefault();
-            window.alert('신용카드 결제는 테스트 모듈 설치 후 제공됩니다. 무통장입금을 선택해주세요.');
+    form.addEventListener('submit', async function (event) {
+        if (selectedPaymentMethod() === 'bank') {
+            return;
+        }
+
+        event.preventDefault();
+        if (submitButton) {
+            submitButton.disabled = true;
+        }
+        try {
+            await requestTossPayment();
+        } catch (error) {
+            window.alert('토스페이먼츠 결제창을 여는 중 오류가 발생했습니다.');
+        } finally {
+            if (submitButton) {
+                submitButton.disabled = false;
+            }
         }
     });
 

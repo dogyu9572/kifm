@@ -3,14 +3,20 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\EduTraining;
+use App\Models\EduTrainingAttachment;
 use App\Services\Frontend\PublicAcademicEventService;
 use App\Services\Frontend\PublicTrainingCourseService;
+use App\Support\BackofficeFile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AcademicEventController extends Controller
 {
@@ -182,7 +188,7 @@ class AcademicEventController extends Controller
         ));
     }
 
-    public function storeTrainingCoursePayment(Request $request): RedirectResponse
+    public function storeTrainingCoursePayment(Request $request): JsonResponse|RedirectResponse
     {
         $validated = $request->validate([
             'training_id' => ['required', 'integer', 'exists:edu_trainings,id'],
@@ -217,6 +223,13 @@ class AcademicEventController extends Controller
                 return back()->withInput()->withErrors(['round_ids' => '선택한 차수가 이 연수강좌에 속하지 않습니다.']);
             }
         }
+        if (($validated['payment_method'] ?? '') === 'card' && ! $this->hasTossKeys()) {
+            return response()->json([
+                'success' => false,
+                'message' => '토스페이먼츠 테스트 키가 설정되어 있지 않습니다.',
+                'errors' => ['payment' => ['토스페이먼츠 테스트 키가 설정되어 있지 않습니다.']],
+            ], 422);
+        }
 
         try {
             $payment = $this->trainingCourseService->createPayment($training, $validated, $this->frontendUser());
@@ -224,7 +237,42 @@ class AcademicEventController extends Controller
             return back()->withInput()->withErrors(['round_ids' => $e->getMessage()]);
         }
 
+        if (($validated['payment_method'] ?? '') === 'card' && (int) $payment->total_amount > 0) {
+            return response()->json($this->trainingTossPaymentPayload($payment));
+        }
+
         return redirect()->route('academic_event.training_course_end', ['payment' => $payment->id]);
+    }
+
+    public function confirmTrainingCourseTossPayment(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'paymentKey' => ['required', 'string'],
+            'orderId' => ['required', 'string'],
+            'amount' => ['required', 'integer', 'min:0'],
+        ]);
+
+        try {
+            $payment = $this->trainingCourseService->confirmTossPayment(
+                $validated['orderId'],
+                $validated['paymentKey'],
+                (int) $validated['amount']
+            );
+        } catch (RuntimeException $e) {
+            return redirect()->route('academic_event.training_course')
+                ->withErrors(['payment' => $e->getMessage()]);
+        }
+
+        return redirect()->route('academic_event.training_course_end', ['payment' => $payment->id])
+            ->with('success', '토스페이먼츠 결제가 완료되었습니다.');
+    }
+
+    public function failTrainingCourseTossPayment(Request $request): RedirectResponse
+    {
+        $message = trim((string) $request->query('message'));
+
+        return redirect()->route('academic_event.training_course')
+            ->withErrors(['payment' => $message !== '' ? $message : '토스페이먼츠 결제가 취소되었거나 실패했습니다.']);
     }
 
     public function applyTrainingCourseCoupon(Request $request): JsonResponse
@@ -283,6 +331,31 @@ class AcademicEventController extends Controller
         ));
     }
 
+    public function downloadTrainingTextbook(EduTraining $training): StreamedResponse
+    {
+        if ($training->status !== 'PUBLIC' || ! $training->textbook_file_path || ! Storage::disk('public')->exists($training->textbook_file_path)) {
+            abort(404);
+        }
+
+        return Storage::disk('public')->download(
+            $training->textbook_file_path,
+            BackofficeFile::displayName($training->textbook_file_path)
+        );
+    }
+
+    public function downloadTrainingAttachment(EduTrainingAttachment $attachment): StreamedResponse
+    {
+        $attachment->loadMissing('training');
+        if ($attachment->training?->status !== 'PUBLIC' || ! Storage::disk('public')->exists($attachment->file_path)) {
+            abort(404);
+        }
+
+        return Storage::disk('public')->download(
+            $attachment->file_path,
+            $attachment->original_name ?: BackofficeFile::displayName($attachment->file_path)
+        );
+    }
+
     private function resolveTrainingFromRequest(Request $request): \App\Models\EduTraining|RedirectResponse
     {
         $trainingId = (int) $request->query('training', 0);
@@ -303,5 +376,33 @@ class AcademicEventController extends Controller
         $user = Auth::user();
 
         return $user && $user->role === 'user' ? $user : null;
+    }
+
+    private function hasTossKeys(): bool
+    {
+        return (string) config('services.toss.client_key') !== ''
+            && (string) config('services.toss.secret_key') !== '';
+    }
+
+    private function trainingTossPaymentPayload(\App\Models\EduTrainingPayment $payment): array
+    {
+        $payment->loadMissing(['items', 'member']);
+        $itemNames = $payment->items->pluck('item_name')->filter()->implode(', ');
+
+        return [
+            'success' => true,
+            'clientKey' => (string) config('services.toss.client_key'),
+            'orderId' => $payment->order_no,
+            'orderName' => mb_substr($itemNames ?: '연수강좌 결제', 0, 100),
+            'amount' => (int) $payment->total_amount,
+            'customerName' => $payment->name,
+            'customerEmail' => $payment->email,
+            'customerMobilePhone' => preg_replace('/\D+/', '', (string) $payment->phone),
+            'customerKey' => $payment->member_id
+                ? 'kifm-training-member-' . $payment->member_id
+                : 'kifm-training-guest-' . $payment->id,
+            'successUrl' => route('academic_event.training_course_payment.toss_success'),
+            'failUrl' => route('academic_event.training_course_payment.toss_fail'),
+        ];
     }
 }

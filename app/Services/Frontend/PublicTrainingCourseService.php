@@ -15,8 +15,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class PublicTrainingCourseService
 {
@@ -353,7 +355,7 @@ class PublicTrainingCourseService
         $coupon = $couponResult['coupon'] ?? null;
         $finalAmount = max(0, $subtotal - $discount);
         $method = (string) ($data['payment_method'] ?? 'card');
-        $paymentStatus = $finalAmount <= 0 || $method === 'card' ? 'completed' : 'pending';
+        $paymentStatus = $finalAmount <= 0 ? 'completed' : ($method === 'card' ? 'pending_payment' : 'pending');
 
         return DB::transaction(function () use ($training, $data, $user, $summary, $subtotal, $discount, $coupon, $finalAmount, $method, $paymentStatus): EduTrainingPayment {
             $payment = EduTrainingPayment::query()->create([
@@ -392,7 +394,7 @@ class PublicTrainingCourseService
                 ]);
             }
 
-            if ($coupon) {
+            if ($coupon && ($paymentStatus === 'completed' || $method === 'bank_transfer')) {
                 $coupon->increment('usage_count');
             }
 
@@ -400,10 +402,71 @@ class PublicTrainingCourseService
         });
     }
 
+    public function confirmTossPayment(string $orderId, string $paymentKey, int $amount): EduTrainingPayment
+    {
+        $payment = EduTrainingPayment::query()
+            ->with(['training', 'items'])
+            ->where('order_no', $orderId)
+            ->where('payment_method', 'card')
+            ->first();
+
+        if (! $payment) {
+            throw new RuntimeException('확인할 연수교육 카드 결제 신청 내역이 없습니다.');
+        }
+        if ((int) $payment->total_amount !== $amount) {
+            throw new RuntimeException('결제 금액이 신청 금액과 일치하지 않습니다.');
+        }
+        if ($payment->payment_status === 'completed') {
+            return $payment;
+        }
+
+        $payload = $this->requestTossConfirm($paymentKey, $orderId, $amount);
+        $isCompleted = ($payload['status'] ?? null) === 'DONE';
+        $memo = (string) ($payment->admin_memo ?? '');
+        if ($isCompleted && preg_match('/coupon=([A-Z0-9_-]+)/', $memo, $matches) && ! str_contains($memo, 'coupon_counted=1')) {
+            Coupon::query()->where('coupon_code', $matches[1])->increment('usage_count');
+            $memo = trim($memo . ';coupon_counted=1', ';');
+        }
+
+        $payment->update([
+            'payment_status' => $isCompleted ? 'completed' : 'pending_payment',
+            'paid_at' => $isCompleted ? now() : null,
+            'admin_memo' => trim($memo . ';toss_payment_key=' . $paymentKey, ';'),
+        ]);
+
+        return $payment->refresh()->loadMissing(['training', 'items']);
+    }
+
+    private function requestTossConfirm(string $paymentKey, string $orderId, int $amount): array
+    {
+        $secretKey = (string) config('services.toss.secret_key');
+        if ($secretKey === '') {
+            throw new RuntimeException('토스페이먼츠 시크릿 키가 설정되어 있지 않습니다.');
+        }
+
+        $response = Http::withBasicAuth($secretKey, '')
+            ->acceptJson()
+            ->post('https://api.tosspayments.com/v1/payments/confirm', [
+                'paymentKey' => $paymentKey,
+                'orderId' => $orderId,
+                'amount' => $amount,
+            ]);
+
+        $payload = $response->json();
+        if (! $response->successful()) {
+            throw new RuntimeException((string) ($payload['message'] ?? '토스페이먼츠 결제 승인에 실패했습니다.'));
+        }
+
+        return is_array($payload) ? $payload : [];
+    }
+
     public function paymentSummary(EduTrainingPayment $payment): array
     {
-        $subtotal = $payment->items->sum('price');
         $final = (int) $payment->total_amount;
+        $subtotal = (int) $payment->items->sum('price');
+        if ($subtotal <= 0 && $final > 0) {
+            $subtotal = $final;
+        }
         $discount = max(0, (int) $subtotal - $final);
         $couponCode = '';
         if (preg_match('/coupon=([A-Z0-9_-]+)/', (string) $payment->admin_memo, $matches)) {

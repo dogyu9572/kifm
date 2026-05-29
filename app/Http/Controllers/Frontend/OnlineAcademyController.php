@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use RuntimeException;
 
 class OnlineAcademyController extends Controller
 {
@@ -228,7 +229,7 @@ class OnlineAcademyController extends Controller
         ));
     }
 
-    public function completePayment(Request $request): RedirectResponse
+    public function completePayment(Request $request): JsonResponse|RedirectResponse
     {
         $user = $this->frontendUser();
         if ($user === null) {
@@ -251,6 +252,13 @@ class OnlineAcademyController extends Controller
         ]);
 
         $course = $this->onlineAcademyService->findVisible((int) $validated['course_id']);
+        if (($validated['payment_method'] ?? '') === 'card' && ! $this->hasTossKeys()) {
+            return response()->json([
+                'success' => false,
+                'message' => '토스페이먼츠 테스트 키가 설정되어 있지 않습니다.',
+                'errors' => ['payment' => ['토스페이먼츠 테스트 키가 설정되어 있지 않습니다.']],
+            ], 422);
+        }
 
         try {
             $enrollment = $this->onlineAcademyService->createOrRefreshEnrollmentWithPayment($course, $user, $validated);
@@ -258,7 +266,48 @@ class OnlineAcademyController extends Controller
             return back()->withInput()->withErrors(['course_id' => $e->getMessage()]);
         }
 
+        if (($validated['payment_method'] ?? '') === 'card' && (int) $enrollment->payment_amount > 0) {
+            return response()->json($this->tossPaymentPayload($enrollment));
+        }
+
         return redirect()->route('online_academy.payment.end', ['enrollment' => $enrollment->id]);
+    }
+
+    public function confirmTossPayment(Request $request): RedirectResponse
+    {
+        $user = $this->frontendUser();
+        if ($user === null) {
+            return redirect()->route('member.login');
+        }
+
+        $validated = $request->validate([
+            'paymentKey' => ['required', 'string'],
+            'orderId' => ['required', 'string'],
+            'amount' => ['required', 'integer', 'min:0'],
+        ]);
+
+        try {
+            $enrollment = $this->onlineAcademyService->confirmTossPayment(
+                $validated['orderId'],
+                $validated['paymentKey'],
+                (int) $validated['amount'],
+                $user
+            );
+        } catch (RuntimeException $e) {
+            return redirect()->route('online_academy.index')
+                ->withErrors(['payment' => $e->getMessage()]);
+        }
+
+        return redirect()->route('online_academy.payment.end', ['enrollment' => $enrollment->id])
+            ->with('success', '토스페이먼츠 결제가 완료되었습니다.');
+    }
+
+    public function failTossPayment(Request $request): RedirectResponse
+    {
+        $message = trim((string) $request->query('message'));
+
+        return redirect()->route('online_academy.index')
+            ->withErrors(['payment' => $message !== '' ? $message : '토스페이먼츠 결제가 취소되었거나 실패했습니다.']);
     }
 
     public function paymentEnd(Request $request): View|RedirectResponse
@@ -331,5 +380,30 @@ class OnlineAcademyController extends Controller
         $user = Auth::user();
 
         return $user instanceof User && $user->role === 'user' ? $user : null;
+    }
+
+    private function hasTossKeys(): bool
+    {
+        return (string) config('services.toss.client_key') !== ''
+            && (string) config('services.toss.secret_key') !== '';
+    }
+
+    private function tossPaymentPayload(\App\Models\EduCourseEnrollment $enrollment): array
+    {
+        $enrollment->loadMissing('member');
+
+        return [
+            'success' => true,
+            'clientKey' => (string) config('services.toss.client_key'),
+            'orderId' => $enrollment->payment_no,
+            'orderName' => mb_substr((string) $enrollment->payment_item_name, 0, 100),
+            'amount' => (int) $enrollment->payment_amount,
+            'customerName' => $enrollment->member_name,
+            'customerEmail' => $enrollment->member?->email,
+            'customerMobilePhone' => preg_replace('/\D+/', '', (string) $enrollment->member?->phone_number),
+            'customerKey' => 'kifm-online-member-' . $enrollment->member_id,
+            'successUrl' => route('online_academy.payment.toss_success'),
+            'failUrl' => route('online_academy.payment.toss_fail'),
+        ];
     }
 }

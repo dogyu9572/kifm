@@ -16,6 +16,7 @@ class EduTraining extends Model
         'training_method',
         'status',
         'overview',
+        'program',
         'registration_info',
         'introduction',
         'textbook_file_path',
