@@ -9,7 +9,9 @@
 	<div class="inner">
 		<h1 class="sub_title" id="new-password-heading">{{ $sName }}</h1>
 		
-		<div class="member_inbox">
+		<form action="{{ route('member.new_password.store') }}" method="POST" class="member_inbox" novalidate>
+			@csrf
+			<input type="hidden" name="reset_token" value="{{ old('reset_token', $resetToken ?? '') }}">
 			<div class="tabs">
 				<a href="/member/find_id">아이디 찾기</a>
 				<a href="/member/find_pw" class="on">비밀번호 찾기</a>
@@ -19,50 +21,30 @@
 				<ul>
 					<li>
 						<label for="dormant_pw" class="sound_only">새 비밀번호</label>
-						<input type="password" class="text w100p" placeholder="새 비밀번호">
+						<input type="password" id="dormant_pw" name="password" class="text w100p" placeholder="새 비밀번호" required autocomplete="new-password">
+						@error('password')
+							<p class="c_red" role="alert">{{ $message }}</p>
+						@enderror
 					</li>
 					<li>
 						<label for="dormant_pw_check" class="sound_only">새 비밀번호 확인</label>
-						<input type="password" class="text w100p" placeholder="새 비밀번호 확인">
+						<input type="password" id="dormant_pw_check" name="password_confirmation" class="text w100p" placeholder="새 비밀번호 확인" required autocomplete="new-password">
+						@error('password_confirmation')
+							<p class="c_red" role="alert">{{ $message }}</p>
+						@enderror
 					</li>
 				</ul>
 				<p class="excl mt">* 영문, 숫자, 특수문자 중 2종류 이상을 조합하여 10자리 이상으로 입력해주세요.</p>
+				@error('reset_token')
+					<p class="c_red" role="alert">{{ $message }}</p>
+				@enderror
 			</div>
-			<button type="submit" class="btn btn_wbb" onclick="layerShow('pop_password_end');">변경</button>
-		</div>
+			<button type="submit" class="btn btn_wbb">변경</button>
+		</form>
 		
 	</div>
 </section>
 	
 </main>
 
-<div class="popup" id="pop_password_end">
-	<div class="dm"></div>
-	<div class="inbox">
-		<div class="ptit">비밀번호 변경 완료</div>
-		<div class="con gbox tac">비밀번호 변경이 완료되었습니다.<br/>새로운 비밀번호로 로그인해주세요.</div>
-		<div class="btns flex_center">
-			<button type="button" class="btn btn_wbb" onclick="location.href='/member/login'">로그인 하기</button>
-		</div>
-	</div>
-</div>
-
 @endsection
-
-@push('scripts')
-<script>
-//팝업
-var lastFocusedElement;
-function layerShow(id) {
-    lastFocusedElement = document.activeElement;
-    $("#" + id).fadeIn(300, function() {
-        $(this).find(".btn_wbb").focus();
-    });
-}
-function layerHide(id) {
-    $("#" + id).fadeOut(300, function() {
-        if (lastFocusedElement) lastFocusedElement.focus();
-    });
-}
-</script>
-@endpush

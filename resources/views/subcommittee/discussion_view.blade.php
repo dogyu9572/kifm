@@ -162,6 +162,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+$(".option_area .btn_option").click(function(){
+	$(this).next("ul").stop(true,true).slideToggle("fast");
+});
 </script>
 
 @endpush

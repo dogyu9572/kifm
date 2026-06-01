@@ -55,6 +55,11 @@
 				</tbody>
 			</table>
 		</div>
+		
+		<div class="mo_vw mo_schedule_month_list">
+			<h2 class="sound_only">일정 목록</h2>
+			<ul id="mo-schedule-list"></ul>
+		</div>
 
 	</div>
 </section>
@@ -92,12 +97,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const nextBtn = document.querySelector('.btn.next');
     const monthButtons = document.querySelectorAll('.month button');
     const calendarBody = document.querySelector('.schedule_month_tbl tbody');
+    const moScheduleList = document.getElementById('mo-schedule-list'); // 모바일 리스트 container
 
-    let currentYear = parseInt(yearMonthTxt.textContent.split('.')[0], 10);
+    let currentYear = parseInt(yearMonthTxt.textContent.trim(), 10);
     let currentMonth = 4;
+
+    // 요일 배열 (모바일 날짜 표기용)
+    const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
     function formatDate(y, m, d) {
         return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+
+    // 모바일 리스트에 맞는 날짜 포맷팅 함수 (예: 04.06(월) 또는 연속일정 포맷)
+    function formatMobileDate(startStr, endStr) {
+        const startPart = startStr.split('-');
+        const startDateObj = new Date(startStr);
+        const startLabel = `${startPart[1]}.${startPart[2]}(${weekDays[startDateObj.getDay()]})`;
+
+        if (startStr === endStr) {
+            return startLabel;
+        } else {
+            const endPart = endStr.split('-');
+            const endDateObj = new Date(endStr);
+            const endLabel = `${endPart[1]}.${endPart[2]}(${weekDays[endDateObj.getDay()]})`;
+            return `${startLabel} ~ ${endLabel}`;
+        }
     }
 
     function renderCalendar(year, month) {
@@ -133,6 +158,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const events = (scheduleData[year] && scheduleData[year][formattedMonth]) ? scheduleData[year][formattedMonth] : [];
         
+        // --- [모바일 목록 데이터 처리 및 렌더링] ---
+        let moHtml = '';
+        if (events.length > 0) {
+            // 이벤트를 시작일 순서대로 정렬
+            const sortedEvents = [...events].sort((a, b) => new Date(a.start) - new Date(b.start));
+            
+            sortedEvents.forEach(event => {
+                const dateText = formatMobileDate(event.start, event.end);
+                // 태그 색상(c1, c2 등) 구분을 위해 span에 class를 부여하거나 입맛에 맞게 커스텀 가능합니다.
+                moHtml += `<li>
+                    <span class="${event.class}">${dateText}</span>
+                    <h3>${event.title}</h3>
+                </li>`;
+            });
+        } else {
+            moHtml = '<li class="no_data">등록된 일정이 없습니다.</li>';
+        }
+        moScheduleList.innerHTML = moHtml;
+        // ------------------------------------------
+
         const totalWeeks = calendarDays.length / 7;
         const weekGrid = Array.from({ length: totalWeeks }, () => []);
 
@@ -233,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 listHtml += '<li class="blank"></li>';
                             } else if (cell.type === 'event') {
                                 const wClass = cell.widthClass ? ` ${cell.widthClass}` : '';
-                                listHtml += `<li class="${cell.class}${wClass}"><span>${cell.title}</span></li>`;
+                                listHtml += `<li class="${cell.class}${wClass}"><span title="${cell.title}">${cell.title}</span></li>`;
                             } else if (cell.type === 'blank') {
                                 listHtml += '<li class="blank"></li>';
                             }

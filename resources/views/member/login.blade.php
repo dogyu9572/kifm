@@ -10,6 +10,9 @@
 		<h1 class="sub_title" id="login-heading">{{ $sName }}</h1>
 		
 		<div class="member_inbox" id="member-login-page"@if(! empty($loginPopup)) data-login-popup="{{ $loginPopup }}"@endif>
+			@if(session('member_password_reset_completed'))
+				<p class="c_iden" role="status">비밀번호 변경이 완료되었습니다. 새로운 비밀번호로 로그인해주세요.</p>
+			@endif
 			<form action="{{ route('member.login.store') }}" method="POST" class="inputs" id="member-login-form" novalidate>
 				@csrf
 				<h2 class="sound_only">로그인 정보 입력</h2>

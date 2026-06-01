@@ -2,8 +2,22 @@
 @section('title', $gName)
 @section('gName', $gName)
 
+@php
+	$calendarPayload = e(json_encode($calendarSchedules ?? [], JSON_UNESCAPED_UNICODE));
+	$memberCard = $memberCard ?? ['is_logged_in' => false];
+	$certification = $memberCard['certification'] ?? [
+		'conference_count' => 0,
+		'conference_required' => 3,
+		'conference_short' => 3,
+		'progress_percent' => 0,
+	];
+	$conferenceCount = (int) ($certification['conference_count'] ?? 0);
+	$conferenceRequired = max(1, (int) ($certification['conference_required'] ?? 3));
+	$conferenceShort = max(0, (int) ($certification['conference_short'] ?? 0));
+@endphp
+
 @section('content')
-<main class="main_wrap">
+<main class="main_wrap" data-calendar-schedules="{!! $calendarPayload !!}">
 <h1 class="sound_only">대한기능의학회 메인</h1>
 
 <!-- main_visual -->
@@ -13,16 +27,34 @@
 		<div class="mvisual">
 			<div class="swiper mvisual-swiper">
 				<div class="swiper-wrapper">
-					<div class="swiper-slide"><img src="/images/img_main_visual_01.jpg" alt="메인 비주얼 1">
-						<div class="txt">
-							<p>미래의학의 새로운 패러다임인 <strong>기능의학 학회에<br/>여러분을 초대합니다.</strong></p>
+					@forelse ($banners as $banner)
+						@php
+							$bannerImage = $banner->desktop_image
+								? (str_starts_with($banner->desktop_image, 'http') ? $banner->desktop_image : \Illuminate\Support\Facades\Storage::disk('public')->url($banner->desktop_image))
+								: asset('images/img_main_visual_01.jpg');
+							$bannerAlt = $banner->title ?: '메인 비주얼';
+						@endphp
+						<div class="swiper-slide">
+							@if ($banner->url)
+								<a href="{{ $banner->url }}" target="{{ $banner->url_target ?: '_self' }}">
+									<img src="{{ $bannerImage }}" alt="{{ $bannerAlt }}">
+								</a>
+							@else
+								<img src="{{ $bannerImage }}" alt="{{ $bannerAlt }}">
+							@endif
+							@if ($banner->main_text || $banner->sub_text)
+								<div class="txt">
+									<p>{{ $banner->sub_text }} @if ($banner->main_text)<strong>{!! nl2br(e($banner->main_text)) !!}</strong>@endif</p>
+								</div>
+							@endif
 						</div>
-					</div>
-					<div class="swiper-slide"><img src="/images/img_main_visual_01.jpg" alt="메인 비주얼 1">
-						<div class="txt">
-							<p>미래의학의 새로운 패러다임인 <strong>기능의학 학회에<br/>여러분을 초대합니다.</strong></p>
+					@empty
+						<div class="swiper-slide"><img src="/images/img_main_visual_01.jpg" alt="메인 비주얼">
+							<div class="txt">
+								<p>미래의학의 새로운 패러다임인 <strong>기능의학 학회에<br>여러분을 초대합니다.</strong></p>
+							</div>
 						</div>
-					</div>
+					@endforelse
 				</div>
 				<div class="mvisual-control">
 					<div class="paging"></div>
@@ -33,99 +65,69 @@
 			</div>
 		</div>
 		<div class="right">
-			<!-- 로그인 전 -->
-			<!-- <div class="log_area before">
-				<h2><strong>로그인 후</strong> 맞춤정보를 확인해보세요</h2>
-				<div class="inputs">
-					<input type="text" class="text w100p" placeholder="아이디">
-					<input type="password" class="text w100p" placeholder="비밀번호">
-					<button type="submit" class="btn">로그인</button>
-					<ul class="mem_links">
-						<li><a href="/auth/">아이디 찾기</a></li>
-						<li><a href="/auth/">비밀번호 찾기</a></li>
-						<li><a href="/auth/register">회원가입</a></li>
+			@if (empty($memberCard['is_logged_in']))
+				<div class="log_area before">
+					<h2><strong>로그인 후</strong> 맞춤정보를 확인해보세요</h2>
+					<form method="POST" action="{{ route('member.login.store') }}" class="inputs" novalidate>
+						@csrf
+						<label for="main-login-id" class="sound_only">아이디</label>
+						<input type="text" id="main-login-id" name="login_id" class="text w100p" placeholder="아이디" value="{{ old('login_id') }}" required autocomplete="username">
+						@error('login_id')
+							<p class="c_red" role="alert">{{ $message }}</p>
+						@enderror
+						<label for="main-login-password" class="sound_only">비밀번호</label>
+						<input type="password" id="main-login-password" name="password" class="text w100p" placeholder="비밀번호" required autocomplete="current-password">
+						@error('password')
+							<p class="c_red" role="alert">{{ $message }}</p>
+						@enderror
+						<button type="submit" class="btn">로그인</button>
+						<ul class="mem_links">
+							<li><a href="{{ route('member.find_id') }}">아이디 찾기</a></li>
+							<li><a href="{{ route('member.find_pw') }}">비밀번호 찾기</a></li>
+							<li><a href="{{ route('member.register') }}">회원가입</a></li>
+						</ul>
+					</form>
+				</div>
+			@else
+				<div class="log_area after">
+					<ul class="member_type">
+						@foreach ($memberCard['member_level_labels'] ?? ['회원'] as $idx => $label)
+							<li class="t{{ min($idx + 1, 3) }}">{{ $label }}</li>
+						@endforeach
 					</ul>
-				</div>
-			</div> -->
-			<!-- 로그인 후-->
-			<div class="log_area after">
-				<ul class="member_type">
-					<li class="t1">정회원</li>
-					<li class="t2">고문</li>
-					<li class="t3">임원</li>
-				</ul>
-				<div class="name">
-					<h2>안녕하세요, 홍길동 선생님!</h2>
-					<a href="#this" class="more"></a>
-				</div>
-				<!-- 로그인 후(기본))-->
-				<div class="member_info">
-					<div class="tit">
-						<strong>인정의 자격 정보</strong>
-						<div class="date">2026.03.01 ~ 2027.03.01</div>
+					<div class="name">
+						<h2>안녕하세요, {{ $memberCard['name'] }} 선생님!</h2>
+						<a href="{{ route('mypage.profile_edit') }}" class="more"><span class="sound_only">마이페이지로 이동</span></a>
 					</div>
-					<dl class="flex flex_between">
-						<dt>참석 현황</dt>
-						<dd><strong class="c_iden">1</strong>/3회</dd>
-					</dl>
-					<div class="state_line"><div class="bar"></div></div>
-					<div class="info flex_end">
-						<div class="r"><p class="excl">2회 부족</p></div>
-					</div>
-				</div>
-				<!-- 로그인 후(인정의 미습득))-->
-				<!-- <div class="member_info">
-					<div class="tit">
-						<strong>인정의 취득 요건 현황</strong>
-						<p>인정의 취득을 위해 아래 조건을 충족해주세요</p>
-					</div>
-					<div class="slice_half">
-						<div class="box">
-							<div class="tt">정기 연수강좌(2회)</div>
-							<div class="flex">
-								<a href="#this" class="btn btn_wbb">짝수년</a>
-								<a href="#this" class="btn btn_ggg">홀수년</a>
+					<div class="member_info">
+						<div class="tit">
+							<strong>인정의 자격 정보</strong>
+							@if (! empty($memberCard['certification_period']))
+								<div class="date">{{ $memberCard['certification_period'] }}</div>
+							@endif
+						</div>
+						<dl class="flex flex_between">
+							<dt>참석 현황</dt>
+							<dd><strong class="c_iden">{{ $conferenceCount }}</strong>/{{ $conferenceRequired }}회</dd>
+						</dl>
+						<div class="state_line"><div class="bar"></div></div>
+						@if ($conferenceShort > 0)
+							<div class="info flex_end">
+								<div class="r"><p class="excl">{{ $conferenceShort }}회 부족</p></div>
 							</div>
-						</div>
-						<div class="box">
-							<div class="tt">동계 연수강좌(1회)</div>
-							<a href="#this" class="btn btn_wrr w100p">미수료</a>
-						</div>
+						@endif
 					</div>
-				</div> -->
-				<!-- 로그인 후(인정의 습득))-->
-				<!-- <div class="member_info">
-					<div class="tit">
-						<div class="flex">
-							<strong>자격 유효기간</strong>
-							<div class="date">2026.04 - 2031.03</div>
-							<div class="d_day btn_wbb">D-1240</div>
-						</div>
-						<p>갱신을 위해 아래 조건을 충족해주세요</p>
+					<div class="btns">
+						<a href="{{ route('mypage.profile_edit') }}" class="btn btn_wbb">마이페이지</a>
+						<a href="{{ route('mypage.online_training') }}" class="btn btn_wkk">강의실 입장</a>
 					</div>
-					<div class="slice_half ptb6">
-						<div class="box">
-							<div class="tt mb0">학술 행사 참여</div>
-							<div class="state_line blue_line"><div class="bar"></div></div>
-							<div class="count"><strong class="c_iden">2</strong>/4회</div>
-						</div>
-						<div class="box">
-							<div class="tt mb0">동계 연수강좌</div>
-							<div class="state_line red_line"><div class="bar"></div></div>
-							<div class="count"><strong class="c_iden">1</strong>/3차시</div>
-						</div>
-					</div>
-				</div> -->
-				<div class="btns">
-					<a href="/mypage/profile_edit" class="btn btn_wbb">마이페이지</a>
-					<a href="/mypage/online_training" class="btn btn_wkk">강의실 입장</a>
 				</div>
-			</div>
+			@endif
 			<ul class="page_links">
-				<li class="i1"><a href="#this">회원가입 안내</a></li>
-				<li class="i2"><a href="/academic_event/conference">학술대회</a></li>
-				<li class="i3"><a href="/online_academy">온라인 아카데미</a></li>
-				<li class="i4"><a href="#this">대한기능의학 위원회</a></li>
+				<li class="i1"><a href="{{ route('member.register') }}">회원가입 안내</a></li>
+				<li class="i2"><a href="{{ route('academic_event.conference') }}">학술대회</a></li>
+				<li class="i3"><a href="{{ route('online_academy.index') }}">온라인 아카데미</a></li>
+				<li class="i4"><a href="{{ route('subcommittee.index') }}">대한기능의학 위원회</a></li>
 			</ul>
 		</div>
 	</div>
@@ -134,8 +136,17 @@
 			<h3 class="book_label">학술지</h3>
 			<div class="book_slide swiper">
 				<div class="swiper-wrapper">
-					<div class="swiper-slide"><a href="/archives/academic">장내 미생물과 대사 질환: 기능의학회</a></div>
-					<div class="swiper-slide"><a href="/archives/academic">장내 미생물과 대사 질환: 기능의학회</a></div>
+					@forelse ($journalPosts as $post)
+						@php
+							$journalFields = is_string($post->custom_fields ?? null)
+								? (json_decode($post->custom_fields, true) ?: [])
+								: ($post->custom_fields ?? []);
+							$journalUrl = $journalFields['link_url'] ?? route('archives.journals');
+						@endphp
+						<div class="swiper-slide"><a href="{{ $journalUrl }}" target="_blank" rel="noopener">{{ $post->title }}</a></div>
+					@empty
+						<div class="swiper-slide"><a href="{{ route('archives.journals') }}">등록된 학술지가 없습니다.</a></div>
+					@endforelse
 				</div>
 			</div>
 			<div class="book_control">
@@ -160,53 +171,26 @@
 			</div>
 			<div class="schedule">
 				<ul class="month">
-					<li><button type="button">Jan</button></li>
-					<li><button type="button">Feb</button></li>
-					<li><button type="button">Mar</button></li>
-					<li><button type="button">Apr</button></li>
-					<li><button type="button">May</button></li>
-					<li><button type="button">Jun</button></li>
-					<li><button type="button">Jul</button></li>
-					<li><button type="button">Aug</button></li>
-					<li><button type="button">Sep</button></li>
-					<li><button type="button">Oct</button></li>
-					<li><button type="button">Nov</button></li>
-					<li><button type="button">Dec</button></li>
+					@foreach (['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as $month)
+						<li><button type="button">{{ $month }}</button></li>
+					@endforeach
 				</ul>
 				<div class="schedule_slide">
 					<div class="swiper-wrapper">
-						<div class="swiper-slide t1">
-							<a href="#this" class="card-link">
-								<span class="day" aria-hidden="true"><strong>20</strong>일 (금)</span>
-								<h4 class="title">심화 연수 강좌 1차</h4>
-								<time datetime="2026-02-01/2026-02-07" class="full-date"><span class="sound_only">기간: </span>2026.02.01 ~ 2026.02.07</time>
-								<span class="type">연수강좌</span>
-							</a>
-						</div>
-						<div class="swiper-slide t1">
-							<a href="#this" class="card-link">
-								<span class="day" aria-hidden="true"><strong>21</strong>일 (금)</span>
-								<h4 class="title">심화 연수 강좌 1차</h4>
-								<time datetime="2026-02-01/2026-02-07" class="full-date"><span class="sound_only">기간: </span>2026.02.01 ~ 2026.02.07</time>
-								<span class="type">연수강좌</span>
-							</a>
-						</div>
-						<div class="swiper-slide t2">
-							<a href="#this" class="card-link">
-								<span class="day" aria-hidden="true"><strong>22</strong>일 (금)</span>
-								<h4 class="title">춘계학술대회</h4>
-								<time datetime="2026-02-01/2026-02-07" class="full-date"><span class="sound_only">기간: </span>2026.02.01 ~ 2026.02.07</time>
-								<span class="type">학술대회</span>
-							</a>
-						</div>
-						<div class="swiper-slide t2">
-							<a href="#this" class="card-link">
-								<span class="day" aria-hidden="true"><strong>22</strong>일 (금)</span>
-								<h4 class="title">춘계학술대회</h4>
-								<time datetime="2026-02-01/2026-02-07" class="full-date"><span class="sound_only">기간: </span>2026.02.01 ~ 2026.02.07</time>
-								<span class="type">학술대회</span>
-							</a>
-						</div>
+						@forelse ($eventScheduleItems as $item)
+							<div class="swiper-slide {{ $item['type_class'] }}">
+								<a href="{{ $item['url'] }}" class="card-link" data-schedule-month="{{ \Carbon\Carbon::parse($item['start_date'])->format('M') }}">
+									<span class="day" aria-hidden="true"><strong>{{ $item['day'] }}</strong>일 ({{ $item['weekday'] }})</span>
+									<h4 class="title">{{ $item['title'] }}</h4>
+									<time datetime="{{ $item['end_date'] ? $item['start_date'].'/'.$item['end_date'] : $item['start_date'] }}" class="full-date"><span class="sound_only">기간: </span>{{ $item['date_text'] }}</time>
+									<span class="type">{{ $item['type_label'] }}</span>
+								</a>
+							</div>
+						@empty
+							<div class="swiper-slide empty">
+								<p class="schedule_empty">등록된 학술행사가 없습니다.</p>
+							</div>
+						@endforelse
 					</div>
 				</div>
 			</div>
@@ -217,9 +201,9 @@
 			</div>
 			<div class="month_area">
 				<div class="select_month">
-					<button class="arrow prev" aria-label="이전달"></button>
-					<button class="arrow next" aria-label="다음달"></button>
-					<span class="tomonth">2026.04</span>
+					<button type="button" class="arrow prev" aria-label="이전달"></button>
+					<button type="button" class="arrow next" aria-label="다음달"></button>
+					<span class="tomonth"></span>
 				</div>
 				<div class="month">
 					<table>
@@ -249,38 +233,44 @@
 	<h2 class="sound_only" id="notice-title">공지사항 및 배너 링크</h2>
 	<div class="inner">
 		<div class="long notice">
-			<div class="mtit"><h3>공지사항</h3><a href="#this" class="more" aria-label="대한기능의학회 공지사항 으로 이동"></a></div>
+			<div class="mtit"><h3>공지사항</h3><a href="{{ route('member_plaza.society_notices') }}" class="more" aria-label="대한기능의학회 공지사항으로 이동"></a></div>
 			<ul class="list">
-				<li class="notice"><a href="/member_plaza/society_notices/view">사단법인 대한기능의학회 창립총회 개최 공고문<span class="date">2022.07.13</span></a></li>
-				<li><a href="/member_plaza/society_notices/view">2025년 7월 20일 - 하계연수강좌<span class="date">2022.07.13</span></a></li>
-				<li><a href="/member_plaza/society_notices/view">2025년 4월 20일 - 춘계학술대회<span class="date">2022.07.13</span></a></li>
-				<li><a href="/member_plaza/society_notices/view">2025년 2월 16일 - 심화 연수강좌 3차<span class="date">2022.07.13</span></a></li>
+				@forelse ($noticePosts as $post)
+					<li class="{{ $post->is_notice ? 'notice' : '' }}"><a href="{{ route('member_plaza.society_notices_show', $post->id) }}">{{ $post->title }}<span class="date">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</span></a></li>
+				@empty
+					<li><a href="{{ route('member_plaza.society_notices') }}">등록된 공지사항이 없습니다.<span class="date">-</span></a></li>
+				@endforelse
 			</ul>
 		</div>
 		<div class="short academy">
 			<div class="mtit"><h3>온라인 아카데미</h3></div>
 			<div class="main_gall">
-				<a href="#this"><span class="imgfit"><img src="/images/img_sample_mc02_01.jpg" alt=""></span><span class="txt"><p>[대한기능의학회] 대사 건강의 출발점: 기능의학으로 풀어보는 인슐린 저항성/ 분당차병원 가정의학과 김영상</p></span></a>
+				@if ($academyCourse)
+					<a href="{{ route('online_academy.show', $academyCourse) }}"><span class="imgfit"><img src="{{ $academyCourse->thumbnail_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($academyCourse->thumbnail_path) : asset('images/img_sample_mc02_01.jpg') }}" alt=""></span><span class="txt"><p>{{ $academyCourse->title }}</p></span></a>
+				@else
+					<a href="{{ route('online_academy.index') }}"><span class="imgfit"><img src="/images/img_sample_mc02_01.jpg" alt=""></span><span class="txt"><p>등록된 온라인 아카데미가 없습니다.</p></span></a>
+				@endif
 			</div>
 		</div>
 		<div class="short archives">
 			<div class="mtit"><h3>회원자료실</h3></div>
 			<div class="main_gall">
-				<a href="#this"><span class="imgfit"><img src="/images/img_sample_mc02_02.jpg" alt=""></span><span class="txt"><p>2025 추계 학술대회 초록집 (PDF)</p></span></a>
+				@if ($memberArchivePost)
+					<a href="{{ route('archives.members_show', $memberArchivePost->id) }}"><span class="imgfit"><img src="{{ $memberArchivePost->thumbnail ? \Illuminate\Support\Facades\Storage::disk('public')->url($memberArchivePost->thumbnail) : asset('images/img_sample_mc02_02.jpg') }}" alt=""></span><span class="txt"><p>{{ $memberArchivePost->title }}</p></span></a>
+				@else
+					<a href="{{ route('archives.members') }}"><span class="imgfit"><img src="/images/img_sample_mc02_02.jpg" alt=""></span><span class="txt"><p>등록된 회원자료실 게시글이 없습니다.</p></span></a>
+				@endif
 			</div>
 		</div>
 	</div>
 </section>
 
 <!-- 달력 클릭시 팝업 -->
-<div class="popup calendar_event_popup">
+<div class="popup calendar_event_popup" hidden>
 	<div class="dm"></div>
 	<div class="inbox">
-		<div class="event_tit">2026년 4월 27일(월요일)</div>
-		<ul class="schedule_list scroll auto">
-			<li><strong>KIFM 춘계학술대회 및 정기 총회</strong><div class="timebox"><span><time datetime="09:00">09:00</time> - <time datetime="18:00">18:00</time></span><span>서울 코엑스 D홀</span></div></li>
-			<li><strong>제 2차 기능의학 인정의 실무 교육</strong><div class="timebox"><span><time datetime="18:30">18:30</time> - <time datetime="20:30">20:30</time></span><span>코엑스 세미나실 203호</span></div></li>
-		</ul>
+		<div class="event_tit"></div>
+		<ul class="schedule_list scroll auto"></ul>
 		<div class="btns_btm">
 			<button type="button" class="btn btn_wkk btn_close_btm">닫기</button>
 		</div>
@@ -289,13 +279,13 @@
 
 <!-- 로그인시 팝업 - 위원회 미가입 -->
 @if(auth()->user()?->role === 'user')
-<div class="popup popup_login_start" data-target="popup_login_start" style="display:block;">
+<div class="popup popup_login_start" data-main-auto-open hidden>
 	<div class="dm"></div>
 	<div class="inbox">
 		<div class="tit_center">회원님의 더 깊이 있는 <br class="mo_vw">연구와 교류를 응원합니다</div>
-		<div class="gbox tac">대한기능의학회의 학술적 발전을 위해 산하 위원회 활동을 권장해 드립니다.<br/>지금 바로 회원님께 꼭 맞는 위원회를 확인해 보세요.</div>
+		<div class="gbox tac">대한기능의학회의 학술적 발전을 위해 산하 위원회 활동을 권장해 드립니다.<br>지금 바로 회원님께 꼭 맞는 위원회를 확인해 보세요.</div>
 		<div class="flex_center">
-			<a href="/subcommittee" class="btn btn_sanha_link">산하위원회 가기</a>
+			<a href="{{ route('subcommittee.index') }}" class="btn btn_sanha_link">산하위원회 가기</a>
 		</div>
 		<div class="btns_btm mt0">
 			<button type="button" class="btn btn_wkk btn_close_btm">닫기</button>
@@ -310,226 +300,60 @@
 
 @section('popups')
 @if($popups->count() > 0)
-    @foreach($popups as $popup)
-        @if($popup->popup_display_type === 'normal')
-            {{-- 일반팝업 (새창) --}}
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const popupUrl = '{{ route("popup.show", $popup->id) }}';
-                    const popupFeatures = 'width={{ $popup->width }},height={{ $popup->height }},left={{ $popup->position_left ?? 100 }},top={{ $popup->position_top ?? 100 }},scrollbars=yes,resizable=yes,menubar=no,toolbar=no,location=no,status=no';
-                    window.open(popupUrl, 'popup_{{ $popup->id }}', popupFeatures);
-                });
-            </script>
-        @else
-            {{-- 레이어팝업 (오버레이) --}}
-            <div class="popup-layer popup-fixed"
-                 id="popup-{{ $popup->id }}"
-                 data-popup-id="{{ $popup->id }}"
-                 data-display-type="layer"
-                 style="position: absolute !important; width: {{ $popup->width }}px; height: auto; top: {{ $popup->position_top }}px; left: {{ $popup->position_left }}px; z-index: 99999;">
+	@foreach($popups as $popup)
+		@if($popup->popup_display_type === 'normal')
+			<div
+				data-main-normal-popup
+				data-popup-url="{{ route('popup.show', $popup->id) }}"
+				data-popup-id="{{ $popup->id }}"
+				data-popup-width="{{ $popup->width }}"
+				data-popup-height="{{ $popup->height }}"
+				data-popup-left="{{ $popup->position_left ?? 100 }}"
+				data-popup-top="{{ $popup->position_top ?? 100 }}"
+				hidden
+			></div>
+		@else
+			<div
+				class="popup-layer popup-fixed"
+				id="popup-{{ $popup->id }}"
+				data-main-layer-popup
+				data-popup-id="{{ $popup->id }}"
+				data-display-type="layer"
+				data-popup-width="{{ $popup->width }}"
+				data-popup-top="{{ $popup->position_top }}"
+				data-popup-left="{{ $popup->position_left }}"
+				hidden
+			>
 
-                <div class="popup-body">
-                    @if($popup->popup_type === 'image' && $popup->popup_image)
-                        @if($popup->url)
-                            <a href="{{ $popup->url }}" target="{{ $popup->url_target }}">
-                                <img src="{{ asset('storage/' . $popup->popup_image) }}" alt="{{ $popup->title }}">
-                            </a>
-                        @else
-                            <img src="{{ asset('storage/' . $popup->popup_image) }}" alt="{{ $popup->title }}">
-                        @endif
-                    @elseif($popup->popup_type === 'html' && $popup->popup_content)
-                        {!! $popup->popup_content !!}
-                    @endif
-                </div>
+				<div class="popup-body">
+					@if($popup->popup_type === 'image' && $popup->popup_image)
+						@if($popup->url)
+							<a href="{{ $popup->url }}" target="{{ $popup->url_target }}">
+								<img src="{{ asset('storage/' . $popup->popup_image) }}" alt="{{ $popup->title }}">
+							</a>
+						@else
+							<img src="{{ asset('storage/' . $popup->popup_image) }}" alt="{{ $popup->title }}">
+						@endif
+					@elseif($popup->popup_type === 'html' && $popup->popup_content)
+						{!! $popup->popup_content !!}
+					@endif
+				</div>
 
-                <div class="popup-footer">
-                    <label class="popup-today-label" data-popup-id="{{ $popup->id }}">
-                        <input type="checkbox" class="popup-today-close" data-popup-id="{{ $popup->id }}">
-                        1일 동안 보지 않음
-                    </label>
-                    <button type="button" class="popup-footer-close-btn" data-popup-id="{{ $popup->id }}">닫기</button>
-                </div>
-            </div>
-        @endif
-    @endforeach
+				<div class="popup-footer">
+					<label class="popup-today-label" data-popup-id="{{ $popup->id }}">
+						<input type="checkbox" class="popup-today-close" data-popup-id="{{ $popup->id }}">
+						1일 동안 보지 않음
+					</label>
+					<button type="button" class="popup-footer-close-btn" data-popup-id="{{ $popup->id }}">닫기</button>
+				</div>
+			</div>
+		@endif
+	@endforeach
 @endif
 @endsection
 
 @push('scripts')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script>
-$(document).ready(function () {
-// mvisual
-	const mvisualSwiper = new Swiper('.mvisual-swiper', {
-        loop: true,
-        speed: 800,
-        autoplay: {
-            delay: 5000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.mvisual-control .paging',
-            type: 'fraction',
-			formatFractionCurrent: function (number) { return String(number).padStart(2, '0'); },
-			formatFractionTotal: function (number) { return String(number).padStart(2, '0'); },
-        },
-        navigation: {
-            nextEl: '.mvisual-control .next',
-            prevEl: '.mvisual-control .prev',
-        },
-    });
-    $('.mvisual-control .papl').on('click', function () {
-        const isPressed = $(this).attr('aria-pressed') === 'true';
-        if (isPressed) {
-            mvisualSwiper.autoplay.start();
-            $(this).attr('aria-pressed', 'false');
-            $(this).attr('aria-label', '슬라이드 정지');
-            $(this).removeClass('stop');
-        } else {
-            mvisualSwiper.autoplay.stop();
-            $(this).attr('aria-pressed', 'true');
-            $(this).attr('aria-label', '슬라이드 재생');
-            $(this).addClass('stop');
-        }
-    });
-// 학술지
-	const bookSwiper = new Swiper('.book_slide', {
-		direction: 'vertical',
-        loop: true,
-		spaceBetween: 8,
-        slidesPerView: 1,
-        navigation: {
-            nextEl: '.book_area .next',
-            prevEl: '.book_area .prev',
-        },
-		autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
-        },
-    });
-// 학술대회 일정
-    const scheduleSwiper = new Swiper('.schedule_slide', {
-        loop: true,
-		spaceBetween: 8,
-        slidesPerView: 'auto',
-        breakpoints: {
-            768: {
-                slidesPerView: 3,
-				spaceBetween: 16,
-            }
-        },
-        navigation: {
-            nextEl: '.arrows .next',
-            prevEl: '.arrows .prev',
-        },
-    });
-    $('.month li button').on('click', function () {
-        const $parentLi = $(this).parent('li');
-        const selectedMonth = $(this).text();
-        $parentLi.addClass('on').siblings().removeClass('on');
-        updateSchedule(selectedMonth);
-    });
-    function updateSchedule(month) {
-        console.log(month + " 데이터로 교체합니다.");
-    }
-    $('.month li').first().addClass('on');
-// 학회 일정
-    let date = new Date(), realToday = new Date();
-	const eventDates = ['2026-04-01', '2026-04-14', '2026-05-14'];
-	function renderCalendar() {
-		const viewYear = date.getFullYear(), viewMonth = date.getMonth();
-		$('.tomonth').text(`${viewYear}.${String(viewMonth + 1).padStart(2, '0')}`);
-		const prevLast = new Date(viewYear, viewMonth, 0), thisLast = new Date(viewYear, viewMonth + 1, 0);
-		const PLDate = prevLast.getDate(), PLDay = prevLast.getDay(), TLDate = thisLast.getDate(), TLDay = thisLast.getDay();
-		const prevDates = [], nextDates = [];
-		if (PLDay !== 6) for (let i = 0; i < PLDay + 1; i++) prevDates.unshift(PLDate - i);
-		for (let i = 1; i < 7 - TLDay; i++) nextDates.push(i);
-		const thisDates = [...Array(TLDate + 1).keys()].slice(1);
-		const dates = prevDates.concat(thisDates, nextDates), firstDateIndex = dates.indexOf(1), lastDateIndex = dates.lastIndexOf(TLDate);
-		let html = '';
-		dates.forEach((d, i) => {
-			const condition = i >= firstDateIndex && i <= lastDateIndex ? 'this' : 'disabled';
-			const dateStr = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-			const isToday = viewYear === realToday.getFullYear() && viewMonth === realToday.getMonth() && d === realToday.getDate() && condition === 'this';
-			const hasEvent = condition === 'this' && eventDates.includes(dateStr) ? 'event' : '';
-			if (i % 7 === 0) html += '<tr>';
-			html += `<td class="${condition} ${isToday ? 'today' : ''} ${hasEvent}" data-date="${dateStr}"><button type="button"><span>${d}</span></button></td>`;
-			if (i % 7 === 6) html += '</tr>';
-		});
-		$('.month tbody').html(html);
-	}
-	renderCalendar();
-	$('.select_month .prev').on('click', () => { date.setMonth(date.getMonth() - 1); renderCalendar(); });
-	$('.select_month .next').on('click', () => { date.setMonth(date.getMonth() + 1); renderCalendar(); });
-	$(document).on('click', '.month tbody button', function () {
-		const targetTd = $(this).parent('td');
-		if (targetTd.hasClass('disabled')) return;
-		$('.month tbody td').removeClass('click');
-		targetTd.addClass('click');
-		if (targetTd.hasClass('event')) {
-			const selectedDateStr = targetTd.attr('data-date');
-			const dayNames = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-			const clickDate = new Date(selectedDateStr);
-			const year = clickDate.getFullYear();
-			const month = clickDate.getMonth() + 1;
-			const day = clickDate.getDate();
-			const dayName = dayNames[clickDate.getDay()];
-			$('.calendar_event_popup .tit').text(`${year}년 ${month}월 ${day}일(${dayName})`);
-			$('.calendar_event_popup').stop().fadeIn(200);
-		}
-	});
-	$(document).on('click', '.calendar_event_popup .btn_close_btm, .calendar_event_popup .dm', function() {
-		$('.calendar_event_popup').stop().fadeOut(200);
-	});
-	$('.month li').first().addClass('on');
-// 로그인 후 인정의 참석 현황 게이지바
-	$('.member_info').each(function() {
-		const $flexBetween = $(this).find('.flex_between dd');
-		if ($flexBetween.length > 0) {
-			const text = $flexBetween.text();
-			const matches = text.match(/\d+/g);
-
-			if (matches && matches.length >= 2) {
-				const current = parseInt(matches[0]);
-				const total = parseInt(matches[1]);
-				const percentage = (current / total) * 100;
-
-				$(this).find('.state_line .bar').css('width', percentage + '%');
-			}
-		}
-		const $boxes = $(this).find('.slice_half .box');
-		if ($boxes.length > 0) {
-			$boxes.each(function() {
-				const text = $(this).find('.count').text();
-				const matches = text.match(/\d+/g);
-
-				if (matches && matches.length >= 2) {
-					const current = parseInt(matches[0]);
-					const total = parseInt(matches[1]);
-					const percentage = (current / total) * 100;
-					$(this).find('.state_line .bar').css('width', percentage + '%');
-				}
-			});
-		}
-	});
-// 로그인시 팝업 닫기
-    $('.popup').on('click', '.dm, .btn_close_btm', function() {
-        var $popup = $(this).closest('.popup');
-        $popup.fadeOut(300, function() {
-            if (lastFocusedElement) {
-                lastFocusedElement.focus();
-            }
-        });
-    });
-    $(document).on('keydown', function(e) {
-        if (e.key === 'Escape' || e.keyCode === 27) {
-            $('.popup:visible').fadeOut(300, function() {
-                if (lastFocusedElement) lastFocusedElement.focus();
-            });
-        }
-    });
-});
-</script>
-
+<script src="{{ asset('js/frontend/home.js') }}"></script>
 @endpush

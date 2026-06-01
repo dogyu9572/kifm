@@ -87,6 +87,16 @@ class ArchivesController extends Controller
         ));
     }
 
+    public function journals(Request $request): View
+    {
+        $posts = $this->publicBoardService->list('academic_journals', $request, 10);
+
+        return view('archives.journals', array_merge(
+            $this->archivesViewData('04', '학술지', 'archives_journals'),
+            compact('posts'),
+        ));
+    }
+
     /**
      * 학회 자료실 공통 화면 변수.
      */

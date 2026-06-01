@@ -3,22 +3,28 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FrontendMemberFindIdRequest;
+use App\Http\Requests\FrontendMemberFindPasswordRequest;
 use App\Http\Requests\FrontendMemberLoginRequest;
 use App\Http\Requests\FrontendMemberRegisterRequest;
+use App\Http\Requests\FrontendMemberResetPasswordRequest;
 use App\Models\CommunityCommittee;
 use App\Models\User;
 use App\Services\Backoffice\MemberService;
+use App\Services\Frontend\MemberAccountRecoveryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class MemberController extends Controller
 {
     public function __construct(
         private readonly MemberService $memberService,
+        private readonly MemberAccountRecoveryService $accountRecoveryService,
     ) {}
 
     public function login(Request $request): View
@@ -120,9 +126,37 @@ class MemberController extends Controller
         return $this->renderMember('find_id', '02', '아이디 찾기', 'find_id');
     }
 
-    public function findIdResult(): View
+    public function findIdStore(FrontendMemberFindIdRequest $request): RedirectResponse
     {
-        return $this->renderMember('find_id_result', '02', '아이디 찾기 완료', 'find_id_result');
+        $validated = $request->validated();
+        $user = $this->accountRecoveryService->findMemberForId(
+            (string) $validated['name'],
+            (string) $validated['phone_number'],
+            (string) $validated['email']
+        );
+
+        if (! $user) {
+            return back()
+                ->withInput($request->only(['name', 'phone_number', 'email']))
+                ->withErrors(['email' => '입력하신 정보와 일치하는 회원을 찾을 수 없습니다.']);
+        }
+
+        $request->session()->put(
+            'member_find_id_result',
+            $this->accountRecoveryService->buildFindIdResult($user)
+        );
+
+        return redirect()->route('member.find_id_result');
+    }
+
+    public function findIdResult(Request $request): View|RedirectResponse
+    {
+        $findIdResult = $request->session()->get('member_find_id_result');
+        if (! is_array($findIdResult)) {
+            return redirect()->route('member.find_id');
+        }
+
+        return $this->renderMember('find_id_result', '02', '아이디 찾기 완료', 'find_id_result', compact('findIdResult'));
     }
 
     public function findPw(): View
@@ -130,9 +164,92 @@ class MemberController extends Controller
         return $this->renderMember('find_pw', '03', '비밀번호 찾기', 'find_pw');
     }
 
-    public function newPassword(): View
+    public function findPwStore(FrontendMemberFindPasswordRequest $request): RedirectResponse
     {
-        return $this->renderMember('new_password', '03', '새 비밀번호 입력', 'new_password');
+        $validated = $request->validated();
+        $user = $this->accountRecoveryService->findMemberForPasswordReset(
+            (string) $validated['login_id'],
+            (string) $validated['email'],
+            (string) $validated['phone_number']
+        );
+
+        if (! $user) {
+            return back()
+                ->withInput($request->only(['login_id', 'email', 'phone_number']))
+                ->withErrors(['phone_number' => '입력하신 정보와 일치하는 회원을 찾을 수 없습니다.']);
+        }
+
+        $token = Str::random(64);
+        $request->session()->put('member_password_reset', [
+            'user_id' => $user->id,
+            'token' => $token,
+            'token_hash' => hash('sha256', $token),
+            'expires_at' => now()->addMinutes(20)->timestamp,
+        ]);
+
+        return redirect()->route('member.new_password');
+    }
+
+    public function newPassword(Request $request): View|RedirectResponse
+    {
+        if (! $this->hasValidPasswordResetSession($request)) {
+            return redirect()
+                ->route('member.find_pw')
+                ->withErrors(['phone_number' => '비밀번호 재설정 인증이 만료되었습니다. 다시 진행해주세요.']);
+        }
+
+        $reset = $request->session()->get('member_password_reset');
+        $resetToken = is_array($reset) ? (string) ($reset['token'] ?? '') : '';
+
+        return $this->renderMember('new_password', '03', '새 비밀번호 입력', 'new_password', compact('resetToken'));
+    }
+
+    public function newPasswordStore(FrontendMemberResetPasswordRequest $request): RedirectResponse
+    {
+        $reset = $request->session()->get('member_password_reset');
+        $token = (string) $request->validated('reset_token');
+
+        if (
+            ! is_array($reset)
+            || ! isset($reset['user_id'], $reset['token_hash'], $reset['expires_at'])
+            || (int) $reset['expires_at'] < now()->timestamp
+            || ! hash_equals((string) $reset['token_hash'], hash('sha256', $token))
+        ) {
+            $request->session()->forget('member_password_reset');
+
+            return redirect()
+                ->route('member.find_pw')
+                ->withErrors(['phone_number' => '비밀번호 재설정 인증이 만료되었습니다. 다시 진행해주세요.']);
+        }
+
+        $user = User::query()
+            ->where('role', 'user')
+            ->whereNull('withdrawn_at')
+            ->find((int) $reset['user_id']);
+
+        if (! $user) {
+            $request->session()->forget('member_password_reset');
+
+            return redirect()
+                ->route('member.find_pw')
+                ->withErrors(['phone_number' => '회원 정보를 찾을 수 없습니다. 다시 진행해주세요.']);
+        }
+
+        $this->accountRecoveryService->resetPassword($user, (string) $request->validated('password'));
+        $request->session()->forget('member_password_reset');
+
+        return redirect()
+            ->route('member.login')
+            ->with('member_password_reset_completed', true);
+    }
+
+    private function hasValidPasswordResetSession(Request $request): bool
+    {
+        $reset = $request->session()->get('member_password_reset');
+
+        return is_array($reset)
+            && isset($reset['user_id'], $reset['token_hash'], $reset['expires_at'])
+            && (int) $reset['expires_at'] >= now()->timestamp;
     }
 
     public function register(): View

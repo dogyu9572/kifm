@@ -7,7 +7,9 @@
 <article class="scon terms_area" aria-labelledby="privacy-policy-title">
 	<h1 class="sub_title" id="privacy-policy-title">{{ $sName }}</h1>
 	<div class="inner">
-	
+		@if(! empty($privacyPolicyPost?->content))
+			{!! $privacyPolicyPost->content !!}
+		@else
 		<div class="blue_box privacy_policy_head">
 			우리 헌법은 국민의 기본권인 사생활의 비밀과 자유 및 통신의 비밀을 보장하고 있으므로 도/감청 등에의한 개인 정보 및 사생활의 은밀한 탐지는 원칙적으로 불법입니다.<br/>
 			그러나 우리 사회에 횡행하는 불법 도청, 통신상의 정보 유출로 인하여 심각한 인권 침해가 나타나고 있고 국민 개개인의 자유로운 생활형성이 위협 받고 있습니다.<br/>
@@ -30,6 +32,7 @@
 			<h2 class="num_tit"><span>3</span>개인정보의 보유 및 폐기</h2>
 			<p>귀하가 대한기능의학회 의 회원으로서 대한기능의학회 가 제공하는 서비스를 받는 동안 회원님의 개인정보는 대한기능의학회에서 계속 보유하며 서비스 제공을 위해 이용하게 됩니다. 다만 대한기능의학회 의 회원이 아래의 '7. 자신의 개인정보 열람, 정정 및 삭제'에서 설명한 절차에 따라 ID를 삭제하거나 가입해지를 요청한 경우와 회원님께 사전에 알려드린 개인정보를 제공받은 목적이 달성된 경우에 수집된 개인의 정보는 재생할 수 없는 방법에 의하여 하드디스크에서 완전히 삭제되며 어떠한 용도로도 열람 또는 이용할 수 없도록 처리됩니다.</p>
 		</section>
+		@endif
 		
 	</div>
 </article>

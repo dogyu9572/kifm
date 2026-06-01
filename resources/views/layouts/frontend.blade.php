@@ -83,6 +83,7 @@
 		$ver_reactive_aca	= file_exists($reactive_aca_path) ? filemtime($reactive_aca_path) : date('YmdHis');
 	@endphp
     <link rel="preload" href="/css/font/Pretendard-Regular.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/css/font/Pretendard-Medium.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/css/font/Pretendard-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
 
 	<link rel="stylesheet" href="/css/frontend/font.css" media="all">
@@ -205,6 +206,7 @@
 							<li><a href="/archives/general"  @if(($gNum ?? '') == '04' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>일반 자료실</a></li>
 							<li><a href="/archives/academic" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>학술 자료실</a></li>
 							<li><a href="/archives/members"  @if(($gNum ?? '') == '04' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>회원 자료실</a></li>
+							<li><a href="/archives/journals" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>학술지</a></li>
 						</ul>
 					</li>
 					<li class="menu {{ ($gNum ?? '') == '05' ? 'on' : '' }}">
@@ -346,6 +348,7 @@
 						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/archives/general" @if(($sNum ?? '') == '01') aria-current="page" @endif>일반 자료실</a></li>
 						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/archives/academic" @if(($sNum ?? '') == '02') aria-current="page" @endif>학술 자료실</a></li>
 						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/archives/members" @if(($sNum ?? '') == '03') aria-current="page" @endif>회원 자료실</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/archives/journals" @if(($sNum ?? '') == '04') aria-current="page" @endif>학술지</a></li>
 					@endif
 					@if(isset($gNum) && $gNum == '05')
 						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/member_plaza/society_notices" @if(($sNum ?? '') == '01') aria-current="page" @endif>학회 공지</a></li>

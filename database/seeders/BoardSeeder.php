@@ -19,6 +19,7 @@ class BoardSeeder extends Seeder
         $generalArchiveTemplate = BoardTemplate::where('name', '일반 자료실')->first();
         $academicArchiveTemplate = BoardTemplate::where('name', '학술 자료실')->first();
         $memberArchiveTemplate = BoardTemplate::where('name', '회원 자료실')->first();
+        $academicJournalTemplate = BoardTemplate::where('name', '학술지')->first();
         $memberSquareNoticesTemplate = BoardTemplate::where('name', '학회 공지')->first();
         $otherNoticesTemplate = BoardTemplate::where('name', '기타 공지')->first();
         $memberSquareAlbumTemplate = BoardTemplate::where('name', '학회 앨범')->first();
@@ -282,7 +283,7 @@ class BoardSeeder extends Seeder
                     'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
                     'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
                     'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
-                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'thumbnail' => ['enabled' => true, 'required' => false, 'label' => '썸네일'],
                     'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
                     'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
                     'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
@@ -305,6 +306,46 @@ class BoardSeeder extends Seeder
                         'required' => true,
                         'max_length' => null,
                         'placeholder' => null,
+                    ],
+                ],
+            ],
+            [
+                'name' => '학술지',
+                'slug' => 'academic_journals',
+                'description' => '학회 자료실 학술지 링크 게시판',
+                'skin_id' => $defaultSkin?->id,
+                'template_id' => $academicJournalTemplate?->id,
+                'is_active' => true,
+                'table_created' => false,
+                'list_count' => 20,
+                'enable_notice' => false,
+                'is_single_page' => false,
+                'enable_sorting' => false,
+                'hot_threshold' => 100,
+                'permission_read' => 'all',
+                'permission_write' => 'admin',
+                'permission_comment' => 'member',
+                'field_config' => [
+                    'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
+                    'content' => ['enabled' => false, 'required' => false, 'label' => '내용'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '카테고리'],
+                    'author_name' => ['enabled' => true, 'required' => false, 'label' => '작성자'],
+                    'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
+                    'attachments' => ['enabled' => false, 'required' => false, 'label' => '첨부파일'],
+                    'thumbnail' => ['enabled' => false, 'required' => false, 'label' => '썸네일'],
+                    'is_secret' => ['enabled' => false, 'required' => false, 'label' => '비밀글'],
+                    'is_active' => ['enabled' => true, 'required' => true, 'label' => '공개여부'],
+                    'created_at' => ['enabled' => true, 'required' => false, 'label' => '등록일'],
+                ],
+                'custom_fields_config' => [
+                    [
+                        'name' => 'link_url',
+                        'type' => 'url',
+                        'label' => '링크 URL',
+                        'options' => null,
+                        'required' => true,
+                        'max_length' => null,
+                        'placeholder' => 'https://example.com',
                     ],
                 ],
             ],

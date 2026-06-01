@@ -7,6 +7,7 @@ use App\Models\CommunityCommittee;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PublicBoardService
 {
@@ -18,6 +19,13 @@ class PublicBoardService
      */
     public function list(string $slug, Request $request, int $perPage = 10, ?string $committeeCategory = null): LengthAwarePaginator
     {
+        if (! Schema::hasTable($this->table($slug))) {
+            return new LengthAwarePaginator([], 0, $perPage, 1, [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]);
+        }
+
         $query = DB::table($this->table($slug))
             ->whereNull('deleted_at')
             ->where('is_active', true)

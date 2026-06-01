@@ -643,6 +643,18 @@ class AdminMenuSeeder extends Seeder
         "permission_key": null
     },
     {
+        "id": 103,
+        "parent_id": 51,
+        "name": "학술지",
+        "url": "/backoffice/board-posts/academic_journals",
+        "icon": null,
+        "order": 4,
+        "is_active": 1,
+        "created_at": "2026-06-01 12:00:00",
+        "updated_at": "2026-06-01 12:00:00",
+        "permission_key": null
+    },
+    {
         "id": 53,
         "parent_id": 19,
         "name": "학회 공지",

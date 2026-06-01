@@ -93,6 +93,7 @@ Route::prefix('archives')->name('archives.')->group(function () {
     Route::get('/academic/{id}', [ArchivesController::class, 'academicShow'])->whereNumber('id')->name('academic_show');
     Route::get('/members', [ArchivesController::class, 'members'])->name('members');
     Route::get('/members/{id}', [ArchivesController::class, 'membersShow'])->whereNumber('id')->name('members_show');
+    Route::get('/journals', [ArchivesController::class, 'journals'])->name('journals');
 });
 
 // 회원광장
@@ -151,9 +152,18 @@ Route::prefix('member')->name('member.')->group(function () {
     Route::get('/dormant_auth', [FrontendMemberController::class, 'dormantAuth'])->name('dormant_auth');
     Route::get('/password_reset', [FrontendMemberController::class, 'passwordReset'])->name('password_reset');
     Route::get('/find_id', [FrontendMemberController::class, 'findId'])->name('find_id');
+    Route::post('/find_id', [FrontendMemberController::class, 'findIdStore'])
+        ->middleware('throttle:10,1')
+        ->name('find_id.store');
     Route::get('/find_id_result', [FrontendMemberController::class, 'findIdResult'])->name('find_id_result');
     Route::get('/find_pw', [FrontendMemberController::class, 'findPw'])->name('find_pw');
+    Route::post('/find_pw', [FrontendMemberController::class, 'findPwStore'])
+        ->middleware('throttle:10,1')
+        ->name('find_pw.store');
     Route::get('/new_password', [FrontendMemberController::class, 'newPassword'])->name('new_password');
+    Route::post('/new_password', [FrontendMemberController::class, 'newPasswordStore'])
+        ->middleware('throttle:10,1')
+        ->name('new_password.store');
     Route::get('/register', [FrontendMemberController::class, 'register'])->name('register');
     Route::post('/register', [FrontendMemberController::class, 'registerStore'])->name('register.store');
     Route::middleware('throttle:30,1')->group(function () {

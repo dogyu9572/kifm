@@ -97,6 +97,33 @@
                 </div>
 
                 <div class="board-form-group">
+                    <label class="board-form-label">썸네일</label>
+                    <div class="board-file-upload">
+                        <div class="board-file-input-wrapper">
+                            <input type="file" class="board-file-input" id="thumbnail" name="thumbnail" accept=".jpg,.jpeg,.png,.gif">
+                            <div class="board-file-input-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span class="board-file-input-text">파일을 선택하거나 여기로 드래그하세요</span>
+                                <span class="board-file-input-subtext">1개, 파일 10MB 이하</span>
+                            </div>
+                        </div>
+
+                        @if(!empty($post->thumbnail))
+                            <div class="board-existing-files">
+                                <div class="board-attachment-list">
+                                    <div class="board-attachment-item">
+                                        <i class="fas fa-image"></i>
+                                        <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($post->thumbnail) }}</span>
+                                        <input type="hidden" name="existing_thumbnail" value="{{ $post->thumbnail }}">
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        <div class="board-file-preview" id="thumbnailPreview"></div>
+                    </div>
+                </div>
+
+                <div class="board-form-group">
                     <label class="board-form-label">첨부파일</label>
                     <div class="board-file-upload">
                         <div class="board-file-input-wrapper">

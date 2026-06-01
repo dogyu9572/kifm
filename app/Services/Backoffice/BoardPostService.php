@@ -200,7 +200,7 @@ class BoardPostService
             }
         }
 
-        if (in_array($slug, ['member_square_notices', 'inquiry_qna'], true) && $request->filled('visibility')) {
+        if (in_array($slug, ['member_square_notices', 'inquiry_qna', 'academic_journals'], true) && $request->filled('visibility')) {
             if ($request->visibility === 'public') {
                 $query->where('is_active', true);
             } elseif ($request->visibility === 'private') {

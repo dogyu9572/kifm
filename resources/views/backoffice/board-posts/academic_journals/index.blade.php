@@ -1,6 +1,6 @@
 @extends('backoffice.layouts.app')
 
-@section('title', $board->name ?? '회원 자료실')
+@section('title', $board->name ?? '학술지')
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/backoffice/boards.css') }}">
@@ -21,8 +21,8 @@
                 <button type="button" id="bulk-delete-btn" class="btn btn-danger">
                     <i class="fas fa-trash"></i> 선택 삭제
                 </button>
-                <a href="{{ route('backoffice.board-posts.create', $board->slug ?? 'member_archive') }}" class="btn btn-success">
-                    <i class="fas fa-plus"></i> 신규 자료 등록
+                <a href="{{ route('backoffice.board-posts.create', $board->slug ?? 'academic_journals') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> 신규 학술지 등록
                 </a>
             </div>
         </div>
@@ -30,7 +30,7 @@
         <div class="board-card">
             <div class="board-card-body">
                 <div class="board-filter">
-                    <form method="GET" action="{{ route('backoffice.board-posts.index', $board->slug ?? 'member_archive') }}" class="filter-form">
+                    <form method="GET" action="{{ route('backoffice.board-posts.index', $board->slug ?? 'academic_journals') }}" class="filter-form">
                         <div class="filter-row">
                             <div class="filter-group">
                                 <label for="visibility" class="filter-label">공개여부</label>
@@ -41,25 +41,6 @@
                                 </select>
                             </div>
                             <div class="filter-group">
-                                <label for="member_grade" class="filter-label">회원 설정</label>
-                                <select id="member_grade" name="member_grade" class="filter-select">
-                                    <option value="">전체</option>
-                                    <option value="associate" @selected(request('member_grade') === 'associate')>준회원 이상</option>
-                                    <option value="regular" @selected(request('member_grade') === 'regular')>정회원 이상</option>
-                                    <option value="lifetime" @selected(request('member_grade') === 'lifetime')>평생회원</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="archive_type" class="filter-label">자료 유형</label>
-                                <select id="archive_type" name="archive_type" class="filter-select">
-                                    <option value="">전체</option>
-                                    <option value="ebook" @selected(request('archive_type') === 'ebook')>E-book (초록집)</option>
-                                    <option value="video" @selected(request('archive_type') === 'video')>강의 영상</option>
-                                    <option value="paper" @selected(request('archive_type') === 'paper')>논문/학술지</option>
-                                    <option value="guide" @selected(request('archive_type') === 'guide')>가이드라인</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
                                 <label for="start_date" class="filter-label">등록일 시작</label>
                                 <input type="date" id="start_date" name="start_date" class="filter-input" value="{{ request('start_date') }}">
                             </div>
@@ -67,14 +48,12 @@
                                 <label for="end_date" class="filter-label">등록일 끝</label>
                                 <input type="date" id="end_date" name="end_date" class="filter-input" value="{{ request('end_date') }}">
                             </div>
-                        </div>
-                        <div class="filter-row">
                             <div class="filter-group">
                                 <label for="search_type" class="filter-label">검색어</label>
                                 <select id="search_type" name="search_type" class="filter-select">
                                     <option value="">전체</option>
                                     <option value="title" @selected(request('search_type') === 'title')>제목</option>
-                                    <option value="keyword" @selected(request('search_type') === 'keyword')>키워드</option>
+                                    <option value="content" @selected(request('search_type') === 'content')>내용</option>
                                 </select>
                             </div>
                             <div class="filter-group">
@@ -86,7 +65,7 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search"></i> 검색
                                     </button>
-                                    <a href="{{ route('backoffice.board-posts.index', $board->slug ?? 'member_archive') }}" class="btn btn-secondary">
+                                    <a href="{{ route('backoffice.board-posts.index', $board->slug ?? 'academic_journals') }}" class="btn btn-secondary">
                                         <i class="fas fa-undo"></i> 초기화
                                     </a>
                                 </div>
@@ -100,10 +79,8 @@
                         <span class="list-count">총 {{ $posts->total() }}건</span>
                     </div>
                     <div class="list-controls">
-                        <form method="GET" action="{{ route('backoffice.board-posts.index', $board->slug ?? 'member_archive') }}" class="per-page-form">
+                        <form method="GET" action="{{ route('backoffice.board-posts.index', $board->slug ?? 'academic_journals') }}" class="per-page-form">
                             <input type="hidden" name="visibility" value="{{ request('visibility') }}">
-                            <input type="hidden" name="member_grade" value="{{ request('member_grade') }}">
-                            <input type="hidden" name="archive_type" value="{{ request('archive_type') }}">
                             <input type="hidden" name="start_date" value="{{ request('start_date') }}">
                             <input type="hidden" name="end_date" value="{{ request('end_date') }}">
                             <input type="hidden" name="keyword" value="{{ request('keyword') }}">
@@ -113,6 +90,7 @@
                                 <option value="10" @selected(request('per_page', 15) == 10)>10개</option>
                                 <option value="20" @selected(request('per_page', 15) == 20)>20개</option>
                                 <option value="50" @selected(request('per_page', 15) == 50)>50개</option>
+                                <option value="100" @selected(request('per_page', 15) == 100)>100개</option>
                             </select>
                         </form>
                     </div>
@@ -126,10 +104,8 @@
                                     <input type="checkbox" id="select-all" class="form-check-input">
                                 </th>
                                 <th class="w5">번호</th>
-                                <th class="w10">썸네일</th>
-                                <th class="w15">자료 유형</th>
-                                <th class="w15">회원 설정</th>
                                 <th>제목</th>
+                                <th class="w25">링크</th>
                                 <th class="w10">공개여부</th>
                                 <th class="w10">등록일</th>
                                 <th class="w15">관리</th>
@@ -141,53 +117,34 @@
                                     $customFields = is_string($post->custom_fields ?? null)
                                         ? (json_decode($post->custom_fields, true) ?: [])
                                         : ($post->custom_fields ?? []);
-                                    $archiveType = match($customFields['archive_type'] ?? null) {
-                                        'ebook' => 'E-book (초록집)',
-                                        'video' => '강의 영상',
-                                        'paper' => '논문/학술지',
-                                        'guide' => '가이드라인',
-                                        default => '-',
-                                    };
-                                    $memberGrade = match($customFields['member_grade'] ?? null) {
-                                        'all' => '전체 회원',
-                                        'associate' => '준회원 이상',
-                                        'regular' => '정회원 이상',
-                                        'lifetime' => '평생회원',
-                                        default => '-',
-                                    };
+                                    $linkUrl = $customFields['link_url'] ?? '';
                                 @endphp
                                 <tr>
                                     <td>
                                         <input type="checkbox" name="selected_posts[]" value="{{ $post->id }}" class="form-check-input post-checkbox">
                                     </td>
                                     <td>
-                                        @if ($post->is_notice)
-                                            <span class="board-notice-badge">공지</span>
-                                        @else
-                                            @php
-                                                $postNumber = $posts->total() - ($posts->currentPage() - 1) * $posts->perPage() - $loop->index;
-                                            @endphp
-                                            {{ $postNumber }}
-                                        @endif
+                                        @php
+                                            $postNumber = $posts->total() - ($posts->currentPage() - 1) * $posts->perPage() - $loop->index;
+                                        @endphp
+                                        {{ $postNumber }}
                                     </td>
-                                    <td>
-                                        @if(!empty($post->thumbnail))
-                                            <img src="{{ asset('storage/' . $post->thumbnail) }}" alt="썸네일" class="gallery-thumbnail-small">
-                                        @else
-                                            <span>-</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $archiveType }}</td>
-                                    <td>{{ $memberGrade }}</td>
                                     <td>{{ $post->title }}</td>
+                                    <td>
+                                        @if($linkUrl !== '')
+                                            <a href="{{ $linkUrl }}" target="_blank" rel="noopener">{{ $linkUrl }}</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>{{ (bool) ($post->is_active ?? true) ? '공개' : '비공개' }}</td>
                                     <td>{{ $post->created_at->format('Y.m.d') }}</td>
                                     <td>
                                         <div class="board-btn-group">
-                                            <a href="{{ route('backoffice.board-posts.edit', [$board->slug ?? 'member_archive', $post->id]) }}" class="btn btn-primary btn-sm">
+                                            <a href="{{ route('backoffice.board-posts.edit', [$board->slug ?? 'academic_journals', $post->id]) }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-edit"></i> 수정
                                             </a>
-                                            <form action="{{ route('backoffice.board-posts.destroy', [$board->slug ?? 'member_archive', $post->id]) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('backoffice.board-posts.destroy', [$board->slug ?? 'academic_journals', $post->id]) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">
@@ -199,7 +156,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center">등록된 자료가 없습니다.</td>
+                                    <td colspan="7" class="text-center">등록된 학술지가 없습니다.</td>
                                 </tr>
                             @endforelse
                         </tbody>
