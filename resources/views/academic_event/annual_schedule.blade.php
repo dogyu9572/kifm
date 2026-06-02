@@ -36,7 +36,7 @@
 				</div>
 			</div>
 		</div>
-
+		
 		<div class="schedule_month_tbl">
 			<table>
 				<thead>
@@ -51,11 +51,11 @@
 					</tr>
 				</thead>
 				<tbody>
-
+					
 				</tbody>
 			</table>
 		</div>
-
+		
 		<div class="mo_vw mo_schedule_month_list">
 			<h2 class="sound_only">일정 목록</h2>
 			<ul id="mo-schedule-list"></ul>
@@ -63,7 +63,7 @@
 
 	</div>
 </section>
-
+	
 </main>
 
 @endsection
@@ -74,14 +74,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const scheduleData = {
         "2026": {
             "04": [
-                { start: "2026-04-06", end: "2026-04-06", class: "c1", title: "심화 연수강좌 2차" },
-                { start: "2026-04-08", end: "2026-04-08", class: "c1", title: "심화 연수강좌 2차" },
-                { start: "2026-04-13", end: "2026-04-13", class: "c1", title: "심화 연수강좌 2차" },
+                { start: "2026-04-06", end: "2026-04-06", class: "c1", title: "학술대회 2차" },
+                { start: "2026-04-08", end: "2026-04-08", class: "c1", title: "학술대회 2차" },
+                { start: "2026-04-13", end: "2026-04-13", class: "c1", title: "학술대회 2차" },
                 { start: "2026-04-15", end: "2026-04-16", class: "c2", title: "심화 연수강좌 2차" },
                 { start: "2026-04-16", end: "2026-04-21", class: "c1", title: "주를 넘어가는 연속 일정" },
-                { start: "2026-04-20", end: "2026-04-20", class: "c1", title: "심화 연수강좌 2차" },
-                { start: "2026-04-22", end: "2026-04-22", class: "c1", title: "심화 연수강좌 2차" },
-                { start: "2026-04-27", end: "2026-04-27", class: "c1", title: "심화 연수강좌 2차" },
+                { start: "2026-04-20", end: "2026-04-20", class: "c1", title: "학술대회 2차" },
+                { start: "2026-04-22", end: "2026-04-22", class: "c1", title: "학술대회 2차" },
+                { start: "2026-04-27", end: "2026-04-27", class: "c1", title: "학술대회 2차" },
                 { start: "2026-04-29", end: "2026-04-30", class: "c2", title: "심화 연수강좌 2차" },
                 { start: "2026-04-29", end: "2026-04-30", class: "c2", title: "심화 연수강좌 2차3" },
             ],
@@ -157,13 +157,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const events = (scheduleData[year] && scheduleData[year][formattedMonth]) ? scheduleData[year][formattedMonth] : [];
-
+        
         // --- [모바일 목록 데이터 처리 및 렌더링] ---
         let moHtml = '';
         if (events.length > 0) {
             // 이벤트를 시작일 순서대로 정렬
             const sortedEvents = [...events].sort((a, b) => new Date(a.start) - new Date(b.start));
-
+            
             sortedEvents.forEach(event => {
                 const dateText = formatMobileDate(event.start, event.end);
                 // 태그 색상(c1, c2 등) 구분을 위해 span에 class를 부여하거나 입맛에 맞게 커스텀 가능합니다.
@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     let startDayOfW = Math.max(startIdx, w * 7) % 7;
                     let endDayOfW = Math.min(endIdx, (w * 7) + 6) % 7;
-
+                    
                     for (let d = startDayOfW; d <= endDayOfW; d++) {
                         if (weekGrid[w][rowIdx][d] !== null) {
                             canPlace = false;
