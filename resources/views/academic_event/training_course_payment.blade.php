@@ -196,7 +196,7 @@
                         </div>
                         <div>
                             <dt>쿠폰 할인</dt>
-                            <dd><strong class="c_iden" id="training-summary-discount">-0</strong>원</dd>
+                            <dd><strong class="c_iden" id="training-summary-discount">0</strong>원</dd>
                         </div>
                         <div class="total">
                             <dt>최종 결제 금액</dt>

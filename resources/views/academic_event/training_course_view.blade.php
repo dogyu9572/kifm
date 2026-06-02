@@ -135,30 +135,47 @@
     });
 // abso_application 고정
     const $window = $(window);
-    const $header = $('header');
-    const $viewTop = $('.academic_event_view_top');
-    const $detail = $('.academic_event_view_detail');
-    const $absoApp = $('.abso_application');
-    $window.on('scroll.stickyApp', function() {
-        const scrollTop = $window.scrollTop();
-        const headerHeight = $header.outerHeight();
-        const topMargin = parseInt($viewTop.css('margin-bottom')) || 0;
-        const detailOffsetTop = $detail.offset().top;
-        const detailHeight = $detail.outerHeight();
-        const appHeight = $absoApp.outerHeight();
-        const fixStartPoint = detailOffsetTop - 190;
-        const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - 190;
-        if (scrollTop >= fixStartPoint) {
-            if (scrollTop >= unfixPoint) {
-                $detail.addClass('unfixed').removeClass('fixed');
-            } else {
-                $detail.addClass('fixed').removeClass('unfixed');
-            }
-        } else {
-            $detail.removeClass('fixed unfixed');
-        }
-    });
-    $window.trigger('scroll.stickyApp');
+	const $header = $('header');
+	const $viewTop = $('.academic_event_view_top');
+	const $detail = $('.academic_event_view_detail');
+	const $inbox = $detail.find('.inbox');
+	const $absoApp = $('.abso_application');
+	function handleStickyLayout() {
+		const scrollTop = $window.scrollTop();
+		const windowHeight = $window.height();
+		const windowWidth = $window.width();
+		const detailOffsetTop = $detail.offset().top;
+		const detailHeight = $detail.outerHeight();
+		const appHeight = $absoApp.outerHeight();
+		if (windowWidth <= 767) {
+			$inbox.css('padding-bottom', (appHeight + 20) + 'px');
+			const mobileUnfixPoint = (detailOffsetTop + detailHeight) - windowHeight;
+			if (scrollTop >= mobileUnfixPoint) {
+				$detail.addClass('unfixed').removeClass('fixed');
+			} else {
+				$detail.removeClass('unfixed').addClass('fixed'); 
+			}
+		} else {
+			$inbox.css('padding-bottom', '');
+			const headerHeight = $header.outerHeight() || 0;
+			const topMargin = parseInt($viewTop.css('margin-bottom')) || 0;
+			const targetOffset = headerHeight + topMargin;
+			const fixStartPoint = detailOffsetTop - targetOffset;
+			const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - targetOffset;
+			if (scrollTop >= fixStartPoint) {
+				if (scrollTop >= unfixPoint) {
+					$detail.addClass('unfixed').removeClass('fixed');
+				} else {
+					$detail.addClass('fixed').removeClass('unfixed');
+				}
+			} else {
+				$detail.removeClass('fixed unfixed');
+			}
+		}
+	}
+	$window.on('scroll.stickyApp resize.stickyApp', handleStickyLayout);
+	$(window).on('load', function() { handleStickyLayout(); });
+	handleStickyLayout();
 // 팝업
 	var lastFocusedElement;
 	function layerShow(id) {
@@ -172,5 +189,8 @@
 		if (lastFocusedElement) lastFocusedElement.focus();
 	});
 	}
+
+//mobile
+	
 </script>
 @endpush

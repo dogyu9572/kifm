@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const deleteForms = document.querySelectorAll('#bo-one-on-one-inquiries-index .js-delete-confirm-form');
     const perPageSelect = document.querySelector('.bo-one-on-one-inquiry-per-page');
     const perPageForm = document.getElementById('one-on-one-inquiry-per-page-form');
+    const filterForm = root?.querySelector('.filter-form');
+    const dateFrom = document.getElementById('filter_date_from');
+    const dateTo = document.getElementById('filter_date_to');
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
     const updateBulkBtn = () => {
@@ -103,6 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (perPageSelect && perPageForm) {
         perPageSelect.addEventListener('change', () => {
             perPageForm.submit();
+        });
+    }
+
+    if (filterForm && dateFrom && dateTo) {
+        filterForm.addEventListener('submit', (event) => {
+            const from = (dateFrom.value || '').trim();
+            const to = (dateTo.value || '').trim();
+
+            if (from === '' || to === '' || from <= to) {
+                return;
+            }
+
+            event.preventDefault();
+            window.alert('시작일이 종료일보다 늦습니다');
+            dateFrom.focus();
         });
     }
 });

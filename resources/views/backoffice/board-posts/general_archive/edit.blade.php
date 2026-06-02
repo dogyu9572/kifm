@@ -226,7 +226,7 @@
                             <span class="required">*</span>
                         @endif
                     </label>
-                    <input type="text" class="board-form-control" id="author_name" name="author_name" value="{{ old('author_name', auth()->user()->name ?? $post->author_name) }}" @if($board->isFieldRequired('author_name')) required @endif>
+                    <input type="text" class="board-form-control" id="author_name" name="author_name" value="{{ old('author_name', $post->author_name ?? auth()->user()->name) }}" @if($board->isFieldRequired('author_name')) required @endif>
                 </div>
                 @endif
 
@@ -300,7 +300,7 @@
                                                     <span class="board-attachment-name">{{ $attachmentName }}</span>
                                                 @endif
                                                 <span class="board-attachment-size">({{ number_format($attachmentSize / 1024 / 1024, 2) }}MB)</span>
-                                                <button type="button" class="board-attachment-remove" onclick="removeExistingFile({{ $index }})">
+                                                <button type="button" class="board-attachment-remove" data-existing-file-index="{{ $index }}">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                                 <input type="hidden" name="existing_attachments[]" value="{{ json_encode($attachment) }}">

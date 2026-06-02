@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Frontend\Mypage\Concerns\RendersMypageViews;
 use App\Http\Requests\FrontendMypageLocalDoctorUpdateRequest;
 use App\Http\Requests\FrontendMypageProfileUpdateRequest;
+use App\Http\Requests\FrontendMypageSecessionRequest;
 use App\Models\CommunityCommittee;
 use App\Models\CommunityCommitteeApplication;
 use App\Models\CommunityCommitteeMember;
@@ -18,6 +19,7 @@ use App\Services\Frontend\MypageLocalDoctorService;
 use App\Services\Frontend\MypageProfileUpdateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -107,6 +109,25 @@ class ProfileController extends Controller
     public function secession(): View
     {
         return $this->renderMypage('secession', '01', '개인정보 관리', 'secession');
+    }
+
+    public function secessionStore(FrontendMypageSecessionRequest $request): RedirectResponse
+    {
+        $user = $this->currentMember();
+        $legacy = is_array($user->legacy_import_json) ? $user->legacy_import_json : [];
+        $legacy['withdraw_reason'] = (string) $request->validated('withdrawal_reason');
+
+        $user->forceFill([
+            'withdrawn_at' => now(),
+            'is_active' => false,
+            'legacy_import_json' => $legacy,
+        ])->save();
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('home');
     }
 
     public function hospitalInformation(): View

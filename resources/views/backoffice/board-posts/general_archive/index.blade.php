@@ -85,6 +85,8 @@
                                     <option value="">전체</option>
                                     <option value="title" @selected(request('search_type') == 'title')>제목
                                     </option>
+                                    <option value="content" @selected(request('search_type') == 'content')>내용
+                                    </option>
                                     <option value="author" @selected(request('search_type') == 'author')>작성자
                                     </option>
                                 </select>
@@ -125,7 +127,7 @@
                             <input type="hidden" name="keyword" value="{{ request('keyword') }}">
                             <input type="hidden" name="search_type" value="{{ request('search_type') }}">
                             <label for="per_page" class="per-page-label">표시 개수:</label>
-                            <select name="per_page" id="per_page" class="per-page-select" onchange="this.form.submit()">
+                            <select name="per_page" id="per_page" class="per-page-select" data-js-submit-form="1">
                                 <option value="10" @selected(request('per_page', 15) == 10)>10개</option>
                                 <option value="20" @selected(request('per_page', 15) == 20)>20개</option>
                                 <option value="50" @selected(request('per_page', 15) == 50)>50개</option>
@@ -216,8 +218,7 @@
                                             </a>
                                             <form
                                                 action="{{ route('backoffice.board-posts.destroy', [$board->slug ?? 'notice', $post->id]) }}"
-                                                method="POST" class="d-inline"
-                                                onsubmit="return confirm('정말 이 게시글을 삭제하시겠습니까?');">
+                                                method="POST" class="d-inline js-delete-confirm-form">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">

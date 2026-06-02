@@ -12,6 +12,7 @@ use App\Models\CommunityCommittee;
 use App\Models\User;
 use App\Services\Backoffice\MemberService;
 use App\Services\Frontend\MemberAccountRecoveryService;
+use App\Services\Frontend\TermsContentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class MemberController extends Controller
     public function __construct(
         private readonly MemberService $memberService,
         private readonly MemberAccountRecoveryService $accountRecoveryService,
+        private readonly TermsContentService $termsContentService,
     ) {}
 
     public function login(Request $request): View
@@ -255,11 +257,18 @@ class MemberController extends Controller
     public function register(): View
     {
         $committeesForRegister = CommunityCommittee::query()
+            ->where('visibility_yn', 'Y')
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get(['id', 'name']);
+        $privacyPolicyPost = $this->termsContentService->getSinglePageContent('privacy_policy');
+        $termsOfServicePost = $this->termsContentService->getSinglePageContent('terms_of_service');
 
-        return $this->renderMember('register', '04', '회원가입', 'register', compact('committeesForRegister'));
+        return $this->renderMember('register', '04', '회원가입', 'register', compact(
+            'committeesForRegister',
+            'privacyPolicyPost',
+            'termsOfServicePost'
+        ));
     }
 
     public function registerStore(FrontendMemberRegisterRequest $request): RedirectResponse
@@ -289,28 +298,6 @@ class MemberController extends Controller
         return response()->json([
             'available' => ! $exists,
             'message' => $exists ? '이미 사용 중인 이메일입니다.' : '사용 가능한 이메일입니다.',
-        ]);
-    }
-
-    public function registerCheckPhone(Request $request): JsonResponse
-    {
-        $request->validate([
-            'phone_number' => 'required|string',
-        ], [
-            'phone_number.required' => '휴대폰 번호를 입력해주세요.',
-        ]);
-
-        $phone = User::normalizePhone((string) $request->input('phone_number', ''));
-        if ($phone === '' || ! preg_match('/^01[016789]\d{7,8}$/', $phone)) {
-            return response()->json([
-                'message' => '휴대폰 번호 형식을 확인해주세요. (숫자만 입력)',
-            ], 422);
-        }
-        $exists = $this->memberService->checkDuplicatePhone($phone, null);
-
-        return response()->json([
-            'available' => ! $exists,
-            'message' => $exists ? '이미 사용 중인 휴대폰번호입니다.' : '사용 가능한 휴대폰번호입니다.',
         ]);
     }
 

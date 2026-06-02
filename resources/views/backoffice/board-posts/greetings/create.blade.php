@@ -103,11 +103,9 @@
                 <div class="board-form-group">
                     <label for="content" class="board-form-label">
                         내용
-                        @if($board->isFieldRequired('content'))
-                            <span class="required">*</span>
-                        @endif
+                        <span class="required">*</span>
                     </label>
-                    <textarea class="board-form-control board-form-textarea" id="content" name="content" rows="15" data-backoffice-ckeditor data-source-editing="true" @if($board->isFieldRequired('content')) required @endif>{{ old('content') }}</textarea>
+                    <textarea class="board-form-control board-form-textarea" id="content" name="content" rows="15" data-backoffice-ckeditor data-source-editing="true" required>{{ old('content') }}</textarea>
                 </div>
                 @endif
 

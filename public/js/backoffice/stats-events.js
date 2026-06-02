@@ -28,7 +28,7 @@
             }
             if (from > to) {
                 event.preventDefault();
-                alert('시작일이 종료일보다 늦습니다. 날짜를 다시 확인해주세요.');
+                alert('시작일이 종료일보다 늦습니다');
                 dateFrom.focus();
             }
         });

@@ -27,7 +27,7 @@
 			</div>
 		</div>
 		
-		<div class="board_list board_bold">
+		<div class="board_list board_bold mo_break_list">
 			<table>
 				<caption>학술대회 연혁입니다.</caption>
 				<colgroup>

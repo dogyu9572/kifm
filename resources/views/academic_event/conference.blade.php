@@ -94,7 +94,7 @@
 			</ul>
 		</div>
 
-		<x-frontend.pagination :paginator="$conferences" />
+		<x-frontend.pagination :paginator="$conferences" :window-size="5" />
 
 	</div>
 </section>

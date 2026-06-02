@@ -110,11 +110,9 @@
                 <div class="board-form-group">
                     <label for="content" class="board-form-label">
                         내용
-                        @if($board->isFieldRequired('content'))
-                            <span class="required">*</span>
-                        @endif
+                        <span class="required">*</span>
                     </label>
-                    <textarea class="board-form-control board-form-textarea" id="content" name="content" rows="15" data-backoffice-ckeditor data-source-editing="true" @if($board->isFieldRequired('content')) required @endif>{{ $post->content }}</textarea>
+                    <textarea class="board-form-control board-form-textarea" id="content" name="content" rows="15" data-backoffice-ckeditor data-source-editing="true" required>{{ $post->content }}</textarea>
                 </div>
                 @endif
 
@@ -337,7 +335,7 @@
                                                     <span class="board-attachment-name">{{ $attachmentName }}</span>
                                                 @endif
                                                 <span class="board-attachment-size">({{ number_format($attachmentSize / 1024 / 1024, 2) }}MB)</span>
-                                                <button type="button" class="board-attachment-remove" onclick="removeExistingFile({{ $index }})">
+                                                <button type="button" class="board-attachment-remove" data-existing-file-index="{{ $index }}">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                                 <input type="hidden" name="existing_attachments[]" value="{{ json_encode($attachment) }}">

@@ -17,6 +17,7 @@ class FrontendMemberRegisterRequest extends FormRequest
     public function rules(): array
     {
         $committeeIds = CommunityCommittee::query()
+            ->where('visibility_yn', 'Y')
             ->pluck('id')
             ->map(static fn ($id): string => (string) $id)
             ->all();

@@ -359,11 +359,6 @@
             return el ? el.value.trim() : '';
         });
 
-        bindDuplicateButton('.js-register-check-phone', root.dataset.checkPhone, 'phone_number', function () {
-            var el = document.querySelector('input[name="phone_number"]');
-            return el ? el.value.replace(/\D/g, '') : '';
-        });
-
         bindDuplicateButton('.js-register-check-license', root.dataset.checkLicense, 'license_number', function () {
             var el = document.querySelector('input[name="license_number"]');
             return el ? el.value.trim() : '';

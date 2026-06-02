@@ -207,6 +207,10 @@ class SubcommitteeController extends Controller
 
     private function assertMayAccessCommittee(CommunityCommittee $committee): void
     {
+        if ($committee->visibility_yn !== 'Y') {
+            throw new NotFoundHttpException();
+        }
+
         $user = Auth::user();
         if ($user === null) {
             abort(403);

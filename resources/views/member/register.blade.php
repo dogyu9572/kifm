@@ -22,7 +22,6 @@
 			id="member-register-page"
 			data-check-login-id="{{ route('member.register.check-login-id') }}"
 			data-check-email="{{ route('member.register.check-email') }}"
-			data-check-phone="{{ route('member.register.check-phone') }}"
 			data-check-license="{{ route('member.register.check-license') }}"
 		>
 			<form action="{{ route('member.register.store') }}" method="POST" class="register_form" novalidate>
@@ -238,10 +237,14 @@
 					</div>
 					<div class="txt_scroll_area glbox">
 						<div class="txt_scroll">
-							<strong>[개인정보 수집·이용에 대한 동의]</strong>
-							<p>개인정보 수집·이용에 대한 동의내용이 들어가는 공간입니다.<br/>
-							개인정보 수집·이용에 대한 동의내용이 들어가는 공간입니다.<br/>
-							개인정보 수집·이용에 대한 동의내용이 들어가는 공간입니다.</p>
+							@if(! empty($privacyPolicyPost?->content))
+								{!! $privacyPolicyPost->content !!}
+							@else
+								<strong>[개인정보 수집·이용에 대한 동의]</strong>
+								<p>개인정보 수집·이용에 대한 동의내용이 들어가는 공간입니다.<br/>
+								개인정보 수집·이용에 대한 동의내용이 들어가는 공간입니다.<br/>
+								개인정보 수집·이용에 대한 동의내용이 들어가는 공간입니다.</p>
+							@endif
 						</div>
 					</div>
 					<div class="checkbox">
@@ -260,10 +263,14 @@
 					</div>
 					<div class="txt_scroll_area glbox">
 						<div class="txt_scroll">
-							<strong>[이용약관에 대한 동의]</strong>
-							<p>이용약관에 대한 동의내용이 들어가는 공간입니다.<br/>
-							이용약관에 대한 동의내용이 들어가는 공간입니다.<br/>
-							이용약관에 대한 동의내용이 들어가는 공간입니다.</p>
+							@if(! empty($termsOfServicePost?->content))
+								{!! $termsOfServicePost->content !!}
+							@else
+								<strong>[이용약관에 대한 동의]</strong>
+								<p>이용약관에 대한 동의내용이 들어가는 공간입니다.<br/>
+								이용약관에 대한 동의내용이 들어가는 공간입니다.<br/>
+								이용약관에 대한 동의내용이 들어가는 공간입니다.</p>
+							@endif
 						</div>
 					</div>
 					<div class="checkbox">

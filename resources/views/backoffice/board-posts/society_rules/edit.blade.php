@@ -2,10 +2,27 @@
 
 @section('title', $board->name ?? '회칙 관리')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/common/modal.css') }}">
+@endsection
+
 @section('content')
 @php
     $returnUrl = request('return_url', route('backoffice.board-posts.index', $board->slug ?? 'society_rules'));
 @endphp
+
+<div id="alertModal" class="modal">
+    <div class="modal-content">
+        <div id="modalHeader" class="modal-header">
+            <span id="modalTitle">알림</span>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div id="modalBody" class="modal-body">
+            <p id="modalMessage"></p>
+        </div>
+    </div>
+</div>
+
 <div class="board-container">
     <div class="board-header">
         <a href="{{ $returnUrl }}" class="btn btn-secondary btn-sm">
@@ -15,6 +32,12 @@
 
     <div class="board-card">
         <div class="board-card-body">
+            @if (session('success'))
+                <div class="alert alert-success board-hidden-alert">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <div class="board-alert board-alert-info">
                 위원회별 내규와 프로토콜은 각 위원회 관리 페이지에서 확인해 주세요.
             </div>

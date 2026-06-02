@@ -228,6 +228,11 @@ class BoardPostController extends Controller
         // 단일페이지 모드인 경우 특별한 메시지
         $message = $board->is_single_page ? '내용이 수정되었습니다.' : '게시글이 수정되었습니다.';
 
+        if ($board->is_single_page) {
+            return redirect()->route('backoffice.board-posts.edit', [$slug, $postId])
+                ->with('success', $message);
+        }
+
         return redirect($this->resolveListReturnUrl($request, $slug))
             ->with('success', $message);
     }

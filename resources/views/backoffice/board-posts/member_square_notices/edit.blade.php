@@ -119,7 +119,7 @@
 
                 <div class="board-form-group">
                     <label for="author_name" class="board-form-label">작성자</label>
-                    <input type="text" class="board-form-control" id="author_name" name="author_name" value="{{ old('author_name', auth()->user()->name ?? $post->author_name) }}">
+                    <input type="text" class="board-form-control" id="author_name" name="author_name" value="{{ old('author_name', $post->author_name ?? auth()->user()->name) }}">
                 </div>
 
                 <div class="board-form-actions">

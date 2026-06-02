@@ -5,10 +5,35 @@
 // 페이지 로드 시 초기화
 document.addEventListener('DOMContentLoaded', function() {
     checkSessionMessage();
+    initDateRangeValidation();
     initBulkActions();
     initDeleteConfirmForms();
     initPerPageSubmitSelects();
 });
+
+function initDateRangeValidation() {
+    document.querySelectorAll('.filter-form').forEach(function (form) {
+        const startDate = form.querySelector('input[name="start_date"]');
+        const endDate = form.querySelector('input[name="end_date"]');
+
+        if (!startDate || !endDate) {
+            return;
+        }
+
+        form.addEventListener('submit', function (event) {
+            const from = (startDate.value || '').trim();
+            const to = (endDate.value || '').trim();
+
+            if (from === '' || to === '' || from <= to) {
+                return;
+            }
+
+            event.preventDefault();
+            alert('시작일이 종료일보다 늦습니다');
+            startDate.focus();
+        });
+    });
+}
 
 /** 목록 표시 개수 등 변경 시 폼 자동 제출 (인라인 onchange 대체) */
 function initPerPageSubmitSelects() {

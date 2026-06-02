@@ -13,7 +13,7 @@
 @endif
 
 {{-- 페이지 번호들 --}}
-@foreach ($paginator->getUrlRange(1, $paginator->lastPage()) as $page => $url)
+@foreach (($pageUrls ?? $paginator->getUrlRange(1, $paginator->lastPage())) as $page => $url)
     @if ($page == $paginator->currentPage())
         <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
     @else

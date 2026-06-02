@@ -1,5 +1,24 @@
 document.addEventListener('DOMContentLoaded', function () {
     const perPageSelect = document.getElementById('perPageSelect');
+    const filterForm = document.querySelector('.bo-payment-membership-filter .filter-form');
+    const dateFrom = document.getElementById('date_from');
+    const dateTo = document.getElementById('date_to');
+
+    if (filterForm && dateFrom && dateTo) {
+        filterForm.addEventListener('submit', function (event) {
+            const from = (dateFrom.value || '').trim();
+            const to = (dateTo.value || '').trim();
+
+            if (from === '' || to === '' || from <= to) {
+                return;
+            }
+
+            event.preventDefault();
+            window.alert('시작일이 종료일보다 늦습니다');
+            dateFrom.focus();
+        });
+    }
+
     if (perPageSelect && perPageSelect.form) {
         perPageSelect.addEventListener('change', function () {
             perPageSelect.form.submit();
@@ -71,4 +90,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-

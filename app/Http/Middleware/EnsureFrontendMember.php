@@ -15,10 +15,16 @@ class EnsureFrontendMember
     {
         $user = $request->user();
 
-        if ($user === null || $user->role !== 'user') {
+        if ($user === null) {
+            return redirect()
+                ->guest(route('member.login'))
+                ->with('alert', '회원 자료실은 로그인 후 이용할 수 있습니다.');
+        }
+
+        if ($user->role !== 'user') {
             return redirect()
                 ->route('home')
-                ->with('error', '마이페이지는 일반 회원 로그인 후 이용할 수 있습니다.');
+                ->with('alert', '일반 회원 로그인 후 이용할 수 있습니다.');
         }
 
         return $next($request);

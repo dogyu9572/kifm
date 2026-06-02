@@ -300,8 +300,7 @@ class BoardPostService
             });
         } elseif ($searchType === 'author') {
             $query->where('author_name', 'like', "%{$keyword}%");
-        } elseif ($searchType === 'content' && $slug !== 'general_archive') {
-            // 일반 자료실 외 게시판은 기존 동작 유지
+        } elseif ($searchType === 'content') {
             $query->where('content', 'like', "%{$keyword}%");
         } elseif ($slug === 'member_archive') {
             $query->where(function ($q) use ($keyword) {
@@ -311,7 +310,8 @@ class BoardPostService
         } else {
             $query->where(function ($q) use ($keyword) {
                 $q->where('title', 'like', "%{$keyword}%")
-                    ->orWhere('author_name', 'like', "%{$keyword}%");
+                    ->orWhere('author_name', 'like', "%{$keyword}%")
+                    ->orWhere('content', 'like', "%{$keyword}%");
             });
         }
     }

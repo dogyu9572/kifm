@@ -109,7 +109,7 @@
                             <input type="hidden" name="keyword" value="{{ request('keyword') }}">
                             <input type="hidden" name="search_type" value="{{ request('search_type') }}">
                             <label for="per_page" class="per-page-label">표시 개수:</label>
-                            <select name="per_page" id="per_page" class="per-page-select" onchange="this.form.submit()">
+                            <select name="per_page" id="per_page" class="per-page-select" data-js-submit-form="1">
                                 <option value="10" @selected(request('per_page', 15) == 10)>10개</option>
                                 <option value="20" @selected(request('per_page', 15) == 20)>20개</option>
                                 <option value="50" @selected(request('per_page', 15) == 50)>50개</option>
@@ -187,7 +187,7 @@
                                             <a href="{{ route('backoffice.board-posts.edit', [$board->slug ?? 'member_archive', $post->id]) }}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-edit"></i> 수정
                                             </a>
-                                            <form action="{{ route('backoffice.board-posts.destroy', [$board->slug ?? 'member_archive', $post->id]) }}" method="POST" class="d-inline">
+                                            <form action="{{ route('backoffice.board-posts.destroy', [$board->slug ?? 'member_archive', $post->id]) }}" method="POST" class="d-inline js-delete-confirm-form">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Services\Frontend\PublicBoardService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -64,7 +65,13 @@ class ArchivesController extends Controller
 
     public function members(Request $request): View
     {
-        $posts = $this->publicBoardService->list('member_archive', $request, 10);
+        $posts = $this->publicBoardService->list(
+            'member_archive',
+            $request,
+            10,
+            null,
+            (string) Auth::user()->member_level
+        );
 
         return view('archives.members', array_merge(
             $this->archivesViewData('03', '회원 자료실', 'archives_members'),
@@ -74,12 +81,13 @@ class ArchivesController extends Controller
 
     public function membersShow(int $id): View
     {
-        $post = $this->publicBoardService->find('member_archive', $id);
+        $memberLevel = (string) Auth::user()->member_level;
+        $post = $this->publicBoardService->find('member_archive', $id, null, $memberLevel);
         if ($post === null) {
             throw new NotFoundHttpException();
         }
 
-        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('member_archive', $id);
+        ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('member_archive', $id, null, $memberLevel);
 
         return view('archives.members_view', array_merge(
             $this->archivesViewData('03', '회원 자료실', 'archives_members_view'),

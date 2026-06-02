@@ -17,8 +17,13 @@ class PublicBoardService
      * @param string $slug 게시판 슬러그 (예: general_archive)
      * @param string|null $committeeCategory 위원회 게시판일 때 `community_committees.name` 과 일치하는 category 필터
      */
-    public function list(string $slug, Request $request, int $perPage = 10, ?string $committeeCategory = null): LengthAwarePaginator
-    {
+    public function list(
+        string $slug,
+        Request $request,
+        int $perPage = 10,
+        ?string $committeeCategory = null,
+        ?string $memberLevel = null
+    ): LengthAwarePaginator {
         if (! Schema::hasTable($this->table($slug))) {
             return new LengthAwarePaginator([], 0, $perPage, 1, [
                 'path' => $request->url(),
@@ -32,6 +37,7 @@ class PublicBoardService
             ->where('is_secret', false);
 
         $this->applyCommitteeCategoryFilter($query, $slug, $committeeCategory);
+        $this->applyMemberArchiveAccessFilter($query, $slug, $memberLevel);
         $this->applyKeywordFilter($query, $request);
 
         if ($request->has('per_page')) {
@@ -82,7 +88,7 @@ class PublicBoardService
      * 단건 조회 + view_count 1 증가.
      * 비공개/삭제글은 404 처리되도록 null 을 반환한다.
      */
-    public function find(string $slug, int $id, ?string $committeeCategory = null): ?object
+    public function find(string $slug, int $id, ?string $committeeCategory = null, ?string $memberLevel = null): ?object
     {
         $query = DB::table($this->table($slug))
             ->whereNull('deleted_at')
@@ -91,6 +97,7 @@ class PublicBoardService
             ->where('id', $id);
 
         $this->applyCommitteeCategoryFilter($query, $slug, $committeeCategory);
+        $this->applyMemberArchiveAccessFilter($query, $slug, $memberLevel);
 
         $post = $query->first();
 
@@ -110,14 +117,15 @@ class PublicBoardService
      *
      * @return array{prev: ?object, next: ?object}
      */
-    public function prevNext(string $slug, int $id, ?string $committeeCategory = null): array
+    public function prevNext(string $slug, int $id, ?string $committeeCategory = null, ?string $memberLevel = null): array
     {
-        $base = function () use ($slug, $committeeCategory) {
+        $base = function () use ($slug, $committeeCategory, $memberLevel) {
             $q = DB::table($this->table($slug))
                 ->whereNull('deleted_at')
                 ->where('is_active', true)
                 ->where('is_secret', false);
             $this->applyCommitteeCategoryFilter($q, $slug, $committeeCategory);
+            $this->applyMemberArchiveAccessFilter($q, $slug, $memberLevel);
 
             return $q;
         };
@@ -183,6 +191,42 @@ class PublicBoardService
             return;
         }
         $query->where('category', $committeeCategory);
+    }
+
+    /**
+     * 회원자료실의 게시글별 회원 설정(all/associate/regular/lifetime)을 로그인 회원 등급에 맞춰 제한한다.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     */
+    private function applyMemberArchiveAccessFilter($query, string $slug, ?string $memberLevel): void
+    {
+        if ($slug !== 'member_archive') {
+            return;
+        }
+
+        $allowedGrades = $this->allowedMemberArchiveGrades($memberLevel);
+        $placeholders = implode(', ', array_fill(0, count($allowedGrades), '?'));
+
+        $query->whereRaw(
+            "CASE
+                WHEN custom_fields IS NULL OR custom_fields = '' OR JSON_VALID(custom_fields) = 0 THEN 'all'
+                ELSE COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"member_grade\"')), ''), 'all')
+            END IN ({$placeholders})",
+            $allowedGrades
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allowedMemberArchiveGrades(?string $memberLevel): array
+    {
+        return match ((string) $memberLevel) {
+            'lifetime' => ['all', 'associate', 'regular', 'lifetime'],
+            'regular' => ['all', 'associate', 'regular'],
+            'associate' => ['all', 'associate'],
+            default => ['all'],
+        };
     }
 
     private function applyKeywordFilter($query, Request $request): void

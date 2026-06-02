@@ -91,8 +91,10 @@ Route::prefix('archives')->name('archives.')->group(function () {
     Route::get('/general/{id}', [ArchivesController::class, 'generalShow'])->whereNumber('id')->name('general_show');
     Route::get('/academic', [ArchivesController::class, 'academic'])->name('academic');
     Route::get('/academic/{id}', [ArchivesController::class, 'academicShow'])->whereNumber('id')->name('academic_show');
-    Route::get('/members', [ArchivesController::class, 'members'])->name('members');
-    Route::get('/members/{id}', [ArchivesController::class, 'membersShow'])->whereNumber('id')->name('members_show');
+    Route::middleware('frontend.member')->group(function () {
+        Route::get('/members', [ArchivesController::class, 'members'])->name('members');
+        Route::get('/members/{id}', [ArchivesController::class, 'membersShow'])->whereNumber('id')->name('members_show');
+    });
     Route::get('/journals', [ArchivesController::class, 'journals'])->name('journals');
 });
 
@@ -171,7 +173,6 @@ Route::prefix('member')->name('member.')->group(function () {
     Route::middleware('throttle:30,1')->group(function () {
         Route::post('/register/check-login-id', [FrontendMemberController::class, 'registerCheckLoginId'])->name('register.check-login-id');
         Route::post('/register/check-email', [FrontendMemberController::class, 'registerCheckEmail'])->name('register.check-email');
-        Route::post('/register/check-phone', [FrontendMemberController::class, 'registerCheckPhone'])->name('register.check-phone');
         Route::post('/register/check-license', [FrontendMemberController::class, 'registerCheckLicense'])->name('register.check-license');
     });
     Route::get('/register_success', [FrontendMemberController::class, 'registerSuccess'])->name('register_success');
@@ -189,6 +190,7 @@ Route::prefix('mypage')->name('mypage.')->middleware(['auth', 'frontend.member']
     });
     Route::post('/membership-payment/cancel', [MypageAnnualFeeController::class, 'cancelPending'])->name('membership_payment.cancel');
     Route::get('/secession', [MypageProfileController::class, 'secession'])->name('secession');
+    Route::post('/secession', [MypageProfileController::class, 'secessionStore'])->name('secession.store');
     Route::get('/hospital_information', [MypageProfileController::class, 'hospitalInformation'])->name('hospital_information');
     Route::put('/hospital_information', [MypageProfileController::class, 'updateHospitalInformation'])->name('hospital_information.update');
     Route::get('/executive_activities', [MypageProfileController::class, 'executiveActivities'])->name('executive_activities');
