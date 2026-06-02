@@ -59,14 +59,6 @@
                                     <option value="executive" @selected(request('executive_access') === 'executive')>임원</option>
                                 </select>
                             </div>
-                            <div class="filter-group">
-                                <label for="category" class="filter-label">게시글 분류</label>
-                                <select id="category" name="category" class="filter-select">
-                                    <option value="">전체</option>
-                                    <option value="academic" @selected(request('category') === 'academic')>학술자료</option>
-                                    <option value="executive-db" @selected(request('category') === 'executive-db')>임원용 DB</option>
-                                </select>
-                            </div>
                         </div>
                         <div class="filter-row">
                             <div class="filter-group">
@@ -121,7 +113,6 @@
                             <input type="hidden" name="visibility" value="{{ request('visibility') }}">
                             <input type="hidden" name="member_type" value="{{ request('member_type') }}">
                             <input type="hidden" name="executive_access" value="{{ request('executive_access') }}">
-                            <input type="hidden" name="category" value="{{ request('category') }}">
                             <input type="hidden" name="start_date" value="{{ request('start_date') }}">
                             <input type="hidden" name="end_date" value="{{ request('end_date') }}">
                             <input type="hidden" name="keyword" value="{{ request('keyword') }}">
@@ -149,7 +140,6 @@
                                 @endif
                                 <th class="w5">번호</th>
                                 <th class="w10">구분</th>
-                                <th class="w10">게시글 분류</th>
                                 <th class="w10">회원설정</th>
                                 <th class="w10">임원공개여부</th>
                                 <th>제목</th>
@@ -171,11 +161,6 @@
                                     $executiveAccess = match($executiveValue) {
                                         'all' => '전체공개',
                                         'executive' => '임원',
-                                        default => '-',
-                                    };
-                                    $categoryLabel = match($post->category ?? null) {
-                                        'academic' => '학술자료',
-                                        'executive-db' => '임원용 DB',
                                         default => '-',
                                     };
                                 @endphp
@@ -201,7 +186,6 @@
                                     <td>
                                         <span class="status-badge status-general">일반</span>
                                     </td>
-                                    <td>{{ $categoryLabel }}</td>
                                     <td>{{ $memberType }}</td>
                                     <td>{{ $executiveAccess }}</td>
                                     <td>
@@ -230,7 +214,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ $board->enable_sorting ? '12' : '11' }}" class="text-center">등록된 게시글이 없습니다.</td>
+                                    <td colspan="{{ $board->enable_sorting ? '11' : '10' }}" class="text-center">등록된 게시글이 없습니다.</td>
                                 </tr>
                             @endforelse
                         </tbody>

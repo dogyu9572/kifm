@@ -68,8 +68,6 @@
                                         <div class="board-btn-group">
                                             <a href="{{ route('backoffice.address-books.edit', $addressBook) }}" class="btn btn-primary btn-sm">수정</a>
                                             <form action="{{ route('backoffice.address-books.destroy', $addressBook) }}" method="POST" class="d-inline js-delete-confirm-form">@csrf @method('DELETE')<button type="submit" class="btn btn-danger btn-sm">삭제</button></form>
-                                            <a href="{{ route('backoffice.mails.create') }}?recipient_type=addressbook&address_book_id={{ $addressBook->id }}" class="btn btn-secondary btn-sm">이메일 발송</a>
-                                            <a href="{{ route('backoffice.sms.create') }}?recipient_type=addressbook&address_book_id={{ $addressBook->id }}" class="btn btn-secondary btn-sm">SMS 발송</a>
                                         </div>
                                     </td>
                                 </tr>

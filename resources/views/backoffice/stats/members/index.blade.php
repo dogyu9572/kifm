@@ -19,12 +19,12 @@
                     <form method="GET" action="{{ route('backoffice.stats.members.index') }}" class="filter-form">
                         <div class="filter-row">
                             <div class="filter-group">
-                                <label for="date_from" class="filter-label">등록일 시작</label>
+                                <label for="date_from" class="filter-label">기간 시작</label>
                                 <input type="date" id="date_from" name="date_from" class="filter-input"
                                     value="{{ $dateFrom }}">
                             </div>
                             <div class="filter-group">
-                                <label for="date_to" class="filter-label">등록일 끝</label>
+                                <label for="date_to" class="filter-label">기간 끝</label>
                                 <input type="date" id="date_to" name="date_to" class="filter-input"
                                     value="{{ $dateTo }}">
                             </div>
@@ -45,27 +45,31 @@
                 <div class="bo-stats-grid">
                     <div class="bo-stat-card">
                         <div class="bo-stat-label">전체 회원수</div>
-                        <div class="bo-stat-value">{{ number_format($summary['totalMembers']) }}</div>
-                        <div class="bo-stat-unit">명</div>
+                        <div class="bo-stat-measure">
+                            <span class="bo-stat-value">{{ number_format($summary['totalMembers']) }}</span>
+                            <span class="bo-stat-unit">명</span>
+                        </div>
                     </div>
                     <div class="bo-stat-card">
                         <div class="bo-stat-label">기간 내 신규 가입</div>
-                        <div class="bo-stat-value bo-stat-value--success">
-                            +{{ number_format($summary['periodJoin']) }}
+                        <div class="bo-stat-measure">
+                            <span class="bo-stat-value bo-stat-value--success">{{ number_format($summary['periodJoin']) }}</span>
+                            <span class="bo-stat-unit">명</span>
                         </div>
-                        <div class="bo-stat-unit">명</div>
                     </div>
                     <div class="bo-stat-card">
                         <div class="bo-stat-label">기간 내 탈퇴</div>
-                        <div class="bo-stat-value bo-stat-value--danger">
-                            -{{ number_format($summary['periodLeave']) }}
+                        <div class="bo-stat-measure">
+                            <span class="bo-stat-value bo-stat-value--danger">{{ number_format($summary['periodLeave']) }}</span>
+                            <span class="bo-stat-unit">명</span>
                         </div>
-                        <div class="bo-stat-unit">명</div>
                     </div>
                     <div class="bo-stat-card">
                         <div class="bo-stat-label">유효 회원</div>
-                        <div class="bo-stat-value">{{ number_format($summary['activeMembers']) }}</div>
-                        <div class="bo-stat-unit">명</div>
+                        <div class="bo-stat-measure">
+                            <span class="bo-stat-value">{{ number_format($summary['activeMembers']) }}</span>
+                            <span class="bo-stat-unit">명</span>
+                        </div>
                     </div>
                 </div>
 

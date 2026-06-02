@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateSeparator = document.getElementById('schedule-date-separator');
     const contentInput = document.getElementById('content');
     const contentCounter = document.getElementById('schedule-content-count');
+    const submitFormSelects = document.querySelectorAll('[data-js-submit-form="1"]');
 
     deleteForms.forEach((form) => {
         form.addEventListener('submit', (event) => {
@@ -128,4 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
         contentInput.addEventListener('input', updateContentCounter);
         updateContentCounter();
     }
+
+    submitFormSelects.forEach((select) => {
+        select.addEventListener('change', () => {
+            select.form?.submit();
+        });
+    });
 });

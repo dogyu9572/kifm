@@ -41,31 +41,25 @@ class StatsEventService
 
     /**
      * 요약 카드 데이터.
-     * 기간 필터는 registered_at 기준(academic_events 행사일 컬럼이 모두 null 인 현 상황 대응).
+     * 기간 필터와 집계 기준은 행사별 참가 현황 표와 동일하게 registered_at/cancelled 제외 기준을 사용한다.
      *
      * @return array{eventCount:int, totalParticipants:int, totalAmount:int}
      */
     public function summary(CarbonInterface $from, CarbonInterface $to): array
     {
-        $range = $this->rangeBoundaries($from, $to);
+        return $this->summaryFromByEvent($this->byEvent($from, $to));
+    }
 
-        $eventCount = (int) DB::table('academic_event_registrations')
-            ->whereBetween('registered_at', $range)
-            ->where('payment_status', '!=', 'cancelled')
-            ->distinct()
-            ->count('academic_event_id');
-
-        $completed = DB::table('academic_event_registrations')
-            ->whereBetween('registered_at', $range)
-            ->where('payment_status', 'completed');
-
-        $totalParticipants = (int) (clone $completed)->count();
-        $totalAmount = (int) (clone $completed)->sum('total_amount');
-
+    /**
+     * @param array{rows:list<array{eventId:int, name:string, eventDate:?string, applied:int, paid:int, amount:int}>, totals:array{applied:int, paid:int, amount:int}} $byEvent
+     * @return array{eventCount:int, totalParticipants:int, totalAmount:int}
+     */
+    public function summaryFromByEvent(array $byEvent): array
+    {
         return [
-            'eventCount' => $eventCount,
-            'totalParticipants' => $totalParticipants,
-            'totalAmount' => $totalAmount,
+            'eventCount' => count($byEvent['rows']),
+            'totalParticipants' => $byEvent['totals']['applied'],
+            'totalAmount' => $byEvent['totals']['amount'],
         ];
     }
 

@@ -876,7 +876,7 @@
 	.pc_vw {display:none !important;}
 	.mo_vw {display:block !important;}
 	.container_wrap {margin-top:102px; min-height:calc(100vh - 102px);}
-	select {background-position: right 12px center;}
+	select {background-position:right 12px center;}
 /* 버튼 */
 	.btn {height:40px; line-height:38px;}
 	.btn.btn_small {height:36px; line-height:34px;}
@@ -1117,14 +1117,14 @@
 .tabs.mb48 {margin-bottom:36px;}
 .tabs a,
 .tabs button {font-size:14px; padding-bottom:5px;}
-.gbox,
-.glbox {padding:20px;}
-.tbl th,
-.tbl td {font-size:15px; padding:10px;}
+	.gbox,
+	.glbox {padding:16px;}
+	.tbl th,
+	.tbl td {font-size:14px; padding:6px;}
 .btn_outlink:after,
 .btn_download:after {width:18px; height:18px;}
 /* 게시판 상단 */
-	.board_top {margin-bottom:12px; flex-wrap: wrap; gap:4px;}
+	.board_top {margin-bottom:12px; flex-wrap:wrap; gap:4px;}
 	.board_top .left .tt {padding-right:6px;}
 	.board_top select {font-size:13px; width:90px; padding:0 12px;}
 	.board_top .total {font-size:13px;}
@@ -1173,7 +1173,7 @@
 	.mo_break_list table,
 	.mo_break_list tbody,
 	.mo_break_list td {display:block;}
-	.mo_break_list tr {display:flex; flex-wrap:wrap; align-items: center; gap:10px; padding:20px 0; border-bottom:#ddd 1px solid;}
+	.mo_break_list tr {display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:20px 0; border-bottom:#ddd 1px solid;}
 	.mo_break_list td {padding:0 !important; height:auto !important; border:0; flex:1 1 auto; text-align:left;}
 /* 게시판 상세 */
 .board_view .tit_area {padding:20px 0;}
@@ -1317,12 +1317,12 @@
 	.mo_schedule_month_list .c1 h3 {background:#E60012; background:#FDE6E8; border-color:#E60012;}
 	.mo_schedule_month_list .c2 h3 {background:#0088B8; background:#ECF5F8; border-color:#0088B8;}
 /* 학술대회 연혁 */
-	.mo_break_list td.tac {order:1; font-size: 16px;}
+	.mo_break_list td.tac {order:1; font-size:16px;}
 	.mo_break_list td.dates {order:2; font-size:14px; flex:1 1 calc(100% - 100px);}
 	.mo_break_list td.down {order:3; width:90px;}
 /* 학술행사 게시판 */
 	.bookmark {width:30px;}
-	.academic_event_head {flex-direction: column;}
+	.academic_event_head {flex-direction:column;}
 	.academic_event_head .imgfit {width:100%; border-radius:6px 6px 0 0;}
 	.academic_event_head .txt {width:100%; padding:20px; border-radius:0 0 6px 6px;}
 	.academic_event_head .eng_title {font-size:14px; padding-left:14px;}
@@ -1338,7 +1338,7 @@
 	.academic_event_body {margin-top:40px;}
 	.academic_event_body .bdbtit {padding-bottom:0; margin-bottom:24px;}
 	.academic_event_body .bdbtit h3 {font-size:20px;}
-	.academic_event_body .bdbtit .tabs {position: relative; margin-top:24px; gap:16px;}
+	.academic_event_body .bdbtit .tabs {position:relative; margin-top:24px; gap:16px;}
 	.academic_event_body .bdbtit .tabs li {width:calc((100% - 48px)/4); max-width:120px;}
 	.academic_event_body .bdbtit .tabs a {width:100%;}
 	.academic_event_body .list {gap:16px;}
@@ -1367,8 +1367,8 @@
 	.academic_event_view_detail .tbl,
 	.academic_event_view_detail .gbox {margin-top:10px;}
 	.conference_view_wrap .inbox {padding:0;}
-	.conference_view_wrap .abso_application {position:fixed; top:auto; bottom:0; left:50%; width:calc(100% - 40px); transform:translateX(-50%); background: #fff; z-index:30;}
-	.academic_event_view_detail.unfixed .abso_application {position: absolute; width: 100%;}
+	.conference_view_wrap .abso_application {position:fixed; top:auto; bottom:0; left:50%; width:calc(100% - 40px); transform:translateX(-50%); background:#fff; z-index:30;}
+	.academic_event_view_detail.unfixed .abso_application {position:absolute; width:100%;}
 	.conference_view_wrap .abso_application .head .tit {font-size:16px;}
 	.conference_view_wrap .abso_application .head .limit {padding-left:20px; background-size:16px;}
 	.conference_view_wrap .abso_application .cont {padding:16px;}
@@ -1402,35 +1402,37 @@ fieldset .float.mt {margin-top:10px;}
 .check_box_line li .radio span {gap:6px;}
 .check_box_line li .checkbox strong,
 .check_box_line li .radio strong {right:20px; font-size:18px;}
-.training_course_view_wrap .glbox li {font-size:16px;}
-.training_course_view_wrap .glbox > li + li {margin-top:16px;}
-.training_course_view_wrap .glbox label {width:100px;}
-.training_course_view_wrap .glbox .text {flex:1 1 calc(100% - 100px);}
-.training_course_view_wrap .long_label label {width:140px;}
-.training_course_view_wrap .long_label .text {flex:1 1 calc(100% - 140px);}
-.inbtn {gap:10px; flex:1 1 calc(100% - 136px);}
-.inbtn .text {flex-basis:calc(100% - 110px);}
-.inbtn .btn {width:100px; height:50px; font-size:15px;}
-.btns_flex {gap:10px;}
-.btns_flex .radio {width:200px;}
-.btns_flex .radio span {height:50px; line-height:48px;}
-.btns_flex .radio input:checked + label span {line-height:46px;}
-.training_course_view_wrap .c_red {font-size:14px; margin-top:8px;}
-	.training_course_view_wrap .abso_application {position: fixed; top:auto; bottom:0; right:auto; left:50%; width:calc(100% - 40px); padding:16px; z-index:30; transform:translateX(-50%);}
-.training_course_view_wrap .abso_application .tit {font-size:22px; margin-bottom:12px;}
-.training_course_view_wrap .abso_application .selected_item {margin-bottom:20px;}
-.training_course_view_wrap .abso_application .price_info {font-size:14px;}
-.training_course_view_wrap .abso_application .price_info div + div {margin-top:8px;}
-.training_course_view_wrap .abso_application .price_info dd {gap:2px;}
-.training_course_view_wrap .abso_application .price_info dd strong {font-size:16px;}
-.training_course_view_wrap .abso_application .price_info .total {padding-top:16px; margin-top:16px;}
-.training_course_view_wrap .abso_application .price_info .total dd strong {font-size:20px;}
-.training_course_view_wrap .abso_application .check_area {margin:24px 0 12px; font-size:14px;}
-.training_course_view_wrap .abso_application .check_area.checkbox input {top:8px;}
-.training_course_view_wrap .abso_application .check_area.checkbox i {top:3px; transform:none;}
-.training_course_view_wrap .abso_application .btn_submit,
-.training_course_view_wrap .abso_application .btn_cancel {height:50px;}
-.training_course_view_wrap .abso_application .btn_cancel {margin-top:6px;}
+	.training_course_view_wrap .glbox li {font-size:14px; flex-direction: column; gap:4px;}
+	.training_course_view_wrap .glbox > li + li {margin-top:12px;}
+	.training_course_view_wrap .glbox label,
+	.training_course_view_wrap .glbox .text {width:100%; flex:0 0 auto;}
+	.training_course_view_wrap .glbox .text {height:40px;}
+.inbtn {gap:4px; flex:1 1 calc(100% - 136px);}
+	.inbtn .text {flex-basis:calc(100% - 84px); width:calc(100% - 84px) !important;}
+	.inbtn .btn {width:80px; height:40px; font-size:14px;}
+	.btns_flex {gap:4px;}
+	.btns_flex .radio {width:calc(50% - 2px);}
+	.btns_flex .radio span {height:40px; line-height:38px;}
+	.btns_flex .radio input:checked + label span {line-height:36px;}
+	.training_course_view_wrap .c_red {font-size:13px; margin-top:6px;}
+	.training_course_view_wrap .abso_application {position:fixed; top:auto; right:auto; left:50%; width:calc(100% - 40px); padding:34px 16px 16px; z-index:30; transform:translateX(-50%);}
+	.training_course_view_wrap .abso_application,
+	.training_course_view_wrap.fixed .abso_application {bottom:calc(-100% + (100vh - 315px) + 33px);}
+	.training_course_view_wrap.unfixed .abso_application.open {bottom:0;}
+	.training_course_view_wrap .abso_application .mobile_opcl {position:absolute; top:16px; left:50%; width:50%; height:2px; background:#ddd; transform:translateX(-50%);}
+	.training_course_view_wrap .abso_application .tit {font-size:20px; margin-bottom:10px;}
+	.training_course_view_wrap .abso_application .selected_item {margin-bottom:12px;}
+	.training_course_view_wrap .abso_application .price_info {font-size:13px;}
+	.training_course_view_wrap .abso_application .price_info div + div {margin-top:6px;}
+	.training_course_view_wrap .abso_application .price_info dd strong {font-size:14px;}
+	.training_course_view_wrap .abso_application .price_info .total {padding-top:12px; margin-top:12px;}
+	.training_course_view_wrap .abso_application .price_info .total dd strong {font-size:16px;}
+	.training_course_view_wrap .abso_application .check_area {margin:16px 0 10px; font-size:13px;}
+	.training_course_view_wrap .abso_application .check_area.checkbox input {top:6px;}
+	.training_course_view_wrap .abso_application .check_area.checkbox i {top:2px;}
+	.training_course_view_wrap .abso_application .btn_submit,
+	.training_course_view_wrap .abso_application .btn_cancel {height:40px;}
+.training_course_view_wrap .abso_application .btn_cancel {margin-top:4px;}
 .type_bank_hide {padding-top:5px; margin-top:16px;}
 .type_bank_hide ul li + li {margin-top:6px;}
 .type_bank_hide ul li .text.flex {gap:0; flex-direction:column;}
@@ -1441,12 +1443,12 @@ fieldset .float.mt {margin-top:10px;}
 .type_bank_hide ul li .flex.bank input {width:100%;}
 .type_bank_hide .bdt {padding-top:12px; margin-top:12px;}
 /* 완료 */
-.academic_event_view_end .title_area {margin-bottom:50px;}
-.academic_event_view_end .title_area.mb24 {margin-bottom:20px;}
-.academic_event_view_end .title_area:before {width:50px; height:50px; margin-bottom:16px;}
-.academic_event_view_end .title_area .title {font-size:30px;}
-.academic_event_view_end .title_area p {font-size:16px; margin-top:8px;}
-.shadow_box {padding:20px;}
+	.academic_event_view_end .title_area {margin-bottom:30px;}
+	.academic_event_view_end .title_area.mb24 {margin-bottom:12px;}
+	.academic_event_view_end .title_area:before {margin-bottom:12px;}
+	.academic_event_view_end .title_area .title {font-size:24px;}
+	.academic_event_view_end .title_area p {font-size:13px; margin-top:6px;}
+	.shadow_box {padding:16px;}
 .academic_event_view_end .shadow_box + .shadow_box {margin-top:12px;}
 .academic_event_view_end .shadow_box .tit {font-size:18px; padding-bottom:16px; margin-bottom:16px;}
 .academic_event_view_end .shadow_box dl {gap:20px;}

@@ -45,20 +45,24 @@
                 <div class="bo-stats-grid bo-stats-grid--3">
                     <div class="bo-stat-card">
                         <div class="bo-stat-label">기간 내 행사 수</div>
-                        <div class="bo-stat-value">{{ number_format($summary['eventCount']) }}</div>
-                        <div class="bo-stat-unit">건</div>
+                        <div class="bo-stat-measure">
+                            <span class="bo-stat-value">{{ number_format($summary['eventCount']) }}</span>
+                            <span class="bo-stat-unit">건</span>
+                        </div>
                     </div>
                     <div class="bo-stat-card">
                         <div class="bo-stat-label">총 참가자</div>
-                        <div class="bo-stat-value bo-stat-value--success">
-                            {{ number_format($summary['totalParticipants']) }}
+                        <div class="bo-stat-measure">
+                            <span class="bo-stat-value bo-stat-value--success">{{ number_format($summary['totalParticipants']) }}</span>
+                            <span class="bo-stat-unit">명</span>
                         </div>
-                        <div class="bo-stat-unit">명</div>
                     </div>
                     <div class="bo-stat-card">
                         <div class="bo-stat-label">총 결제 금액</div>
-                        <div class="bo-stat-value">{{ number_format($summary['totalAmount']) }}</div>
-                        <div class="bo-stat-unit">원</div>
+                        <div class="bo-stat-measure">
+                            <span class="bo-stat-value">{{ number_format($summary['totalAmount']) }}</span>
+                            <span class="bo-stat-unit">원</span>
+                        </div>
                     </div>
                 </div>
 

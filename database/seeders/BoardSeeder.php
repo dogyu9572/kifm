@@ -230,7 +230,7 @@ class BoardSeeder extends Seeder
                 'field_config' => [
                     'title' => ['enabled' => true, 'required' => true, 'label' => '제목'],
                     'content' => ['enabled' => true, 'required' => true, 'label' => '내용'],
-                    'category' => ['enabled' => true, 'required' => true, 'label' => '게시글 분류'],
+                    'category' => ['enabled' => false, 'required' => false, 'label' => '게시글 분류'],
                     'author_name' => ['enabled' => true, 'required' => true, 'label' => '작성자'],
                     'password' => ['enabled' => false, 'required' => false, 'label' => '비밀번호'],
                     'attachments' => ['enabled' => true, 'required' => false, 'label' => '첨부파일'],
@@ -302,7 +302,7 @@ class BoardSeeder extends Seeder
                         'name' => 'member_grade',
                         'type' => 'radio',
                         'label' => '회원 설정',
-                        'options' => 'all,associate,regular,lifetime',
+                        'options' => 'all,associate,regular,lifetime,senior',
                         'required' => true,
                         'max_length' => null,
                         'placeholder' => null,

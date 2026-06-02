@@ -194,7 +194,7 @@ class PublicBoardService
     }
 
     /**
-     * 회원자료실의 게시글별 회원 설정(all/associate/regular/lifetime)을 로그인 회원 등급에 맞춰 제한한다.
+     * 회원자료실의 게시글별 회원 설정을 로그인 회원 등급에 맞춰 제한한다.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
      */
@@ -222,6 +222,7 @@ class PublicBoardService
     private function allowedMemberArchiveGrades(?string $memberLevel): array
     {
         return match ((string) $memberLevel) {
+            'senior' => ['all', 'associate', 'regular', 'lifetime', 'senior'],
             'lifetime' => ['all', 'associate', 'regular', 'lifetime'],
             'regular' => ['all', 'associate', 'regular'],
             'associate' => ['all', 'associate'],

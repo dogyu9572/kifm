@@ -47,6 +47,7 @@
                                     <option value="associate" @selected(request('member_grade') === 'associate')>준회원 이상</option>
                                     <option value="regular" @selected(request('member_grade') === 'regular')>정회원 이상</option>
                                     <option value="lifetime" @selected(request('member_grade') === 'lifetime')>평생회원</option>
+                                    <option value="senior" @selected(request('member_grade') === 'senior')>시니어회원</option>
                                 </select>
                             </div>
                             <div class="filter-group">
@@ -153,6 +154,7 @@
                                         'associate' => '준회원 이상',
                                         'regular' => '정회원 이상',
                                         'lifetime' => '평생회원',
+                                        'senior' => '시니어회원',
                                         default => '-',
                                     };
                                 @endphp

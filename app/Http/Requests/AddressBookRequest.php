@@ -15,7 +15,7 @@ class AddressBookRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:200'],
-            'members' => ['required', 'string'],
+            'members' => ['nullable', 'string'],
         ];
     }
 }

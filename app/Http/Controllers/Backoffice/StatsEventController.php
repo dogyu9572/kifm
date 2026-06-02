@@ -21,8 +21,8 @@ class StatsEventController extends BaseController
             $request->query('date_to'),
         );
 
-        $summary = $this->statsEventService->summary($range['from'], $range['to']);
         $byEvent = $this->statsEventService->byEvent($range['from'], $range['to']);
+        $summary = $this->statsEventService->summaryFromByEvent($byEvent);
 
         return $this->view('backoffice.stats.events.index', [
             'dateFrom' => $range['from']->format('Y-m-d'),

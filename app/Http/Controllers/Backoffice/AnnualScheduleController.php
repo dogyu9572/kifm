@@ -20,6 +20,15 @@ class AnnualScheduleController extends Controller
             $keyword = (string) $request->input('keyword');
             $query->where('title', 'like', '%'.$keyword.'%');
         }
+        if ($request->filled('start_date')) {
+            $query->whereDate('end_date', '>=', (string) $request->input('start_date'));
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('start_date', '<=', (string) $request->input('end_date'));
+        }
+        if ($request->filled('is_visible')) {
+            $query->where('is_visible', (bool) $request->boolean('is_visible'));
+        }
 
         $schedules = $query
             ->orderByDesc('start_date')

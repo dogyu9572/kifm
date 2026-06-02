@@ -37,10 +37,7 @@ class AddressBookController extends Controller
     public function store(AddressBookRequest $request)
     {
         $payload = $request->validated();
-        $members = $this->decodeMembers((string) $payload['members']);
-        if ($members === []) {
-            return back()->withInput()->withErrors(['members' => '추가 대상 회원을 1명 이상 선택해주세요.']);
-        }
+        $members = $this->decodeMembers((string) ($payload['members'] ?? ''));
         $addressBook = AddressBook::create([
             'name' => $payload['name'],
             'member_count' => count($members),
@@ -68,10 +65,7 @@ class AddressBookController extends Controller
     public function update(AddressBookRequest $request, AddressBook $addressBook)
     {
         $payload = $request->validated();
-        $members = $this->decodeMembers((string) $payload['members']);
-        if ($members === []) {
-            return back()->withInput()->withErrors(['members' => '추가 대상 회원을 1명 이상 선택해주세요.']);
-        }
+        $members = $this->decodeMembers((string) ($payload['members'] ?? ''));
         $addressBook->update([
             'name' => $payload['name'],
             'member_count' => count($members),
@@ -96,34 +90,63 @@ class AddressBookController extends Controller
 
     public function searchMembers(Request $request)
     {
+        $keyword = trim((string) $request->input('keyword', ''));
+        $field = (string) $request->input('search_field', 'all');
         $query = User::query()->whereNull('withdrawn_at');
 
-        if ($request->filled('name')) {
-            $query->where('name', 'like', '%'.trim((string) $request->input('name')).'%');
-        }
-        if ($request->filled('login_id')) {
-            $query->where('login_id', 'like', '%'.trim((string) $request->input('login_id')).'%');
-        }
-        if ($request->filled('email')) {
-            $query->where('email', 'like', '%'.trim((string) $request->input('email')).'%');
-        }
-        if ($request->filled('phone')) {
-            $query->where('phone_number', 'like', '%'.trim((string) $request->input('phone')).'%');
+        if ($keyword !== '') {
+            $query->where(function ($innerQuery) use ($keyword, $field) {
+                $like = '%'.$keyword.'%';
+                if ($field === 'name') {
+                    $innerQuery->where('name', 'like', $like);
+                    return;
+                }
+                if ($field === 'id') {
+                    $innerQuery->where('login_id', 'like', $like);
+                    return;
+                }
+                if ($field === 'email') {
+                    $innerQuery->where('email', 'like', $like);
+                    return;
+                }
+                if ($field === 'phone') {
+                    $innerQuery->where('phone_number', 'like', $like);
+                    return;
+                }
+
+                $innerQuery->where('name', 'like', $like)
+                    ->orWhere('login_id', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('phone_number', 'like', $like);
+            });
         }
 
         $members = $query
-            ->limit(50)
-            ->get(['id', 'name', 'login_id', 'email', 'phone_number'])
-            ->map(fn (User $user) => [
+            ->orderBy('name')
+            ->paginate(10, ['id', 'name', 'login_id', 'email', 'phone_number'])
+            ->withQueryString();
+
+        $data = $members->getCollection()->map(fn (User $user) => [
                 'member_id' => $user->id,
+                'id' => $user->id,
                 'name' => $user->name,
                 'login_id' => $user->login_id,
                 'email' => $user->email,
                 'phone' => $user->phone_number,
+                'phone_number' => $user->phone_number,
                 'source_type' => 'SEARCH',
             ]);
 
-        return response()->json(['members' => $members]);
+        return response()->json([
+            'data' => $data,
+            'members' => $data,
+            'meta' => [
+                'current_page' => $members->currentPage(),
+                'last_page' => $members->lastPage(),
+                'total' => $members->total(),
+                'per_page' => $members->perPage(),
+            ],
+        ]);
     }
 
     private function decodeMembers(string $membersJson): array

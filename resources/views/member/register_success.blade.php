@@ -9,7 +9,7 @@
     <div class="inner">
 		<div class="inbox">
 		
-			<div class="sub_title">{{ $sName }}</div>
+			<div class="sub_title">{{ $sName }} 완료</div>
 		
 			<div class="title_area mb24">
 				<h1 id="register-success-heading" class="title">회원가입이 완료되었습니다.</h1>

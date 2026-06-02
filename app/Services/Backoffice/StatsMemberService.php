@@ -49,7 +49,7 @@ class StatsMemberService
     }
 
     /**
-     * 기간 내 월별 신규 가입 / 탈퇴 집계.
+     * 기간 내 월별 신규 가입(created_at) / 탈퇴(withdrawn_at) 집계.
      * 데이터가 없는 월도 0으로 채워서 반환한다.
      *
      * @return array{rows:list<array{yearMonth:string, yearMonthLabel:string, joinCount:int, leaveCount:int}>, totalJoin:int, totalLeave:int}
@@ -58,17 +58,18 @@ class StatsMemberService
     {
         $startMonth = $from->copy()->startOfMonth();
         $endMonth = $to->copy()->endOfMonth();
+        $range = [$from->copy()->startOfDay(), $to->copy()->endOfDay()];
 
         $joinRows = $this->baseQuery()
             ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) AS c")
-            ->whereBetween('created_at', [$startMonth, $endMonth])
+            ->whereBetween('created_at', $range)
             ->groupBy('ym')
             ->pluck('c', 'ym');
 
         $leaveRows = $this->baseQuery()
             ->selectRaw("DATE_FORMAT(withdrawn_at, '%Y-%m') AS ym, COUNT(*) AS c")
             ->whereNotNull('withdrawn_at')
-            ->whereBetween('withdrawn_at', [$startMonth, $endMonth])
+            ->whereBetween('withdrawn_at', $range)
             ->groupBy('ym')
             ->pluck('c', 'ym');
 

@@ -50,6 +50,18 @@ class CommunityCommitteeService
         if ($keyword !== '') {
             $query->where('name', 'like', '%' . $keyword . '%');
         }
+        if ($request->filled('committee_type')) {
+            $committeeType = (string) $request->input('committee_type');
+            if (array_key_exists($committeeType, self::committeeTypeLabels())) {
+                $query->where('committee_type', $committeeType);
+            }
+        }
+        if ($request->filled('visibility_yn')) {
+            $visibility = strtoupper((string) $request->input('visibility_yn'));
+            if (array_key_exists($visibility, self::visibilityLabels())) {
+                $query->where('visibility_yn', $visibility);
+            }
+        }
 
         return $query->orderBy('name', 'asc')
             ->orderByDesc('id')
@@ -57,4 +69,3 @@ class CommunityCommitteeService
             ->withQueryString();
     }
 }
-

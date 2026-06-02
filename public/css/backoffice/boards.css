@@ -520,6 +520,14 @@
     line-height: 1.1;
 }
 
+.bo-stat-measure {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
 .bo-stat-value--success {
     color: #22c55e;
 }
@@ -531,7 +539,6 @@
 .bo-stat-unit {
     font-size: 12px;
     color: #6c757d;
-    margin-top: 4px;
 }
 
 .bo-stats-tables {
@@ -616,4 +623,3 @@
         grid-template-columns: 1fr;
     }
 }
-

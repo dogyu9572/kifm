@@ -46,25 +46,6 @@
                 </div>
                 @endif
 
-                @if($board->isFieldEnabled('category') && $categoryOptions && $categoryOptions->count() > 0)
-                <div class="board-form-group">
-                    <label for="category" class="board-form-label">
-                        카테고리 분류
-                        @if($board->isFieldRequired('category'))
-                            <span class="required">*</span>
-                        @endif
-                    </label>
-                    <select class="board-form-control" id="category" name="category" @if($board->isFieldRequired('category')) required @endif>
-                        <option value="">카테고리를 선택하세요</option>
-                        @foreach($categoryOptions as $category)
-                            <option value="{{ $category->name }}" @selected(old('category') == $category->name)>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                @endif
-
                 @if($board->isFieldEnabled('title'))
                 <div class="board-form-group">
                     <label for="title" class="board-form-label">
@@ -270,6 +251,22 @@
                         </label>
                     </div>
                     <small class="board-form-text">체크하면 본인만 조회할 수 있습니다.</small>
+                </div>
+                @endif
+
+                @if($board->isFieldEnabled('is_active'))
+                <div class="board-form-group">
+                    <label class="board-form-label">공개여부 <span class="required">*</span></label>
+                    <div class="board-options-list board-options-horizontal">
+                        <div class="board-option-item">
+                            <input type="radio" id="is_active_public" name="is_active" value="1" @checked((string) old('is_active', '1') === '1') required>
+                            <label for="is_active_public">공개</label>
+                        </div>
+                        <div class="board-option-item">
+                            <input type="radio" id="is_active_private" name="is_active" value="0" @checked((string) old('is_active') === '0') required>
+                            <label for="is_active_private">비공개</label>
+                        </div>
+                    </div>
                 </div>
                 @endif
 

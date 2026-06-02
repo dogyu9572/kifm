@@ -31,6 +31,22 @@
                     <form method="GET" action="{{ route('backoffice.annual_schedule.index') }}" class="filter-form">
                         <div class="filter-row">
                             <div class="filter-group">
+                                <label for="start_date" class="filter-label">기간 시작</label>
+                                <input type="date" id="start_date" name="start_date" class="filter-input" value="{{ request('start_date') }}">
+                            </div>
+                            <div class="filter-group">
+                                <label for="end_date" class="filter-label">기간 종료</label>
+                                <input type="date" id="end_date" name="end_date" class="filter-input" value="{{ request('end_date') }}">
+                            </div>
+                            <div class="filter-group">
+                                <label for="is_visible" class="filter-label">노출 여부</label>
+                                <select id="is_visible" name="is_visible" class="filter-select">
+                                    <option value="">전체</option>
+                                    <option value="1" @selected(request('is_visible') === '1')>노출</option>
+                                    <option value="0" @selected(request('is_visible') === '0')>미노출</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
                                 <label for="keyword" class="filter-label">검색어</label>
                                 <input type="text" id="keyword" name="keyword" class="filter-input" placeholder="일정명을 입력하세요." value="{{ request('keyword') }}">
                             </div>
@@ -55,8 +71,11 @@
                     <div class="list-controls">
                         <form method="GET" action="{{ route('backoffice.annual_schedule.index') }}" class="per-page-form">
                             <input type="hidden" name="keyword" value="{{ request('keyword') }}">
+                            <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+                            <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+                            <input type="hidden" name="is_visible" value="{{ request('is_visible') }}">
                             <label for="per_page" class="per-page-label">표시 개수:</label>
-                            <select name="per_page" id="per_page" class="per-page-select" onchange="this.form.submit()">
+                            <select name="per_page" id="per_page" class="per-page-select" data-js-submit-form="1">
                                 <option value="20" @selected($perPage === 20)>20개</option>
                                 <option value="50" @selected($perPage === 50)>50개</option>
                                 <option value="100" @selected($perPage === 100)>100개</option>

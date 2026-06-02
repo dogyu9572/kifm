@@ -41,12 +41,6 @@
                     </div>
                 @endif
 
-                @if ($post->category)
-                    <div class="board-post-category">
-                        <span class="badge badge-info">{{ $post->category }}</span>
-                    </div>
-                @endif
-
                 <div class="board-post-content">
                     {!! $post->content !!}
                 </div>
@@ -113,8 +107,7 @@
                         <i class="fas fa-edit"></i> 수정
                     </a>
                     <form action="{{ route('backoffice.board-posts.destroy', [$board->slug ?? 'notice', $post->id]) }}" 
-                          method="POST" class="d-inline" 
-                          onsubmit="return confirm('정말 이 게시글을 삭제하시겠습니까?');">
+                          method="POST" class="d-inline js-delete-confirm-form">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">

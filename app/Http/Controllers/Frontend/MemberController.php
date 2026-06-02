@@ -158,7 +158,7 @@ class MemberController extends Controller
             return redirect()->route('member.find_id');
         }
 
-        return $this->renderMember('find_id_result', '02', '아이디 찾기 완료', 'find_id_result', compact('findIdResult'));
+        return $this->renderMember('find_id_result', '02', '아이디 찾기', 'find_id_result', compact('findIdResult'));
     }
 
     public function findPw(): View
@@ -337,7 +337,7 @@ class MemberController extends Controller
 
     public function registerSuccess(): View
     {
-        return $this->renderMember('register_success', '04', '회원가입 완료', 'register_success');
+        return $this->renderMember('register_success', '04', '회원가입', 'register_success');
     }
 
     /**

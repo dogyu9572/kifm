@@ -187,6 +187,7 @@
                 </fieldset>
 
                 <article class="abso_application">
+					<div class="mobile_opcl" aria-hidden="true"></div>
                     <h2 class="tit">최종 결제 확인</h2>
                     <p class="selected_item" id="training-summary-items">결제 항목을 선택해주세요.</p>
                     <dl class="price_info">
@@ -209,7 +210,7 @@
                         <label for="training-terms-agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
                     </div>
                     @error('terms_agree')<span class="c_red">{{ $message }}</span>@enderror
-                    <button type="submit" class="btn_submit btn_wbb"><span class="sound_only" id="training-submit-amount">0원 </span>결제하기</button>
+                    <button type="submit" class="btn_submit btn_wgg"><span class="sound_only" id="training-submit-amount">0원 </span>결제 약관에 동의해주세요.</button>
                 </article>
             </form>
         </div>

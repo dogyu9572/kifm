@@ -83,6 +83,10 @@
                             <input type="radio" id="member_grade_lifetime" name="custom_field_member_grade" value="lifetime" @checked(old('custom_field_member_grade', $selectedMemberGrade) === 'lifetime') required>
                             <label for="member_grade_lifetime">평생회원</label>
                         </div>
+                        <div class="board-option-item">
+                            <input type="radio" id="member_grade_senior" name="custom_field_member_grade" value="senior" @checked(old('custom_field_member_grade', $selectedMemberGrade) === 'senior') required>
+                            <label for="member_grade_senior">시니어회원</label>
+                        </div>
                     </div>
                 </div>
 

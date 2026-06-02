@@ -4,6 +4,8 @@
 
 @section('styles')
     <link rel="stylesheet" href="{{ asset('css/backoffice/boards.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/common/modal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/backoffice/member-selector-modal.css') }}">
 @endsection
 
 @section('content')

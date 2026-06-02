@@ -23,6 +23,24 @@
                                 <input type="text" name="keyword" class="filter-input" value="{{ request('keyword') }}" placeholder="위원회명을 입력하세요">
                             </div>
                             <div class="filter-group">
+                                <label for="committee_type" class="filter-label">위원회 유형</label>
+                                <select id="committee_type" name="committee_type" class="filter-select">
+                                    <option value="">전체</option>
+                                    @foreach ($typeLabels as $type => $label)
+                                        <option value="{{ $type }}" @selected(request('committee_type') === $type)>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="visibility_yn" class="filter-label">노출여부</label>
+                                <select id="visibility_yn" name="visibility_yn" class="filter-select">
+                                    <option value="">전체</option>
+                                    @foreach ($visibilityLabels as $visibility => $label)
+                                        <option value="{{ $visibility }}" @selected(request('visibility_yn') === $visibility)>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="filter-group">
                                 <div class="filter-buttons">
                                     <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> 검색</button>
                                     <a href="{{ route('backoffice.community-committees.index') }}" class="btn btn-secondary"><i class="fas fa-undo"></i> 초기화</a>
@@ -48,6 +66,8 @@
                     <div class="list-controls">
                         <form method="GET" action="{{ route('backoffice.community-committees.index') }}" id="committee-per-page-form" class="per-page-form">
                             <input type="hidden" name="keyword" value="{{ request('keyword') }}">
+                            <input type="hidden" name="committee_type" value="{{ request('committee_type') }}">
+                            <input type="hidden" name="visibility_yn" value="{{ request('visibility_yn') }}">
                             <label class="per-page-label">표시 개수:</label>
                             <select name="per_page" class="per-page-select js-committee-per-page">
                                 <option value="10" @selected($perPage === 10)>10개</option>
@@ -129,4 +149,3 @@
     <script src="{{ asset('js/backoffice/community-committees-index.js') }}"></script>
     <script src="{{ asset('js/backoffice/board-table-select-all.js') }}"></script>
 @endsection
-

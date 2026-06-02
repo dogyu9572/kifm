@@ -23,6 +23,8 @@ class StatsMemberController extends BaseController
 
         $summary = $this->statsMemberService->summary($range['from'], $range['to']);
         $monthly = $this->statsMemberService->monthly($range['from'], $range['to']);
+        $summary['periodJoin'] = $monthly['totalJoin'];
+        $summary['periodLeave'] = $monthly['totalLeave'];
         $gradeDistribution = $this->statsMemberService->gradeDistribution();
 
         return $this->view('backoffice.stats.members.index', [

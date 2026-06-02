@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Backoffice;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminAccessLog;
 use App\Models\User;
-use App\Models\UserAccessLog;
 use App\Support\ClientIpResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,14 +74,14 @@ class AuthController extends Controller
         // 마지막 로그인 시간 업데이트
         $user->update(['last_login_at' => now()]);
         
-        // 접속 로그 기록
-        UserAccessLog::create([
-            'user_id' => $user->id,
+        // 관리자 접속 로그 기록: 백오피스 로그인 성공 시점 기준
+        AdminAccessLog::create([
+            'admin_id' => $user->id,
             'name' => $user->name,
             'ip_address' => ClientIpResolver::resolve($request),
             'user_agent' => $request->userAgent(),
             'referer' => $request->header('referer'),
-            'login_at' => now(),
+            'accessed_at' => now(),
         ]);
         
         // 세션에 로그인 시간 저장 (세션 타이머용)

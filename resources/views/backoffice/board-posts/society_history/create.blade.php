@@ -272,6 +272,22 @@
                 </div>
                 @endif
 
+                @if($board->isFieldEnabled('is_active'))
+                <div class="board-form-group">
+                    <label class="board-form-label">사용여부 <span class="required">*</span></label>
+                    <div class="board-options-list board-options-horizontal">
+                        <div class="board-option-item">
+                            <input type="radio" id="is_active_public" name="is_active" value="1" @checked((string) old('is_active', '1') === '1') required>
+                            <label for="is_active_public">사용</label>
+                        </div>
+                        <div class="board-option-item">
+                            <input type="radio" id="is_active_private" name="is_active" value="0" @checked((string) old('is_active') === '0') required>
+                            <label for="is_active_private">미사용</label>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <div class="board-form-group">
                     <label for="created_at" class="board-form-label">등록일시</label>
                     <input type="datetime-local" class="board-form-control" id="created_at" name="created_at" value="{{ old('created_at', now()->format('Y-m-d\TH:i')) }}">
