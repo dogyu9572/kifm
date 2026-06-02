@@ -5,7 +5,7 @@
 			<div class="logo"></div>
 	        <h3>{{ $siteTitle }}</h3>
 	    </div>
-	    <ul class="sidebar-menu">
+	    <ul class="sidebar-menu is-scroll-pending">
 	        @php
 	            $currentPath = request()->path();
                 $activePathCandidates = [$currentPath];

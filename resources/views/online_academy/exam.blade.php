@@ -19,23 +19,30 @@
 				<div class="line"><div class="bar"></div></div>
 				<div class="step">{{ $stepText }}</div>
 			</div>
-			@if ($question)
-				<article>
-					<h3 class="test_title">Q{{ $currentStep }}</h3>
-					<p class="tac">{{ $question->question }}</p>
-					@if ($choices !== [])
-						<ul class="a_list">
-							@foreach ($choices as $choice)
-								<li><div class="test_radio"><input type="radio" name="test_select" id="{{ $choice['id'] }}"><label for="{{ $choice['id'] }}"><i>{{ $choice['number'] }}</i><span>{{ $choice['text'] }}</span></label></div></li>
-							@endforeach
-						</ul>
-					@endif
-				</article>
-			@endif
-			<div class="btns_btm flex_center">
-				<button type="button" class="btn btn_kwg prev" data-history-back>이전</button>
-				<a href="{{ route('online_academy.end', ['course' => $course->id]) }}" class="btn btn_woo2 next">다음</a>
-			</div>
+			<form method="POST" action="{{ route('online_academy.exam.submit', $course) }}">
+				@csrf
+				<input type="hidden" name="step" value="{{ $currentStep }}">
+				@if ($question)
+					<article>
+						<h3 class="test_title">Q{{ $currentStep }}</h3>
+						<p class="tac">{{ $question->question }}</p>
+						@if ($choices !== [])
+							<ul class="a_list">
+								@foreach ($choices as $choice)
+									<li><div class="test_radio"><input type="radio" name="answer" id="{{ $choice['id'] }}" value="{{ $choice['value'] }}" required><label for="{{ $choice['id'] }}"><i>{{ $choice['number'] }}</i><span>{{ $choice['text'] }}</span></label></div></li>
+								@endforeach
+							</ul>
+						@endif
+						@error('answer')
+							<p class="c_red tac" role="alert">{{ $message }}</p>
+						@enderror
+					</article>
+				@endif
+				<div class="btns_btm flex_center">
+					<a href="{{ $previousStepUrl }}" class="btn btn_kwg prev">이전</a>
+					<button type="submit" class="btn btn_woo2 next">{{ $isLastStep ? '결과보기' : '다음' }}</button>
+				</div>
+			</form>
 		</div>
 
 	</div>

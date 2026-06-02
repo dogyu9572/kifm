@@ -102,14 +102,14 @@
 			<form method="POST" action="{{ route('online_academy.payment.store') }}">
 				@csrf
 				<input type="hidden" name="course_id" value="{{ $course->id }}">
-				<div class="check_area checkbox">
+				<div class="check_area checkbox" @if($isPending) hidden @endif>
 					<input type="checkbox" name="terms_agree" id="terms_agree" value="1" required @checked(old('terms_agree'))>
 					<label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
 				</div>
 				@error('terms_agree')
 					<p class="c_red" role="alert">{{ $message }}</p>
 				@enderror
-				<button type="submit" class="btn_submit btn_wbb" @disabled(! $isEligible)>지금 수강 신청하기</button>
+				<button type="submit" class="btn_submit btn_wbb" @disabled(! $isEligible || $isPending)>지금 수강 신청하기</button>
 				<button type="button" class="btn_cancel btn_kwg mt" data-history-back>돌아가기</button>
 			</form>
 		</article>

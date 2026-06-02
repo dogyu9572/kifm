@@ -15,11 +15,13 @@ use App\Models\AcademicEventRegistration;
 use App\Services\Frontend\PublicAcademicConferenceAbstractService;
 use App\Services\Frontend\PublicAcademicConferenceService;
 use App\Services\Frontend\PublicAcademicConferenceRegistrationService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use RuntimeException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AcademicConferenceSiteController extends Controller
 {
@@ -31,8 +33,17 @@ class AcademicConferenceSiteController extends Controller
 
     public function show(Request $request, string $folderName, ?string $pagePath = null): View|RedirectResponse
     {
-        $event = $this->conferenceService->findPublicEventByFolder($folderName);
-        $page = $this->conferenceService->pageData($event, $pagePath);
+        try {
+            $event = $this->conferenceService->findPublicEventByFolder($folderName);
+            $page = $this->conferenceService->pageData($event, $pagePath);
+        } catch (ModelNotFoundException) {
+            return redirect()->to($this->blockedRedirectUrl($request))
+                ->with('alert', '접근할 수 없는 학술대회입니다.');
+        } catch (NotFoundHttpException) {
+            return redirect()->to($this->blockedRedirectUrl($request))
+                ->with('alert', '접근할 수 없는 학술대회입니다.');
+        }
+
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
         $normalizedPagePath = trim((string) $pagePath, '/');
 
@@ -573,6 +584,14 @@ class AcademicConferenceSiteController extends Controller
     private function isFrontendMemberLoggedIn(): bool
     {
         return auth()->check() && auth()->user()?->role === 'user';
+    }
+
+    private function blockedRedirectUrl(Request $request): string
+    {
+        $fallback = route('academic_event.conference');
+        $previous = url()->previous();
+
+        return $previous !== $request->fullUrl() ? $previous : $fallback;
     }
 
     private function fieldBelongsToEvent(AcademicEvent $event, mixed $fieldId): bool

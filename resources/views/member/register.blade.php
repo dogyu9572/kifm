@@ -40,7 +40,7 @@
 							<li class="w100p">
 								<label for="register-id">아이디<span class="c_iden">*</span></label>
 								<div class="inbtn">
-									<input type="text" id="register-id" name="login_id" class="text" value="{{ old('login_id') }}" placeholder="아이디를 입력해주세요." required maxlength="80" autocomplete="username">
+									<input type="text" id="register-id" name="login_id" class="text" value="{{ old('login_id') }}" placeholder="4~12자 영문 소문자, 숫자만 입력 가능" required maxlength="80" autocomplete="username">
 									<button type="button" class="btn btn_wkk js-register-check-login-id">중복 확인</button>
 								</div>
 								@error('login_id')
@@ -49,7 +49,7 @@
 							</li>
 							<li>
 								<label for="register-pw">비밀번호<span class="c_iden">*</span></label>
-								<input type="password" id="register-pw" name="password" class="text" placeholder="8~10자 (백오피스 회원 등록과 동일)" required minlength="8" maxlength="10" autocomplete="new-password">
+								<input type="password" id="register-pw" name="password" class="text" placeholder="8~10자 (영문+숫자 필수, 특수문자 허용)" required minlength="8" maxlength="10" autocomplete="new-password">
 								@error('password')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
@@ -75,16 +75,13 @@
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-							<li>
-								<label for="register-phone">휴대폰 번호<span class="c_iden">*</span></label>
-								<div class="inbtn">
-									<input type="text" id="register-phone" name="phone_number" class="text js-register-phone-input" value="{{ old('phone_number') }}" placeholder="숫자만 입력 (하이픈 자동)" inputmode="numeric" autocomplete="tel" maxlength="13">
-									<button type="button" class="btn btn_wkk js-register-check-phone">중복 확인</button>
-								</div>
-								@error('phone_number')
-									<p class="c_red" role="alert">{{ $message }}</p>
-								@enderror
-							</li>
+						<li>
+							<label for="register-phone">휴대폰 번호<span class="c_iden">*</span></label>
+							<input type="text" id="register-phone" name="phone_number" class="text js-register-phone-input" value="{{ old('phone_number') }}" placeholder="휴대폰 번호를 입력해 주세요." inputmode="numeric" autocomplete="tel" maxlength="13">
+							@error('phone_number')
+								<p class="c_red" role="alert">{{ $message }}</p>
+							@enderror
+						</li>
 							<li>
 								<label for="register-email">이메일<span class="c_iden">*</span></label>
 								<div class="inbtn">
@@ -108,7 +105,7 @@
 					<div class="flex_inputs">
 						<ul>
 							<li>
-								<span class="sound_only">구분<span class="c_iden">*</span></span>
+								<label class="">구분<span class="c_iden">*</span></label>
 								<div class="radios flex" role="radiogroup" aria-label="구분">
 									<div class="radio"><input type="radio" name="job_type" id="register-type1" value="specialist" @checked(old('job_type', 'specialist') === 'specialist') required><label for="register-type1"><i aria-hidden="true"></i><span>전문의</span></label></div>
 									<div class="radio"><input type="radio" name="job_type" id="register-type2" value="resident" @checked(old('job_type') === 'resident')><label for="register-type2"><i aria-hidden="true"></i><span>전공의</span></label></div>
@@ -131,20 +128,20 @@
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-							<li>
+<!-- 							<li>
 								<label for="register-specialist">전문의번호<span class="c_iden">*</span></label>
 								<input type="text" id="register-specialist" name="specialist_number" class="text" value="{{ old('specialist_number') }}" placeholder="전문의 번호를 입력해 주세요." required maxlength="80">
 								@error('specialist_number')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
-							</li>
-							<li>
+							</li> -->
+<!-- 							<li>
 								<label for="register-specialty">전문과<span class="c_iden">*</span></label>
 								<input type="text" id="register-specialty" name="specialty" class="text" value="{{ old('specialty') }}" placeholder="전문과를 입력해 주세요." required maxlength="120">
 								@error('specialty')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
-							</li>
+							</li> -->
 							<li>
 								<label for="register-company">직장명<span class="c_iden">*</span></label>
 								<input type="text" id="register-company" name="workplace_name" class="text" value="{{ old('workplace_name') }}" placeholder="직장명을 입력해 주세요." required maxlength="200">
@@ -154,7 +151,7 @@
 							</li>
 							<li>
 								<label for="register-company-tel">직장전화<span class="c_iden">*</span></label>
-								<input type="text" id="register-company-tel" name="workplace_phone" class="text" value="{{ old('workplace_phone') }}" placeholder="직장 전화번호를 입력해 주세요." required maxlength="40">
+								<input type="text" id="register-company-tel" name="workplace_phone" class="text js-register-workplace-phone-input" value="{{ old('workplace_phone') }}" placeholder="직장 전화번호를 입력해 주세요." required maxlength="40" inputmode="numeric">
 								@error('workplace_phone')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
@@ -181,7 +178,7 @@
 							</li>
 							<li>
 								<label for="register-graduation">학교 졸업년도</label>
-								<input type="number" id="register-graduation" name="graduate_year" class="text" value="{{ old('graduate_year') }}" placeholder="예: 2010" min="1950" max="2100" step="1">
+								<input type="number" id="register-graduation" name="graduate_year" class="text" value="{{ old('graduate_year') }}" placeholder="최종 학교 졸업년도를 숫자로면 입력해주세요 (예: 2020)" min="1950" max="2100" step="1">
 								@error('graduate_year')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror

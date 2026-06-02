@@ -201,10 +201,19 @@
         </div>
         <div class="board-form-group mb-0">
             <label class="board-form-label">강의시간 <span class="required">*</span></label>
+            @php
+                $durationTotalSec = (int) old('duration_sec', $course->duration_sec ?? ((int) ($course->duration_min ?? 0) * 60));
+                $durationMin = old('duration_min', intdiv($durationTotalSec, 60));
+                $durationSeconds = old('duration_seconds', $durationTotalSec % 60);
+            @endphp
             <div class="board-inline-form bo-inline-form d-inline-flex align-items-center">
-                <input type="number" name="duration_min" class="board-form-control board-form-control--max-xs" value="{{ old('duration_min', $course->duration_min ?? 0) }}" min="0">
+                <input type="number" name="duration_min" class="board-form-control board-form-control--max-xs" value="{{ $durationMin }}" min="0">
                 <span class="ml-2">분</span>
+                <input type="number" name="duration_seconds" class="board-form-control board-form-control--max-xs ml-2" value="{{ $durationSeconds }}" min="0" max="59">
+                <span class="ml-2">초</span>
             </div>
+            @error('duration_min')<span class="bo-inline-error">{{ $message }}</span>@enderror
+            @error('duration_seconds')<span class="bo-inline-error">{{ $message }}</span>@enderror
         </div>
     </div>
 
@@ -507,4 +516,3 @@
         </div>
     </div>
 </div>
-

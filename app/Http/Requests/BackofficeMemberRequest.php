@@ -30,11 +30,12 @@ class BackofficeMemberRequest extends FormRequest
         $rules = [
             'name' => 'required|string|max:20',
             'name_en' => 'nullable|string|max:100',
-            'phone_number' => array_filter([
+/*            'phone_number' => array_filter([
                 'nullable',
                 'string',
                 $memberId ? Rule::unique('users', 'phone_number')->ignore($memberId) : Rule::unique('users', 'phone_number'),
-            ]),
+            ]),*/
+			'phone_number' => ['nullable', 'string'],
             'email' => 'nullable|email|unique:users,email' . ($isUpdate ? ',' . $memberId : ''),
             'birth_date' => 'nullable|string|regex:/^\d{8}$/',
             'school_name' => 'nullable|string|max:255',
@@ -66,16 +67,15 @@ class BackofficeMemberRequest extends FormRequest
             'committee_codes.*' => ['string', Rule::in($committeeCodes)],
         ];
 
-        if ($isUpdate) {
-            $rules['password'] = 'nullable|string|min:8|max:10|confirmed';
-            $rules['password_confirmation'] = 'nullable|string|same:password';
-        } else {
-            $rules['join_type'] = 'required|in:email,kakao,naver';
-            $rules['login_id'] = 'required|string|unique:users,login_id';
-            $rules['password'] = 'required|string|min:8|max:10|confirmed';
-            $rules['password_confirmation'] = 'required|string|same:password';
-        }
-
+		if ($isUpdate) {
+			$rules['password'] = ['nullable', 'string', 'min:8', 'max:10', 'confirmed', 'regex:/^(?=.*[a-zA-Z])(?=.*\d).{8,10}$/'];
+			$rules['password_confirmation'] = 'nullable|string|same:password';
+		} else {
+			$rules['join_type'] = 'required|in:email,kakao,naver';
+			$rules['login_id'] = 'required|string|unique:users,login_id';
+			$rules['password'] = ['required', 'string', 'min:8', 'max:10', 'confirmed', 'regex:/^(?=.*[a-zA-Z])(?=.*\d).{8,10}$/'];
+			$rules['password_confirmation'] = 'required|string|same:password';
+		}
         return $rules;
     }
 
@@ -112,7 +112,8 @@ class BackofficeMemberRequest extends FormRequest
             'job_type.required' => '구분을 선택해주세요.',
             'name.required' => '이름은 필수 입력 항목입니다.',
             'name.max' => '이름은 최대 20자까지 입력 가능합니다.',
-            'phone_number.unique' => '이미 사용 중인 휴대폰번호입니다.',
+			'password.regex' => '비밀번호는 영문과 숫자를 포함해야 합니다.',
+/*            'phone_number.unique' => '이미 사용 중인 휴대폰번호입니다.',*/
             'email.email' => '올바른 이메일 형식이 아닙니다.',
             'email.unique' => '이미 사용 중인 이메일입니다.',
             'birth_date.regex' => '생년월일은 8자리 숫자(YYYYMMDD) 형식으로 입력해주세요.',

@@ -22,17 +22,17 @@ class FrontendMemberRegisterRequest extends FormRequest
             ->all();
 
         return [
-            'login_id' => ['required', 'string', 'max:80', Rule::unique('users', 'login_id')],
-            'password' => ['required', 'string', 'min:8', 'max:10', 'confirmed'],
+			'login_id' => ['required', 'string', 'min:4', 'max:12', 'regex:/^[a-z0-9]+$/', Rule::unique('users', 'login_id')],
+			'password' => ['required', 'string', 'min:8', 'max:10', 'confirmed', 'regex:/^(?=.*[a-zA-Z])(?=.*\d).{8,10}$/'],
             'password_confirmation' => ['required', 'string', 'same:password'],
             'name' => ['required', 'string', 'max:20'],
             'name_en' => ['required', 'string', 'max:100'],
-            'phone_number' => ['required', 'string', 'regex:/^01[016789]\d{7,8}$/', Rule::unique('users', 'phone_number')],
+			'phone_number' => ['required', 'string', 'regex:/^01[016789]\d{7,8}$/'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
             'job_type' => ['required', Rule::in(['specialist', 'resident', 'public_doctor', 'military_doctor', 'nurse', 'other'])],
             'license_number' => ['required', 'string', 'max:80'],
-            'specialist_number' => ['required', 'string', 'max:80'],
-            'specialty' => ['required', 'string', 'max:120'],
+            'specialist_number' => ['nullable', 'string', 'max:80'],
+            'specialty' => ['nullable', 'string', 'max:120'],
             'workplace_name' => ['required', 'string', 'max:200'],
             'workplace_phone' => ['required', 'string', 'max:40'],
             'workplace_zipcode' => ['nullable', 'string', 'max:20'],
@@ -83,6 +83,9 @@ class FrontendMemberRegisterRequest extends FormRequest
     {
         return [
             'login_id.required' => '아이디를 입력해주세요.',
+			'login_id.min' => '아이디는 최소 4자 이상이어야 합니다.',
+			'login_id.max' => '아이디는 최대 12자까지 입력 가능합니다.',
+			'login_id.regex' => '아이디는 영문 소문자와 숫자만 사용할 수 있습니다.',
             'login_id.unique' => '이미 사용 중인 아이디입니다.',
             'password.required' => '비밀번호를 입력해주세요.',
             'password.min' => '비밀번호는 최소 8자 이상이어야 합니다.',
@@ -99,8 +102,11 @@ class FrontendMemberRegisterRequest extends FormRequest
             'email.unique' => '이미 사용 중인 이메일입니다.',
             'job_type.required' => '구분을 선택해주세요.',
             'license_number.required' => '의사면허번호를 입력해주세요.',
-            'specialist_number.required' => '전문의번호를 입력해주세요.',
-            'specialty.required' => '전문과를 입력해주세요.',
+			'graduate_year.integer' => '졸업년도는 숫자로 입력해주세요.',
+			'graduate_year.min' => '졸업년도는 1950년 이후여야 합니다.',
+			'graduate_year.max' => '졸업년도는 2100년 이하여야 합니다.',
+/*            'specialist_number.required' => '전문의번호를 입력해주세요.',*/
+/*            'specialty.required' => '전문과를 입력해주세요.',*/
             'workplace_name.required' => '직장명을 입력해주세요.',
             'workplace_phone.required' => '직장전화를 입력해주세요.',
             'committee_codes.max' => '위원회 참가 신청은 최대 3개까지 선택 가능합니다.',

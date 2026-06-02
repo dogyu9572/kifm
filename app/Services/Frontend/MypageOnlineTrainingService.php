@@ -61,6 +61,7 @@ class MypageOnlineTrainingService
             'pending_payment' => '결제대기',
             'pending' => '입금대기',
             'completed' => '결제완료',
+            'paid' => '결제완료',
             'cancel_requested' => '취소요청',
             'cancelled' => '취소',
         ];

@@ -106,6 +106,7 @@
     <script src="//code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="/js/frontend/swiper.js"></script>
     <script src="/js/frontend/com.js"></script>
+    <script src="/js/frontend/channel-talk.js"></script>
 </head>
 <body>
 	<div class="blind_link"><a href="#mainContent">본문 바로가기</a></div>
@@ -153,11 +154,11 @@
 					<a href="/" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
 				</div>
 				<div class="center">
-					<search class="search_area">
+					<form method="GET" action="{{ route('total_search') }}" class="search_area">
 						<label for="site-search" class="sound_only">검색어 입력</label>
-						<input type="search" id="site-search" name="q" class="text" placeholder="검색어를 입력해주세요" autocomplete="off">
-						<button type="submit" class="btn" aria-label="검색 실행" onclick="location.href='/total_search'">검색</button>
-					</search>
+						<input type="search" id="site-search" name="q" class="text" value="{{ request('q', request('keyword', '')) }}" placeholder="검색어를 입력해주세요" autocomplete="off">
+						<button type="submit" class="btn" aria-label="검색 실행">검색</button>
+					</form>
 				</div>
 				<div class="right">
 					<button type="button" class="btn_search_mobile mo_vw" aria-label="모바일 검색창 열기">검색</button>
@@ -296,12 +297,13 @@
 			@endif
 			@if(isset($gNum) && $gNum == 'online_academy')
 			<div class="title inner">
-				<strong>대한기능의학회 온라인 아카데미</strong>
-				<span>기능의학에 대한 심도있고 다양한 강의 및 교육 자료를 제공해드립니다.<br/>강의 수강 가능 여부 및 기간은 회원 등급별로 다르게 운영되고 있습니다.</span>
-				<div class="search_area">
-					<input type="text" class="text" placeholder="학술지, 게시글, 키워드 등을 입력해 주세요.">
-					<button type="button" class="btn_search" onclick="location.href='/total_search'">검색</button>
-				</div>
+				<strong>대한기능의학회 <br class="mo_vw">온라인 아카데미</strong>
+				<span>기능의학에 대한 심도있고 <br class="mo_vw">다양한 강의 및 교육 자료를 제공해드립니다.<br/>강의 수강 가능 여부 및 기간은 회원 등급별로 <br class="mo_vw">다르게 운영되고 있습니다.</span>
+				<form method="GET" action="{{ route('total_search') }}" class="search_area">
+					<label for="online-total-search" class="sound_only">검색어 입력</label>
+					<input type="search" id="online-total-search" name="q" class="text" value="{{ request('q', request('keyword', '')) }}" placeholder="학술지, 게시글, 키워드 등을 입력해 주세요.">
+					<button type="submit" class="btn_search">검색</button>
+				</form>
 			</div>
 			@endif
 		</div>
@@ -446,6 +448,9 @@
 		</nav>
 		@endif
 
+		@if(session('alert'))
+			<div data-global-page-alert="{{ session('alert') }}"></div>
+		@endif
 		@yield('content')
 	</div> 
 	

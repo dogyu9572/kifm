@@ -129,7 +129,9 @@ Route::prefix('online_academy')->name('online_academy.')->group(function () {
     Route::get('/payment/toss/fail', [OnlineAcademyController::class, 'failTossPayment'])->name('payment.toss_fail');
     Route::get('/payment/end', [OnlineAcademyController::class, 'paymentEnd'])->name('payment.end');
     Route::post('/payment/coupon', [OnlineAcademyController::class, 'applyCoupon'])->name('payment.coupon');
+    Route::post('/{course}/progress', [OnlineAcademyController::class, 'storeProgress'])->whereNumber('course')->name('progress');
     Route::get('/{course}/exam', [OnlineAcademyController::class, 'exam'])->whereNumber('course')->name('exam');
+    Route::post('/{course}/exam', [OnlineAcademyController::class, 'submitExam'])->whereNumber('course')->name('exam.submit');
     Route::get('/{course}', [OnlineAcademyController::class, 'show'])->whereNumber('course')->name('show');
 });
 

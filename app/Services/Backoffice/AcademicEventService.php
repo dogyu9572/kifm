@@ -10,6 +10,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+use RuntimeException;
+use Throwable;
 
 class AcademicEventService
 {
@@ -123,6 +126,7 @@ class AcademicEventService
             $this->fillEventAttributes($event, $validated);
             $event->save();
             $this->syncChildData($event, $validated);
+            $this->ensureFrontendViewFolder($event);
 
             return $event->fresh([
                 'venueFloors',
@@ -173,7 +177,66 @@ class AcademicEventService
 
     public function deleteMany(array $ids): int
     {
+        $events = AcademicEvent::query()->whereIn('id', $ids)->get();
+        foreach ($events as $event) {
+            $this->deleteFrontendViewFolder($event);
+        }
+
         return AcademicEvent::destroy($ids);
+    }
+
+    private function ensureFrontendViewFolder(AcademicEvent $event): void
+    {
+        $folderName = trim((string) $event->folder_name);
+        if ($folderName === '') {
+            return;
+        }
+
+        $sourcePath = resource_path('views/academic_conference/default');
+        $targetPath = resource_path('views/academic_conference/'.$folderName);
+
+        if (File::isDirectory($targetPath)) {
+            return;
+        }
+
+        if (! File::isDirectory($sourcePath)) {
+            throw new RuntimeException('학술대회 기본 프론트 템플릿 폴더를 찾을 수 없습니다.');
+        }
+
+        try {
+            $copied = File::copyDirectory($sourcePath, $targetPath);
+        } catch (Throwable $exception) {
+            throw new RuntimeException('학술대회 프론트 템플릿 폴더를 생성할 권한이 없습니다.');
+        }
+
+        if (! $copied) {
+            throw new RuntimeException('학술대회 프론트 템플릿 폴더 복제에 실패했습니다.');
+        }
+    }
+
+    public function deleteFrontendViewFolder(AcademicEvent $event): void
+    {
+        $folderName = trim((string) $event->folder_name);
+        if ($folderName === '' || $folderName === 'default') {
+            return;
+        }
+
+        $basePath = realpath(resource_path('views/academic_conference'));
+        if ($basePath === false) {
+            return;
+        }
+
+        $targetPath = resource_path('views/academic_conference/'.$folderName);
+        $realTargetPath = realpath($targetPath);
+        if ($realTargetPath === false || ! File::isDirectory($realTargetPath)) {
+            return;
+        }
+
+        if (! str_starts_with($realTargetPath, $basePath.DIRECTORY_SEPARATOR)) {
+            return;
+        }
+
+        File::deleteDirectory($realTargetPath);
     }
 
     /**

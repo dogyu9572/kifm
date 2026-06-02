@@ -70,11 +70,19 @@ class OnlineAcademyController extends Controller
         $user = $this->frontendUser();
 
         if (! $this->onlineAcademyService->canViewCourse($course, $user)) {
+            if ($user !== null && $this->onlineAcademyService->activeEnrollment($course, $user)) {
+                return redirect()->route('online_academy.index', ['course_type' => $course->course_type])
+                    ->with('alert', '이미 신청 접수된 강좌입니다. 결제 완료 후 수강이 가능합니다.');
+            }
+
             return redirect()->route('online_academy.payment', ['course' => $course->id]);
         }
 
+        $enrollment = $this->onlineAcademyService->completedEnrollment($course, $user);
+
         return $this->renderInner('view', 'online_academy_view', [
             'course' => $course,
+            'enrollment' => $enrollment,
         ]);
     }
 
@@ -83,24 +91,132 @@ class OnlineAcademyController extends Controller
         return $this->renderInner('test', 'online_academy_test');
     }
 
-    public function exam(EduCourse $course): View|RedirectResponse
+    public function exam(Request $request, EduCourse $course): View|RedirectResponse
     {
         $course = $this->onlineAcademyService->findVisible((int) $course->id);
         $user = $this->frontendUser();
         if (! $this->onlineAcademyService->canViewCourse($course, $user)) {
+            if ($user !== null && $this->onlineAcademyService->activeEnrollment($course, $user)) {
+                return redirect()->route('online_academy.index', ['course_type' => $course->course_type])
+                    ->with('alert', '이미 신청 접수된 강좌입니다. 결제 완료 후 시험을 볼 수 있습니다.');
+            }
+
             return redirect()->route('online_academy.payment', ['course' => $course->id]);
         }
 
-        $examPage = $this->onlineAcademyService->examPageData($course);
+        $enrollment = $this->onlineAcademyService->completedEnrollment($course, $user);
+        if (($enrollment?->progress_rate ?? 0) < 100) {
+            return redirect()->route('online_academy.show', $course)
+                ->withErrors(['progress' => '수강률 100% 달성 후 시험을 볼 수 있습니다.']);
+        }
+
+        $examPage = $this->onlineAcademyService->examPageData($course, (int) $request->query('step', 1));
 
         return $this->renderInner('exam', 'online_academy_exam', array_merge([
             'course' => $course,
         ], $examPage));
     }
 
-    public function end(): View
+    public function submitExam(Request $request, EduCourse $course): RedirectResponse
     {
-        return $this->renderInner('end', 'online_academy_end');
+        $course = $this->onlineAcademyService->findVisible((int) $course->id);
+        $user = $this->frontendUser();
+        if (! $this->onlineAcademyService->canViewCourse($course, $user)) {
+            return redirect()->route('online_academy.index', ['course_type' => $course->course_type])
+                ->with('alert', '결제 완료 후 시험을 볼 수 있습니다.');
+        }
+
+        $step = max(1, (int) $request->input('step', 1));
+        $total = $course->examQuestions->count();
+        $request->validate([
+            'answer' => ['required', 'integer', 'min:0'],
+        ], [
+            'answer.required' => '정답을 선택해주세요.',
+        ]);
+
+        $sessionKey = 'online_academy_exam_answers.' . $course->id;
+        $answers = $request->session()->get($sessionKey, []);
+        if (! is_array($answers)) {
+            $answers = [];
+        }
+        $answers[$step] = (int) $request->input('answer');
+        $request->session()->put($sessionKey, $answers);
+
+        if ($step < $total) {
+            return redirect()->route('online_academy.exam', [
+                'course' => $course->id,
+                'step' => $step + 1,
+            ]);
+        }
+
+        $result = $this->onlineAcademyService->gradeExam($course, $user, $answers);
+        $request->session()->forget($sessionKey);
+        $request->session()->put('online_academy_exam_result.' . $course->id, $result);
+
+        return redirect()->route('online_academy.end', ['course' => $course->id]);
+    }
+
+    public function storeProgress(Request $request, EduCourse $course): JsonResponse
+    {
+        $course = $this->onlineAcademyService->findVisible((int) $course->id);
+        $user = $this->frontendUser();
+
+        if ($user === null || ! $this->onlineAcademyService->canViewCourse($course, $user)) {
+            return response()->json([
+                'success' => false,
+                'message' => '수강 권한이 없습니다.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'current_time' => ['required', 'numeric', 'min:0'],
+            'duration' => ['required', 'numeric', 'min:0'],
+            'ended' => ['nullable', 'boolean'],
+        ]);
+
+        try {
+            $progress = $this->onlineAcademyService->updateProgress($course, $user, $validated);
+        } catch (RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
+
+        return response()->json(array_merge(['success' => true], $progress));
+    }
+
+    public function end(Request $request): View|RedirectResponse
+    {
+        $courseId = (int) $request->query('course', 0);
+        if ($courseId <= 0) {
+            return redirect()->route('online_academy.index');
+        }
+
+        $course = $this->onlineAcademyService->findVisible($courseId);
+        $user = $this->frontendUser();
+        if (! $this->onlineAcademyService->canViewCourse($course, $user)) {
+            return redirect()->route('online_academy.index', ['course_type' => $course->course_type])
+                ->with('alert', '결제 완료 후 수강 완료 처리가 가능합니다.');
+        }
+
+        $enrollment = $this->onlineAcademyService->completedEnrollment($course, $user);
+        $resultKey = 'online_academy_exam_result.' . $course->id;
+        $result = $request->session()->get($resultKey);
+        if (! is_array($result)) {
+            $result = [
+                'score' => (int) ($enrollment?->exam_score ?? 0),
+                'correct' => 0,
+                'total' => $course->examQuestions->count(),
+                'passed' => ($enrollment?->exam_status ?? '') === 'passed',
+            ];
+        }
+
+        return $this->renderInner('end', 'online_academy_end', [
+            'course' => $course,
+            'enrollment' => $enrollment,
+            'result' => $result,
+        ]);
     }
 
     private function renderInner(string $view, string $slug, array $data = []): View
@@ -134,6 +250,11 @@ class OnlineAcademyController extends Controller
 
         if ($this->onlineAcademyService->canViewCourse($course, $user)) {
             return redirect()->route('online_academy.show', $course);
+        }
+
+        if ($this->onlineAcademyService->activeEnrollment($course, $user)) {
+            return redirect()->route('online_academy.index', ['course_type' => $course->course_type])
+                ->with('alert', '이미 신청 접수된 강좌입니다. 입금 확인 후 수강이 가능합니다.');
         }
 
         $page_type = 'online_academy';

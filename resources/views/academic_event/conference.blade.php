@@ -86,8 +86,8 @@
 						<x-frontend.bookmark-button content-type="academic_event" :content-id="$conference->id" :title="$conference->title" :menu-label="$sName" :url="$publicAcademicEvent->eventUrl($conference)" label="이 행사를 북마크에 추가" />
 					</li>
 				@empty
-					<li>
-						<span class="state end"><span class="sound_only">상태:</span>검색결과 없음</span>
+					<li class="no_board">
+						<span class="state"></span>
 						<h4>검색 조건에 해당하는 학술대회가 없습니다.</h4>
 					</li>
 				@endforelse

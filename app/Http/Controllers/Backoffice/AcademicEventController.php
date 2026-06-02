@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 class AcademicEventController extends Controller
 {
@@ -66,7 +67,14 @@ class AcademicEventController extends Controller
     {
         $validated = $request->validated();
         $validated['presentation_types'] = array_values($validated['presentation_types'] ?? []);
-        $event = $this->academicEventService->create($validated);
+        try {
+            $event = $this->academicEventService->create($validated);
+        } catch (RuntimeException $exception) {
+            return back()
+                ->withInput()
+                ->withErrors(['folder_name' => $exception->getMessage()]);
+        }
+
         $this->syncUploadedFiles($request, $event);
 
         return redirect()->route('backoffice.academic-events.index')
@@ -135,6 +143,7 @@ class AcademicEventController extends Controller
             'ip' => $request->ip(),
         ]);
         $this->deleteEventFiles($academic_event);
+        $this->academicEventService->deleteFrontendViewFolder($academic_event);
         $academic_event->delete();
 
         return redirect()->route('backoffice.academic-events.index')

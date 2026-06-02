@@ -107,6 +107,12 @@ class EduCourseEnrollmentController extends Controller
             'refund_holder' => ['nullable', 'string', 'max:100'],
         ]);
 
+        if (in_array($validated['payment_status'], ['paid', 'completed'], true)
+            && $eduCourseEnrollment->enrollment_status === 'payment_pending') {
+            $validated['enrollment_status'] = 'in_progress';
+            $validated['paid_at'] = $eduCourseEnrollment->paid_at ?: now();
+        }
+
         $eduCourseEnrollment->fill($validated);
         $eduCourseEnrollment->save();
 
@@ -148,7 +154,7 @@ class EduCourseEnrollmentController extends Controller
                 return;
             }
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['번호', '분류', '개설연도', '강의명', '수강자명', '신청일', '수강만료일', '진도율', '상태']);
+            fputcsv($out, ['번호', '분류', '개설연도', '강의명', '수강자명', '신청일', '수강만료일', '수강률', '상태']);
             foreach ($rows as $row) {
                 fputcsv($out, [
                     $row->id,

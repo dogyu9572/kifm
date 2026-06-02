@@ -34,12 +34,12 @@
 .bo-form-field { flex: 1; min-width: 0; }
 .bo-form-field .board-form-control { width: 100%; max-width: 400px; }
 .bo-section-title {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 20px !important;
+    font-weight: 700;
     color: #495057;
     margin-bottom: 24px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #e8e8e8;
+    border-bottom: 2px solid #007bff !important;
 }
 
 .input-with-button { display: flex; gap: 10px; }

@@ -125,7 +125,7 @@
                                 <th class="w10">수강자명</th>
                                 <th class="w10">신청일</th>
                                 <th class="w10">수강만료일</th>
-                                <th class="w8">진도율</th>
+                                <th class="w8">수강률</th>
                                 <th class="w10">상태</th>
                                 <th class="w10">수료증</th>
                                 <th class="w12">관리</th>
@@ -133,6 +133,12 @@
                         </thead>
                         <tbody>
                             @forelse ($enrollments as $enrollment)
+                                @php
+                                    $displayEnrollmentStatus = in_array($enrollment->payment_status, ['paid', 'completed'], true)
+                                        && $enrollment->enrollment_status === 'payment_pending'
+                                            ? 'in_progress'
+                                            : $enrollment->enrollment_status;
+                                @endphp
                                 <tr>
                                     <td><input type="checkbox" value="{{ $enrollment->id }}" class="form-check-input bo-edu-course-enrollment-checkbox bo-row-checkbox"></td>
                                     <td>{{ $enrollments->total() - (($enrollments->currentPage() - 1) * $enrollments->perPage()) - $loop->index }}</td>
@@ -144,12 +150,12 @@
                                     <td>{{ optional($enrollment->expire_at)->format('Y.m.d') ?? '—' }}</td>
                                     <td>{{ $enrollment->progress_rate }}%</td>
                                     <td>
-                                        @if ($enrollment->enrollment_status === 'payment_pending')
-                                            <span class="text-warning font-weight-bold">{{ $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status }}</span>
-                                        @elseif ($enrollment->enrollment_status === 'in_progress' || $enrollment->enrollment_status === 'completed')
-                                            <span class="text-primary font-weight-bold">{{ $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status }}</span>
+                                        @if ($displayEnrollmentStatus === 'payment_pending')
+                                            <span class="text-warning font-weight-bold">{{ $statusLabels[$displayEnrollmentStatus] ?? $displayEnrollmentStatus }}</span>
+                                        @elseif ($displayEnrollmentStatus === 'in_progress' || $displayEnrollmentStatus === 'completed')
+                                            <span class="text-primary font-weight-bold">{{ $statusLabels[$displayEnrollmentStatus] ?? $displayEnrollmentStatus }}</span>
                                         @else
-                                            <span class="text-secondary font-weight-bold">{{ $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status }}</span>
+                                            <span class="text-secondary font-weight-bold">{{ $statusLabels[$displayEnrollmentStatus] ?? $displayEnrollmentStatus }}</span>
                                         @endif
                                     </td>
                                     <td>
@@ -178,4 +184,3 @@
 @section('scripts')
     <script src="{{ asset('js/backoffice/edu-course-enrollments-index.js') }}"></script>
 @endsection
-

@@ -17,7 +17,10 @@ class EduCourseEnrollment extends Model
         'exam_status',
         'exam_score',
         'total_study_min',
+        'last_position_sec',
+        'video_duration_sec',
         'last_studied_at',
+        'completed_at',
         'certificate_status',
         'certificate_issued_at',
         'payment_no',
@@ -45,8 +48,11 @@ class EduCourseEnrollment extends Model
             'progress_rate' => 'integer',
             'exam_score' => 'integer',
             'total_study_min' => 'integer',
+            'last_position_sec' => 'integer',
+            'video_duration_sec' => 'integer',
             'payment_amount' => 'integer',
             'last_studied_at' => 'datetime',
+            'completed_at' => 'datetime',
             'certificate_issued_at' => 'datetime',
             'paid_at' => 'datetime',
             'bank_deposit_date' => 'date',
@@ -65,4 +71,3 @@ class EduCourseEnrollment extends Model
         return $this->belongsTo(User::class, 'member_id');
     }
 }
-

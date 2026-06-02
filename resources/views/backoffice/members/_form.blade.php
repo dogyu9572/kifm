@@ -123,19 +123,15 @@
 <div class="bo-form-section">
     <h3 class="bo-section-title">연락처 및 네트워크 정보</h3>
     <div class="bo-form-list">
-        <div class="bo-form-row">
-            <label class="bo-form-label">핸드폰</label>
-            <div class="bo-form-field">
-                <div class="input-with-button bo-gap-bottom">
-                    <input type="text" class="board-form-control @error('phone_number') is-invalid @enderror" id="phone_number" name="phone_number" value="{{ old('phone_number', $member->phone_number ?? '') }}" placeholder="010-0000-0000">
-                    <button type="button" class="btn btn-secondary btn-sm" id="btnCheckPhone" @if($isEdit) data-exclude-id="{{ $member->id }}" @endif>중복확인</button>
-                </div>
-                <div id="phoneCheckResult" class="check-result"></div>
-                @error('phone_number')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-        </div>
+		<div class="bo-form-row">
+			<label class="bo-form-label">핸드폰</label>
+			<div class="bo-form-field">
+				<input type="text" class="board-form-control @error('phone_number') is-invalid @enderror" id="phone_number" name="phone_number" value="{{ old('phone_number', $member->phone_number ?? '') }}" placeholder="010-0000-0000">
+				@error('phone_number')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
 
         <div class="bo-form-row">
             <label class="bo-form-label">이메일</label>
@@ -270,19 +266,17 @@
     <div class="bo-form-list">
         <div class="bo-member-dual-row">
             <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">출신대학</label>
-                    <div class="bo-form-field">
-                        <div class="input-with-button bo-gap-bottom">
-                            <input type="text" class="board-form-control @error('school_name') is-invalid @enderror" id="school_name" name="school_name" value="{{ old('school_name', $member->school_name ?? '') }}" placeholder="출신대학교 입력">
-                            <button type="button" class="btn btn-secondary btn-sm" id="btnSearchSchool">검색</button>
-                        </div>
-                        <input type="text" class="board-form-control bo-school-direct" id="school_name_direct" placeholder="학교명을 직접 입력해주세요.">
-                        @error('school_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
+				<div class="bo-member-dual-col">
+					<div class="bo-form-row">
+						<label class="bo-form-label">출신대학</label>
+						<div class="bo-form-field">
+							<input type="text" class="board-form-control @error('school_name') is-invalid @enderror" id="school_name" name="school_name" value="{{ old('school_name', $member->school_name ?? '') }}" placeholder="출신대학교 입력">
+							@error('school_name')
+								<div class="invalid-feedback">{{ $message }}</div>
+							@enderror
+						</div>
+					</div>
+				</div>
             </div>
             <div class="bo-member-dual-col">
                 <div class="bo-form-row">

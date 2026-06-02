@@ -22,18 +22,15 @@
         if (d.length <= 3) {
             return d;
         }
-        // 10자리 완성(011 등 구형) → 3-3-4
         if (d.length === 10 && d[2] !== '0') {
             return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
         }
-        // 010·016~019 또는 11자리 입력 중 → 3-4-4
         if (d.startsWith('010') || d.length === 11 || /^01[6789]/.test(d)) {
             if (d.length <= 7) {
                 return d.slice(0, 3) + '-' + d.slice(3);
             }
             return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
         }
-        // 011 입력 중(10자리 미만) → 3-3-4 형태로 진행
         if (d.startsWith('011')) {
             if (d.length <= 6) {
                 return d.slice(0, 3) + '-' + d.slice(3);
@@ -47,6 +44,39 @@
         }
         return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
     }
+
+    /**
+     * 직장 전화 포매팅 (02-123-4567, 031-1234-5678, 010-1234-5678)
+     */
+	function formatWorkplacePhoneDisplay(raw) {
+		var d = String(raw || '')
+			.replace(/\D/g, '')
+			.slice(0, 11);
+		if (!d.length) {
+			return '';
+		}
+		if (d[0] === '0') {
+			// 휴대폰 번호 (010, 011 등) → 3-4-4
+			if (/^01/.test(d)) {
+				if (d.length <= 3) return d;
+				if (d.length <= 7) return d.slice(0, 3) + '-' + d.slice(3);
+				return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+			}
+			// 02 (서울) → 2-3-4
+			if (d.startsWith('02')) {
+				if (d.length <= 2) return d;
+				if (d.length <= 5) return d.slice(0, 2) + '-' + d.slice(2);
+				return d.slice(0, 2) + '-' + d.slice(2, 5) + '-' + d.slice(5);
+			}
+			// 031 등 지역번호 → 3-3-4
+			if (d.length <= 3) return d;
+			if (d.length <= 6) return d.slice(0, 3) + '-' + d.slice(3);
+			return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+		}
+		if (d.length <= 3) return d;
+		if (d.length <= 7) return d.slice(0, 3) + '-' + d.slice(3);
+		return d.slice(0, 3) + '-' + d.slice(3, 7) + '-' + d.slice(7);
+	}
 
     function bindRegisterPhoneInput() {
         var input = document.querySelector('input.js-register-phone-input[name="phone_number"]');
@@ -71,6 +101,46 @@
         });
     }
 
+    function bindWorkplacePhoneInput() {
+        var input = document.querySelector('input.js-register-workplace-phone-input[name="workplace_phone"]');
+        if (!input) {
+            return;
+        }
+        var apply = function () {
+            var formatted = formatWorkplacePhoneDisplay(input.value);
+            input.value = formatted;
+            var end = formatted.length;
+            input.setSelectionRange(end, end);
+        };
+        if (input.value) {
+            input.value = formatWorkplacePhoneDisplay(input.value);
+        }
+        input.addEventListener('input', apply);
+        input.addEventListener('blur', function () {
+            input.value = formatWorkplacePhoneDisplay(input.value);
+        });
+        input.addEventListener('paste', function () {
+            window.requestAnimationFrame(apply);
+        });
+    }
+
+    function bindLoginIdInput() {
+        var input = document.querySelector('input[name="login_id"]');
+        if (!input) {
+            return;
+        }
+        input.addEventListener('input', function () {
+            this.value = this.value.replace(/[^a-z0-9]/g, '').slice(0, 12);
+        });
+        input.addEventListener('blur', function () {
+            var val = this.value;
+            if (val && (val.length < 4 || val.length > 12)) {
+                window.alert('아이디는 4~12자의 영문 소문자와 숫자만 사용할 수 있습니다.');
+                this.focus();
+            }
+        });
+    }
+
     function bindWorkplaceAddressSearch() {
         var btn = document.querySelector('.js-register-search-workplace-address');
         if (!btn) {
@@ -86,15 +156,9 @@
                     var zip = document.getElementById('register-workplace-zipcode');
                     var base = document.getElementById('register-company-address');
                     var detail = document.getElementById('register-workplace-address-detail');
-                    if (zip) {
-                        zip.value = data.zonecode;
-                    }
-                    if (base) {
-                        base.value = data.address;
-                    }
-                    if (detail) {
-                        detail.focus();
-                    }
+                    if (zip) { zip.value = data.zonecode; }
+                    if (base) { base.value = data.address; }
+                    if (detail) { detail.focus(); }
                 },
             }).open();
         });
@@ -168,6 +232,111 @@
         });
     }
 
+    function validateRegisterForm() {
+        var checks = [
+            {
+                el: document.querySelector('input[name="login_id"]'),
+                test: function (v) { return !!v; },
+                msg: '아이디를 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="login_id"]'),
+                test: function (v) { return v.length >= 4 && v.length <= 12; },
+                msg: '아이디는 4~12자여야 합니다.',
+            },
+            {
+                el: document.querySelector('input[name="login_id"]'),
+                test: function (v) { return /^[a-z0-9]+$/.test(v); },
+                msg: '아이디는 영문 소문자와 숫자만 사용할 수 있습니다.',
+            },
+            {
+                el: document.querySelector('input[name="password"]'),
+                test: function (v) { return !!v; },
+                msg: '비밀번호를 입력해주세요.',
+            },
+			{
+				el: document.querySelector('input[name="password"]'),
+				test: function (v) { return /^(?=.*[a-zA-Z])(?=.*\d).{8,10}$/.test(v); },
+				msg: '비밀번호는 8~10자이며 영문과 숫자를 포함해야 합니다.',
+			},
+            {
+                el: document.querySelector('input[name="password_confirmation"]'),
+                test: function (v) {
+                    var pw = document.querySelector('input[name="password"]');
+                    return pw && v === pw.value;
+                },
+                msg: '비밀번호가 일치하지 않습니다.',
+            },
+            {
+                el: document.querySelector('input[name="name"]'),
+                test: function (v) { return !!v; },
+                msg: '한글 이름을 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="name_en"]'),
+                test: function (v) { return !!v; },
+                msg: '영문 이름을 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="phone_number"]'),
+                test: function (v) { return !!v; },
+                msg: '휴대폰 번호를 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="phone_number"]'),
+                test: function (v) { return v.replace(/\D/g, '').length >= 10; },
+                msg: '휴대폰 번호를 정확히 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="email"]'),
+                test: function (v) { return !!v; },
+                msg: '이메일을 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="email"]'),
+                test: function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); },
+                msg: '유효한 이메일 주소를 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="license_number"]'),
+                test: function (v) { return !!v; },
+                msg: '의사면허번호를 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="workplace_name"]'),
+                test: function (v) { return !!v; },
+                msg: '직장명을 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="workplace_phone"]'),
+                test: function (v) { return !!v; },
+                msg: '직장 전화를 입력해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="privacy_agreed"]'),
+                test: function (v, el) { return el.checked; },
+                msg: '개인정보 수집 및 이용에 동의해주세요.',
+            },
+            {
+                el: document.querySelector('input[name="terms_agreed"]'),
+                test: function (v, el) { return el.checked; },
+                msg: '이용약관에 동의해주세요.',
+            },
+        ];
+
+        for (var i = 0; i < checks.length; i++) {
+            var c = checks[i];
+            if (!c.el) { continue; }
+            var val = c.el.value || '';
+            if (!c.test(val, c.el)) {
+                window.alert(c.msg);
+                c.el.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         var root = document.getElementById('member-register-page');
         if (!root) {
@@ -175,8 +344,9 @@
         }
 
         bindRegisterPhoneInput();
+        bindWorkplacePhoneInput();
+        bindLoginIdInput();
         bindWorkplaceAddressSearch();
-
         bindCommitteeLimit();
 
         bindDuplicateButton('.js-register-check-login-id', root.dataset.checkLoginId, 'login_id', function () {
@@ -204,5 +374,14 @@
                 window.history.back();
             });
         });
+
+        var form = document.querySelector('.register_form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                if (!validateRegisterForm()) {
+                    e.preventDefault();
+                }
+            });
+        }
     });
 })();

@@ -1,0 +1,14 @@
+{
+  "socketPath": "/tmp/mcp-opGirv/mcp.sock",
+  "scheme": "unix",
+  "headers": {
+    "Authorization": "Nonce 3ac58ee0-9937-45ca-94ca-f6bdf72519dd"
+  },
+  "pid": 1101306,
+  "ideName": "Visual Studio Code",
+  "timestamp": 1780276231177,
+  "workspaceFolders": [
+    "/var/www/html/kifm"
+  ],
+  "isTrusted": true
+}

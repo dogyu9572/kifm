@@ -8,6 +8,7 @@ use App\Models\MemberExecutive;
 use App\Models\MembershipPayment;
 use App\Models\User;
 use App\Services\Backoffice\MembershipPaymentService;
+use App\Services\Frontend\PublicOnlineAcademyService;
 
 class MypagePrintService
 {
@@ -41,7 +42,7 @@ class MypagePrintService
             ->with('course')
             ->where('member_id', $user->id)
             ->whereKey($enrollmentId)
-            ->where('payment_status', 'completed')
+            ->whereIn('payment_status', PublicOnlineAcademyService::PAYMENT_COMPLETED_STATUSES)
             ->first();
     }
 

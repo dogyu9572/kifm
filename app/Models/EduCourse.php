@@ -25,6 +25,7 @@ class EduCourse extends Model
         'lecture_file_path',
         'video_url',
         'duration_min',
+        'duration_sec',
         'completion_score',
         'annual_fee_target',
         'free_yn',
@@ -44,6 +45,7 @@ class EduCourse extends Model
         return [
             'open_year' => 'integer',
             'duration_min' => 'integer',
+            'duration_sec' => 'integer',
             'completion_score' => 'integer',
             'duration_days' => 'integer',
             'free_start_date' => 'date',
@@ -83,4 +85,3 @@ class EduCourse extends Model
         return $this->belongsTo(AcademicEvent::class, 'linked_event_id');
     }
 }
-

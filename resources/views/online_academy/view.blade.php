@@ -9,10 +9,15 @@
 	$videoEmbedUrl = $onlineAcademy->videoEmbedUrl($course->video_url);
 	$topicItems = $onlineAcademy->topicList($course->topics);
 	$keywordItems = $onlineAcademy->keywordList($course->keywords);
+	$progress = $onlineAcademy->progressData($enrollment ?? null);
 @endphp
 <main class="sub_area">
 
-<section class="scon online_academy_view" aria-labelledby="online-academy-heading">
+<section class="scon online_academy_view" aria-labelledby="online-academy-heading"
+	data-progress-url="{{ route('online_academy.progress', $course) }}"
+	data-initial-progress="{{ $progress['progress_rate'] }}"
+	data-initial-position="{{ $progress['last_position_sec'] }}"
+	data-initial-duration="{{ $progress['video_duration_sec'] ?: $onlineAcademy->courseDurationSeconds($course) }}">
 	<div class="inner">
 
 		<div class="board_view nbd_t">
@@ -28,21 +33,23 @@
 					<a href="{{ $lectureFileUrl }}" class="btn_abso btn_kwk btn_download" download>강의록 다운로드</a>
 				@endif
 			</div>
+			@error('progress')
+				<p class="c_red">{{ $message }}</p>
+			@enderror
 			<div class="state_line">
-				<div class="line"><div class="bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div>
+				<div class="line"><div class="bar" role="progressbar" aria-valuenow="{{ $progress['progress_rate'] }}" aria-valuemin="0" aria-valuemax="100"></div></div>
 				<div class="flex">
-					<div class="left">수강률 <strong class="percent_val">0%</strong></div>
-					<div class="right"><strong>0분</strong> / {{ (int) $course->duration_min }}분</div>
+					<div class="left">수강률 <strong class="percent_val">{{ $progress['progress_rate'] }}%</strong></div>
+					<div class="right"><strong class="watched_min">{{ $progress['watched_min'] }}분</strong> / <span class="duration_text">{{ $onlineAcademy->durationText($course) }}</span></div>
 				</div>
 			</div>
 			<div class="cont">
 				<div class="video">
 					@if ($videoEmbedUrl)
-						<iframe src="{{ $videoEmbedUrl }}" title="{{ $course->title }}" allowfullscreen></iframe>
+						<iframe src="{{ $videoEmbedUrl }}" title="{{ $course->title }}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen data-vimeo-player></iframe>
 					@elseif ($course->video_url)
 						<a href="{{ $course->video_url }}" target="_blank" rel="noopener" class="video_link">
-							<img src="{{ $onlineAcademy->imageUrl($course->thumbnail_path, $onlineAcademy::FALLBACK_VIEW_IMAGE) }}" alt="">
-							<span>강의 영상 새 창으로 열기</span>
+							<span>{{ $course->video_url }}</span>
 						</a>
 					@else
 						<img src="{{ $onlineAcademy->imageUrl($course->thumbnail_path, $onlineAcademy::FALLBACK_VIEW_IMAGE) }}" alt="">
@@ -72,7 +79,7 @@
 					@endif
 					<div class="btn_area">
 						<div class="txtbox" aria-hidden="true">학습을 모두 마치셨나요?<br/>아래 버튼을 누르면 간단한 테스트 후 수강 완료 처리가 됩니다.</div>
-						<a href="{{ route('online_academy.exam', $course) }}" class="btn btn_test disabled" aria-disabled="true">시험보기</a>
+						<a href="{{ route('online_academy.exam', $course) }}" class="btn btn_test {{ $progress['is_completed'] ? '' : 'disabled' }}" aria-disabled="{{ $progress['is_completed'] ? 'false' : 'true' }}">시험보기</a>
 					</div>
 				</article>
 			</div>

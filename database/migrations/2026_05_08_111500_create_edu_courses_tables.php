@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('lecture_file_path')->nullable();
             $table->string('video_url')->nullable();
             $table->unsignedSmallInteger('duration_min')->default(0);
+            $table->unsignedInteger('duration_sec')->default(0);
             $table->unsignedSmallInteger('completion_score')->default(0);
             $table->string('annual_fee_target', 20)->default('all');
             $table->string('free_yn', 1)->default('N');
@@ -88,4 +89,3 @@ return new class extends Migration
         Schema::dropIfExists('edu_courses');
     }
 };
-

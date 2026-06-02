@@ -7,6 +7,9 @@
 @php
 	$currentMember = auth()->user();
 @endphp
+@if (session('alert'))
+	<div data-page-alert="{{ session('alert') }}"></div>
+@endif
 <main class="sub_area">
 
 @if ($featuredCourses->isNotEmpty())
@@ -134,10 +137,9 @@
 					</a>
 				</li>
 			@empty
-				<li>
-					<span class="txt">
-						<h3>검색 조건에 해당하는 강좌가 없습니다.</h3>
-					</span>
+				<li class="no_board">
+					<span class="state"></span>
+					<h4>검색 조건에 해당하는 학술대회가 없습니다.</h4>
 				</li>
 			@endforelse
 		</ul>

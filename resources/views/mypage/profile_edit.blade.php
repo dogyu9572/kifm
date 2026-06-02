@@ -154,7 +154,7 @@
 							</li>
 							<li>
 								<label for="register-graduation">학교 졸업년도</label>
-								<input type="text" id="register-graduation" name="graduate_year" class="text" placeholder="최종 학교 졸업년도를 숫자로만 입력해 주세요." value="{{ old('graduate_year', $user->graduate_year) }}">
+								<input type="text" id="register-graduation" name="graduate_year" class="text" placeholder="최종 학교 졸업년도를 숫자로면 입력해주세요 (예: 2020)" value="{{ old('graduate_year', $user->graduate_year) }}">
 								@error('graduate_year')
 								<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror

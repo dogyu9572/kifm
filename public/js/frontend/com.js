@@ -165,6 +165,9 @@ $(document).ready(function(){
 	$(".btn_search_mobile").click(function(){
 		$(".header .btm .center").fadeToggle("fast");
 	});
+	$(".sub_menu_area .menu.set_s .btn").click(function(){
+		$(this).next("ul").stop(true,true).slideToggle("fast").parent().stop(true,true).toggleClass("on");
+	});
 //브라우저 사이즈
 	let vh = window.innerHeight * 0.01; 
 	document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -198,6 +201,32 @@ $(document).ready(function(){
 			captchaImage.setAttribute('src', baseUrl + separator + 't=' + Date.now());
 		});
 	}
+
+	const globalPageAlert = document.querySelector('[data-global-page-alert]');
+	if (globalPageAlert && globalPageAlert.dataset.globalPageAlert) {
+		window.alert(globalPageAlert.dataset.globalPageAlert);
+	}
+
+	$('[data-total-search-tabs] a').on('click', function(e) {
+		const targetId = $(this).attr('href');
+		const $target = targetId && targetId !== '#this' ? $(targetId) : $();
+		if ($target.length === 0) {
+			return;
+		}
+
+		e.preventDefault();
+
+		const $tab = $(this).closest('li');
+		$tab.addClass('on').siblings().removeClass('on');
+		$tab.parent().find('a[role="tab"]').attr('aria-selected', 'false');
+		$(this).attr('aria-selected', 'true');
+
+		const headerHeight = $('.header').outerHeight() || 0;
+		const targetPos = $target.offset().top - headerHeight - 20;
+		$('html, body').stop().animate({
+			scrollTop: Math.max(0, targetPos),
+		}, 500);
+	});
 
 	if (document.querySelector('.online_academy_wrap')) {
 		const academyScript = document.createElement('script');

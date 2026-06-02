@@ -251,6 +251,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    function scrollActiveSidebarMenuIntoView() {
+        const menu = document.querySelector('.sidebar-menu');
+        const activeItem = document.querySelector('.sidebar-submenu li.active') || document.querySelector('.sidebar-menu > li.active');
+        if (!menu) {
+            return;
+        }
+        if (!activeItem) {
+            menu.classList.remove('is-scroll-pending');
+            return;
+        }
+
+        const menuRect = menu.getBoundingClientRect();
+        const itemRect = activeItem.getBoundingClientRect();
+        const itemCenter = itemRect.top - menuRect.top + menu.scrollTop + (itemRect.height / 2);
+        const targetTop = Math.max(0, itemCenter - (menu.clientHeight / 2));
+
+        menu.scrollTo({
+            top: targetTop,
+            behavior: 'auto',
+        });
+        menu.classList.remove('is-scroll-pending');
+    }
+
+    window.requestAnimationFrame(function() {
+        window.setTimeout(scrollActiveSidebarMenuIntoView, 80);
+    });
+
     // 모바일 디바이스 확인
     function isMobile() {
         return window.innerWidth <= 768;

@@ -9,7 +9,7 @@
 	$paymentStatusLabel = $paymentStatusLabels[$enrollment->payment_status] ?? $enrollment->payment_status;
 	$methodLabel = $paymentMethodLabels[$enrollment->payment_method] ?? $enrollment->payment_method;
 	$isCompleted = $enrollment->enrollment_status === 'completed';
-	$isPaymentCompleted = $enrollment->payment_status === 'completed';
+	$isPaymentCompleted = in_array($enrollment->payment_status, ['completed', 'paid'], true);
 	$periodEnd = $enrollment->expire_at ?: $course?->period_end;
 @endphp
 <main class="sub_area">
@@ -57,7 +57,7 @@
 					<tr>
 						<th scope="row">수강 상태</th>
 						<td>{{ $statusLabel }}</td>
-						<th scope="row">진도율</th>
+						<th scope="row">수강률</th>
 						<td>{{ (int) $enrollment->progress_rate }}%</td>
 					</tr>
 					<tr>

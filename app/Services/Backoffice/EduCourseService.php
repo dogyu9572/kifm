@@ -159,6 +159,7 @@ class EduCourseService
             'content' => $validated['content'] ?? null,
             'video_url' => $validated['video_url'] ?? null,
             'duration_min' => (int) $validated['duration_min'],
+            'duration_sec' => (int) ($validated['duration_sec'] ?? ((int) $validated['duration_min'] * 60)),
             'completion_score' => (int) $validated['completion_score'],
             'annual_fee_target' => $validated['annual_fee_target'],
             'free_yn' => $validated['free_yn'],
@@ -222,4 +223,3 @@ class EduCourseService
         ]);
     }
 }
-

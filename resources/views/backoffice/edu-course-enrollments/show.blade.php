@@ -37,6 +37,12 @@
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="return_url" value="{{ request('return_url') }}">
+                    @php
+                        $displayEnrollmentStatus = in_array($enrollment->payment_status, ['paid', 'completed'], true)
+                            && $enrollment->enrollment_status === 'payment_pending'
+                                ? 'in_progress'
+                                : $enrollment->enrollment_status;
+                    @endphp
 
                     <div class="bo-form-section">
                         <h3 class="bo-section-title">강좌 정보</h3>
@@ -116,13 +122,13 @@
                                     <div class="bo-form-row">
                                         <label class="bo-form-label">상태</label>
                                         <div class="bo-form-field">
-                                            <input type="text" class="board-form-control" value="{{ $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status }}" readonly>
+                                            <input type="text" class="board-form-control" value="{{ $statusLabels[$displayEnrollmentStatus] ?? $displayEnrollmentStatus }}" readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="bo-member-dual-col">
                                     <div class="bo-form-row">
-                                        <label class="bo-form-label">진도율</label>
+                                        <label class="bo-form-label">수강률</label>
                                         <div class="bo-form-field">
                                             <input type="text" class="board-form-control" value="{{ $enrollment->progress_rate }}%" readonly>
                                         </div>
@@ -393,4 +399,3 @@
 @section('scripts')
     <script src="{{ asset('js/backoffice/edu-course-enrollments-show.js') }}"></script>
 @endsection
-

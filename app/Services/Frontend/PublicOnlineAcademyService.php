@@ -21,6 +21,7 @@ class PublicOnlineAcademyService
     public const FALLBACK_HEAD_IMAGE = 'images/img_sample_online_academy_head.jpg';
     public const FALLBACK_LIST_IMAGE = 'images/img_sample_online_academy_list.jpg';
     public const FALLBACK_VIEW_IMAGE = 'images/img_sample_online_academy_view.jpg';
+    public const PAYMENT_COMPLETED_STATUSES = ['completed', 'paid'];
 
     /** @return array<string, string> */
     public function courseTypeLabels(): array
@@ -88,10 +89,11 @@ class PublicOnlineAcademyService
     }
 
     /** @return array<string, mixed> */
-    public function examPageData(EduCourse $course): array
+    public function examPageData(EduCourse $course, int $step = 1): array
     {
-        $question = $course->examQuestions->first();
         $total = $course->examQuestions->count();
+        $currentStep = $total > 0 ? min(max(1, $step), $total) : 0;
+        $question = $currentStep > 0 ? $course->examQuestions->values()->get($currentStep - 1) : null;
         $choices = is_array($question?->choices_json)
             ? array_values(array_filter(array_map('strval', $question->choices_json)))
             : [];
@@ -100,6 +102,7 @@ class PublicOnlineAcademyService
                 'id' => 'test_select' . str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
                 'number' => $index + 1,
                 'text' => $choice,
+                'value' => $index,
             ],
             $choices,
             array_keys($choices),
@@ -108,9 +111,52 @@ class PublicOnlineAcademyService
         return [
             'question' => $question,
             'choices' => $choiceItems,
-            'currentStep' => $question ? 1 : 0,
+            'currentStep' => $currentStep,
             'totalSteps' => $total,
-            'stepText' => $question ? '01/' . str_pad((string) $total, 2, '0', STR_PAD_LEFT) : '00/00',
+            'stepText' => $question ? str_pad((string) $currentStep, 2, '0', STR_PAD_LEFT) . '/' . str_pad((string) $total, 2, '0', STR_PAD_LEFT) : '00/00',
+            'previousStepUrl' => $currentStep > 1 ? route('online_academy.exam', ['course' => $course->id, 'step' => $currentStep - 1]) : route('online_academy.show', $course),
+            'nextStepUrl' => $currentStep < $total ? route('online_academy.exam', ['course' => $course->id, 'step' => $currentStep + 1]) : route('online_academy.end', ['course' => $course->id]),
+            'isLastStep' => $currentStep >= $total,
+        ];
+    }
+
+    /**
+     * @param array<int, int|string> $answers
+     *
+     * @return array{score: int, correct: int, total: int, passed: bool}
+     */
+    public function gradeExam(EduCourse $course, User $user, array $answers): array
+    {
+        $questions = $course->examQuestions->values();
+        $total = $questions->count();
+        $correct = 0;
+
+        foreach ($questions as $index => $question) {
+            if ((int) ($answers[$index + 1] ?? -1) === (int) $question->answer_index) {
+                $correct++;
+            }
+        }
+
+        $score = $total > 0 ? (int) floor(($correct / $total) * 100) : 0;
+        $passingScore = (int) ($course->completion_score ?: 100);
+        $passed = $score >= $passingScore;
+
+        $enrollment = $this->completedEnrollment($course, $user);
+        if ($enrollment) {
+            $enrollment->fill([
+                'exam_status' => $passed ? 'passed' : 'failed',
+                'exam_score' => $score,
+                'enrollment_status' => $passed ? 'completed' : $enrollment->enrollment_status,
+                'completed_at' => $passed ? ($enrollment->completed_at ?: now()) : $enrollment->completed_at,
+            ]);
+            $enrollment->save();
+        }
+
+        return [
+            'score' => $score,
+            'correct' => $correct,
+            'total' => $total,
+            'passed' => $passed,
         ];
     }
 
@@ -199,7 +245,7 @@ class PublicOnlineAcademyService
 
     public function canViewCourse(EduCourse $course, ?User $user): bool
     {
-        return $user !== null && $this->hasActiveEnrollment($course, $user);
+        return $user !== null && $this->hasCompletedEnrollment($course, $user);
     }
 
     public function hasActiveEnrollment(EduCourse $course, ?User $user): bool
@@ -211,6 +257,15 @@ class PublicOnlineAcademyService
         return $this->activeEnrollment($course, $user) !== null;
     }
 
+    public function hasCompletedEnrollment(EduCourse $course, ?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        return $this->completedEnrollment($course, $user) !== null;
+    }
+
     public function activeEnrollment(EduCourse $course, User $user): ?EduCourseEnrollment
     {
         return EduCourseEnrollment::query()
@@ -219,6 +274,69 @@ class PublicOnlineAcademyService
             ->whereNotIn('payment_status', ['cancel_requested', 'cancelled'])
             ->orderByDesc('id')
             ->first();
+    }
+
+    public function completedEnrollment(EduCourse $course, User $user): ?EduCourseEnrollment
+    {
+        return EduCourseEnrollment::query()
+            ->where('edu_course_id', $course->id)
+            ->where('member_id', $user->id)
+            ->whereIn('payment_status', self::PAYMENT_COMPLETED_STATUSES)
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    /**
+     * @return array{progress_rate: int, watched_min: int, last_position_sec: int, video_duration_sec: int, is_completed: bool}
+     */
+    public function progressData(?EduCourseEnrollment $enrollment): array
+    {
+        return [
+            'progress_rate' => (int) ($enrollment?->progress_rate ?? 0),
+            'watched_min' => (int) ($enrollment?->total_study_min ?? 0),
+            'last_position_sec' => (int) ($enrollment?->last_position_sec ?? 0),
+            'video_duration_sec' => (int) ($enrollment?->video_duration_sec ?? 0),
+            'is_completed' => (int) ($enrollment?->progress_rate ?? 0) >= 100,
+        ];
+    }
+
+    /**
+     * @param array{current_time: mixed, duration: mixed, ended?: mixed} $data
+     *
+     * @return array{progress_rate: int, watched_min: int, last_position_sec: int, video_duration_sec: int, is_completed: bool}
+     */
+    public function updateProgress(EduCourse $course, User $user, array $data): array
+    {
+        $enrollment = $this->completedEnrollment($course, $user);
+        if (! $enrollment) {
+            throw new RuntimeException('수강 신청 내역을 찾을 수 없습니다.');
+        }
+
+        $currentTime = max(0, (int) floor((float) $data['current_time']));
+        $duration = max(0, (int) floor((float) $data['duration']));
+        $ended = filter_var($data['ended'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        $previousDuration = (int) ($enrollment->video_duration_sec ?? 0);
+        $duration = max($duration, $previousDuration, $this->courseDurationSeconds($course));
+        $progressRate = $duration > 0 ? (int) floor(($currentTime / $duration) * 100) : 0;
+        if ($ended || ($duration > 0 && $currentTime >= $duration - 2)) {
+            $progressRate = 100;
+        }
+        $progressRate = max((int) ($enrollment->progress_rate ?? 0), min(100, $progressRate));
+        $lastPosition = $ended ? $duration : $currentTime;
+
+        $enrollment->fill([
+            'progress_rate' => $progressRate,
+            'total_study_min' => max((int) ($enrollment->total_study_min ?? 0), (int) ceil($lastPosition / 60)),
+            'last_position_sec' => max(0, $lastPosition),
+            'video_duration_sec' => max(0, $duration),
+            'last_studied_at' => now(),
+            'completed_at' => $progressRate >= 100 ? ($enrollment->completed_at ?: now()) : $enrollment->completed_at,
+            'enrollment_status' => $progressRate >= 100 ? 'completed' : ($enrollment->enrollment_status ?: 'in_progress'),
+        ]);
+        $enrollment->save();
+
+        return $this->progressData($enrollment->refresh());
     }
 
     /**
@@ -508,6 +626,24 @@ class PublicOnlineAcademyService
         return $text !== '' ? Str::limit($text, $limit) : $course->title;
     }
 
+    public function courseDurationSeconds(EduCourse $course): int
+    {
+        return max(0, (int) ($course->duration_sec ?? 0) ?: ((int) $course->duration_min * 60));
+    }
+
+    public function durationText(EduCourse $course): string
+    {
+        $seconds = $this->courseDurationSeconds($course);
+        $minutes = intdiv($seconds, 60);
+        $remainSeconds = $seconds % 60;
+
+        if ($remainSeconds <= 0) {
+            return $minutes . '분';
+        }
+
+        return $minutes . '분 ' . $remainSeconds . '초';
+    }
+
     public function videoEmbedUrl(?string $url): ?string
     {
         $url = trim((string) $url);
@@ -521,7 +657,10 @@ class PublicOnlineAcademyService
         if (str_contains($url, 'youtube.com/embed/')) {
             return $url;
         }
-        if (preg_match('~vimeo\.com/(\d+)~', $url, $matches)) {
+        if (str_contains($url, 'player.vimeo.com/video/')) {
+            return $url;
+        }
+        if (preg_match('~vimeo\.com/(?:video/)?(\d+)~', $url, $matches)) {
             return 'https://player.vimeo.com/video/' . $matches[1];
         }
 

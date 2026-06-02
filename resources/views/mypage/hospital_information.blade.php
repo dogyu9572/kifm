@@ -65,7 +65,7 @@
                         @if ($doc->photo_path)
                             <label class="checkbox">
                                 <input type="checkbox" name="delete_photo" value="1" @checked(old('delete_photo'))>
-                                <span>등록된 사진 삭제</span>
+                                <span class="btn btn_wkk">등록된 사진 삭제</span>
                             </label>
                         @endif
                         @error('photo')
@@ -266,8 +266,8 @@
                 @enderror
             </fieldset>
 
-            <div class="btns_area">
-                <button type="submit" class="btn btn_b">저장하기</button>
+            <div class="btns_btm">
+                <button type="submit" class="btn btn_b btn_wbb">저장하기</button>
             </div>
         </form>
         @endif

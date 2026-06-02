@@ -8,7 +8,7 @@
 <section class="scon participation_history_wrap" aria-labelledby="participation-history-heading">
 	<div class="inner">
 		<h1 class="sub_title" id="participation-history-heading">{{ $sName }}</h1>
-		
+
 		@include('mypage.mypage_tab')
 
 		<div class="board_top">
@@ -33,8 +33,9 @@
 				</form>
 			</div>
 		</div>
-		
-		<div class="board_list tac">
+
+		<div class="board_list tac tbl_break_list">
+
 			<table>
 				<caption>임상 영양 및 대사 의학 연구회 공지사항 입니다.</caption>
 				<colgroup>
@@ -69,11 +70,11 @@
 						$isCompleted = $row->payment_status === 'completed';
 					@endphp
 					<tr>
-						<td>{{ $row->event?->title ?? '-' }}</td>
-						<td>-</td>
-						<td>{{ number_format((int) $row->total_amount) }}원</td>
-						<td>{{ $methodLabel }}</td>
-						<td>
+						<td class="part_his1">{{ $row->event?->title ?? '-' }}</td>
+						<td class="part_his2">-</td>
+						<td class="part_his3">{{ number_format((int) $row->total_amount) }}원</td>
+						<td class="part_his4">{{ $methodLabel }}</td>
+						<td class="part_his5">
 							@if ($row->registered_at)
 								{{ $row->registered_at->format('Y.m.d') }}
 							@endif
@@ -81,22 +82,22 @@
 								<br/>(결제일: {{ $row->paid_at->format('Y.m.d') }})
 							@endif
 						</td>
-						<td>{{ $statusLabel }}</td>
-						<td>
+						<td class="part_his6">{{ $statusLabel }}</td>
+						<td class="part_his7">
 							@if ($isCompleted)
 								<a href="{{ route('mypage.print_participation', ['registration_id' => $row->id]) }}" class="btn btn_kwk" target="_blank">참가 증명서</a>
 							@else
 								-
 							@endif
 						</td>
-						<td>
+						<td class="part_his8">
 							@if ($isCompleted)
 								<a href="{{ route('mypage.print_receipt_save', ['registration_id' => $row->id]) }}" class="btn btn_kwk" target="_blank">영수증 출력</a>
 							@else
 								-
 							@endif
 						</td>
-						<td>
+						<td class="part_his9">
 							<a href="{{ route('mypage.participation_history_view', ['id' => $row->id]) }}" class="btn btn_kwk">신청 내역 보기</a>
 						</td>
 					</tr>
@@ -121,7 +122,7 @@
 				<li>'미등록' 상태이거나 로그인이 안 될 경우, 사무국으로 문의해 주시기 바랍니다.</li>
 			</ul>
 		</div>
-		
+
 	</div>
 </section>
 

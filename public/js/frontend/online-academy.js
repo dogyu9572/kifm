@@ -38,6 +38,14 @@
         academyTxtSlide.controller.control = academyImgSlide;
     }
 
+    function initPageAlert() {
+        const alertElement = document.querySelector('[data-page-alert]');
+        const message = alertElement?.dataset.pageAlert || '';
+        if (message) {
+            window.alert(message);
+        }
+    }
+
     function initKeywordFilter() {
         const form = document.getElementById('online-academy-filter-form');
         const customBox = document.querySelector('[data-keyword-select]');
@@ -227,6 +235,57 @@
         });
     }
 
+    function formatDurationText(durationSec) {
+        const seconds = Math.max(0, parseInt(durationSec, 10) || 0);
+        const minutes = Math.floor(seconds / 60);
+        const remainSeconds = seconds % 60;
+
+        if (remainSeconds <= 0) {
+            return minutes + '분';
+        }
+
+        return minutes + '분 ' + remainSeconds + '초';
+    }
+
+    function setCourseProgress(progressRate, watchedMin, durationSec) {
+        const progress = Math.max(0, Math.min(100, parseInt(progressRate, 10) || 0));
+        const watched = Math.max(0, parseInt(watchedMin, 10) || 0);
+        const container = document.querySelector('.online_academy_view');
+        const line = document.querySelector('.state_line');
+        const bar = line?.querySelector('.bar');
+        const percentText = line?.querySelector('.percent_val');
+        const watchedText = line?.querySelector('.watched_min');
+        const durationText = line?.querySelector('.duration_text');
+        const testButton = document.querySelector('.btn_test');
+        const buttonArea = document.querySelector('.btn_area');
+        const textBox = document.querySelector('.txtbox');
+
+        if (bar) {
+            bar.style.width = progress + '%';
+            bar.setAttribute('aria-valuenow', String(progress));
+        }
+        if (percentText) {
+            percentText.textContent = progress + '%';
+        }
+        if (watchedText) {
+            watchedText.textContent = watched + '분';
+        }
+        if (durationText && durationSec !== undefined) {
+            durationText.textContent = formatDurationText(durationSec);
+        }
+        if (container) {
+            container.dataset.initialProgress = String(progress);
+        }
+
+        if (progress >= 100) {
+            container?.classList.add('percent100');
+            buttonArea?.classList.add('end');
+            textBox?.removeAttribute('aria-hidden');
+            testButton?.classList.remove('disabled');
+            testButton?.setAttribute('aria-disabled', 'false');
+        }
+    }
+
     function initTestButton() {
         const percentText = document.querySelector('.state_line .left strong');
         const testButton = document.querySelector('.btn_test');
@@ -238,11 +297,7 @@
         }
 
         if (percentText.textContent.replace(/\s/g, '') === '100%') {
-            container.classList.add('percent100');
-            buttonArea.classList.add('end');
-            textBox?.removeAttribute('aria-hidden');
-            testButton.classList.remove('disabled');
-            testButton.setAttribute('aria-disabled', 'false');
+            setCourseProgress(100, document.querySelector('.watched_min')?.textContent.replace(/[^0-9]/g, '') || 0);
         }
 
         testButton.addEventListener('click', function (event) {
@@ -257,21 +312,13 @@
         if (!end) {
             return;
         }
-        const score = parseInt((end.querySelector('.gbox h2')?.textContent || '').replace(/[^0-9]/g, ''), 10);
-        if (score >= 100) {
+        const passed = end.dataset.passed === '1';
+        if (passed) {
             end.classList.add('pass');
             end.closest('.test_page')?.querySelectorAll('.btn_kwg, .btn_wkk').forEach((button) => button.remove());
         } else {
             end.classList.add('fail');
             end.closest('.test_page')?.querySelectorAll('.btn_woo2').forEach((button) => button.remove());
-            const title = end.querySelector('.tit');
-            const message = end.querySelector('.gbox p');
-            if (title) {
-                title.innerHTML = '아쉽지만 <strong class="c_red">불합격</strong> 하셨습니다.';
-            }
-            if (message) {
-                message.textContent = '다시 한번 도전해 보세요!';
-            }
         }
     }
 
@@ -316,6 +363,145 @@
         window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', onScroll);
         onScroll();
+    }
+
+    function loadVimeoSdk() {
+        if (window.Vimeo?.Player) {
+            return Promise.resolve(window.Vimeo);
+        }
+
+        return new Promise((resolve, reject) => {
+            const existingScript = document.querySelector('script[src="https://player.vimeo.com/api/player.js"]');
+            if (existingScript) {
+                existingScript.addEventListener('load', () => resolve(window.Vimeo));
+                existingScript.addEventListener('error', reject);
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://player.vimeo.com/api/player.js';
+            script.async = true;
+            script.onload = function () {
+                if (window.Vimeo?.Player) {
+                    resolve(window.Vimeo);
+                    return;
+                }
+                reject(new Error('Vimeo Player SDK is not available.'));
+            };
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+    }
+
+    function initVimeoProgress() {
+        const container = document.querySelector('.online_academy_view[data-progress-url]');
+        const iframe = container?.querySelector('iframe[data-vimeo-player]');
+        if (!container || !iframe) {
+            return;
+        }
+
+        const progressUrl = container.dataset.progressUrl || '';
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        let lastSavedAt = 0;
+        let lastPayload = null;
+        let isSaving = false;
+
+        function initialPosition() {
+            const position = parseInt(container.dataset.initialPosition || '0', 10) || 0;
+            const progress = parseInt(container.dataset.initialProgress || '0', 10) || 0;
+            return progress < 100 ? position : 0;
+        }
+
+        async function saveProgress(player, ended) {
+            if (!progressUrl || isSaving) {
+                return;
+            }
+
+            isSaving = true;
+            try {
+                const values = await Promise.all([
+                    player.getCurrentTime(),
+                    player.getDuration(),
+                ]);
+                const currentTime = Math.max(0, Number(values[0]) || 0);
+                const duration = Math.max(0, Number(values[1]) || 0);
+                const payload = {
+                    current_time: currentTime,
+                    duration: duration,
+                    ended: Boolean(ended),
+                };
+                const payloadKey = [
+                    Math.floor(payload.current_time),
+                    Math.floor(payload.duration),
+                    payload.ended ? 1 : 0,
+                ].join(':');
+
+                if (!payload.ended && payloadKey === lastPayload) {
+                    return;
+                }
+                lastPayload = payloadKey;
+
+                const response = await fetch(progressUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrf,
+                    },
+                    body: JSON.stringify(payload),
+                });
+                const data = await response.json().catch(() => ({}));
+                if (response.ok && data.success) {
+                    setCourseProgress(data.progress_rate, data.watched_min, data.video_duration_sec);
+                    if (data.last_position_sec !== undefined) {
+                        container.dataset.initialPosition = String(data.last_position_sec);
+                    }
+                    if (data.video_duration_sec !== undefined) {
+                        container.dataset.initialDuration = String(data.video_duration_sec);
+                    }
+                }
+            } catch (error) {
+                // Progress saving is retried by the next player event.
+            } finally {
+                isSaving = false;
+            }
+        }
+
+        loadVimeoSdk()
+            .then((Vimeo) => {
+                const player = new Vimeo.Player(iframe);
+                const resumeAt = initialPosition();
+
+                if (resumeAt > 0) {
+                    player.getDuration()
+                        .then((duration) => {
+                            if (duration && resumeAt < duration - 5) {
+                                return player.setCurrentTime(resumeAt);
+                            }
+                            return null;
+                        })
+                        .catch(() => {});
+                }
+
+                player.on('timeupdate', function (event) {
+                    const now = Date.now();
+                    if (now - lastSavedAt < 10000 && (event.percent || 0) < 0.99) {
+                        return;
+                    }
+                    lastSavedAt = now;
+                    saveProgress(player, false);
+                });
+                player.on('pause', function () {
+                    saveProgress(player, false);
+                });
+                player.on('ended', function () {
+                    saveProgress(player, true);
+                });
+                window.addEventListener('beforeunload', function () {
+                    saveProgress(player, false);
+                });
+            })
+            .catch(() => {});
     }
 
     function initCheckoutForm() {
@@ -561,6 +747,7 @@
     }
 
     function initOnlineAcademy() {
+        initPageAlert();
         initSlides();
         initKeywordFilter();
         initListAnchorFocus();
@@ -569,6 +756,7 @@
         initTestEnd();
         initHistoryBack();
         initPaymentStickyBox();
+        initVimeoProgress();
         initCheckoutForm();
     }
 

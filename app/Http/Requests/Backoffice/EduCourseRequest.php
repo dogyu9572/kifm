@@ -30,6 +30,7 @@ class EduCourseRequest extends FormRequest
             'grade_prices' => $grades,
             'exam_questions' => is_array($this->input('exam_questions')) ? $this->input('exam_questions') : [],
             'link_round_ids' => is_array($this->input('link_round_ids')) ? $this->input('link_round_ids') : [],
+            'duration_sec' => ((int) $this->input('duration_min', 0) * 60) + (int) $this->input('duration_seconds', 0),
         ]);
     }
 
@@ -51,6 +52,8 @@ class EduCourseRequest extends FormRequest
             'lecture_file' => ['nullable', 'file', 'mimes:pdf,ppt,pptx,doc,docx', 'max:51200'],
             'video_url' => ['nullable', 'url', 'max:500'],
             'duration_min' => ['required', 'integer', 'min:0', 'max:10000'],
+            'duration_seconds' => ['required', 'integer', 'min:0', 'max:59'],
+            'duration_sec' => ['required', 'integer', 'min:0', 'max:600000'],
             'completion_score' => ['required', 'integer', 'min:0', 'max:100'],
             'annual_fee_target' => ['required', Rule::in(['all', 'paid'])],
             'free_yn' => ['required', Rule::in(['Y', 'N'])],
@@ -118,4 +121,3 @@ class EduCourseRequest extends FormRequest
         });
     }
 }
-

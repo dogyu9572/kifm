@@ -8,10 +8,10 @@
 <section class="scon overview01" aria-labelledby="overview01-heading">
 	<div class="inner">
 		<h1 class="sub_title" id="overview01-heading">기능의학회</h1>
-		
+
 		<div class="copy_tit">
-			<h2>증상을 넘어 <strong>원인</strong>으로, 질병을 넘어 <strong>사람</strong>으로</h2>
-			<p>대한기능의학회가 현대 의학의 한계를 넘는 새로운 의료의 패러다임을 제시합니다.</p>
+			<h2>증상을 넘어 <strong>원인</strong>으로, <br class="mo_vw">질병을 넘어 <strong>사람</strong>으로</h2>
+			<p>대한기능의학회가 현대 의학의 한계를 넘는 <br class="mo_vw">새로운 의료의 패러다임을 제시합니다.</p>
 		</div>
 		<ul class="box_list">
 			<li class="i1">
@@ -31,8 +31,8 @@
 <section class="scon overview02" aria-labelledby="overview02-heading">
 	<div class="inner">
 		<div class="copy_tit">
-			<h2 id="overview02-heading">우리가 기능의학을 <strong>실천하는 이유</strong></h2>
-			<p>검증된 글로벌 기준 위에 과학적 근거를 더하고, 전국 전문가들과 함께 성장합니다.<br>IFM의 핵심 커리큘럼을 국내 의료 현장에 뿌리내려, 기능의학이 한국 의료의 새로운 표준이 되도록 합니다.</p>
+			<h2 id="overview02-heading">우리가 기능의학을 <br class="mo_vw"><strong>실천하는 이유</strong></h2>
+			<p>검증된 글로벌 기준 위에 과학적 근거를 더하고, <br class="mo_vw">전국 전문가들과 함께 성장합니다.<br>IFM의 핵심 커리큘럼을 국내 의료 현장에 뿌리내려, <br class="mo_vw">기능의학이 한국 의료의 새로운 표준이 되도록 합니다.</p>
 		</div>
 		<ul class="why_list">
 			<li class="i1"><h3>글로벌 표준의 <strong>국산화</strong></h3><p>미국 IFM(The Institute for Functional Medicine)의 <br class="pc_vw">핵심 커리큘럼을 국내 의료 환경에 맞춰 <strong>체계적 보급</strong></p></li>
@@ -46,7 +46,7 @@
 	<div class="inner">
 		<div class="copy_tit">
 			<h2 id="overview03-heading">우리의 주요 활동</h2>
-			<p>글로벌 기준의 교육 보급부터 과학적 연구, 전문가 네트워크 운영까지 <br>기능의학이 한국 의료 현장에 깊이 뿌리내릴 수 있도록 세 가지 핵심 활동을 이어가고 있습니다.</p>
+			<p>글로벌 기준의 교육 보급부터 과학적 연구, <br class="mo_vw">전문가 네트워크 운영까지 <br>기능의학이 한국 의료 현장에 깊이 뿌리내릴 수 있도록 <br class="mo_vw">세 가지 핵심 활동을 이어가고 있습니다.</p>
 		</div>
 		<ul class="act_list">
 			<li>
@@ -77,7 +77,7 @@
 		<div class="end">기능의학회 일동</div>
 	</div>
 </section>
-	
+
 </main>
 
 @endsection

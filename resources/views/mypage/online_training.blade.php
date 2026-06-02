@@ -45,7 +45,7 @@
 			</form>
 		</div>
 
-		<div class="board_list tac">
+		<div class="board_list tac tbl_break_list">
 			<table>
 				<caption>온라인 교육 수강내역입니다.</caption>
 				<colgroup>
@@ -75,22 +75,22 @@
 					@php
 						$isCompleted = $enrollment->enrollment_status === 'completed';
 						$isExpired = $enrollment->enrollment_status === 'expired';
-						$isPaymentCompleted = $enrollment->payment_status === 'completed';
+						$isPaymentCompleted = in_array($enrollment->payment_status, ['completed', 'paid'], true);
 						$statusLabel = $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status;
 						$periodStart = $enrollment->applied_at;
 						$periodEnd = $enrollment->expire_at ?: $enrollment->course?->period_end;
 					@endphp
 					<tr>
-						<td>{{ $enrollment->course?->title ?? '-' }}</td>
-						<td>-</td>
-						<td>
+						<td class="online1">{{ $enrollment->course?->title ?? '-' }}</td>
+						<td class="online2">-</td>
+						<td class="online3">
 							@if ($periodStart || $periodEnd)
 							{{ optional($periodStart)->format('Y.m.d') ?: '-' }} ~ {{ optional($periodEnd)->format('Y.m.d') ?: '-' }}
 							@else
 							-
 							@endif
 						</td>
-						<td>
+						<td class="online4">
 							@if ($isExpired)
 							<span class="c_red">{{ $statusLabel }}</span>
 							@else
@@ -100,28 +100,28 @@
 							<br/>({{ $paymentStatusLabels[$enrollment->payment_status] }})
 							@endif
 						</td>
-						<td>
+						<td class="online5">
 							@if ($isCompleted)
 							<a href="{{ route('mypage.print_completion', ['enrollment_id' => $enrollment->id]) }}" class="btn btn_kwk" target="_blank">이수증</a>
 							@else
 							-
 							@endif
 						</td>
-						<td>
+						<td class="online6">
 							@if ($isPaymentCompleted)
 							<a href="{{ route('mypage.print_receipt_save', ['enrollment_id' => $enrollment->id]) }}" class="btn btn_kwk" target="_blank">영수증 출력</a>
 							@else
 							-
 							@endif
 						</td>
-						<td>
+						<td class="online7">
 							@if ($enrollment->course)
 							<a href="{{ route('online_academy.show', $enrollment->course) }}" class="btn btn_kwk">강의보기</a>
 							@else
 							-
 							@endif
 						</td>
-						<td><a href="{{ route('mypage.online_training_view', ['id' => $enrollment->id]) }}" class="btn btn_kwk">신청 내역 보기</a></td>
+						<td class="online8"><a href="{{ route('mypage.online_training_view', ['id' => $enrollment->id]) }}" class="btn btn_kwk">신청 내역 보기</a></td>
 					</tr>
 					@empty
 					<tr class="empty">
