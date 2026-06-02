@@ -36,43 +36,43 @@
 		</div>
     </div>
 	<!-- 인정의 수강 -->
-    <!-- <div class="glbox participation_area participation_course" data-progress-percent="{{ $cert['progress_percent'] }}">
+    <div class="glbox participation_area participation_course" data-progress-percent="{{ $cert['progress_percent'] }}">
         <div class="info">
             <div class="l" id="participation-label">인증의 취득 요건 현황 <p>인증의 취득을 위해 아래 조건을 충족해주세요</p></div>
         </div>
         <div class="slice_half">
-			<div class="box flex_center">
-				<div class="tt">정기 연수강좌(2회)</div>
-				<div class="flex">
-					<a href="#this" class="btn btn_wbb">짝수년</a>
-					<a href="#this" class="btn btn_ggg">홀수년</a>
-				</div>
-			</div>
-			<div class="box flex_center">
-				<div class="tt">동계 연수강좌(1회)</div>
-				<div class="flex">
-					<a href="#this" class="btn btn_wrr w100p">강좌 미수료</a>
-				</div>
-			</div>
-		</div>
-    </div> -->
+    			<div class="box flex_center">
+    				<div class="tt">정기 연수강좌(2회)</div>
+    				<div class="flex">
+    					<a href="#this" class="btn btn_wbb">짝수년</a>
+    					<a href="#this" class="btn btn_ggg">홀수년</a>
+    				</div>
+    			</div>
+    			<div class="box flex_center">
+    				<div class="tt">동계 연수강좌(1회)</div>
+    				<div class="flex">
+    					<a href="#this" class="btn btn_wrr w100p">강좌 미수료</a>
+    				</div>
+    			</div>
+    		</div>
+    </div>
 	<!-- 인정의 유지 -->
-    <!-- <div class="glbox participation_area" data-progress-percent="{{ $cert['progress_percent'] }}">
+    <div class="glbox participation_area" data-progress-percent="{{ $cert['progress_percent'] }}">
         <div class="info">
             <div class="l gap0" id="participation-label">자격 유효기간 <span class="day">(2026.04 - 2031.03)</span><p>인증의 갱신을 위해 아래 조건을 충족해주세요</p></div>
             <div class="r d_day btn_wbb">D-1240</div>
         </div>
         <div class="slice_half ptb6">
-			<div class="box">
-				<div class="tt mb0">학술 행사 참여 <div class="count"><strong class="c_iden">2</strong>/4회</div></div>
-				<div class="state_line blue_line"><div class="bar"></div></div>
-			</div>
-			<div class="box">
-				<div class="tt mb0">동계 연수강좌 <div class="count"><strong class="c_iden">1</strong>/3차시</div></div>
-				<div class="state_line red_line"><div class="bar"></div></div>
-			</div>
-		</div>
-    </div> -->
+    			<div class="box">
+    				<div class="tt mb0">학술 행사 참여 <div class="count"><strong class="c_iden">2</strong>/4회</div></div>
+    				<div class="state_line blue_line"><div class="bar"></div></div>
+    			</div>
+    			<div class="box">
+    				<div class="tt mb0">동계 연수강좌 <div class="count"><strong class="c_iden">1</strong>/3차시</div></div>
+    				<div class="state_line red_line"><div class="bar"></div></div>
+    			</div>
+    		</div>
+    </div>
 
     <ul class="gbox state_tri">
         <li class="i1">

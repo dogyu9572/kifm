@@ -63,6 +63,7 @@ class MypageLocalDoctorService
                 'inactive' => '미운영',
             ],
             'photo_url' => $doctor ? $this->publicLocalDoctorService->photoUrl($doctor) : asset('images/img_sample_profile_human.jpg'),
+            'introduction_text' => $this->plainText($doctor?->introduction),
         ];
     }
 
@@ -79,7 +80,7 @@ class MypageLocalDoctorService
         $doctor = DB::transaction(function () use ($request, $validated, $doctor): LocalDoctor {
             $doctor->doctor_name = (string) $validated['doctor_name'];
             $doctor->license_no = (string) $validated['license_no'];
-            $doctor->introduction = $validated['introduction'] ?? null;
+            $doctor->introduction = $this->plainText($validated['introduction'] ?? null);
             $doctor->hospital_name = (string) $validated['hospital_name'];
             $sidoRaw = trim((string) ($validated['sido'] ?? ''));
             $norm = LocalDoctorRegionNormalizer::normalizeSido($sidoRaw);
@@ -97,8 +98,6 @@ class MypageLocalDoctorService
 
             if ($request->hasFile('photo')) {
                 $this->replacePhoto($doctor, $request->file('photo'));
-            } elseif ($request->boolean('delete_photo')) {
-                $this->deletePhoto($doctor);
             }
 
             $doctor->save();
@@ -120,16 +119,19 @@ class MypageLocalDoctorService
         $doctor->photo_path = $file->store('local_doctors/photos', 'public');
     }
 
-    protected function deletePhoto(LocalDoctor $doctor): void
-    {
-        $this->deleteStoredPhoto($doctor->photo_path);
-        $doctor->photo_path = null;
-    }
-
     protected function deleteStoredPhoto(?string $path): void
     {
         if ($path && ! str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
+    }
+
+    private function plainText(?string $value): ?string
+    {
+        $decoded = html_entity_decode((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim(strip_tags($decoded));
+        $text = preg_replace("/[ \t]+/", ' ', $text) ?? $text;
+
+        return $text !== '' ? $text : null;
     }
 }

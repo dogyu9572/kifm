@@ -5,6 +5,7 @@ namespace App\Services\Frontend;
 use App\Models\AcademicEvent;
 use App\Models\Banner;
 use App\Models\CertifiedMember;
+use App\Models\CommunityCommitteeMember;
 use App\Models\EduTrainingRound;
 use App\Models\MemberExecutive;
 use App\Models\Popup;
@@ -42,6 +43,7 @@ class FrontendHomeService
             'eventScheduleItems' => $this->eventScheduleItems(),
             'calendarSchedules' => $this->calendarSchedules(),
             'memberCard' => $this->memberCard($user),
+            'showCommitteeJoinPopup' => $this->shouldShowCommitteeJoinPopup($user),
         ];
     }
 
@@ -223,7 +225,7 @@ class FrontendHomeService
 
     private function memberCard(?User $user): array
     {
-        if ($user === null) {
+        if ($user === null || $user->role !== 'user') {
             return ['is_logged_in' => false];
         }
 
@@ -252,6 +254,25 @@ class FrontendHomeService
                 ? $this->periodText($certifiedMember->validity_start_date, $certifiedMember->validity_end_date)
                 : null,
         ];
+    }
+
+    private function shouldShowCommitteeJoinPopup(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        if ($user->role !== 'user') {
+            return false;
+        }
+
+        if ($user->communityCommitteeAccessIdStrings() !== []) {
+            return false;
+        }
+
+        return ! CommunityCommitteeMember::query()
+            ->where('user_id', $user->id)
+            ->exists();
     }
 
     private function hasActiveExecutiveRole(User $user): bool

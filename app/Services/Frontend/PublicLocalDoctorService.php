@@ -90,7 +90,7 @@ class PublicLocalDoctorService
             'phone_href' => $this->phoneHref($doctor->phone),
             'homepage' => $doctor->homepage,
             'photo_url' => $this->photoUrl($doctor),
-            'introduction_html' => $doctor->introduction ?? '',
+            'introduction_html' => $this->introductionText($doctor->introduction),
             'map' => [
                 'lat' => $doctor->map_lat,
                 'lng' => $doctor->map_lng,
@@ -222,5 +222,13 @@ class PublicLocalDoctorService
         $digits = preg_replace('/\D+/', '', (string) $phone);
 
         return $digits !== '' ? 'tel:' . $digits : '#';
+    }
+
+    private function introductionText(?string $introduction): string
+    {
+        $decoded = html_entity_decode((string) $introduction, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim(strip_tags($decoded));
+
+        return preg_replace("/[ \t]+/", ' ', $text) ?? $text;
     }
 }

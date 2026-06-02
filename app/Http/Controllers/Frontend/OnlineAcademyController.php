@@ -357,9 +357,12 @@ class OnlineAcademyController extends Controller
             return redirect()->route('member.login');
         }
 
+        $this->normalizePaymentMethod($request);
+
         $validated = $request->validate([
             'course_id' => ['required', 'integer', 'exists:edu_courses,id'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
+            'payment_method_display' => ['nullable', 'in:card,bank'],
             'payment_method' => ['required', 'in:card,bank_transfer'],
             'bank_depositor' => ['required_if:payment_method,bank_transfer', 'nullable', 'string', 'max:100'],
             'bank_deposit_date' => ['required_if:payment_method,bank_transfer', 'nullable', 'date'],
@@ -507,6 +510,19 @@ class OnlineAcademyController extends Controller
     {
         return (string) config('services.toss.client_key') !== ''
             && (string) config('services.toss.secret_key') !== '';
+    }
+
+    private function normalizePaymentMethod(Request $request): void
+    {
+        $displayMethod = (string) $request->input('payment_method_display', '');
+        if ($displayMethod === 'card') {
+            $request->merge(['payment_method' => 'card']);
+            return;
+        }
+
+        if ($displayMethod === 'bank') {
+            $request->merge(['payment_method' => 'bank_transfer']);
+        }
     }
 
     private function tossPaymentPayload(\App\Models\EduCourseEnrollment $enrollment): array

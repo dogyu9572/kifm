@@ -278,7 +278,7 @@
 </div>
 
 <!-- 로그인시 팝업 - 위원회 미가입 -->
-@if(auth()->user()?->role === 'user')
+@if($showCommitteeJoinPopup ?? false)
 <div class="popup popup_login_start" data-main-auto-open hidden>
 	<div class="dm"></div>
 	<div class="inbox">
@@ -288,6 +288,7 @@
 			<a href="{{ route('subcommittee.index') }}" class="btn btn_sanha_link">산하위원회 가기</a>
 		</div>
 		<div class="btns_btm mt0">
+			<button type="button" class="btn btn_kwg btn_close_btm" data-main-popup-hide-today>오늘 하루 보지 않기</button>
 			<button type="button" class="btn btn_wkk btn_close_btm">닫기</button>
 		</div>
 	</div>

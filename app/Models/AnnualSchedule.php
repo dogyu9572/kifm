@@ -11,10 +11,12 @@ class AnnualSchedule extends Model
 
     protected $fillable = [
         'title',
+        'schedule_type',
         'start_date',
         'end_date',
         'is_single_day',
         'content',
+        'link_url',
         'is_visible',
     ];
 

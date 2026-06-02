@@ -71,7 +71,7 @@
 				@forelse ($conferences as $conference)
 					@php $status = $publicAcademicEvent->status($conference); @endphp
 					<li class="{{ $status['class'] }}">
-						<a href="{{ $publicAcademicEvent->eventUrl($conference) }}">
+						<a href="{{ $publicAcademicEvent->eventUrl($conference) }}" @if($status['code'] === 'closed') data-closed-conference @endif>
 							<span class="states_area flex">
 								<span class="state {{ $status['class'] }}"><span class="sound_only">상태:</span>{{ $status['label'] }}</span>
 							</span>

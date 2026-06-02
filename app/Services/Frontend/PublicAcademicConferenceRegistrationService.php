@@ -167,6 +167,68 @@ class PublicAcademicConferenceRegistrationService
         $registration->update(['payment_status' => 'cancel_requested']);
     }
 
+    public function cancelRegistration(AcademicEventRegistration $registration): string
+    {
+        if (in_array($registration->payment_status, ['cancel_requested', 'cancelled'], true)) {
+            return '이미 취소 요청 또는 취소 완료된 등록입니다.';
+        }
+
+        if ($registration->payment_method === 'card' && $registration->payment_status === 'completed') {
+            $this->cancelTossCardPayment($registration);
+
+            return '취소되었습니다.';
+        }
+
+        $this->markCancelRequested($registration);
+
+        return '등록 취소 요청이 접수되었습니다.';
+    }
+
+    public function cancelTossCardPayment(AcademicEventRegistration $registration): void
+    {
+        if ($registration->payment_method !== 'card' || $registration->payment_status !== 'completed') {
+            throw new RuntimeException('취소할 수 있는 카드 결제 완료 내역이 아닙니다.');
+        }
+
+        $secretKey = (string) config('services.toss.secret_key');
+        if ($secretKey === '') {
+            throw new RuntimeException('토스페이먼츠 시크릿 키가 설정되어 있지 않습니다.');
+        }
+
+        $source = $registration->source_row_json ?? [];
+        $paymentKey = (string) data_get($source, 'toss_payment.paymentKey', data_get($source, 'toss_payment_key', ''));
+        if ($paymentKey === '') {
+            throw new RuntimeException('토스 결제키가 없어 즉시 취소할 수 없습니다.');
+        }
+
+        $response = Http::withBasicAuth($secretKey, '')
+            ->withHeaders(['Idempotency-Key' => 'academic-registration-cancel-' . $registration->id])
+            ->acceptJson()
+            ->post('https://api.tosspayments.com/v1/payments/' . rawurlencode($paymentKey) . '/cancel', [
+                'cancelReason' => '고객 요청으로 결제 취소',
+            ]);
+
+        $payload = $response->json();
+        if (! $response->successful()) {
+            throw new RuntimeException((string) ($payload['message'] ?? '토스페이먼츠 결제 취소에 실패했습니다.'));
+        }
+
+        if (! empty($source['coupon_code']) && ! empty($source['coupon_usage_counted']) && empty($source['coupon_cancel_counted'])) {
+            Coupon::query()
+                ->where('coupon_code', (string) $source['coupon_code'])
+                ->where('usage_count', '>', 0)
+                ->decrement('usage_count');
+            $source['coupon_cancel_counted'] = true;
+        }
+        $source['toss_cancel_payment'] = $payload;
+
+        $registration->update([
+            'payment_status' => 'cancelled',
+            'cancelled_at' => now(),
+            'source_row_json' => $source,
+        ]);
+    }
+
     public function registrationSummary(AcademicEventRegistration $registration): array
     {
         $subtotal = (int) ($registration->source_row_json['subtotal_amount'] ?? $registration->items->sum('price'));

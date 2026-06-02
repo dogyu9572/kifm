@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EduTraining;
 use App\Models\EduTrainingAttachment;
 use App\Services\Frontend\PublicAcademicEventService;
+use App\Services\Frontend\PublicBoardService;
 use App\Services\Frontend\PublicTrainingCourseService;
 use App\Support\BackofficeFile;
 use Illuminate\Http\JsonResponse;
@@ -23,6 +24,7 @@ class AcademicEventController extends Controller
     public function __construct(
         private readonly PublicAcademicEventService $academicEventService,
         private readonly PublicTrainingCourseService $trainingCourseService,
+        private readonly PublicBoardService $publicBoardService,
     ) {}
 	
 	public function annualSchedule(): View
@@ -34,10 +36,25 @@ class AcademicEventController extends Controller
         $sName = 'KIFM 연간일정';
         $geName = 'Academic Event';
         $gSlug = 'annual_schedule';
-        return view('academic_event.annual_schedule', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        $annualSchedules = $this->academicEventService->annualCalendarSchedules();
+        $initialYear = (int) now()->format('Y');
+        $initialMonth = (int) now()->format('n');
+
+        return view('academic_event.annual_schedule', compact(
+            'page_type',
+            'gNum',
+            'sNum',
+            'gName',
+            'sName',
+            'geName',
+            'gSlug',
+            'annualSchedules',
+            'initialYear',
+            'initialMonth',
+        ));
     }
 	
-	public function academicHistory(): View
+	public function academicHistory(Request $request): View
     {
         $page_type = 'professional';
         $gNum = '02';
@@ -46,7 +63,13 @@ class AcademicEventController extends Controller
         $sName = '학술대회 연혁';
         $geName = 'Academic Event';
         $gSlug = 'academic_history';
-        return view('academic_event.academic_history', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        $histories = $this->publicBoardService->listAcademicConferenceHistory($request);
+        $filters = [
+            'search_type' => (string) $request->query('search_type', 'all'),
+            'keyword' => trim((string) $request->query('keyword', '')),
+        ];
+
+        return view('academic_event.academic_history', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug', 'histories', 'filters'));
     }
 
     public function conference(Request $request): View

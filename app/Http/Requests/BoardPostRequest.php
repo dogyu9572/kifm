@@ -61,9 +61,17 @@ class BoardPostRequest extends FormRequest
             ]));
         }
 
+        $contentRules = ['required', 'string'];
+        if ($board) {
+            $contentRules = array_values(array_filter([
+                $board->isFieldEnabled('content') && $board->isFieldRequired('content') ? 'required' : 'nullable',
+                'string',
+            ]));
+        }
+
         $rules = [
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => $contentRules,
             'category' => $categoryRules,
             'is_notice' => 'nullable|boolean',
             'is_secret' => 'nullable|boolean',
@@ -147,6 +155,10 @@ class BoardPostRequest extends FormRequest
             // URL 필드
             if ($fieldConfig['type'] === 'url') {
                 $fieldRules[] = 'url';
+            }
+
+            if ($fieldConfig['type'] === 'date') {
+                $fieldRules[] = 'date';
             }
             
             // 파일 필드

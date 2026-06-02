@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 
 class PublicBoardService
 {
@@ -172,9 +173,90 @@ class PublicBoardService
         ]);
     }
 
+    public function listAcademicConferenceHistory(Request $request, int $perPage = 10): LengthAwarePaginator
+    {
+        $slug = 'academic_conference_history';
+        $table = $this->table($slug);
+
+        if (! Schema::hasTable($table)) {
+            return new LengthAwarePaginator([], 0, $perPage, 1, [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]);
+        }
+
+        $query = DB::table($table)
+            ->whereNull('deleted_at')
+            ->where('is_active', true)
+            ->where('is_secret', false);
+
+        $this->applyKeywordFilter($query, $request);
+
+        return $query
+            ->orderByDesc('sort_order')
+            ->orderByRaw("COALESCE(JSON_UNQUOTE(JSON_EXTRACT(custom_fields, '$.\"event_start_date\"')), '') DESC")
+            ->orderByDesc('created_at')
+            ->paginate($perPage)
+            ->withQueryString();
+    }
+
+    public function academicConferenceHistoryPeriod(object $post): string
+    {
+        $customFields = $this->decodeJsonObject($post->custom_fields ?? null);
+        $startDate = trim((string) ($customFields['event_start_date'] ?? ''));
+        $endDate = trim((string) ($customFields['event_end_date'] ?? ''));
+
+        if ($startDate !== '' && $endDate !== '') {
+            return $startDate.' ~ '.$endDate;
+        }
+
+        return $startDate !== '' ? $startDate : $endDate;
+    }
+
+    public function firstAttachmentUrl(?string $attachments): ?string
+    {
+        $attachment = $this->firstAttachment($attachments);
+        $path = trim((string) ($attachment['path'] ?? ''));
+        if ($path === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http')) {
+            return $path;
+        }
+
+        return Storage::disk('public')->url($path);
+    }
+
+    public function firstAttachmentName(?string $attachments): string
+    {
+        $attachment = $this->firstAttachment($attachments);
+
+        return trim((string) ($attachment['name'] ?? '자료집'));
+    }
+
     private function table(string $slug): string
     {
         return 'board_'.$slug;
+    }
+
+    private function decodeJsonObject(mixed $value): array
+    {
+        if (! is_string($value) || $value === '') {
+            return [];
+        }
+
+        $decoded = json_decode($value, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    private function firstAttachment(?string $attachments): array
+    {
+        $decoded = $this->decodeJsonObject($attachments);
+        $first = $decoded[0] ?? [];
+
+        return is_array($first) ? $first : [];
     }
 
     /**

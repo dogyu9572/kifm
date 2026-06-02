@@ -106,11 +106,27 @@ class MemberController extends Controller
 
     public function logout(Request $request): RedirectResponse
     {
+        $redirectUrl = $this->logoutRedirectUrl($request);
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect()->to($redirectUrl)->with('alert', '로그아웃 되었습니다.');
+    }
+
+    private function logoutRedirectUrl(Request $request): string
+    {
+        $fallback = route('home');
+        $previous = (string) ($request->headers->get('referer') ?: url()->previous());
+
+        if ($previous === '' || ! $this->isSafeIntendedUrl($previous)) {
+            return $fallback;
+        }
+
+        $path = (string) parse_url($previous, PHP_URL_PATH);
+
+        return str_starts_with($path, '/academic_conference') ? $previous : $fallback;
     }
 
     public function dormantAuth(): View

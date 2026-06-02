@@ -127,7 +127,9 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect()
+            ->route('home')
+            ->with('alert', "회원 탈퇴가 완료되었습니다.\n이용해 주셔서 감사합니다.");
     }
 
     public function hospitalInformation(): View

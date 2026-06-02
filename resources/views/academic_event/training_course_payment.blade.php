@@ -116,7 +116,7 @@
                             <ul class="long_label">
                                 <li>
                                     <label>입금하실 계좌번호</label>
-                                    <div class="text flex">
+                                    <div class="text flex bank_number">
                                         <span><strong>국민은행</strong><p>287937-00-000083</p></span>
                                         <span><strong>예금주</strong><p>대한기능의학회</p></span>
                                     </div>

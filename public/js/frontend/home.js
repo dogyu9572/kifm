@@ -314,6 +314,23 @@
     }
 
     function initPopups() {
+        var mainCommitteePopupCookie = 'main_committee_join_popup_hide';
+
+        function getCookie(name) {
+            var value = '; ' + document.cookie;
+            var parts = value.split('; ' + name + '=');
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+            return '';
+        }
+
+        function setTodayCookie(name) {
+            var expires = new Date();
+            expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
+            document.cookie = name + '=1; expires=' + expires.toUTCString() + '; path=/; SameSite=Lax';
+        }
+
         $('[data-main-normal-popup]').each(function () {
             var popup = $(this);
             var features = [
@@ -346,7 +363,14 @@
         });
 
         $('[data-main-auto-open]').each(function () {
+            if (getCookie(mainCommitteePopupCookie) === '1') {
+                return;
+            }
             $(this).removeAttr('hidden').fadeIn(200);
+        });
+
+        $(document).on('click', '[data-main-popup-hide-today]', function () {
+            setTodayCookie(mainCommitteePopupCookie);
         });
 
         $(document).on('click', '.calendar_event_popup .btn_close_btm, .calendar_event_popup .dm, .popup_login_start .btn_close_btm, .popup_login_start .dm', function () {

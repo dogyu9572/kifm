@@ -127,6 +127,7 @@ class AcademicConferenceSiteController extends Controller
         $abstractSubmission = null;
         $abstractSummary = null;
         $memberAbstracts = collect();
+        $hasMemberAbstractSubmission = false;
         if ($normalizedPagePath === 'notice') {
             $notices = $this->conferenceService->notices($event, $request);
         }
@@ -152,6 +153,7 @@ class AcademicConferenceSiteController extends Controller
             $memberAbstracts = $currentMember
                 ? $this->abstractService->memberAbstracts($event, $currentMember)
                 : collect();
+            $hasMemberAbstractSubmission = $memberAbstracts->isNotEmpty();
         }
 
         return view($view, compact(
@@ -172,6 +174,7 @@ class AcademicConferenceSiteController extends Controller
             'abstractSubmission',
             'abstractSummary',
             'memberAbstracts',
+            'hasMemberAbstractSubmission',
             'page_type',
             'gNum',
             'sNum',
@@ -535,10 +538,15 @@ class AcademicConferenceSiteController extends Controller
             (int) session('academic_conference_registration_lookup_id')
         ), 403);
 
-        $this->registrationService->markCancelRequested($registration);
+        try {
+            $message = $this->registrationService->cancelRegistration($registration);
+        } catch (RuntimeException $e) {
+            return redirect()->to($this->conferenceService->baseUrl($event) . '/registration/result')
+                ->with('alert', $e->getMessage());
+        }
 
         return redirect()->to($this->conferenceService->baseUrl($event) . '/registration/result')
-            ->with('success', '등록 취소 요청이 접수되었습니다.');
+            ->with('success', $message);
     }
 
     public function printParticipation(string $folderName, AcademicEventRegistration $registration): View

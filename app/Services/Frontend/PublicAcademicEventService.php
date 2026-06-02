@@ -3,6 +3,7 @@
 namespace App\Services\Frontend;
 
 use App\Models\AcademicEvent;
+use App\Models\AnnualSchedule;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -41,6 +42,10 @@ class PublicAcademicEventService
         $this->applyFilters($query, $request);
 
         return $query
+            ->orderByRaw(
+                'CASE WHEN pre_reg_start IS NOT NULL AND pre_reg_end IS NOT NULL AND DATE(pre_reg_start) <= ? AND DATE(pre_reg_end) >= ? THEN 0 ELSE 1 END',
+                [Carbon::today()->toDateString(), Carbon::today()->toDateString()]
+            )
             ->orderByDesc('start_at')
             ->orderByDesc('id')
             ->paginate($perPage)
@@ -58,6 +63,42 @@ class PublicAcademicEventService
             ->orderByDesc('year')
             ->pluck('year')
             ->map(static fn ($year): int => (int) $year)
+            ->all();
+    }
+
+    /**
+     * @return list<array{start: string, end: string, class: string, type: string, title: string, url: string|null}>
+     */
+    public function annualCalendarSchedules(): array
+    {
+        return AnnualSchedule::query()
+            ->where('is_visible', true)
+            ->orderBy('start_date')
+            ->orderBy('id')
+            ->get()
+            ->map(function (AnnualSchedule $schedule): array {
+                $start = $schedule->start_date instanceof Carbon
+                    ? $schedule->start_date
+                    : Carbon::parse($schedule->start_date);
+                $end = $schedule->end_date instanceof Carbon
+                    ? $schedule->end_date
+                    : Carbon::parse($schedule->end_date ?: $schedule->start_date);
+                $title = trim((string) $schedule->title);
+                $type = (string) ($schedule->schedule_type ?? '');
+                if (! in_array($type, ['academic_conference', 'training_course'], true)) {
+                    $type = $this->annualScheduleTypeFromTitle($title);
+                }
+
+                return [
+                    'start' => $start->toDateString(),
+                    'end' => $end->toDateString(),
+                    'class' => $type === 'training_course' ? 'c2' : 'c1',
+                    'type' => $type,
+                    'title' => $title,
+                    'url' => $schedule->link_url ?: null,
+                ];
+            })
+            ->values()
             ->all();
     }
 
@@ -190,5 +231,10 @@ class PublicAcademicEventService
         $weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
         return $date->format('Y년 n월 j일') . ' (' . $weekdays[(int) $date->dayOfWeek] . ')';
+    }
+
+    private function annualScheduleTypeFromTitle(string $title): string
+    {
+        return preg_match('/(연수|강좌|교육)/u', $title) === 1 ? 'training_course' : 'academic_conference';
     }
 }

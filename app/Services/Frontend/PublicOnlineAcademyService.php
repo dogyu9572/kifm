@@ -706,7 +706,9 @@ class PublicOnlineAcademyService
                 return;
             }
             if ($field === 'topic_detail') {
-                $q->where('topic_detail', 'like', $like)->orWhere('topics', 'like', $like);
+                $q->where('topic_detail', 'like', $like)
+                    ->orWhere('topics', 'like', $like)
+                    ->orWhere('content', 'like', $like);
                 return;
             }
             if ($field === 'professor_name') {
@@ -718,6 +720,7 @@ class PublicOnlineAcademyService
             $q->where('title', 'like', $like)
                 ->orWhere('topic_detail', 'like', $like)
                 ->orWhere('topics', 'like', $like)
+                ->orWhere('content', 'like', $like)
                 ->orWhere('keywords', 'like', $like)
                 ->orWhere('professor_name', 'like', $like)
                 ->orWhereHas('professorMember', fn (Builder $memberQ) => $memberQ->where('name', 'like', $like));

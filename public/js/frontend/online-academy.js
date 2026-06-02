@@ -624,19 +624,25 @@
             return form.querySelector('input[name="payment_method_display"]:checked')?.value || 'card';
         }
 
+        function syncPaymentMethod() {
+            const method = selectedPaymentMethod() === 'bank' ? 'bank_transfer' : 'card';
+            if (paymentMethodInput) {
+                paymentMethodInput.value = method;
+            }
+
+            return method;
+        }
+
         function toggleReceiptArea() {
             const isReceipt = form.querySelector('input[name="receipt_issue"]:checked')?.value === 'YES';
-            const isBank = selectedPaymentMethod() === 'bank';
+            const isBank = syncPaymentMethod() === 'bank_transfer';
             if (cashReceiptArea) {
                 cashReceiptArea.style.display = isBank && isReceipt ? 'block' : 'none';
             }
         }
 
         function togglePaymentMethod() {
-            const isBank = selectedPaymentMethod() === 'bank';
-            if (paymentMethodInput) {
-                paymentMethodInput.value = isBank ? 'bank_transfer' : 'card';
-            }
+            const isBank = syncPaymentMethod() === 'bank_transfer';
             bankElements.forEach((element) => {
                 element.style.display = isBank ? 'block' : 'none';
             });
@@ -675,6 +681,7 @@
         }
 
         async function requestTossPayment() {
+            syncPaymentMethod();
             const response = await fetch(form.action, {
                 method: 'POST',
                 headers: {
@@ -724,7 +731,7 @@
         paymentRadios.forEach((input) => input.addEventListener('change', togglePaymentMethod));
         receiptRadios.forEach((input) => input.addEventListener('change', toggleReceiptArea));
         form.addEventListener('submit', async function (event) {
-            if (selectedPaymentMethod() === 'bank' || currentTotal() <= 0) {
+            if (syncPaymentMethod() === 'bank_transfer' || currentTotal() <= 0) {
                 return;
             }
 

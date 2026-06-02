@@ -55,8 +55,8 @@
                                 <label for="executive_access" class="filter-label">임원공개여부</label>
                                 <select id="executive_access" name="executive_access" class="filter-select">
                                     <option value="">전체</option>
-                                    <option value="all" @selected(request('executive_access') === 'all')>전체공개</option>
-                                    <option value="executive" @selected(request('executive_access') === 'executive')>임원</option>
+                                    <option value="all" @selected(request('executive_access') === 'all')>공개</option>
+                                    <option value="executive" @selected(request('executive_access') === 'executive')>비공개</option>
                                 </select>
                             </div>
                         </div>
@@ -159,8 +159,8 @@
                                     $memberType = is_array($memberTypeValue) ? implode(', ', $memberTypeValue) : ($memberTypeValue ?: '-');
                                     $executiveValue = $customFields['is_executive_public'] ?? ($customFields['executive_access'] ?? null);
                                     $executiveAccess = match($executiveValue) {
-                                        'all' => '전체공개',
-                                        'executive' => '임원',
+                                        'all' => '공개',
+                                        'executive' => '비공개',
                                         default => '-',
                                     };
                                 @endphp

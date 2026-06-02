@@ -67,7 +67,7 @@
 	</div>
 	<div class="foot">
 		<div class="date">{{ now()->format('Y년 m월 d일') }}</div>
-		<div class="copy">대한기능의학회(KIFM) <img src="/images/img_stamp.png" alt=""></div>
+		<div class="copy">대한기능의학회(KIFM)<!--  <img src="/images/img_stamp.png" alt=""> --></div>
 	</div>
 </section>
 </main>

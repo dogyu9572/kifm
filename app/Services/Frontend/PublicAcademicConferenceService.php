@@ -50,7 +50,10 @@ class PublicAcademicConferenceService
         abort_unless(array_key_exists($path, $pages), 404);
 
         $page = $pages[$path];
-        $view = 'academic_conference.' . $event->folder_name . '.' . $page['view'];
+        $eventView = 'academic_conference.' . $event->folder_name . '.' . $page['view'];
+        $defaultView = 'academic_conference.default.' . $page['view'];
+        $view = View::exists($eventView) ? $eventView : $defaultView;
+
         abort_unless(View::exists($view), 404);
 
         return array_merge($page, ['view' => $view]);

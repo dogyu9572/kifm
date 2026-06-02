@@ -5,14 +5,21 @@
 @section('content')
 <main class="sub_area">
 
-<section class="scon annual_schedule_wrap" aria-labelledby="conference-heading">
+<section
+	class="scon annual_schedule_wrap"
+	aria-labelledby="conference-heading"
+	data-annual-schedule
+	data-annual-schedules='@json($annualSchedules ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'
+	data-initial-year="{{ $initialYear ?? now()->year }}"
+	data-initial-month="{{ $initialMonth ?? now()->month }}"
+>
 	<div class="inner">
 		<h1 class="sub_title" id="conference-heading">{{ $sName }}</h1>
 
 		<div class="schedule_wrap">
 			<div class="schedule_top">
 				<div class="years">
-					<strong>2026</strong>
+					<strong>{{ $initialYear ?? now()->year }}</strong>
 					<button type="button" class="btn prev">이전</button>
 					<button type="button" class="btn next">다음</button>
 				</div>
@@ -31,8 +38,18 @@
 					<button type="button">12월</button>
 				</div>
 				<div class="tag">
-					<span class="c1">학술대회</span>
-					<span class="c2">연수강좌</span>
+					<label>
+						<input type="radio" name="annual_schedule_type" value="all" checked>
+						<span>전체</span>
+					</label>
+					<label>
+						<input type="radio" name="annual_schedule_type" value="academic_conference">
+						<span class="c1">학술대회</span>
+					</label>
+					<label>
+						<input type="radio" name="annual_schedule_type" value="training_course">
+						<span class="c2">연수강좌</span>
+					</label>
 				</div>
 			</div>
 		</div>
@@ -69,250 +86,5 @@
 @endsection
 
 @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const scheduleData = {
-        "2026": {
-            "04": [
-                { start: "2026-04-06", end: "2026-04-06", class: "c1", title: "학술대회 2차" },
-                { start: "2026-04-08", end: "2026-04-08", class: "c1", title: "학술대회 2차" },
-                { start: "2026-04-13", end: "2026-04-13", class: "c1", title: "학술대회 2차" },
-                { start: "2026-04-15", end: "2026-04-16", class: "c2", title: "심화 연수강좌 2차" },
-                { start: "2026-04-16", end: "2026-04-21", class: "c1", title: "주를 넘어가는 연속 일정" },
-                { start: "2026-04-20", end: "2026-04-20", class: "c1", title: "학술대회 2차" },
-                { start: "2026-04-22", end: "2026-04-22", class: "c1", title: "학술대회 2차" },
-                { start: "2026-04-27", end: "2026-04-27", class: "c1", title: "학술대회 2차" },
-                { start: "2026-04-29", end: "2026-04-30", class: "c2", title: "심화 연수강좌 2차" },
-                { start: "2026-04-29", end: "2026-04-30", class: "c2", title: "심화 연수강좌 2차3" },
-            ],
-            "05": [
-                { start: "2026-05-01", end: "2026-05-01", class: "c1", title: "학술대회 샘플" },
-                { start: "2026-05-15", end: "2026-05-15", class: "c2", title: "연수강좌 샘플" }
-            ]
-        }
-    };
-
-    const yearMonthTxt = document.querySelector('.years strong');
-    const prevBtn = document.querySelector('.btn.prev');
-    const nextBtn = document.querySelector('.btn.next');
-    const monthButtons = document.querySelectorAll('.month button');
-    const calendarBody = document.querySelector('.schedule_month_tbl tbody');
-    const moScheduleList = document.getElementById('mo-schedule-list'); // 모바일 리스트 container
-
-    let currentYear = parseInt(yearMonthTxt.textContent.trim(), 10);
-    let currentMonth = 4;
-
-    // 요일 배열 (모바일 날짜 표기용)
-    const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-
-    function formatDate(y, m, d) {
-        return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    }
-
-    // 모바일 리스트에 맞는 날짜 포맷팅 함수 (예: 04.06(월) 또는 연속일정 포맷)
-    function formatMobileDate(startStr, endStr) {
-        const startPart = startStr.split('-');
-        const startDateObj = new Date(startStr);
-        const startLabel = `${startPart[1]}.${startPart[2]}(${weekDays[startDateObj.getDay()]})`;
-
-        if (startStr === endStr) {
-            return startLabel;
-        } else {
-            const endPart = endStr.split('-');
-            const endDateObj = new Date(endStr);
-            const endLabel = `${endPart[1]}.${endPart[2]}(${weekDays[endDateObj.getDay()]})`;
-            return `${startLabel} ~ ${endLabel}`;
-        }
-    }
-
-    function renderCalendar(year, month) {
-        const formattedMonth = String(month).padStart(2, '0');
-        yearMonthTxt.textContent = `${year}`;
-
-        monthButtons.forEach((btn, index) => {
-            if (index + 1 === month) {
-                btn.classList.add('on');
-            } else {
-                btn.classList.remove('on');
-            }
-        });
-
-        const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
-        const lastDateOfMonth = new Date(year, month, 0).getDate();
-        const lastDateOfPrevMonth = new Date(year, month - 1, 0).getDate();
-
-        const calendarDays = [];
-
-        for (let i = firstDayOfMonth - 1; i >= 0; i--) {
-            calendarDays.push({ day: lastDateOfPrevMonth - i, isCurrentMonth: false, dateStr: "" });
-        }
-
-        for (let i = 1; i <= lastDateOfMonth; i++) {
-            calendarDays.push({ day: i, isCurrentMonth: true, dateStr: formatDate(year, month, i) });
-        }
-
-        let nextMonthDay = 1;
-        while (calendarDays.length % 7 !== 0) {
-            calendarDays.push({ day: nextMonthDay++, isCurrentMonth: false, dateStr: "" });
-        }
-
-        const events = (scheduleData[year] && scheduleData[year][formattedMonth]) ? scheduleData[year][formattedMonth] : [];
-        
-        // --- [모바일 목록 데이터 처리 및 렌더링] ---
-        let moHtml = '';
-        if (events.length > 0) {
-            // 이벤트를 시작일 순서대로 정렬
-            const sortedEvents = [...events].sort((a, b) => new Date(a.start) - new Date(b.start));
-            
-            sortedEvents.forEach(event => {
-                const dateText = formatMobileDate(event.start, event.end);
-                // 태그 색상(c1, c2 등) 구분을 위해 span에 class를 부여하거나 입맛에 맞게 커스텀 가능합니다.
-                moHtml += `<li class="${event.class}">
-                    <span>${dateText}</span>
-                    <h3>${event.title}</h3>
-                </li>`;
-            });
-        } else {
-            moHtml = '<li class="no_data">등록된 일정이 없습니다.</li>';
-        }
-        moScheduleList.innerHTML = moHtml;
-        // ------------------------------------------
-
-        const totalWeeks = calendarDays.length / 7;
-        const weekGrid = Array.from({ length: totalWeeks }, () => []);
-
-        events.forEach(event => {
-            let startIdx = calendarDays.findIndex(d => d.isCurrentMonth && d.dateStr === event.start);
-            let endIdx = calendarDays.findIndex(d => d.isCurrentMonth && d.dateStr === event.end);
-
-            if (startIdx === -1 && endIdx === -1) return;
-            if (startIdx === -1) startIdx = calendarDays.findIndex(d => d.isCurrentMonth);
-            if (endIdx === -1) endIdx = calendarDays.length - 1;
-
-            let eventWeeks = [];
-            for (let i = startIdx; i <= endIdx; i++) {
-                let w = Math.floor(i / 7);
-                if (!eventWeeks.includes(w)) eventWeeks.push(w);
-            }
-
-            let targetRow = -1;
-            let rowIdx = 0;
-
-            while (targetRow === -1) {
-                let canPlace = true;
-                for (let w of eventWeeks) {
-                    if (!weekGrid[w][rowIdx]) {
-                        weekGrid[w][rowIdx] = Array(7).fill(null);
-                    }
-                    let startDayOfW = Math.max(startIdx, w * 7) % 7;
-                    let endDayOfW = Math.min(endIdx, (w * 7) + 6) % 7;
-                    
-                    for (let d = startDayOfW; d <= endDayOfW; d++) {
-                        if (weekGrid[w][rowIdx][d] !== null) {
-                            canPlace = false;
-                            break;
-                        }
-                    }
-                    if (!canPlace) break;
-                }
-
-                if (canPlace) {
-                    targetRow = rowIdx;
-                } else {
-                    rowIdx++;
-                }
-            }
-
-            for (let w of eventWeeks) {
-                let startGlobal = Math.max(startIdx, w * 7);
-                let endGlobal = Math.min(endIdx, (w * 7) + 6);
-                let startDayOfW = startGlobal % 7;
-                let endDayOfW = endGlobal % 7;
-                let width = endDayOfW - startDayOfW + 1;
-
-                let actualWidthClass = event.widthClass;
-                if (!actualWidthClass) {
-                    actualWidthClass = `width${width}`;
-                }
-
-                weekGrid[w][targetRow][startDayOfW] = {
-                    type: 'event',
-                    class: event.class,
-                    title: event.title,
-                    widthClass: actualWidthClass
-                };
-
-                for (let d = startDayOfW + 1; d <= endDayOfW; d++) {
-                    weekGrid[w][targetRow][d] = { type: 'blank' };
-                }
-            }
-        });
-
-        let html = '';
-
-        for (let w = 0; w < totalWeeks; w++) {
-            html += '<tr>';
-            for (let d = 0; d < 7; d++) {
-                const globalIdx = (w * 7) + d;
-                const dayInfo = calendarDays[globalIdx];
-
-                if (!dayInfo.isCurrentMonth) {
-                    html += `<td class="other"><span>${dayInfo.day}</span></td>`;
-                } else {
-                    let listHtml = '';
-                    let hasContent = false;
-                    const maxRows = weekGrid[w].length;
-
-                    for (let r = 0; r < maxRows; r++) {
-                        if (weekGrid[w][r] && weekGrid[w][r][d] !== null) {
-                            hasContent = true;
-                            break;
-                        }
-                    }
-
-                    if (hasContent) {
-                        listHtml += '<ul class="list">';
-                        for (let r = 0; r < maxRows; r++) {
-                            const cell = (weekGrid[w][r]) ? weekGrid[w][r][d] : null;
-                            if (cell === null) {
-                                listHtml += '<li class="blank"></li>';
-                            } else if (cell.type === 'event') {
-                                const wClass = cell.widthClass ? ` ${cell.widthClass}` : '';
-                                listHtml += `<li class="${cell.class}${wClass}"><span title="${cell.title}">${cell.title}</span></li>`;
-                            } else if (cell.type === 'blank') {
-                                listHtml += '<li class="blank"></li>';
-                            }
-                        }
-                        listHtml += '</ul>';
-                    }
-
-                    html += `<td><span>${dayInfo.day}</span>${listHtml}</td>`;
-                }
-            }
-            html += '</tr>';
-        }
-
-        calendarBody.innerHTML = html;
-    }
-
-    prevBtn.addEventListener('click', function() {
-        currentYear--;
-        renderCalendar(currentYear, currentMonth);
-    });
-
-    nextBtn.addEventListener('click', function() {
-        currentYear++;
-        renderCalendar(currentYear, currentMonth);
-    });
-
-    monthButtons.forEach((btn, index) => {
-        btn.addEventListener('click', function() {
-            currentMonth = index + 1;
-            renderCalendar(currentYear, currentMonth);
-        });
-    });
-
-    renderCalendar(currentYear, currentMonth);
-});
-</script>
+<script src="{{ asset('js/frontend/annual-schedule.js') }}"></script>
 @endpush

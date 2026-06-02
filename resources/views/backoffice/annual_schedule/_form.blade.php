@@ -12,6 +12,34 @@
 </div>
 
 <div class="board-form-group">
+    <label class="board-form-label">일정 유형 <span class="required">*</span></label>
+    <div class="board-options-list board-options-horizontal">
+        <div class="board-option-item">
+            <input
+                type="radio"
+                id="schedule_type_academic_conference"
+                name="schedule_type"
+                value="academic_conference"
+                @checked(old('schedule_type', $annualSchedule->schedule_type ?? 'academic_conference') === 'academic_conference')
+                required
+            >
+            <label for="schedule_type_academic_conference">학술대회</label>
+        </div>
+        <div class="board-option-item">
+            <input
+                type="radio"
+                id="schedule_type_training_course"
+                name="schedule_type"
+                value="training_course"
+                @checked(old('schedule_type', $annualSchedule->schedule_type ?? 'academic_conference') === 'training_course')
+                required
+            >
+            <label for="schedule_type_training_course">연수강좌</label>
+        </div>
+    </div>
+</div>
+
+<div class="board-form-group">
     <label class="board-form-label">일정 기간 <span class="required">*</span></label>
     <div class="board-options-list board-options-horizontal">
         <input
@@ -54,6 +82,22 @@
         maxlength="1000"
     >{{ old('content', $annualSchedule->content ?? '') }}</textarea>
     <small class="board-form-text"><span id="schedule-content-count">0</span> / 1000자</small>
+</div>
+
+<div class="board-form-group">
+    <label for="link_url" class="board-form-label">URL</label>
+    <input
+        type="url"
+        class="board-form-control"
+        id="link_url"
+        name="link_url"
+        value="{{ old('link_url', $annualSchedule->link_url ?? '') }}"
+        maxlength="500"
+        placeholder="https://"
+    >
+    @error('link_url')
+        <p class="board-form-error">{{ $message }}</p>
+    @enderror
 </div>
 
 <div class="board-form-group">

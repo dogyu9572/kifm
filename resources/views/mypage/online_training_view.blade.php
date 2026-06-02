@@ -8,6 +8,10 @@
 	$statusLabel = $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status;
 	$paymentStatusLabel = $paymentStatusLabels[$enrollment->payment_status] ?? $enrollment->payment_status;
 	$methodLabel = $paymentMethodLabels[$enrollment->payment_method] ?? $enrollment->payment_method;
+	$receiptIssueValue = strtoupper((string) $enrollment->receipt_issue);
+	$isReceiptIssued = in_array($receiptIssueValue, ['YES', 'Y', '1', 'TRUE'], true);
+	$receiptTypeValue = strtoupper((string) $enrollment->receipt_type);
+	$receiptTypeLabel = $receiptTypeLabels[$receiptTypeValue] ?? ($enrollment->receipt_type ?: '-');
 	$isCompleted = $enrollment->enrollment_status === 'completed';
 	$isPaymentCompleted = in_array($enrollment->payment_status, ['completed', 'paid'], true);
 	$periodEnd = $enrollment->expire_at ?: $course?->period_end;
@@ -121,15 +125,15 @@
 				<tbody>
 					<tr>
 						<th scope="row">현금 영수증</th>
-						<td>{{ $enrollment->receipt_issue === 'YES' ? '발행 신청' : '미신청' }}</td>
+						<td>{{ $isReceiptIssued ? '발행 신청' : '미신청' }}</td>
 						<th scope="row">발급 구분</th>
-						<td>{{ $enrollment->receipt_type ?: '-' }}</td>
+						<td>{{ $isReceiptIssued ? $receiptTypeLabel : '-' }}</td>
 					</tr>
 					<tr>
 						<th scope="row">휴대폰 번호</th>
 						<td>-</td>
-						<th scope="row">현금영수수증 <br>카드 번호</th>
-						<td>{{ $enrollment->receipt_number ?: '-' }}</td>
+						<th scope="row">현금영수증 <br>카드 번호</th>
+						<td>{{ $isReceiptIssued ? ($enrollment->receipt_number ?: '-') : '-' }}</td>
 					</tr>
 				</tbody>
 			</table>

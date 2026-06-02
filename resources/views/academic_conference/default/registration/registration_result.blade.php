@@ -31,6 +31,8 @@
 		'onsite' => '현장결제',
 	][$registration?->payment_method] ?? ($registration?->payment_method ?: '-');
 	$isCompleted = $registration?->payment_status === 'completed';
+	$isBankTransfer = $registration?->payment_method === 'bank_transfer';
+	$isWaitingForDeposit = $isBankTransfer && $registration?->payment_status === 'pending';
 	$isCancelable = $registration && ! in_array($registration->payment_status, ['cancel_requested', 'cancelled'], true);
 @endphp
 <main class="sub_area">
@@ -116,7 +118,7 @@
 					<dl>
 						<div>
 							<dt>결제 상태</dt>
-							<dd class="flex">{{ $paymentStatusLabel }} @if($registration->paid_at)({{ $registration->paid_at->format('Y.m.d') }})@endif @if($registration->payment_status !== 'completed')<strong class="c_red">입금 전</strong>@endif</dd>
+							<dd class="flex">{{ $paymentStatusLabel }} @if($registration->paid_at)({{ $registration->paid_at->format('Y.m.d') }})@endif @if($isWaitingForDeposit)<strong class="c_red">입금 전</strong>@endif</dd>
 						</div>
 						<div>
 							<dt>결제 항목</dt>
@@ -140,18 +142,20 @@
 							<dt>결제 수단</dt>
 							<dd>{{ $paymentMethodLabel }}</dd>
 						</div>
-						<div>
-							<dt>입금 계좌</dt>
-							<dd>{{ $registration->bank_account_text ?: '-' }}</dd>
-						</div>
-						<div>
-							<dt>입금자명</dt>
-							<dd>{{ $registration->bank_depositor ?: '-' }}</dd>
-						</div>
-						<div>
-							<dt>입금 예정일</dt>
-							<dd>{{ optional($registration->bank_deposit_date)->format('Y.m.d') ?: '-' }}</dd>
-						</div>
+						@if ($isBankTransfer)
+							<div>
+								<dt>입금 계좌</dt>
+								<dd>{{ $registration->bank_account_text ?: '-' }}</dd>
+							</div>
+							<div>
+								<dt>입금자명</dt>
+								<dd>{{ $registration->bank_depositor ?: '-' }}</dd>
+							</div>
+							<div>
+								<dt>입금 예정일</dt>
+								<dd>{{ optional($registration->bank_deposit_date)->format('Y.m.d') ?: '-' }}</dd>
+							</div>
+						@endif
 					</dl>
 				</div>
 			</div>
@@ -162,8 +166,6 @@
 						@csrf
 						<button type="submit" class="btn btn_wbb">결제 취소</button>
 					</form>
-				@else
-					<button type="button" class="btn btn_wbb" disabled>결제 취소</button>
 				@endif
 			</div>
 			@endunless

@@ -28,7 +28,7 @@
 				</dl>
 			</section>
 
-            <section class="guide_section">
+            <section class="guide_section member_type">
 				<div class="tit_flex"><h2 class="tit mb0">회원 구분 및 혜택 안내</h2><a href="/member/register" class="btn_abso btn_wkk btn_link">회원가입 바로가기</a></div>
 				<div class="tbl tac">
 					<table>

@@ -109,6 +109,9 @@
     <script src="/js/frontend/channel-talk.js"></script>
 </head>
 <body>
+	@php
+		$frontendMember = auth()->user()?->role === 'user' ? auth()->user() : null;
+	@endphp
 	<div class="blind_link"><a href="#mainContent">본문 바로가기</a></div>
 	@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'print' && $page_type!== 'academic_conference')
 	<!-- 일반인, 전문인, 온라인 아카데미 -->
@@ -129,7 +132,7 @@
 				</ul>
 				@if(isset($gNum) && $gNum !== 'online_academy')
 				<ul class="member" aria-label="회원 메뉴">
-					@guest
+					@if($frontendMember === null)
 					<li class="i1"><a href="{{ route('member.login') }}">로그인</a></li>
 					<li class="i2"><a href="{{ route('member.register') }}">회원가입</a></li>
 					@else
@@ -139,10 +142,8 @@
 							<button type="submit" class="member-nav-link">로그아웃</button>
 						</form>
 					</li>
-					@if(auth()->user()?->role === 'user')
 					<li class="i2"><a href="{{ route('mypage.profile_edit') }}">마이페이지</a></li>
 					@endif
-					@endguest
 				</ul>
 				@endif
 			</div>
@@ -259,17 +260,15 @@
 				</li>
 			</ul>
 			<div class="member">
-				@guest
+				@if($frontendMember === null)
 				<a href="{{ route('member.login') }}" class="btn i1">로그인</a>
 				@else
-				@if(auth()->user()?->role === 'user')
 				<a href="{{ route('mypage.profile_edit') }}" class="btn i1">마이페이지</a>
-				@endif
 				<form action="{{ route('member.logout') }}" method="POST" class="member-nav-logout-form member-nav-logout-form--academic">
 					@csrf
 					<button type="submit" class="btn i2">로그아웃</button>
 				</form>
-				@endguest
+				@endif
 			</div>
 		</div>
 	</header>

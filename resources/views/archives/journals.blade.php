@@ -26,7 +26,7 @@
 			</form>
 		</div>
 
-		<div class="board_list">
+		<div class="board_list mo_break_list slim_board">
 			<table>
 				<caption>{{ $sName }} 목록입니다.</caption>
 				<colgroup>

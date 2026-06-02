@@ -5,7 +5,8 @@
 @section('sName', $sName)
 @section('content')
 @php
-	$currentMember = auth()->user();
+	$authUser = auth()->user();
+	$currentMember = $authUser?->role === 'user' ? $authUser : null;
 @endphp
 @if (session('alert'))
 	<div data-page-alert="{{ session('alert') }}"></div>

@@ -291,7 +291,7 @@
 
         const introEl = popup.querySelector('.js-popup-introduction');
         if (introEl) {
-            introEl.innerHTML = data.introduction_html || '';
+            introEl.textContent = data.introduction_html || '';
         }
     }
 

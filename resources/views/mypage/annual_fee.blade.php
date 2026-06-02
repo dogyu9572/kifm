@@ -49,10 +49,7 @@
                         </li>
                         <li>
                             <label for="doctor_license">의사면허번호<span class="required">*</span></label>
-                            <div class="inbtn">
-                                <input type="text" id="doctor_license" name="doctor_license" class="text" placeholder="의사면허번호를 입력해주세요" value="{{ $user->license_number }}" readonly required title="의사면허번호 입력 필수">
-                                <button type="button" class="btn btn_wkk">중복 확인</button>
-                            </div>
+                            <input type="text" id="doctor_license" name="doctor_license" class="text" placeholder="의사면허번호를 입력해주세요" value="{{ $user->license_number }}" readonly required title="의사면허번호 입력 필수">
                         </li>
                     </ul>
                 </fieldset>
@@ -155,6 +152,7 @@
                 </fieldset>
 
                 <article class="abso_application">
+					<div class="mobile_opcl" aria-hidden="true"></div>
                     <h2 class="tit">결제정보</h2>
                     <p class="selected_item">정회원 연회비</p>
                     <dl class="price_info">
@@ -172,8 +170,8 @@
                         <input type="checkbox" name="terms_agree" id="terms_agree" required>
                         <label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
                     </div>
-                    <button type="submit" class="btn_submit btn_wbb" onclick="location.href='/mypage/annual_fee/end'"><span class="sound_only">90,000원 </span>결제하기</button>
-                    <button type="button" class="btn_cancel btn_kwg" onclick="history.back">결제취소</button>
+                    <button type="submit" class="btn_submit btn_wbb"><span class="sound_only">90,000원 </span>결제하기</button>
+                    <button type="button" class="btn_cancel btn_kwg" data-history-back>뒤로가기</button>
                 </article>
             </form>
         </div>
@@ -185,58 +183,5 @@
 @endsection
 
 @push('scripts')
-<script>
-// abso_application 고정
-    const $window = $(window);
-    const $header = $('header');
-    const $viewTop = $('.academic_event_view_top');
-    const $detail = $('.academic_event_view_detail');
-    const $absoApp = $('.abso_application');
-    $window.on('scroll.stickyApp', function() {
-        const scrollTop = $window.scrollTop();
-        const headerHeight = $header.outerHeight();
-        const topMargin = parseInt($viewTop.css('margin-bottom')) || 0;
-        const detailOffsetTop = $detail.offset().top;
-        const detailHeight = $detail.outerHeight();
-        const appHeight = $absoApp.outerHeight();
-        const fixStartPoint = detailOffsetTop - 190; 
-        const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - 190;
-        if (scrollTop >= fixStartPoint) {
-            if (scrollTop >= unfixPoint) {
-                $detail.addClass('unfixed').removeClass('fixed');
-            } else {
-                $detail.addClass('fixed').removeClass('unfixed');
-            }
-        } else {
-            $detail.removeClass('fixed unfixed');
-        }
-    });
-    $window.trigger('scroll.stickyApp');
-
-//무통장입금
-	const paymentRadios = document.querySelectorAll('input[name="payment_type"]');
-	const cashRadios = document.querySelectorAll('input[name="cash_receipt"]');
-	const bankElements = document.querySelectorAll('.type_bank_hide');
-	const cardElements = document.querySelectorAll('.type_card');
-	const cashArea = document.querySelector('.cash_receipt_area');
-	function handlePaymentChange() {
-		const isBank = document.getElementById('payment_type_bank').checked;
-		bankElements.forEach(el => el.style.display = isBank ? 'block' : 'none');
-		cardElements.forEach(el => el.style.display = isBank ? 'none' : 'block');
-		if (!isBank) {
-			document.getElementById('cash_receipt_non').checked = true;
-			handleCashReceiptChange(); 
-		}
-		$(window).trigger('scroll.stickyApp');
-	}
-	function handleCashReceiptChange() {
-		const isReceipt = document.getElementById('cash_receipt').checked;
-		cashArea.style.display = isReceipt ? 'block' : 'none';
-		$(window).trigger('scroll.stickyApp');
-	}
-	paymentRadios.forEach(radio => radio.addEventListener('change', handlePaymentChange));
-	cashRadios.forEach(radio => radio.addEventListener('change', handleCashReceiptChange));
-	handlePaymentChange();
-	handleCashReceiptChange();
-</script>
+<script src="{{ asset('js/frontend/mypage-annual-fee.js') }}"></script>
 @endpush

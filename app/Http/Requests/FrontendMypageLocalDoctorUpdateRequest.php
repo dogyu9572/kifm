@@ -15,7 +15,6 @@ class FrontendMypageLocalDoctorUpdateRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'delete_photo' => $this->boolean('delete_photo'),
             'category_ids' => $this->input('category_ids', []),
             'functional_tests_selected' => $this->input('functional_tests_selected', []),
             'treatment_areas_selected' => $this->input('treatment_areas_selected', []),
@@ -31,7 +30,6 @@ class FrontendMypageLocalDoctorUpdateRequest extends FormRequest
         $treatmentIds = collect(config('local_doctor_form_options.treatment_areas', []))->pluck('id')->all();
 
         return [
-            'delete_photo' => ['boolean'],
             'photo' => ['nullable', 'image', 'max:5120'],
             'doctor_name' => ['required', 'string', 'max:100'],
             'license_no' => ['required', 'string', 'max:50'],

@@ -64,12 +64,26 @@ class MypageOnlineTrainingService
             'paid' => '결제완료',
             'cancel_requested' => '취소요청',
             'cancelled' => '취소',
+            'failed' => '결제실패',
+            'expired' => '기간만료',
         ];
     }
 
     /** @return array<string, string> */
     public function paymentMethodLabels(): array
     {
-        return MembershipPaymentService::paymentMethodLabels();
+        return array_merge(MembershipPaymentService::paymentMethodLabels(), [
+            'bank' => '무통장입금',
+            'bank_transfer' => '무통장입금',
+        ]);
+    }
+
+    /** @return array<string, string> */
+    public function receiptTypeLabels(): array
+    {
+        return [
+            'PERSONAL' => '개인소득공제용',
+            'CARD' => '사업자증빙용',
+        ];
     }
 }

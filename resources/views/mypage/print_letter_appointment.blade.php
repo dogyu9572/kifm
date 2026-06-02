@@ -40,7 +40,7 @@
 	</div>
 	<div class="foot">
 		<div class="date">YYYY년 MM월 DD일</div>
-		<div class="copy">대한기능의학회(KIFM) <img src="/images/img_stamp.png" alt=""></div>
+		<div class="copy">대한기능의학회(KIFM) <!-- <img src="/images/img_stamp.png" alt=""> --></div>
 	</div>
 </section>
 </main>

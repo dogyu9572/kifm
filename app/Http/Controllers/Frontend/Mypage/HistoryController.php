@@ -75,6 +75,7 @@ class HistoryController extends Controller
             'statusLabels' => $this->onlineTrainingService->enrollmentStatusLabels(),
             'paymentStatusLabels' => $this->onlineTrainingService->paymentStatusLabels(),
             'paymentMethodLabels' => $this->onlineTrainingService->paymentMethodLabels(),
+            'receiptTypeLabels' => $this->onlineTrainingService->receiptTypeLabels(),
         ]);
     }
 

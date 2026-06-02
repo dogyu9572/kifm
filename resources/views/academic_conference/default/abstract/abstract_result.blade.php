@@ -3,6 +3,10 @@
 @section('gName', $gName)
 @section('sName', $sName)
 @section('content')
+@php
+	$isFrontendMember = ($currentMember?->role ?? null) === 'user';
+	$showMemberSubmitButton = $isFrontendMember && ! ($hasMemberAbstractSubmission ?? false);
+@endphp
 <main class="sub_area">
 
 <section class="scon">
@@ -16,8 +20,15 @@
 					<p>확인 가능한 초록 접수 내역이 없습니다. 입력하신 정보를 다시 확인해 주세요.</p>
 				</div>
 				<div class="btns_btm flex_center">
-					<a href="{{ $conferenceBaseUrl }}/abstract/check_member" class="btn btn_kwg">회원 초록 조회</a>
-					<a href="{{ $conferenceBaseUrl }}/abstract/check_non_member" class="btn btn_wbb">비회원 초록 조회</a>
+					@if ($showMemberSubmitButton)
+						<a href="{{ $conferenceBaseUrl }}/abstract/submission" class="btn btn_kwg">접수하기</a>
+						<a href="{{ $conferenceBaseUrl }}" class="btn btn_wbb">메인 페이지로</a>
+					@elseif ($isFrontendMember)
+						<a href="{{ $conferenceBaseUrl }}" class="btn btn_kwg">메인 페이지로</a>
+					@else
+						<a href="{{ $conferenceBaseUrl }}/abstract/check_member" class="btn btn_kwg">회원 초록 조회</a>
+						<a href="{{ $conferenceBaseUrl }}/abstract/check_non_member" class="btn btn_wbb">비회원 초록 조회</a>
+					@endif
 				</div>
 			@else
 				<div class="registration_check_wrap">

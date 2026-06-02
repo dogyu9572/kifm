@@ -115,7 +115,7 @@
 							@endif
 						</td>
 						<td class="online7">
-							@if ($enrollment->course)
+							@if ($enrollment->course && $isPaymentCompleted)
 							<a href="{{ route('online_academy.show', $enrollment->course) }}" class="btn btn_kwk">강의보기</a>
 							@else
 							-

@@ -246,6 +246,16 @@ class BoardPostService
             }
         }
 
+        if ($slug === 'academic_conference_history') {
+            if ($request->filled('visibility')) {
+                if ($request->visibility === 'public') {
+                    $query->where('is_active', true);
+                } elseif ($request->visibility === 'private') {
+                    $query->where('is_active', false);
+                }
+            }
+        }
+
         if ($request->filled('keyword')) {
             $this->applyKeywordSearch($query, $request->keyword, $request->search_type, $slug);
         }
@@ -293,7 +303,7 @@ class BoardPostService
                     ->orWhere('author_name', 'like', "%{$keyword}%")
                     ->orWhere('content', 'like', "%{$keyword}%");
             });
-        } elseif ($searchType === 'keyword' && $slug === 'society_history') {
+        } elseif ($searchType === 'keyword' && in_array($slug, ['society_history', 'academic_conference_history'], true)) {
             $query->where(function ($q) use ($keyword) {
                 $q->where('title', 'like', "%{$keyword}%")
                     ->orWhere('content', 'like', "%{$keyword}%");
@@ -368,7 +378,7 @@ class BoardPostService
             'user_id' => null,
             'author_name' => $validated['author_name'] ?? '관리자',
             'title' => $validated['title'],
-            'content' => $this->sanitizeContent($validated['content']),
+            'content' => $this->sanitizeContent((string) ($validated['content'] ?? '')),
             'category' => $validated['category'] ?? null,
             'is_notice' => $request->has('is_notice'),
             'is_secret' => $request->has('is_secret'),
@@ -575,7 +585,7 @@ class BoardPostService
 
         $data = [
             'title' => $validated['title'],
-            'content' => $this->sanitizeContent($validated['content']),
+            'content' => $this->sanitizeContent((string) ($validated['content'] ?? '')),
             'category' => $validated['category'] ?? null,
             'is_notice' => $request->has('is_notice'),
             'is_secret' => $request->has('is_secret'),

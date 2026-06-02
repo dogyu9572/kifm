@@ -125,6 +125,13 @@
                                                 @php
                                                     $isChecked = is_array($fieldValue) ? in_array($option, $fieldValue) : $fieldValue == $option;
                                                     $isOldChecked = is_array(old('custom_field_' . $fieldConfig['name'])) ? in_array($option, old('custom_field_' . $fieldConfig['name'])) : old('custom_field_' . $fieldConfig['name']) == $option;
+                                                    $optionLabel = $fieldConfig['name'] === 'is_executive_public'
+                                                        ? match($option) {
+                                                            'all' => '공개',
+                                                            'executive' => '비공개',
+                                                            default => $option,
+                                                        }
+                                                        : $option;
                                                 @endphp
                                                 <div class="board-option-item">
                                                     <input type="checkbox" 
@@ -132,7 +139,7 @@
                                                            name="custom_field_{{ $fieldConfig['name'] }}[]" 
                                                            value="{{ $option }}"
                                                            @checked($isChecked || $isOldChecked)>
-                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $option }}</label>
+                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $optionLabel }}</label>
                                                 </div>
                                             @endif
                                         @endforeach
@@ -164,6 +171,13 @@
                                                 @php
                                                     $isChecked = is_array($fieldValue) ? in_array($option, $fieldValue) : $fieldValue == $option;
                                                     $isOldChecked = is_array(old('custom_field_' . $fieldConfig['name'])) ? in_array($option, old('custom_field_' . $fieldConfig['name'])) : old('custom_field_' . $fieldConfig['name']) == $option;
+                                                    $optionLabel = $fieldConfig['name'] === 'is_executive_public'
+                                                        ? match($option) {
+                                                            'all' => '공개',
+                                                            'executive' => '비공개',
+                                                            default => $option,
+                                                        }
+                                                        : $option;
                                                 @endphp
                                                 <div class="board-option-item">
                                                     <input type="radio" 
@@ -172,7 +186,7 @@
                                                            value="{{ $option }}"
                                                            @checked($isChecked || $isOldChecked)
                                                            @if($fieldConfig['required']) required @endif>
-                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $option }}</label>
+                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $optionLabel }}</label>
                                                 </div>
                                             @endif
                                         @endforeach

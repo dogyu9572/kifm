@@ -1,30 +1,32 @@
 @extends('layouts.frontend')
+@inject('publicBoard', 'App\Services\Frontend\PublicBoardService')
 @section('title', $gName . ' | ' . $sName)
 @section('gName', $gName)
 @section('sName', $sName)
 @section('content')
 <main class="sub_area">
 
-<section class="scon" aria-labelledby="society-notices-heading">
+<section class="scon" aria-labelledby="academic-history-heading">
 	<div class="inner">
-		<h1 class="sub_title" id="society-notices-heading">{{ $sName }}</h1>
+		<h1 class="sub_title" id="academic-history-heading">{{ $sName }}</h1>
 
 		<div class="board_top">
 			<div class="left">
-				<div class="total">Total <strong class="c_iden">100</strong></div>
+				<div class="total">Total <strong class="c_iden">{{ number_format($histories->total()) }}</strong></div>
 			</div>
-			<div class="right flex">
-				<select name="" id="" class="text">
-					<option value="">전체</option>
-					<option value="">제목</option>
-					<option value="">내용</option>
+			<form method="GET" action="{{ route('academic_event.academic_history') }}" class="right flex">
+				<label for="academic-history-field" class="sound_only">검색 구분</label>
+				<select name="search_type" id="academic-history-field" class="text">
+					<option value="all" @selected(($filters['search_type'] ?? 'all') === 'all')>전체</option>
+					<option value="title" @selected(($filters['search_type'] ?? 'all') === 'title')>제목</option>
+					<option value="content" @selected(($filters['search_type'] ?? 'all') === 'content')>내용</option>
 				</select>
-				<form class="search_area">
-					<label for="event-search" class="sound_only">제목</label>
-					<input type="text" id="event-search" class="text" placeholder="행사명을 입력해주세요">
+				<div class="search_area">
+					<label for="academic-history-search" class="sound_only">행사명 검색</label>
+					<input type="text" id="academic-history-search" name="keyword" class="text" value="{{ $filters['keyword'] ?? '' }}" placeholder="행사명을 입력해주세요">
 					<button type="submit" class="btn_search">검색</button>
-				</form>
-			</div>
+				</div>
+			</form>
 		</div>
 		
 		<div class="board_list board_bold mo_break_list">
@@ -43,80 +45,34 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
-					<tr>
-						<td class="dates">2026-03-15 ~ 2026-03-20</td>
-						<td class="tac">제 24회 정기 춘계 학술대회: 인공지능과 현대의학의 만남</td>
-						<td class="down"><a href="#this" class="btn btn_gwg btn_download">자료집</a></td>
-					</tr>
+					@forelse ($histories as $history)
+						@php
+							$attachmentUrl = $publicBoard->firstAttachmentUrl($history->attachments);
+						@endphp
+						<tr>
+							<td class="dates">{{ $publicBoard->academicConferenceHistoryPeriod($history) ?: '-' }}</td>
+							<td class="tac">{{ $history->title }}</td>
+							<td class="down">
+								@if ($attachmentUrl)
+									<a href="{{ $attachmentUrl }}" class="btn btn_gwg btn_download" target="_blank" rel="noopener" download="{{ $publicBoard->firstAttachmentName($history->attachments) }}">자료집</a>
+								@else
+									-
+								@endif
+							</td>
+						</tr>
+					@empty
+						<tr>
+							<td colspan="3" class="tac">등록된 학술대회 연혁이 없습니다.</td>
+						</tr>
+					@endforelse
 				</tbody>
 			</table>
 		</div>
 
-		<nav class="board-pagination" aria-label="게시판 페이지 이동">
-			<ul class="pagination">
-				<li class="page-item arw_item"><a class="page-link" href="#" title="첫 페이지" aria-label="첫 페이지로 이동"><i class="arrow two first" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="이전 페이지" aria-label="이전 페이지로 이동"><i class="arrow one prev" aria-hidden="true"></i></a></li>
-				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="현재 페이지 1">1</span></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="2페이지로 이동">2</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="3페이지로 이동">3</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="4페이지로 이동">4</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="5페이지로 이동">5</a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="다음 페이지" aria-label="다음 페이지로 이동"><i class="arrow one next" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="마지막 페이지" aria-label="마지막 페이지로 이동"><i class="arrow two last" aria-hidden="true"></i></a></li>
-			</ul>
-		</nav>
-		
+		<x-frontend.pagination :paginator="$histories" :window-size="5" />
 	</div>
 </section>
 	
 </main>
 
 @endsection
-
-@push('scripts')
-@endpush

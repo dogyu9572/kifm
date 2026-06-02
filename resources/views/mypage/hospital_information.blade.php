@@ -62,12 +62,6 @@
                         </label>
                         <input type="file" name="photo" id="doctor_photo_file" class="sound_only" accept=".jpg,.jpeg,.png,.gif">
                         <p class="c_iden">*사진을 클릭하여 이미지를 변경해 주세요.</p>
-                        @if ($doc->photo_path)
-                            <label class="checkbox">
-                                <input type="checkbox" name="delete_photo" value="1" @checked(old('delete_photo'))>
-                                <span class="btn btn_wkk">등록된 사진 삭제</span>
-                            </label>
-                        @endif
                         @error('photo')
                             <p class="c_red">{{ $message }}</p>
                         @enderror
@@ -96,7 +90,7 @@
                         <div>
                             <dt><label for="introduction">병원소개</label></dt>
                             <dd>
-                                <textarea name="introduction" id="introduction" cols="30" rows="10" class="text w100p edit_area">{{ old('introduction', $doc->introduction) }}</textarea>
+                                <textarea name="introduction" id="introduction" cols="30" rows="10" class="text w100p edit_area">{{ old('introduction', $introduction_text) }}</textarea>
                                 @error('introduction')
                                     <p class="c_red">{{ $message }}</p>
                                 @enderror

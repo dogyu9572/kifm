@@ -123,13 +123,22 @@
                                         @foreach(explode(",", $fieldConfig['options']) as $option)
                                             @php $option = trim($option); @endphp
                                             @if(!empty($option))
+                                                @php
+                                                    $optionLabel = $fieldConfig['name'] === 'is_executive_public'
+                                                        ? match($option) {
+                                                            'all' => '공개',
+                                                            'executive' => '비공개',
+                                                            default => $option,
+                                                        }
+                                                        : $option;
+                                                @endphp
                                                 <div class="board-option-item">
                                                     <input type="checkbox" 
                                                            id="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}" 
                                                            name="custom_field_{{ $fieldConfig['name'] }}[]" 
                                                            value="{{ $option }}"
                                                            {{ in_array($option, old('custom_field_' . $fieldConfig['name'], [])) ? 'checked' : '' }}>
-                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $option }}</label>
+                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $optionLabel }}</label>
                                                 </div>
                                             @endif
                                         @endforeach
@@ -153,6 +162,15 @@
                                         @foreach(explode(",", $fieldConfig['options']) as $option)
                                             @php $option = trim($option); @endphp
                                             @if(!empty($option))
+                                                @php
+                                                    $optionLabel = $fieldConfig['name'] === 'is_executive_public'
+                                                        ? match($option) {
+                                                            'all' => '공개',
+                                                            'executive' => '비공개',
+                                                            default => $option,
+                                                        }
+                                                        : $option;
+                                                @endphp
                                                 <div class="board-option-item">
                                                     <input type="radio" 
                                                            id="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}" 
@@ -160,7 +178,7 @@
                                                            value="{{ $option }}"
                                                            @checked(old('custom_field_' . $fieldConfig['name']) == $option)
                                                            @if($fieldConfig['required']) required @endif>
-                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $option }}</label>
+                                                    <label for="option_{{ $fieldConfig['name'] }}_{{ $loop->index }}">{{ $optionLabel }}</label>
                                                 </div>
                                             @endif
                                         @endforeach
