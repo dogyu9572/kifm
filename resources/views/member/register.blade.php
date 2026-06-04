@@ -32,7 +32,7 @@
 					<legend class="sound_only">기본정보 입력</legend>
 					<div class="num_tit_area">
 						<div class="num_tit radius4" aria-hidden="true"><span>1</span>기본정보 입력</div>
-						<p class="abso c_red">* 은 필수 입력 항목입니다.</p>
+						<p class="abso c_iden">* 은 필수 입력 항목입니다.</p>
 					</div>
 					<div class="flex_inputs">
 						<ul>
@@ -99,7 +99,7 @@
 					<legend class="sound_only">추가정보 입력</legend>
 					<div class="num_tit_area">
 						<div class="num_tit radius4" aria-hidden="true"><span>2</span>추가정보 입력</div>
-						<p class="abso c_red">* 은 필수 입력 항목입니다.</p>
+						<p class="abso c_iden">* 은 필수 입력 항목입니다.</p>
 					</div>
 					<div class="flex_inputs">
 						<ul>
@@ -197,7 +197,7 @@
 					<legend class="sound_only">위원회 참가 신청</legend>
 					<div class="num_tit_area">
 						<div class="num_tit radius4" aria-hidden="true"><span>3</span>위원회 참가 신청</div>
-						<p class="abso c_red">*최대 3개 선택 가능 (등록된 산하위원회 기준)</p>
+						<p class="abso c_iden">*최대 3개 선택 가능 (등록된 산하위원회 기준)</p>
 					</div>
 					<div class="select_committee">
 						@php
@@ -249,7 +249,7 @@
 					</div>
 					<div class="checkbox">
 						<input type="checkbox" id="register-privacy" name="privacy_agreed" value="1" @checked(old('privacy_agreed'))>
-						<label for="register-privacy"><i></i><span><strong class="c_red">(필수)</strong> 개인정보의 수집 및 이용에 동의합니다.</span></label>
+						<label for="register-privacy"><i></i><span><strong class="c_iden">(필수)</strong> 개인정보의 수집 및 이용에 동의합니다.</span></label>
 					</div>
 					@error('privacy_agreed')
 						<p class="c_red" role="alert">{{ $message }}</p>
@@ -275,7 +275,7 @@
 					</div>
 					<div class="checkbox">
 						<input type="checkbox" id="terms_of_use" name="terms_agreed" value="1" @checked(old('terms_agreed'))>
-						<label for="terms_of_use"><i></i><span><strong class="c_red">(필수)</strong> 이용약관에 동의합니다.</span></label>
+						<label for="terms_of_use"><i></i><span><strong class="c_iden">(필수)</strong> 이용약관에 동의합니다.</span></label>
 					</div>
 					@error('terms_agreed')
 						<p class="c_red" role="alert">{{ $message }}</p>

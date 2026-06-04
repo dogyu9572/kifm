@@ -31,19 +31,19 @@
 					<legend class="num_tit"><span>2</span>결제자 정보</legend>
 					<ul class="glbox">
 						<li>
-							<label for="user_name">이름<span class="required">*</span></label>
+							<label for="user_name">이름<span class="required c_iden"> *</span></label>
 							<input type="text" id="user_name" name="user_name" class="text" value="{{ $user->name }}" readonly required>
 						</li>
 						<li>
-							<label for="user_email">이메일<span class="required">*</span></label>
+							<label for="user_email">이메일<span class="required c_iden"> *</span></label>
 							<input type="email" id="user_email" name="user_email" class="text" value="{{ $user->email }}" readonly required>
 						</li>
 						<li>
-							<label for="user_tel">휴대폰번호<span class="required">*</span></label>
+							<label for="user_tel">휴대폰번호<span class="required c_iden"> *</span></label>
 							<input type="tel" id="user_tel" name="user_tel" class="text" value="{{ $user->phone_number }}" readonly required>
 						</li>
 						<li>
-							<label for="doctor_license">의사면허번호<span class="required">*</span></label>
+							<label for="doctor_license">의사면허번호<span class="required c_iden"> *</span></label>
 							<input type="text" id="doctor_license" name="doctor_license" class="text" value="{{ $user->license_number }}" readonly required>
 						</li>
 					</ul>
@@ -81,9 +81,9 @@
 							</li>
 						</ul>
 						<input type="hidden" name="payment_method" id="online-payment-method" value="card">
-						<p class="c_red type_card" role="alert">* 신용카드 결제는 토스페이먼츠 테스트 결제창으로 진행됩니다.</p>
+						<p class="type_card c_iden" role="alert">* 신용카드 결제는 토스페이먼츠 테스트 결제창으로 진행됩니다.</p>
 						@error('payment')
-							<p class="c_red" role="alert">{{ $message }}</p>
+							<p class="c_iden" role="alert">{{ $message }}</p>
 						@enderror
 						<div class="type_bank_hide bank_info_area">
 							<ul class="long_label">
@@ -96,21 +96,21 @@
 									<input type="hidden" name="bank_account_text" value="국민은행 287937-00-000083 / 예금주 대한기능의학회">
 								</li>
 								<li>
-									<label for="bank_depositor">입금자명<span class="required">*</span></label>
+									<label for="bank_depositor">입금자명<span class="required c_iden"> *</span></label>
 									<input type="text" id="bank_depositor" name="bank_depositor" class="text" value="{{ old('bank_depositor', $user->name) }}" placeholder="입금자명을 입력해 주세요">
 									@error('bank_depositor')
-										<p class="c_red" role="alert">{{ $message }}</p>
+										<p class="c_iden" role="alert">{{ $message }}</p>
 									@enderror
 								</li>
 								<li>
-									<label for="bank_deposit_date">입금 예정일<span class="required">*</span></label>
+									<label for="bank_deposit_date">입금 예정일<span class="required c_iden"> *</span></label>
 									<input type="date" id="bank_deposit_date" name="bank_deposit_date" class="text" value="{{ old('bank_deposit_date', now()->toDateString()) }}">
 									@error('bank_deposit_date')
-										<p class="c_red" role="alert">{{ $message }}</p>
+										<p class="c_iden" role="alert">{{ $message }}</p>
 									@enderror
 								</li>
 							</ul>
-							<p class="c_red" role="alert">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
+							<p class="c_iden" role="alert">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
 						</div>
 					</div>
 				</fieldset>
@@ -137,7 +137,7 @@
 								</select>
 							</li>
 							<li>
-								<label for="receipt_number">현금영수증 번호<span class="required">*</span></label>
+								<label for="receipt_number">현금영수증 번호<span class="required c_iden"> *</span></label>
 								<input type="text" id="receipt_number" name="receipt_number" class="text" value="{{ old('receipt_number', $user->phone_number) }}">
 								@error('receipt_number')
 									<p class="c_red" role="alert">{{ $message }}</p>
@@ -166,7 +166,7 @@
 					</dl>
 					<div class="check_area checkbox">
 						<input type="checkbox" name="terms_agree" id="terms_agree" value="1" required @checked(old('terms_agree'))>
-						<label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
+						<label for="terms_agree "><i></i><span><strong class="c_iden">(필수)</strong> 결제 이용 약관, 개인정보 처리 동의</span></label>
 					</div>
 					@error('terms_agree')
 						<p class="c_red" role="alert">{{ $message }}</p>

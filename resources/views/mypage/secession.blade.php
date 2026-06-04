@@ -18,12 +18,12 @@
 				탈퇴와 재가입을 통해 아이디를 교체하면서 선량한 이용자들께 피해를 끼치는 행위를 방지하기 위한 조치이오니 넓은 양해 바랍니다.<br/>
 				회원탈퇴 즉시 회원정보는 영구 삭제되며 회원제 서비스와 관련하여 아래의 처리가 완료 됩니다.<br/>
 				<div class="dots_list">
-					<p>- 고객님의 개인정보 삭제</p>
+					<p>고객님의 개인정보 삭제</p>
 				</div>
 			</div>
 			<div class="checkbox">
-				<input type="checkbox" name="secession_agreed" id="save-id" value="1" @checked(old('secession_agreed')) required>
-				<label for="save-id"><i aria-hidden="true"></i><span><strong class="c_red">(필수)</strong> 모두 확인하였으며 이에 동의합니다.</span></label>
+				<input type="checkbox" name="secession_agreed" id="save-id" value="1" @checked(old('secession_agreed'))>
+				<label for="save-id"><i aria-hidden="true"></i><span><strong class="c_iden">(필수)</strong> 모두 확인하였으며 이에 동의합니다.</span></label>
 			</div>
 			@error('secession_agreed')
 				<p class="c_red" role="alert">{{ $message }}</p>
@@ -33,14 +33,14 @@
 				<ul>
 					<li>
 						<label for="secession_password" class="tit">비밀번호<span class="c_iden">*</span></label>
-						<input type="password" name="password" class="text w100p" id="secession_password" placeholder="비밀번호를 입력해 주세요." autocomplete="current-password" required>
+						<input type="password" name="password" class="text w100p" id="secession_password" placeholder="비밀번호를 입력해 주세요." autocomplete="current-password">
 						@error('password')
 							<p class="c_red" role="alert">{{ $message }}</p>
 						@enderror
 					</li>
 					<li>
 						<label for="secession_reason" class="tit">탈퇴사유<span class="c_iden">*</span></label>
-						<textarea name="withdrawal_reason" id="secession_reason" cols="30" rows="10" class="text w100p" placeholder="탈퇴 사유를 간략하게 입력해 주세요." required>{{ old('withdrawal_reason') }}</textarea>
+						<textarea name="withdrawal_reason" id="secession_reason" cols="30" rows="10" class="text w100p" placeholder="탈퇴 사유를 간략하게 입력해 주세요.">{{ old('withdrawal_reason') }}</textarea>
 						@error('withdrawal_reason')
 							<p class="c_red" role="alert">{{ $message }}</p>
 						@enderror
@@ -48,8 +48,8 @@
 				</ul>
 			</div>
 			<div class="btns_btm flex_colm mt48">
+				<button type="submit" class="btn btn_wbb" id="btnWithdraw">회원탈퇴</button>			
 				<button type="button" class="btn btn_kwg js-mypage-secession-back">뒤로가기</button>
-				<button type="submit" class="btn btn_wbb" id="btnWithdraw">회원탈퇴</button>
 			</div>
 		</form>
 		

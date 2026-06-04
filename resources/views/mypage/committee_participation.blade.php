@@ -22,7 +22,7 @@
 			</div>
 		</div>
 		
-		<div class="board_list slide5 td_height">
+		<div class="board_list slide5 td_height mo_break_list">
 			<table>
 				<caption>참여중인 위원회 목록입니다.</caption>
 				<thead>
@@ -36,13 +36,21 @@
 				</thead>
 				<tbody>
 					@forelse ($committees as $committee)
+
 					<tr>
+
 						<td>{{ $committee->name }}</td>
+
 						<td>위원</td>
+
 						<td>-</td>
+
 						<td>참여 중</td>
+
 						<td><a href="{{ route('subcommittee.notice', ['committee' => $committee->id]) }}" class="btn btn_kwk">위원회 바로가기</a></td>
+
 					</tr>
+
 					@empty
 					<tr class="empty">
 						<td colspan="5">참여 중인 위원회가 없습니다.</td>

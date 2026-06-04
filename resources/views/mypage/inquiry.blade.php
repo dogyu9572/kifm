@@ -32,7 +32,7 @@
 			</div>
 		</div>
 		
-		<div class="board_list">
+		<div class="board_list mo_break_list">
 			<table>
 				<caption>임상 영양 및 대사 의학 연구회 공지사항 입니다.</caption>
 				<colgroup>
@@ -52,7 +52,7 @@
 				<tbody>
 					@forelse ($posts as $post)
 					<tr>
-						<td class="num">{{ $post->id }}</td>
+						<td class="num pc_vw">{{ $post->id }}</td>
 						<td class="tal"><a href="{{ route('mypage.inquiry_view', ['id' => $post->id]) }}">{{ $post->title }}</a></td>
 						<td class="reply"><span class="state {{ $post->reply_status_class }}">{{ $post->reply_status_label }}</span></td>
 						<td class="date">{{ \Illuminate\Support\Carbon::parse($post->created_at)->format('Y.m.d') }}</td>

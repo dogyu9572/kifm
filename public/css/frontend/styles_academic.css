@@ -30,8 +30,6 @@
 	.tabs button:after {content:""; position:absolute; bottom:0; left:50%; width:0; height:2px; background:#E60012; transform:translateX(-50%); transition:.2s linear;}
 	.tabs .on a,
 	.tabs .on button {color:#E60012; font-weight:700;}
-	.tabs li:hover a:after,
-	.tabs li:hover button:after,
 	.tabs .on a:after,
 	.tabs .on button:after{width:100%;}
 /* 팝업 */
@@ -167,7 +165,6 @@
 	.mc02 .list a:before {content:""; position:absolute; top:50%; left:0; width:3px; aspect-ratio:1/1; border-radius:50%; background:#888; transform:translateY(-50%);}
 	.mc02 .list .subject {font-weight:600;}
 	.mc02 .list .date {position:absolute; top:50%; right:0; font-size:16px; color:#888; transform:translateY(-50%);}
-	.mc02 .list a:hover .subject {text-decoration:underline;}
 	.mc03 .slide_area + .slide_area {margin-top:24px;}
 	.mc03 .tit {display:flex; align-items:center; gap:13px; margin-bottom:12px;}
 	.mc03 .tit h3 {font-size:16px; font-weight:600;}
@@ -295,8 +292,6 @@
 	.speakers_area p {font-size:16px;}
 	.speakers_area .name {margin-top:4px;}
 	.speakers_area .btn {display:block; font-size:16px; font-weight:600; line-height:36px; height:36px; width:80px; border-radius:8px; margin-top:16px; transition:.2s linear;}
-	.speakers_area .speakers_btn:hover {background:#fff;}
-	.speakers_area .speakers_btn:hover:after {opacity:1;}
 	.pop_speakers .inbox {width:720px;}
 	.pop_speakers .head {display:flex; align-items:center; margin-bottom:24px;}
 	.pop_speakers .head .imgfit {width:106px; height:106px; border-radius:50%;}
@@ -342,7 +337,7 @@
 	.member_inbox .after_info .tel_mail_infobox li + li:after {content:""; position:absolute; top:50%; left:-12px; background:#ddd; transform:translateY(-50%);}
 /* Registration - 결제 */
 	.registration_form_wrap .inbox {position:relative; padding-right:440px;}
-	fieldset { :hidden;}
+	fieldset {overflow:hidden;}
 	fieldset .float {float:left; width:100%;}
 	fieldset .float.mt {margin-top:10px;}
 	legend {display:block; width:100%; float:left;}
@@ -376,7 +371,7 @@
 	.coupon_sale dd {font-size:16px; font-weight:600;}
 	.btns_flex {display:flex; gap:8px;}
 	.btns_flex .radio {position:relative; width:calc(50% - 4px); margin:0 !important;}
-	.btns_flex .radio input {position:absolute; top:50%; left:50%; transform:translateY(-50%,-50%); z-index:-1;}
+	.btns_flex .radio input {position:absolute; top:50%; left:50%; transform:translateY(-50%); z-index:-1;}
 	.btns_flex .radio label {display:block; width:100%; padding:0;}
 	.btns_flex .radio span {display:block; width:100%; height:50px; line-height:48px; text-align:center; border:#ccc 1px solid; border-radius:8px; transition:color .2s linear, border-color .2s linear;}
 	.btns_flex .radio input:checked + label span {color:#222; font-weight:600; border-color:#222; border-width:2px; line-height:46px;}
@@ -499,7 +494,6 @@
 	.board_list th {font-weight:600; line-height:80px; border-bottom:#000 1px solid;}
 	.board_list td {font-weight:300; line-height:88px; border-bottom:#ddd 1px solid;}
 	.board_list td.tal a {display:inline-block; vertical-align:top; max-width:100%; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-	.board_list td.tal a:hover {font-weight:600; text-decoration:underline;}
 	.board_list .notice td.num:before {content:""; display:block; width:23px; height:23px; border-radius:50%; background:#E60012 url('/images/icon_notice_w.svg') no-repeat 50% 50%; margin:0 auto;}
 	.board_list span.state {display:block; width:80px; height:30px; line-height:30px; text-align:center; border-radius:4px; font-size:16px; margin:0 auto;}
 	.board_list span.state.ing {background:#2222220D;}
@@ -543,7 +537,6 @@
 	.btn_abso .btn:before {content:""; display:block; width:14px; height:14px; background:no-repeat 50% 50% / contain;}
 	.btn_abso .btn.i1:before {background-image:url('/images/icon_modify.svg');}
 	.btn_abso .btn.i2:before {background-image:url('/images/icon_delete.svg');}
-	.btn_abso .btn:hover {background:#f8f8f8;}
 	.board_bottom .btn_list {display:block; border-radius:8px; width:160px; font-weight:600; text-align:center; margin:0 auto; border:1px solid;}
 	/* 상세 */
 	.board_view {padding-top:40px; max-width:1000px; margin:0 auto;}
@@ -598,12 +591,12 @@
 	.excl_tri {font-size:16px; font-weight:600; padding-left:32px; background:url('/images/icon_excl_tri.svg') no-repeat 0 50%;}
 	.go_main_timer {font-size:16px; color:#000; font-weight:500; margin-top:60px; text-align:center;}
 	.go_main_timer strong {font-weight:500; padding-left:16px; background:url('/images/icon_timer.svg') no-repeat 0 50%;}
-	.after_txt {margin-top:40px; text-align: center;}
-	.after_txt p {color: #666;}
-	.after_txt .btn_link {display: block; line-height: 58px; height: 60px; width: 200px; border-radius:8px; border: 1px solid; margin: 24px auto 0;}
-	.academic_event_view_end .title_area.end_ico2:before {background-image: url('/images/icon_registration_end2.svg');}
-	.user_info {display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin-bottom:20px; padding:40px; border: #0088B8 2px solid; border-radius:8px; box-shadow: 0 4px 20px 0 rgba(0, 136, 184, 0.08);}
-	.user_info .name {font-size: 28px;}
-	.user_info .eng_name {font-size: 16px; color: #666; line-height: 1.6; margin: 8px 0 24px;}
-	.user_info p {font-size: 16px; color: #888; line-height: 1.6;}
-	.user_info strong {display: block; color: #222; font-weight: 600;}
+	.after_txt {margin-top:40px; text-align:center;}
+	.after_txt p {color:#666;}
+	.after_txt .btn_link {display:block; line-height:58px; height:60px; width:200px; border-radius:8px; border:1px solid; margin:24px auto 0;}
+	.academic_event_view_end .title_area.end_ico2:before {background-image:url('/images/icon_registration_end2.svg');}
+	.user_info {display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; margin-bottom:20px; padding:40px; border:#0088B8 2px solid; border-radius:8px; box-shadow:0 4px 20px 0 rgba(0, 136, 184, 0.08);}
+	.user_info .name {font-size:28px;}
+	.user_info .eng_name {font-size:16px; color:#666; line-height:1.6; margin:8px 0 24px;}
+	.user_info p {font-size:16px; color:#888; line-height:1.6;}
+	.user_info strong {display:block; color:#222; font-weight:600;}

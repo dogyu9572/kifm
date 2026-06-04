@@ -18,7 +18,7 @@
 				<table>
 					<tbody>
 						<tr>
-							<th scope="row">제목<span class="c_red">*</span></th>
+							<th scope="row">제목<span class="c_iden">*</span></th>
 							<td>
 								<input type="text" name="title" class="text w100p" value="{{ old('title', $post->title ?? '') }}" required>
 								@error('title')
@@ -27,7 +27,7 @@
 							</td>
 						</tr>
 						<tr>
-							<th scope="row">내용</th>
+							<th scope="row">내용<span class="c_iden">*</span></th>
 							<td>
 								<textarea name="content" cols="30" rows="10" class="text w100p" required>{{ old('content', $post->content ?? '') }}</textarea>
 								@error('content')

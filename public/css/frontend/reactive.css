@@ -1144,15 +1144,15 @@
 	.board_top .right.flex,
 	form.board_top,
 	.board_top form {gap:4px; width:100%; flex-basis:100%;}
-.btn_write {width:100px; height:40px; line-height:40px;}
-.board_top .btn_search_solo {width:40px; height:40px;}
+	.board_top form .left select {width:calc(100% - 44px);}
+	.btn_write {width:80px;}
 .flex_end.mb10 {margin-bottom:10px;}
 .flex_end .btn {padding:0 24px;}
 /* 게시판 하단 */
 	.board-pagination {margin-top:24px;}
 	.board-pagination .pagination {gap:2px;}
 	.board-pagination .pagination .page-link {width:32px; line-height:32px;}
-	.board-pagination .btn_abso {top:-20px;}
+	.board-pagination .btn_abso {position: relative; top:0; margin: 0 0 10px auto;}
 	.board_bottom {padding-top:20px; margin-top:20px;}
 .btn_abso {gap:8px;}
 .btn_abso .btn {gap:4px; font-size:14px; line-height:28px; height:30px; width:82px;}
@@ -1168,7 +1168,7 @@
 .board_list th {font-size:14px; line-height:40px;}
 .board_list td {font-size:15px; line-height:20px; height:50px;}
 .board_list .notice td.num:before {width:23px; height:23px;}
-.board_list span.state {width:80px; height:30px; line-height:30px; font-size:16px;}
+	.board_list span.state {width:60px; height:24px; line-height:24px; font-size:13px;}
 .board_list.slide4 th,
 .board_list.slide4 td {width:25%;}
 .board_list.slide5 th,
@@ -1189,6 +1189,9 @@
 	.mo_break_list .num {position:absolute; top:50%; left:0; width:20px; height:100%; transform:translateY(-50%);}
 	.mo_break_list .tal,
 	.mo_break_list .date {width:100%;}
+	.mo_break_list .reply {position: absolute; bottom:20px; right:0;}
+	.mo_break_list tr.empty {background:#f8f8f8;}
+	.mo_break_list tr.empty td {background:none; text-align: center;}
 /* 게시판 상세 */
 	.board_view .tit_area {padding:16px 36px 16px 0;}
 	.board_view .tit_area .tit {font-size:18px;}
@@ -1678,69 +1681,52 @@ fieldset .float.mt {margin-top:10px;}
 	.pop_account .gbox {padding:24px 16px; margin-bottom:4px;}
 	.pop_account .gbox p {font-size:13px;}
 	.pop_account .payment div {padding:12px 0;}
-.pop_account .payment dd {gap:13px;}
+	.pop_account .payment dd {gap:10px;}
 /* 회원탈퇴 */
-.secession_wrap .top_tit {font-size:28px; margin-bottom:24px;}
-.secession_wrap .top_tit:before {width:80px; height:80px; margin-bottom:8px;}
-.secession_wrap .gbox {font-size:16px;}
-.secession_wrap .dots_list p:before {top:12px;}
-.secession_wrap .checkbox {margin:16px 0 24px;}
-.secession_wrap .flex_colm {gap:10px;}
+	.secession_wrap .top_tit {font-size:20px; margin-bottom:20px;}
+	.secession_wrap .top_tit:before {width:50px; height:50px; margin-bottom:6px;}
+	.secession_wrap .gbox {font-size:14px;}
+	.secession_wrap .dots_list p:before {top:10px;}
+	.secession_wrap .checkbox {margin:12px 0 20px;}
+	.secession_wrap .flex_colm {gap:4px;}
 /* 참가내역 관리 */
-col.part_his134 {width:10%;}
-col.part_his180 {width:18%;}
-.participation_history_wrap td {height:88px; padding:17px 10px;}
-.participation_history_wrap .btn {font-size:14px; line-height:28px; height:30px; width:110px;}
-.participation_history_wrap .btn_un {font-size:14px;}
-.board_list .empty td {font-size:16px; padding:120px 10px;}
-.board_list .empty td:before {width:24px; height:24px; margin:0 auto 13px;}
-.excl_wrap {margin-top:48px;}
-.excl_wrap .excl {padding-left:28px; margin-bottom:12px;}
-.excl_wrap .excl:before {top:4px; width:20px;}
+	.participation_history_wrap .btn_un {font-size:13px;}
+	.board_list .empty td {font-size:14px; padding:60px 10px;}
+	.excl_wrap {margin-top:24px;}
+	.excl_wrap .excl {padding-left:24px; line-height:24px; margin-bottom:10px;}
+	.excl_wrap .excl:before {top:3px; width:18px;}
 /* 상세 */
-.participation_history_view_top h2 {font-size:24px;}
-.participation_history_view_top p {margin:12px 0;}
-.participation_history_view_top .tel_mail_infobox {gap:21px;}
-.participation_history_view_top .btns_btm {position:relative; top:0; right:0; transform:none; width:100%; flex-direction:row; gap:8px; padding-top:10px;}
-.participation_history_view_top .btns_btm .btn {max-width:calc(50% - 4px);}
-.row_th_bg th,
-.row_th_bg td {padding:8px; height:50px;}
-.row_th_bg th {width:120px;}
-.row_th_bg td {padding-left:20px; /* line-height:30px; */}
-.before_deposit {line-height:30px; height:30px; width:74px; border-radius:30px;}
+	.participation_history_view_top h2 {font-size:20px;}
+	.participation_history_view_top p {margin:10px 0;}
+	.participation_history_view_top .tel_mail_infobox {flex-direction:column; gap:4px;}
+	.participation_history_view_top .btns_btm {flex-direction:column; gap:4px;}
+	.participation_history_view_top .btns_btm .btn {max-width:100%;}
+	.row_th_bg table,
+	.row_th_bg tbody {display: block;}
+	.row_th_bg tr {display: flex; flex-wrap: wrap;}
+	.row_th_bg th,
+	.row_th_bg td {display: flex; align-items: center; padding:5px; height:50px;}
+	.row_th_bg th {width:80px; justify-content: center;}
+	.row_th_bg td {width:calc(100% - 80px); padding-left:12px; line-height:22px;}
+	.tbl tr:last-child th:nth-child(1),
+	.tbl tr:last-child td:nth-child(2) {border-bottom:#ebebeb 1px solid;}
+	.before_deposit {line-height:24px; height:24px; width:70px;}
 /* 참가내역 관리 */
-.tbl_break_list .part_his1 {width:100%; font-weight:600;}
-.tbl_break_list .part_his2 {width:80px;}
-.tbl_break_list .part_his3 {width:140px;}
-.tbl_break_list .part_his4 {width:140px;}
-.tbl_break_list .part_his5 {width:calc(100% - 540px);}
-.tbl_break_list .part_his6 {width:140px;}
-.tbl_break_list .part_his7,
-.tbl_break_list .part_his8,
-.tbl_break_list .part_his9 {width:calc((100% - 20px)/3); text-align:center;}
-.tbl_break_list td[class*="part_his"] a {width:100%;}
-.tbl_break_list td[class*="part_his"]:before {padding-right:5px;}
-.tbl_break_list .part_his2:before {content:"평점 :";}
-.tbl_break_list .part_his3:before {content:"결제 금액 :";}
-.tbl_break_list .part_his4:before {content:"결제 방법 :";}
-.tbl_break_list .part_his5:before {content:"신청일 :";}
-.tbl_break_list .part_his6:before {content:"신청 상태 :";}
+	.tbl_break_list .part_his1 {order:1; width:100%;}
+	.tbl_break_list .part_his2 {order:2; width:calc(50% - 5px);}
+	.tbl_break_list .part_his3 {order:3; width:calc(50% - 5px);}
+	.tbl_break_list .part_his4 {order:4; width:calc(50% - 5px);}
+	.tbl_break_list .part_his6 {order:5; width:calc(50% - 5px);}
+	.tbl_break_list .part_his5 {order:6; width:100%;}
+	.tbl_break_list .part_his5 br {display: none;}
+	.tbl_break_list .part_his7,
+	.tbl_break_list .part_his8,
+	.tbl_break_list .part_his9 {order:7;}
 /* 온라인 교육 수강내역 */
-.tbl_break_list .online1 {width:100%; font-weight:600;}
-.tbl_break_list .online2 {width:80px;}
-.tbl_break_list .online3 {width:calc(100% - 430px);}
-.tbl_break_list .online4 {width:180px;}
-.tbl_break_list .online5 {width:140px;}
-.tbl_break_list .online6,
-.tbl_break_list .online7,
-.tbl_break_list .online8 {width:calc((100% - 20px)/3); text-align:center;}
-.tbl_break_list td[class*="online"] a {width:100%;}
-.tbl_break_list td[class*="online"]:before {padding-right:5px;}
-.tbl_break_list .online4 br {display:none;}
-.tbl_break_list .online2:before {content:"평점 :";}
-.tbl_break_list .online3:before {content:"수강 기간 :";}
-.tbl_break_list .online4:before {content:"상태 :";}
-.tbl_break_list .online5:before {content:"수료증 :";}
+	.tbl_break_list .online2 {width:calc(50% - 5px);}
+	.tbl_break_list .online3 {width:calc(50% - 5px);}
+	.tbl_break_list .online4 {width:calc(50% - 5px);}
+	.tbl_break_list .online5 {width:calc(50% - 5px);}
 /* 1:1 문의 */
 .contact_info {padding:30px;}
 .contact_info:before {width:60px; height:60px; margin:0 auto 12px;}
@@ -1754,12 +1740,18 @@ col.part_his180 {width:18%;}
 .reply_wrap .file_area {margin-top:24px; padding:24px 0 0;}
 .reply_wrap .file_area a {line-height:28px;}
 /* 쓰기 */
-.inquiry_write_area {padding:16px 28px 28px 20px;}
-.inquiry_write_area th,
-.inquiry_write_area td {padding:8px 0; font-size:16px;}
-.inquiry_write_area th {width:136px; line-height:60px;}
-.inquiry_write_area td .text {height:60px; padding:0 16px;}
-.inquiry_write_area td textarea.text {height:200px; padding:16px;}
+	.inquiry_write_area {padding:16px;}
+	.inquiry_write_area table,
+	.inquiry_write_area tbody,
+	.inquiry_write_area th,
+	.inquiry_write_area td {display: block;}
+	.inquiry_write_area tr {display: flex; flex-direction: column; gap:4px;}
+	.inquiry_write_area tr + tr {margin-top:16px;}
+	.inquiry_write_area th,
+	.inquiry_write_area td {padding:0; font-size:13px; height:auto;}
+	.inquiry_write_area th {width:100%; line-height:20px;}
+	.inquiry_write_area td .text {height:40px; padding:0 12px;}
+	.inquiry_write_area td textarea.text {height:120px; padding:12px;}
 .file_wrap .flex {gap:10px;}
 .file_wrap .flex + .flex {margin-top:8px;}
 .file_wrap .flex .text {width:calc(100% - 200px);}
@@ -1773,41 +1765,41 @@ col.part_his180 {width:18%;}
 .file_list a {gap:10px; line-height:20px; padding:0 22px;}
 .file_list a:after {width:16px;}
 /* 즐겨찾는 메뉴 */
-.favorite_wrap .glbox {margin-top:20px;}
-.favorite_wrap .glbox .box {flex-wrap:wrap; gap:40px 0;}
-.favorite_wrap .glbox fieldset {width:calc(100% / 4); padding:0 16px; overflow:visible;}
-.favorite_wrap .glbox fieldset:nth-child(4n-3) {border-left:0;}
-.favorite_wrap .glbox fieldset:nth-child(-n+5):before {content:""; position:absolute; bottom:-20px; left:0; width:100%; height:1px; background:#ebebeb;}
-.favorite_wrap .glbox .mytit {font-size:18px;}
-.favorite_wrap .favorite_list {gap:3px;}
-.favorite_wrap .favorite_list li {font-size:15px;}
-.favorite_wrap .favorite_list .checkbox input {top:10px;}
-.favorite_wrap .favorite_list .checkbox i {top:3px;}
-.btn_reset {gap:4px;}
-.btn_reset:before {width:10px; height:11px;}
+	.favorite_wrap .glbox {margin-top:16px;}
+	.favorite_wrap .glbox .box {gap:20px 0;}
+	.favorite_wrap .glbox fieldset {width:100%; padding:16px; border-left:0;}
+	.favorite_wrap .glbox fieldset:nth-child(-n+5):before {bottom:-10px;}
+	.favorite_wrap .glbox .mytit {font-size:15px;}
+	.favorite_wrap .favorite_list {gap:2px; flex-direction: row; flex-wrap: wrap;}
+	.favorite_wrap .favorite_list li {width:calc(50% - 1px); font-size:14px;}
+	.favorite_wrap .favorite_list .checkbox i {top:1px;}
 /* 북마크 */
-.board_list col.page {width:120px;}
-.board_list col.bookmark_box {width:100px;}
+	.mo_break_list td.bookmark_box {position: absolute; top:10px; right:0;}
 /* 병원 정보 관리 */
-.hospital_information_area fieldset + fieldset {margin-top:80px;}
-.hospital_information_area .btit {font-size:28px; margin-bottom:24px; padding-bottom:16px;}
-.hospital_information_area textarea.edit_area {font-size:16px;}
-.profile_area {gap:20px;}
-.profile_area .img_area {width:240px;}
-.profile_area .img_area p {font-size:15px; margin-top:12px;}
-.profile_area .txt_area {width:calc(100% - 260px);}
-.profile_area .txt_area div + div {margin-top:24px;}
-.profile_area .txt_area dt {margin-bottom:8px;}
-.profile_area .txt_area dd textarea.edit_area {height:160px;}
-.checkbox_flex {gap:8px;}
-.checkbox_flex .checkbox {width:calc(50% - 4px);}
-.checkbox_flex .checkbox label {padding:10px 15px 10px 40px;}
-.checkbox_flex .checkbox label i {left:12px;}
-.hospital_information_area .tit {margin-bottom:8px;}
-.hospital_information_area .tit ~ .tit {margin-top:48px;}
-.hospital_information_area .text {padding:24px;}
-.hospital_information_area .about_hospital textarea.edit_area {height:220px;}
-/* 회원 활동(임원) - 상단 게시판 관리에 적용 */
+	.hospital_information_area fieldset + fieldset {margin-top:40px;}
+	.hospital_information_area .btit {font-size:20px; margin-bottom:16px; padding-bottom:12px;}
+	.hospital_information_area textarea.edit_area {font-size:13px;}
+	.profile_area {flex-direction: column;}
+	.profile_area .img_area {width:100%;}
+	.profile_area .img_area p {font-size:13px; margin-top:8px;}
+	.profile_area .txt_area {width:100%;}
+	.profile_area .txt_area div + div {margin-top:16px;}
+	.profile_area .txt_area dt {margin-bottom:6px;}
+	.profile_area .txt_area dd textarea.edit_area {height:120px;}
+	.checkbox_flex {gap:6px;}
+	.checkbox_flex .checkbox {width:100%;}
+	.checkbox_flex .checkbox label i {left:10px;}
+	.hospital_information_area .tit {margin-bottom:6px;}
+	.hospital_information_area .tit ~ .tit {margin-top:24px;}
+	.hospital_information_area .text {padding:12px;}
+	.hospital_information_area .about_hospital textarea.edit_area {height:160px;}
+/* 회원 활동(임원) */
+	.mo_break_list.slide4 tr td,
+	.mo_break_list.slide5 tr td {width:calc(50% - 5px);}
+	.mo_break_list.slide4 tr td:last-child,
+	.mo_break_list.slide5 tr td:last-child {width:100%;}
+	.mo_break_list.slide4 tr td .btn,
+	.mo_break_list.slide5 tr td .btn {width:100%;}
 /* 위원회 참여 현황 */
 .committee_participation_admin_top {margin-bottom:40px;}
 .committee_participation_admin_top .status_list {padding:32px 0;}

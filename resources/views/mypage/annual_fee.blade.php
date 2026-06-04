@@ -170,12 +170,14 @@
                         <input type="checkbox" name="terms_agree" id="terms_agree" required>
                         <label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
                     </div>
-                    <button type="submit" class="btn_submit btn_wbb"><span class="sound_only">90,000원 </span>결제하기</button>
-                    <button type="button" class="btn_cancel btn_kwg" data-history-back>뒤로가기</button>
-                </article>
-            </form>
-        </div>
+                    <button type="submit" class="btn_submit btn_wgg"><span class="sound_only" id="training-submit-amount">250,000원 </span>결제 약관에 동의해주세요.</button>
+					<button type="button" class="btn_cancel btn_kwg" data-history-back>뒤로가기</button>
+				</article>
+			</form>
+		</div>
+
 	</div>
+
 </section>
 
 </main>

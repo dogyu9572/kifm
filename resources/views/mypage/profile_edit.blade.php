@@ -24,7 +24,7 @@
 					<legend class="sound_only">기본정보 입력</legend>
 					<div class="num_tit_area">
 						<div class="mytit" aria-hidden="true">기본정보 입력</div>
-						<p class="abso c_red">* 은 필수 입력 항목입니다.</p>
+						<p class="abso c_iden">* 은 필수 입력 항목입니다.</p>
 					</div>
 					<div class="flex_inputs">
 						<ul>
@@ -40,35 +40,35 @@
 								<label for="register-pw">새로운 비밀번호<span class="c_iden">*</span> <p class="abso c_iden" aria-describedby="pw-help">* 비밀번호는 변경을 원하시는 경우에만 입력해 주세요.</p></label>
 								<input type="password" id="register-pw" name="password" class="text" placeholder="영문, 숫자, 특수문자 중 2종류 이상을 조합하여 10자리 이상으로 입력해주세요." autocomplete="new-password">
 								@error('password')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-pw-check">새로운 비밀번호 확인*<span class="c_iden">*</span></label>
 								<input type="password" id="register-pw-check" name="password_confirmation" class="text" placeholder="영문, 숫자, 특수문자 중 2종류 이상을 조합하여 10자리 이상으로 입력해주세요." autocomplete="new-password">
 								@error('password_confirmation')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-name-kor">한글 이름<span class="c_iden">*</span></label>
 								<input type="text" id="register-name-kor" name="name" class="text" placeholder="한글 이름을 입력해 주세요." value="{{ old('name', $user->name) }}" required>
 								@error('name')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-name-eng">영문 이름<span class="c_iden">*</span></label>
 								<input type="text" id="register-name-eng" name="name_en" class="text" placeholder="영문 이름을 입력해 주세요." value="{{ old('name_en', $user->name_en) }}" required>
 								@error('name_en')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-phone">휴대폰 번호<span class="c_iden">*</span></label>
 								<input type="text" id="register-phone" name="phone_number" class="text" placeholder="휴대폰 번호를 입력해 주세요." value="{{ old('phone_number', $phoneDisplay) }}" required>
 								@error('phone_number')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
@@ -78,7 +78,7 @@
 									<button type="button" class="btn btn_wkk" data-check-email data-check-url="{{ route('mypage.profile_edit.check-email') }}">중복 확인</button>
 								</div>
 								@error('email')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 						</ul>
@@ -89,7 +89,7 @@
 					<legend class="sound_only">추가정보 입력</legend>
 					<div class="num_tit_area">
 						<div class="mytit" aria-hidden="true">추가정보 입력</div>
-						<p class="abso c_red">* 은 필수 입력 항목입니다.</p>
+						<p class="abso c_iden">* 은 필수 입력 항목입니다.</p>
 					</div>
 					<div class="flex_inputs">
 						<ul>
@@ -104,7 +104,7 @@
 									@endforeach
 								</div>
 								@error('job_type')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
@@ -114,28 +114,28 @@
 									<button type="button" class="btn btn_wkk" data-check-license data-check-url="{{ route('mypage.profile_edit.check-license') }}">중복 확인</button>
 								</div>
 								@error('license_number')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-specialty">진료 과목<span class="c_iden">*</span></label>
 								<input type="text" id="register-specialty" name="specialty" class="text" value="{{ old('specialty', $user->specialty) }}" placeholder="진료 과목을 입력해 주세요." required>
 								@error('specialty')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-company">직장명<span class="c_iden">*</span></label>
 								<input type="text" id="register-company" name="workplace_name" class="text" placeholder="직장명을 입력해 주세요." value="{{ old('workplace_name', $user->workplace_name) }}" required>
 								@error('workplace_name')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-company-tel">직장전화<span class="c_iden">*</span></label>
 								<input type="text" id="register-company-tel" name="workplace_phone" class="text" placeholder="직장 전화번호를 입력해 주세요." value="{{ old('workplace_phone', $user->workplace_phone) }}" required>
 								@error('workplace_phone')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li class="w100p">
@@ -149,21 +149,21 @@
 									<input type="hidden" id="register-workplace-zipcode" name="workplace_zipcode" value="{{ old('workplace_zipcode', $user->workplace_zipcode) }}">
 								</div>
 								@error('workplace_address')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-graduation">학교 졸업년도</label>
 								<input type="text" id="register-graduation" name="graduate_year" class="text" placeholder="최종 학교 졸업년도를 숫자로면 입력해주세요 (예: 2020)" value="{{ old('graduate_year', $user->graduate_year) }}">
 								@error('graduate_year')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
 								<label for="register-university">출신 대학교</label>
 								<input type="text" id="register-university" name="school_name" class="text" placeholder="출신 대학교를 입력해 주세요. " value="{{ old('school_name', $user->school_name) }}">
 								@error('school_name')
-								<p class="c_red" role="alert">{{ $message }}</p>
+								<p class="c_iden" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 						</ul>

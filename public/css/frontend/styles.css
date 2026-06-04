@@ -3,7 +3,7 @@
 
 /* for styles */
 @import url("default.css");
-
+/* common */
 /* 인트로 */
 	.intro_wrap {position:relative; min-height:100vh; background:url('/images/bg_intro.svg') no-repeat 50% 50% / cover;}
 	.intro_wrap .link_btns {position:absolute; top:50px; right:160px; display:flex; gap:20px;}
@@ -824,6 +824,7 @@
 	.btns_flex .radio span {display:block; width:100%; height:60px; line-height:58px; text-align:center; border:#ddd 1px solid; border-radius:8px; transition:color .2s linear, border-color .2s linear;}
 	.btns_flex .radio input:checked + label span {color:#0088B8; font-weight:600; border-color:#0088B8; border-width:2px; line-height:56px;}
 	.training_course_view_wrap .c_red {font-size:16px; margin-top:10px; border-top:0; padding-top:0;}
+	.training_course_view_wrap .c_iden {font-size:16px; margin-top:10px; border-top:0; padding-top:0;}
 	.training_course_view_wrap .abso_application {width:380px; border-color:#0088B8; box-shadow:0 4px 10px 0 rgba(0, 136, 184, 0.10); padding:30px;}
 	.training_course_view_wrap .abso_application .tit {font-size:26px; font-weight:700; line-height:1.5; margin-bottom:16px;}
 	.training_course_view_wrap .abso_application .selected_item {color:#222; line-height:1.6; margin-bottom:28px;}
@@ -1119,7 +1120,7 @@
 	.register_step li.on i:before {background:#0088B8;}
 	.register_step li.on p {color:#0088B8;}
 	.num_tit_area {position:relative;}
-	.num_tit_area .abso {position:absolute; top:50%; right:0; font-size:16px; transform:translateY(-50%);}
+	.num_tit_area .abso {/* position:absolute;  */top:50%; right:0; font-size:16px; transform:translateY(-50%);}
 	.register_wrap fieldset {overflow:visible;}
 	.register_wrap .text,
 	.register_wrap .btn {border-radius:8px;}

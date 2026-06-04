@@ -22,7 +22,7 @@
 			</div>
 		</div>
 		
-		<div class="board_list slide4 td_height">
+		<div class="board_list slide4 td_height mo_break_list">
 			<table>
 				<caption>활동중인 임원 회원 목록입니다.</caption>
 				<thead>

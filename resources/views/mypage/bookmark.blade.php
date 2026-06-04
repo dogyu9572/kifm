@@ -43,7 +43,7 @@
 			</div>
 		</div>
 		
-		<div class="board_list" data-mypage-bookmark data-destroy-url="{{ route('mypage.bookmark.destroy') }}">
+		<div class="board_list mo_break_list" data-mypage-bookmark data-destroy-url="{{ route('mypage.bookmark.destroy') }}">
 			<table>
 				<caption>임상 영양 및 대사 의학 연구회 공지사항 입니다.</caption>
 				<colgroup>
