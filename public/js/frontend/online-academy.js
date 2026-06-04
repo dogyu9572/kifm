@@ -1,4 +1,6 @@
 (function () {
+    let courseCompletionAlertShown = false;
+
     function initSlides() {
         if (typeof Swiper === 'undefined' || !document.querySelector('.online_academy_slide_wrap')) {
             return;
@@ -259,6 +261,7 @@
         const testButton = document.querySelector('.btn_test');
         const buttonArea = document.querySelector('.btn_area');
         const textBox = document.querySelector('.txtbox');
+        const previousProgress = Math.max(0, Math.min(100, parseInt(container?.dataset.initialProgress || '0', 10) || 0));
 
         if (bar) {
             bar.style.width = progress + '%';
@@ -283,6 +286,10 @@
             textBox?.removeAttribute('aria-hidden');
             testButton?.classList.remove('disabled');
             testButton?.setAttribute('aria-disabled', 'false');
+            if (previousProgress < 100 && !courseCompletionAlertShown) {
+                courseCompletionAlertShown = true;
+                window.alert('강의 수강을 완료하였습니다.');
+            }
         }
     }
 
@@ -320,6 +327,20 @@
             end.classList.add('fail');
             end.closest('.test_page')?.querySelectorAll('.btn_woo2').forEach((button) => button.remove());
         }
+    }
+
+    function initExamEndBackGuard() {
+        const page = document.querySelector('[data-prevent-online-exam-back]');
+        if (!page) {
+            return;
+        }
+
+        const fallbackUrl = page.dataset.onlineExamBackUrl || '/online_academy/';
+        window.history.replaceState({ onlineExamEnd: true }, '', window.location.href);
+        window.history.pushState({ onlineExamEnd: true }, '', window.location.href);
+        window.addEventListener('popstate', function () {
+            window.location.replace(fallbackUrl);
+        });
     }
 
     function initHistoryBack() {
@@ -529,6 +550,7 @@
         let appliedDiscount = 0;
         let appliedCouponCode = '';
         let tossSdkPromise = null;
+        let csrfPreparedForSubmit = false;
 
         function numberFormat(value) {
             return new Intl.NumberFormat('ko-KR').format(Math.max(0, Number(value) || 0));
@@ -540,6 +562,57 @@
 
         function csrfToken() {
             return form.querySelector('input[name="_token"]')?.value || '';
+        }
+
+        function setCsrfToken(token) {
+            if (!token) {
+                return;
+            }
+
+            const csrfInput = form.querySelector('input[name="_token"]');
+            const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            if (csrfInput) {
+                csrfInput.value = token;
+            }
+            if (csrfMeta) {
+                csrfMeta.setAttribute('content', token);
+            }
+        }
+
+        async function refreshCsrfToken() {
+            if (!form.dataset.csrfUrl) {
+                return csrfToken();
+            }
+
+            const response = await fetch(form.dataset.csrfUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.token) {
+                throw new Error('CSRF token refresh failed.');
+            }
+
+            setCsrfToken(data.token);
+            return data.token;
+        }
+
+        async function fetchWithCsrfRetry(url, options) {
+            const requestOptions = Object.assign({}, options);
+            requestOptions.headers = Object.assign({}, requestOptions.headers || {}, {
+                'X-CSRF-TOKEN': csrfToken(),
+            });
+
+            let response = await fetch(url, requestOptions);
+            if (response.status !== 419) {
+                return response;
+            }
+
+            await refreshCsrfToken();
+            requestOptions.headers['X-CSRF-TOKEN'] = csrfToken();
+            return fetch(url, requestOptions);
         }
 
         function setCouponMessage(message) {
@@ -564,7 +637,7 @@
                 summarySubtotal.textContent = numberFormat(currentSubtotal);
             }
             if (summaryDiscount) {
-                summaryDiscount.textContent = '-' + numberFormat(discount);
+                summaryDiscount.textContent = discount > 0 ? '-' + numberFormat(discount) : '0';
             }
             if (summaryTotal) {
                 summaryTotal.textContent = numberFormat(total);
@@ -587,12 +660,11 @@
 
             couponButton.disabled = true;
             try {
-                const response = await fetch(form.dataset.couponUrl, {
+                const response = await fetchWithCsrfRetry(form.dataset.couponUrl, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken(),
                     },
                     body: JSON.stringify({
                         course_id: courseInput?.value || '',
@@ -612,6 +684,7 @@
                     couponInput.value = appliedCouponCode;
                 }
                 setCouponMessage(`${appliedCouponCode} / ${numberFormat(appliedDiscount)}원 할인`);
+                window.alert('쿠폰이 적용되었습니다.');
                 updateSummary();
             } catch (error) {
                 window.alert('쿠폰 확인 중 오류가 발생했습니다.');
@@ -682,11 +755,10 @@
 
         async function requestTossPayment() {
             syncPaymentMethod();
-            const response = await fetch(form.action, {
+            const response = await fetchWithCsrfRetry(form.action, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken(),
                 },
                 body: new FormData(form),
             });
@@ -732,6 +804,18 @@
         receiptRadios.forEach((input) => input.addEventListener('change', toggleReceiptArea));
         form.addEventListener('submit', async function (event) {
             if (syncPaymentMethod() === 'bank_transfer' || currentTotal() <= 0) {
+                if (csrfPreparedForSubmit) {
+                    return;
+                }
+
+                event.preventDefault();
+                try {
+                    await refreshCsrfToken();
+                    csrfPreparedForSubmit = true;
+                    form.requestSubmit();
+                } catch (error) {
+                    window.alert('결제 요청을 준비하는 중 오류가 발생했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
+                }
                 return;
             }
 
@@ -761,6 +845,7 @@
         initStateBars();
         initTestButton();
         initTestEnd();
+        initExamEndBackGuard();
         initHistoryBack();
         initPaymentStickyBox();
         initVimeoProgress();

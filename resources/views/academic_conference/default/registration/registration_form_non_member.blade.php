@@ -28,56 +28,56 @@
                     <legend class="form_tit mt0">결제자 정보</legend>
                     <ul class="inputs">
                         <li>
-                            <label for="user_name">이름(국문)<span class="required">*</span></label>
+                            <label for="user_name">한글 이름<span class="required c_iden">*</span></label>
                             <input type="text" id="user_name" name="name" class="text" value="{{ old('name') }}" placeholder="이름을 입력해주세요" required title="이름 입력 필수">
                             @error('name')
                                 <p class="c_red" role="alert">{{ $message }}</p>
                             @enderror
                         </li>
                         <li>
-                            <label for="user_email">이메일<span class="required">*</span></label>
+                            <label for="user_email">이메일<span class="required c_iden">*</span></label>
                             <input type="email" id="user_email" name="email" class="text" value="{{ old('email') }}" placeholder="이메일을 입력해주세요" required>
                             @error('email')
                                 <p class="c_red" role="alert">{{ $message }}</p>
                             @enderror
                         </li>
                         <li>
-                            <label for="user_tel">휴대폰번호<span class="required">*</span></label>
+                            <label for="user_tel">휴대폰번호<span class="required c_iden">*</span></label>
                             <input type="tel" id="user_tel" name="phone" class="text" value="{{ old('phone') }}" placeholder="휴대폰 번호를 입력해주세요" required inputmode="numeric" autocomplete="tel" maxlength="13">
                             @error('phone')
                                 <p class="c_red" role="alert">{{ $message }}</p>
                             @enderror
                         </li>
                         <li>
-                            <label for="user_name_eng">이름(영문)<span class="required">*</span></label>
+                            <label for="user_name_eng">영문 이름<span class="required c_iden">*</span></label>
                             <input type="text" id="user_name_eng" name="name_en" class="text" value="{{ old('name_en') }}" placeholder="영문이름을 입력해주세요" required title="영문이름 입력 필수">
                             @error('name_en')
                                 <p class="c_red" role="alert">{{ $message }}</p>
                             @enderror
                         </li>
                         <li>
-                            <label for="doctor_license">면허번호</label>
-							<input type="text" id="doctor_license" name="license_no" class="text" value="{{ old('license_no') }}" placeholder="면허번호를 입력해주세요">
+                            <label for="doctor_license">의사면허번호</label>
+							<input type="text" id="doctor_license" name="license_no" class="text" value="{{ old('license_no') }}" placeholder="의사면허번호를 입력해주세요">
                             @error('license_no')
                                 <p class="c_red" role="alert">{{ $message }}</p>
                             @enderror
                         </li>
-                        <li>
+<!--                         <li>
                             <label for="major_subject">전공과목<span class="required">*</span></label>
-							<input type="text" id="major_subject" name="major_subject" class="text" value="{{ old('major_subject') }}" placeholder="전공과목을 입력해주세요" required title="전공과목 입력 필수">
+                            <input type="text" id="major_subject" name="major_subject" class="text" value="{{ old('major_subject') }}" placeholder="전공과목을 입력해주세요" required title="전공과목 입력 필수">
                             @error('major_subject')
                                 <p class="c_red" role="alert">{{ $message }}</p>
                             @enderror
-                        </li>
+                        </li> -->
                         <li>
-                            <label for="affiliated_hospital">소속병의원명<span class="required">*</span></label>
-							<input type="text" id="affiliated_hospital" name="affiliated_hospital" class="text" value="{{ old('affiliated_hospital') }}" placeholder="소속병의원명을 입력해주세요" required title="소속병의원명 입력 필수">
+                            <label for="affiliated_hospital">직장명<span class="required c_iden">*</span></label>
+							<input type="text" id="affiliated_hospital" name="affiliated_hospital" class="text" value="{{ old('affiliated_hospital') }}" placeholder="직장명을 입력해주세요" required title="소속병의원명 입력 필수">
                             @error('affiliated_hospital')
                                 <p class="c_red" role="alert">{{ $message }}</p>
                             @enderror
                         </li>
                         <li>
-                            <label for="address_postcode">주소<span class="required">*</span></label>
+                            <label for="address_postcode">직장 주소<span class="required c_iden">*</span></label>
 							<div class="inbtn">
 								<input type="text" id="address_postcode" name="address_postcode" class="text" value="{{ old('address_postcode') }}" placeholder="우편번호를 입력해주세요" required title="우편번호 입력 필수" readonly>
 								<button type="button" class="btn btn_wkk" id="academic-registration-address-search">주소 검색</button>
@@ -166,21 +166,21 @@
                                     <input type="hidden" name="bank_account_text" value="국민은행 287937-00-000083 / 예금주 대한기능의학회">
 								</li>
 								<li>
-									<label for="name">입금자명<span class="required">*</span></label>
+									<label for="name">입금자명<span class="required c_iden">*</span></label>
 		                            <input type="text" id="name" name="bank_depositor" class="text" value="{{ old('bank_depositor') }}" placeholder="입금자명을 입력해 주세요">
                                     @error('bank_depositor')
                                         <p class="c_red" role="alert">{{ $message }}</p>
                                     @enderror
 								</li>
 								<li>
-									<label for="date">입금 예정일<span class="required">*</span></label>
+									<label for="date">입금 예정일<span class="required c_iden">*</span></label>
 		                            <input type="date" id="date" name="bank_deposit_date" class="text" value="{{ old('bank_deposit_date', now()->toDateString()) }}">
                                     @error('bank_deposit_date')
                                         <p class="c_red" role="alert">{{ $message }}</p>
                                     @enderror
 								</li>
 							</ul>
-							<p class="c_red" role="alert">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
+							<p class="c_red" role="alert c_iden">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
 						</div>
                     </div>
                 </fieldset>
@@ -208,7 +208,7 @@
 								</select>
 							</li>
 							<li>
-								<label for="receipt_number">현금영수증 번호<span class="required">*</span></label>
+								<label for="receipt_number">현금영수증 번호<span class="required c_iden">*</span></label>
 								<input type="text" id="receipt_number" name="receipt_number" class="text" value="{{ old('receipt_number') }}">
                                 @error('receipt_number')
                                     <p class="c_red" role="alert">{{ $message }}</p>
@@ -230,8 +230,8 @@
                             <dd><strong id="academic-summary-subtotal">{{ number_format((int) $subtotal) }}</strong>원</dd>
                         </div>
                         <div>
-                            <dt>할인 금액</dt>
-                            <dd><strong class="c_iden" id="academic-summary-discount">-0</strong>원</dd>
+                            <dt>쿠폰 할인</dt>
+                            <dd><strong class="" id="academic-summary-discount">0</strong>원</dd>
                         </div>
                         <div class="total">
                             <dt>최종 결제 금액</dt>
@@ -241,13 +241,13 @@
 
                     <div class="check_area checkbox">
                         <input type="checkbox" name="terms_agree" id="terms_agree" value="1" required @checked(old('terms_agree'))>
-                        <label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
-						<button type="button" class="view" data-popup-open="pop_terms">보기</button>
+                        <label for="terms_agree"><i></i><span><strong class="c_iden">(필수)</strong> 결제 이용 약관, 개인정보 처리 동의</span></label>
+<!-- 						<button type="button" class="view" data-popup-open="pop_terms">보기</button> -->
                     </div>
                     @error('terms_agree')
                         <p class="c_red" role="alert">{{ $message }}</p>
                     @enderror
-                    <button type="submit" class="btn_submit btn_wbb"><span class="sound_only" id="academic-submit-amount">{{ number_format((int) $subtotal) }}원 </span>등록 신청하기</button>
+                    <button type="submit" class="btn_submit btn_wbb"><span class="sound_only" id="academic-submit-amount">{{ number_format((int) $subtotal) }}원 </span>결제하기</button>
                 </article>
             </form>
         </div>

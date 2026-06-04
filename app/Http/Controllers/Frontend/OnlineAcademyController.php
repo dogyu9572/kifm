@@ -298,8 +298,21 @@ class OnlineAcademyController extends Controller
         ]);
 
         $course = $this->onlineAcademyService->findVisible((int) $validated['course_id']);
-        if (! $this->onlineAcademyService->priceForUser($course, $user)['eligible']) {
-            return back()->withInput()->withErrors(['course_id' => '현재 회원 등급으로 신청할 수 없는 강좌입니다.']);
+        $pricing = $this->onlineAcademyService->priceForUser($course, $user);
+        if (! $pricing['eligible']) {
+            return back()->withInput()->withErrors(['course_id' => $pricing['message']]);
+        }
+
+        if ((int) ($pricing['price'] ?? 0) <= 0) {
+            try {
+                $enrollment = $this->onlineAcademyService->createOrRefreshEnrollmentWithPayment($course, $user, [
+                    'payment_method' => 'card',
+                ]);
+            } catch (\RuntimeException $e) {
+                return back()->withInput()->withErrors(['course_id' => $e->getMessage()]);
+            }
+
+            return redirect()->route('online_academy.payment.end', ['enrollment' => $enrollment->id]);
         }
 
         return redirect()->route('online_academy.payment.checkout', ['course' => $course->id]);
@@ -350,6 +363,13 @@ class OnlineAcademyController extends Controller
         ));
     }
 
+    public function csrfToken(Request $request): JsonResponse
+    {
+        return response()->json([
+            'token' => csrf_token(),
+        ]);
+    }
+
     public function completePayment(Request $request): JsonResponse|RedirectResponse
     {
         $user = $this->frontendUser();
@@ -387,6 +407,14 @@ class OnlineAcademyController extends Controller
         try {
             $enrollment = $this->onlineAcademyService->createOrRefreshEnrollmentWithPayment($course, $user, $validated);
         } catch (\RuntimeException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                    'errors' => ['course_id' => [$e->getMessage()]],
+                ], 422);
+            }
+
             return back()->withInput()->withErrors(['course_id' => $e->getMessage()]);
         }
 

@@ -44,7 +44,7 @@ class RegistrationController extends Controller
 
     public function regResult(): View
     {
-        return $this->render('registration_result', '03', '학술대회 등록 확인 완료', 'academic_conference_reg_result');
+        return $this->render('registration_result', '03', '학술대회 등록 확인', 'academic_conference_reg_result');
     }
 
     private function render(string $view, string $sNum, string $sName, string $slug): View

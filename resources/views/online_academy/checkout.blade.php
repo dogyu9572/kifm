@@ -12,7 +12,7 @@
 	<h1 id="online-academy-checkout-heading" class="sound_only">온라인 아카데미 결제</h1>
 	<div class="inner">
 		<div class="inbox">
-			<form action="{{ route('online_academy.payment.complete') }}" method="POST" id="online-academy-checkout-form" data-coupon-url="{{ route('online_academy.payment.coupon') }}">
+			<form action="{{ route('online_academy.payment.complete') }}" method="POST" id="online-academy-checkout-form" data-coupon-url="{{ route('online_academy.payment.coupon') }}" data-csrf-url="{{ route('online_academy.payment.csrf_token') }}">
 				@csrf
 				<input type="hidden" name="course_id" value="{{ $course->id }}">
 				<fieldset>
@@ -157,7 +157,7 @@
 						</div>
 						<div>
 							<dt>쿠폰 할인</dt>
-							<dd><strong id="online-summary-discount">-0</strong>원</dd>
+							<dd><strong id="online-summary-discount">0</strong>원</dd>
 						</div>
 						<div class="total">
 							<dt>최종 결제 금액</dt>

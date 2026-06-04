@@ -9,7 +9,7 @@
 	$total = (int) ($result['total'] ?? 0);
 	$passed = (bool) ($result['passed'] ?? false);
 @endphp
-<main class="sub_area">
+<main class="sub_area" data-prevent-online-exam-back data-online-exam-back-url="{{ route('online_academy.index') }}">
 
 <section class="scon online_academy_test" aria-labelledby="online-academy-end-heading">
 	<h1 class="sound_only" id="online-academy-end-heading">학습 테스트 완료 페이지</h1>

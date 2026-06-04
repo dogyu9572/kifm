@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 
 class FrontendMemberLoginRequest extends FormRequest
 {
@@ -25,5 +27,13 @@ class FrontendMemberLoginRequest extends FormRequest
             'login_id.required' => '아이디를 입력해주세요.',
             'password.required' => '비밀번호를 입력해주세요.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        $this->session()->flash('alert', $validator->errors()->first());
+
+        throw (new ValidationException($validator))
+            ->redirectTo($this->getRedirectUrl());
     }
 }

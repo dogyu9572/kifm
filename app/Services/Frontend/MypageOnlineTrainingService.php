@@ -34,6 +34,17 @@ class MypageOnlineTrainingService
         return $query->paginate(20)->withQueryString();
     }
 
+    public function latestEnrollmentYear(User $user): ?int
+    {
+        $latest = EduCourseEnrollment::query()
+            ->where('member_id', $user->id)
+            ->whereNotNull('applied_at')
+            ->orderByDesc('applied_at')
+            ->value('applied_at');
+
+        return $latest ? (int) \Illuminate\Support\Carbon::parse($latest)->format('Y') : null;
+    }
+
     public function findForMember(User $user, int $id): ?EduCourseEnrollment
     {
         return EduCourseEnrollment::query()
@@ -84,6 +95,23 @@ class MypageOnlineTrainingService
         return [
             'PERSONAL' => '개인소득공제용',
             'CARD' => '사업자증빙용',
+        ];
+    }
+
+    /** @return array<string, string> */
+    public function memberGradeLabels(): array
+    {
+        return \App\Services\Backoffice\MemberService::memberLevelLabels();
+    }
+
+    /** @return array<string, string> */
+    public function examStatusLabels(): array
+    {
+        return [
+            'not_attempted' => '미응시',
+            'attempted' => '응시',
+            'passed' => '합격',
+            'failed' => '불합격',
         ];
     }
 }

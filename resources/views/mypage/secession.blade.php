@@ -25,25 +25,16 @@
 				<input type="checkbox" name="secession_agreed" id="save-id" value="1" @checked(old('secession_agreed'))>
 				<label for="save-id"><i aria-hidden="true"></i><span><strong class="c_iden">(필수)</strong> 모두 확인하였으며 이에 동의합니다.</span></label>
 			</div>
-			@error('secession_agreed')
-				<p class="c_red" role="alert">{{ $message }}</p>
-			@enderror
 			<div class="inputs_li">
 				<h2 class="sound_only">이메일 인증 정보 입력</h2>
 				<ul>
 					<li>
 						<label for="secession_password" class="tit">비밀번호<span class="c_iden">*</span></label>
 						<input type="password" name="password" class="text w100p" id="secession_password" placeholder="비밀번호를 입력해 주세요." autocomplete="current-password">
-						@error('password')
-							<p class="c_red" role="alert">{{ $message }}</p>
-						@enderror
 					</li>
 					<li>
 						<label for="secession_reason" class="tit">탈퇴사유<span class="c_iden">*</span></label>
 						<textarea name="withdrawal_reason" id="secession_reason" cols="30" rows="10" class="text w100p" placeholder="탈퇴 사유를 간략하게 입력해 주세요.">{{ old('withdrawal_reason') }}</textarea>
-						@error('withdrawal_reason')
-							<p class="c_red" role="alert">{{ $message }}</p>
-						@enderror
 					</li>
 				</ul>
 			</div>

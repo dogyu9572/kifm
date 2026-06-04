@@ -57,7 +57,7 @@ class MemberController extends Controller
         if (! Auth::attempt($credentials, false)) {
             return back()
                 ->withInput($request->only('login_id'))
-                ->withErrors(['login_id' => '아이디 또는 비밀번호가 올바르지 않습니다.']);
+                ->with('alert', '아이디 또는 비밀번호가 올바르지 않습니다.');
         }
 
         /** @var User $user */
@@ -68,7 +68,7 @@ class MemberController extends Controller
 
             return back()
                 ->withInput($request->only('login_id'))
-                ->withErrors(['login_id' => '탈퇴 처리된 계정입니다.']);
+                ->with('alert', '탈퇴 처리된 계정입니다.');
         }
 
         if ($user->member_level === 'pending') {

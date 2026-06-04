@@ -48,8 +48,8 @@
 					<p>확인 가능한 사전등록 내역이 없습니다. 입력하신 정보를 다시 확인해 주세요.</p>
 				</div>
 				<div class="btns_btm flex_center">
-					<a href="{{ $conferenceBaseUrl }}/registration/check_member" class="btn btn_kwg">회원 등록 조회</a>
-					<a href="{{ $conferenceBaseUrl }}/registration/check_non_member" class="btn btn_wbb">비회원 등록 조회</a>
+<!-- 					<a href="{{ $conferenceBaseUrl }}/registration/check_member" class="btn btn_kwg">회원 등록 조회</a> -->
+					<a href="{{ $conferenceBaseUrl }}/registration/form" class="btn btn_wbb">접수하기</a>
 				</div>
 			@else
 			<div class="gbox after_info print_area">
@@ -75,7 +75,7 @@
 					<h3 class="tit">결제자 정보</h3>
 					<dl>
 						<div>
-							<dt>이름(국문)</dt>
+							<dt>한글 이름</dt>
 							<dd>{{ $registration->name }}</dd>
 						</div>
 						<div>
@@ -83,27 +83,27 @@
 							<dd>{{ $phoneDisplay ?: '-' }}</dd>
 						</div>
 						<div>
-							<dt>이름(영문)</dt>
+							<dt>영문 이름</dt>
 							<dd>{{ $member?->name_en ?: ($source['name_en'] ?? '-') }}</dd>
 						</div>
 						<div>
-							<dt>면허번호</dt>
+							<dt>의사면허번호</dt>
 							<dd>{{ $registration->license_no ?: '-' }}</dd>
 						</div>
-						<div>
+<!-- 						<div>
 							<dt>전공과목</dt>
 							<dd>{{ $member?->medical_department ?: ($member?->specialty ?: ($source['major_subject'] ?? '-')) }}</dd>
-						</div>
+						</div> -->
 						<div>
-							<dt>소속병의원명</dt>
+							<dt>직장명</dt>
 							<dd>{{ $member?->workplace_name ?: ($source['affiliated_hospital'] ?? '-') }}</dd>
 						</div>
 						<div>
-							<dt>주소</dt>
+							<dt>직장 주소</dt>
 							<dd>{{ $address ?: '-' }}</dd>
 						</div>
 						<div>
-							<dt>전화번호</dt>
+							<dt>직장 전화</dt>
 							<dd>{{ $member?->workplace_phone ?: '-' }}</dd>
 						</div>
 						<div>

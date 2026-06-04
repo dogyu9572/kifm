@@ -126,6 +126,7 @@ Route::prefix('online_academy')->name('online_academy.')->group(function () {
     Route::get('/payment', [OnlineAcademyController::class, 'payment'])->name('payment');
     Route::post('/payment', [OnlineAcademyController::class, 'storePayment'])->name('payment.store');
     Route::get('/payment/checkout', [OnlineAcademyController::class, 'checkout'])->name('payment.checkout');
+    Route::get('/payment/csrf-token', [OnlineAcademyController::class, 'csrfToken'])->name('payment.csrf_token');
     Route::post('/payment/checkout', [OnlineAcademyController::class, 'completePayment'])->name('payment.complete');
     Route::get('/payment/toss/success', [OnlineAcademyController::class, 'confirmTossPayment'])->name('payment.toss_success');
     Route::get('/payment/toss/fail', [OnlineAcademyController::class, 'failTossPayment'])->name('payment.toss_fail');
@@ -200,6 +201,8 @@ Route::prefix('mypage')->name('mypage.')->middleware(['auth', 'frontend.member']
     // 연회비 납부
     Route::get('/annual_fee', [MypageAnnualFeeController::class, 'index'])->name('annual_fee');
     Route::post('/annual_fee', [MypageAnnualFeeController::class, 'store'])->name('annual_fee.store');
+    Route::get('/annual_fee/toss/success', [MypageAnnualFeeController::class, 'confirmTossPayment'])->name('annual_fee.toss_success');
+    Route::get('/annual_fee/toss/fail', [MypageAnnualFeeController::class, 'failTossPayment'])->name('annual_fee.toss_fail');
     Route::get('/annual_fee/end', [MypageAnnualFeeController::class, 'end'])->name('annual_fee_end');
 
     // 참가내역·수강·즐겨찾기·북마크

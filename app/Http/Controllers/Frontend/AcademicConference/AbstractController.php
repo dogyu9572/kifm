@@ -39,7 +39,7 @@ class AbstractController extends Controller
 
     public function modify(): View
     {
-        return $this->render('abstract_modify', '03', '학술대회 초록등록 확인 완료', 'academic_conference_abstract_modify');
+        return $this->render('abstract_modify', '03', '학술대회 초록등록 확인', 'academic_conference_abstract_modify');
     }
 
     private function render(string $view, string $sNum, string $sName, string $slug): View

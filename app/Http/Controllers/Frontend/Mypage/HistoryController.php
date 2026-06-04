@@ -52,13 +52,19 @@ class HistoryController extends Controller
 
     public function onlineTraining(Request $request): View
     {
-        $enrollments = $this->onlineTrainingService->paginate($this->currentMember(), $request);
+        $user = $this->currentMember();
+        $filterYear = $request->get('year') ?: $this->onlineTrainingService->latestEnrollmentYear($user);
+        if (! $request->filled('year') && $filterYear) {
+            $request->merge(['year' => $filterYear]);
+        }
+
+        $enrollments = $this->onlineTrainingService->paginate($user, $request);
 
         return $this->renderMypage('online_training', '03', '온라인 교육 수강내역', 'online_training', [
             'enrollments' => $enrollments,
             'statusLabels' => $this->onlineTrainingService->enrollmentStatusLabels(),
             'paymentStatusLabels' => $this->onlineTrainingService->paymentStatusLabels(),
-            'filterYear' => $request->get('year'),
+            'filterYear' => $filterYear,
             'filterStatus' => $request->get('status', 'all'),
             'filterKeyword' => $request->get('keyword'),
         ]);
@@ -76,6 +82,8 @@ class HistoryController extends Controller
             'paymentStatusLabels' => $this->onlineTrainingService->paymentStatusLabels(),
             'paymentMethodLabels' => $this->onlineTrainingService->paymentMethodLabels(),
             'receiptTypeLabels' => $this->onlineTrainingService->receiptTypeLabels(),
+            'memberGradeLabels' => $this->onlineTrainingService->memberGradeLabels(),
+            'examStatusLabels' => $this->onlineTrainingService->examStatusLabels(),
         ]);
     }
 

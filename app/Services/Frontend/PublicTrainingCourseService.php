@@ -239,7 +239,7 @@ class PublicTrainingCourseService
             return [
                 'eligible' => false,
                 'price' => 0,
-                'message' => '현재 회원 등급으로 신청할 수 없는 차수입니다.',
+                'message' => $grade['label'] . ' 등급으로 신청할 수 없는 차수입니다.',
                 'grade_code' => $grade['code'],
                 'grade_label' => $grade['label'],
             ];

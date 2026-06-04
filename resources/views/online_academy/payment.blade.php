@@ -31,7 +31,7 @@
 			@endif
 			<ul class="dots_list">
 				<li>수강기간: {{ $onlineAcademy->periodText($course) }}</li>
-				<li>수강 가능: {{ $pricing['grade_label'] ?? '회원' }}</li>
+				<li>수강 가능: {{ $onlineAcademy->courseGradeLabelText($course) }}</li>
 			</ul>
 		</div>
 
@@ -94,12 +94,12 @@
 			</dl>
 
 			@if (! $isEligible)
-				<p class="c_red" role="alert">{{ $pricing['message'] ?? '신청할 수 없는 강좌입니다.' }}</p>
+				<p class="c_red tb" role="alert"><strong>{{ $pricing['message'] ?? '신청할 수 없는 강좌입니다.' }}</strong></p>
 			@elseif ($isPending)
 				<p class="c_red" role="status">이미 신청 접수된 강좌입니다. 입금 확인 후 수강이 가능합니다.</p>
 			@endif
 
-			<form method="POST" action="{{ route('online_academy.payment.store') }}">
+			<form method="POST" action="{{ route('online_academy.payment.store') }}" @if(! $isEligible) hidden @endif>
 				@csrf
 				<input type="hidden" name="course_id" value="{{ $course->id }}">
 				<div class="check_area checkbox" @if($isPending) hidden @endif>
@@ -109,9 +109,12 @@
 				@error('terms_agree')
 					<p class="c_red" role="alert">{{ $message }}</p>
 				@enderror
-				<button type="submit" class="btn_submit btn_wbb" @disabled(! $isEligible || $isPending)>지금 수강 신청하기</button>
+				<button type="submit" class="btn_submit btn_wbb" @disabled($isPending)>{{ $price <= 0 ? '무료 수강 신청하기' : '지금 수강 신청하기' }}</button>
 				<button type="button" class="btn_cancel btn_kwg mt" data-history-back>돌아가기</button>
 			</form>
+			@if (! $isEligible)
+				<button type="button" class="btn_cancel btn_kwg mt" data-history-back>돌아가기</button>
+			@endif
 		</article>
 	</div>
 </section>

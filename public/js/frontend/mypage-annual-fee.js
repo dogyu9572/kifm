@@ -124,17 +124,85 @@
         handleStickyLayout();
     }
     function initPaymentForm() {
+        var form = document.querySelector('[data-annual-fee-form]');
         var container = document.querySelector('.abso_application');
-        if (!container) { return; }
+        if (!form || !container) { return; }
 
         var termsCheckbox = document.getElementById('terms_agree'); 
         var submitButton = container.querySelector('button[type="submit"]');
-        var totalAmount = 250000; 
+        var planRadios = document.querySelectorAll('input[name="membership_plan_id"]');
+        var selectedPlanLabel = document.querySelector('[data-selected-plan-label]');
+        var selectedPlanAmount = document.querySelector('[data-selected-plan-amount]');
+        var selectedPlanTotal = document.querySelector('[data-selected-plan-total]');
+        var totalAmount = 0;
         var paymentRadios = document.querySelectorAll('input[name="payment_method"]');
-        var cashReceiptRadios = document.querySelectorAll('input[name="cash_receipt"]');
+        var cashReceiptRadios = document.querySelectorAll('input[name="receipt_issue"]');
         var bankElements = document.querySelectorAll('.type_bank_hide');
         var cardElements = document.querySelectorAll('.type_card');
         var cashReceiptArea = document.querySelector('.cash_receipt_area');
+        var tossSdkPromise = null;
+
+        function csrfToken() {
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        }
+
+        function loadTossSdk() {
+            if (window.TossPayments) {
+                return Promise.resolve(window.TossPayments);
+            }
+            if (tossSdkPromise) {
+                return tossSdkPromise;
+            }
+
+            tossSdkPromise = new Promise(function (resolve, reject) {
+                var script = document.createElement('script');
+                script.src = 'https://js.tosspayments.com/v2/standard';
+                script.async = true;
+                script.onload = function () {
+                    if (window.TossPayments) {
+                        resolve(window.TossPayments);
+                        return;
+                    }
+                    reject(new Error('TossPayments SDK is not available.'));
+                };
+                script.onerror = function () {
+                    reject(new Error('Failed to load TossPayments SDK.'));
+                };
+                document.head.appendChild(script);
+            });
+
+            return tossSdkPromise;
+        }
+
+        function setDescendantsDisabled(elements, disabled) {
+            elements.forEach(function (el) {
+                el.querySelectorAll('input, select, textarea').forEach(function (field) {
+                    field.disabled = disabled;
+                });
+            });
+        }
+
+        function getSelectedPlan() {
+            return document.querySelector('input[name="membership_plan_id"]:checked');
+        }
+
+        function updatePlanSummary() {
+            var selectedPlan = getSelectedPlan();
+            var label = selectedPlan ? selectedPlan.getAttribute('data-plan-label') : '';
+            totalAmount = selectedPlan ? Number(selectedPlan.getAttribute('data-plan-amount') || 0) : 0;
+
+            if (selectedPlanLabel) {
+                selectedPlanLabel.textContent = label || '연회비';
+            }
+            if (selectedPlanAmount) {
+                selectedPlanAmount.textContent = numberFormat(totalAmount);
+            }
+            if (selectedPlanTotal) {
+                selectedPlanTotal.textContent = numberFormat(totalAmount);
+            }
+            updateSubmitButton();
+        }
+
         function handlePaymentLayoutToggle() {
             var selectedPayment = document.querySelector('input[name="payment_method"]:checked');
             var isBank = selectedPayment && selectedPayment.value === 'bank_transfer';
@@ -144,15 +212,21 @@
             cardElements.forEach(function (el) {
                 el.style.display = isBank ? 'none' : 'block';
             });
+            setDescendantsDisabled(bankElements, !isBank);
+
             if (isBank) {
-                var selectedReceipt = document.querySelector('input[name="cash_receipt"]:checked');
-                var isReceiptApply = selectedReceipt && selectedReceipt.value === '발행';
+                var selectedReceipt = document.querySelector('input[name="receipt_issue"]:checked');
+                var isReceiptApply = selectedReceipt && selectedReceipt.value === 'YES';
                 
                 if (cashReceiptArea) {
                     cashReceiptArea.style.display = isReceiptApply ? 'block' : 'none';
+                    setDescendantsDisabled([cashReceiptArea], !isReceiptApply);
                 }
             } else {
-                if (cashReceiptArea) { cashReceiptArea.style.display = 'none'; }
+                if (cashReceiptArea) {
+                    cashReceiptArea.style.display = 'none';
+                    setDescendantsDisabled([cashReceiptArea], true);
+                }
             }
             if (typeof window.jQuery !== 'undefined') {
                 window.jQuery(window).trigger('scroll.stickyApp');
@@ -178,12 +252,59 @@
         cashReceiptRadios.forEach(function (radio) {
             radio.addEventListener('change', handlePaymentLayoutToggle);
         });
+        planRadios.forEach(function (radio) {
+            radio.addEventListener('change', updatePlanSummary);
+        });
+
+        async function requestTossPayment() {
+            var response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                },
+                body: new FormData(form),
+            });
+            var data = await response.json().catch(function () { return {}; });
+
+            if (!response.ok || !data.success) {
+                var errors = data.errors || {};
+                var keys = Object.keys(errors);
+                var firstError = keys.length > 0 ? errors[keys[0]][0] : null;
+                window.alert(firstError || data.message || '입력 내용을 확인해주세요.');
+                return;
+            }
+
+            var TossPayments = await loadTossSdk();
+            var tossPayments = TossPayments(data.clientKey);
+            var payment = tossPayments.payment({ customerKey: data.customerKey });
+            await payment.requestPayment({
+                method: 'CARD',
+                amount: {
+                    value: Number(data.amount) || 0,
+                    currency: 'KRW',
+                },
+                orderId: data.orderId,
+                orderName: data.orderName,
+                customerName: data.customerName,
+                customerEmail: data.customerEmail,
+                customerMobilePhone: String(data.customerMobilePhone || '').replace(/\D/g, ''),
+                successUrl: data.successUrl,
+                failUrl: data.failUrl,
+            });
+        }
+
         if (submitButton) {
-            submitButton.addEventListener('click', function (event) {
+            submitButton.addEventListener('click', async function (event) {
+                if (!getSelectedPlan()) {
+                    event.preventDefault();
+                    window.alert('결제 항목을 선택해주세요.');
+                    return;
+                }
                 var selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (selectedPayment && selectedPayment.value === 'bank_transfer') {
-                    var nameInput = document.getElementById('name'); // 입금자명
-                    var dateInput = document.getElementById('date'); // 입금예정일
+                    var nameInput = document.getElementById('depositor_name');
+                    var dateInput = document.getElementById('deposit_expected_date');
 
                     if (nameInput && !nameInput.value.trim()) {
                         event.preventDefault();
@@ -197,17 +318,14 @@
                         dateInput.focus();
                         return;
                     }
-                    var selectedReceipt = document.querySelector('input[name="cash_receipt"]:checked');
-                    if (selectedReceipt && selectedReceipt.value === '발행' && cashReceiptArea) {
-                        var requiredInputs = cashReceiptArea.querySelectorAll('input[required]');
-                        for (var i = 0; i < requiredInputs.length; i++) {
-                            if (!requiredInputs[i].value.trim()) {
-                                event.preventDefault();
-                                var labelText = requiredInputs[i].closest('li').querySelector('label').textContent.replace('*', '').trim();
-                                window.alert(labelText + ' 항목을 입력해 주세요.');
-                                requiredInputs[i].focus();
-                                return;
-                            }
+                    var selectedReceipt = document.querySelector('input[name="receipt_issue"]:checked');
+                    if (selectedReceipt && selectedReceipt.value === 'YES' && cashReceiptArea) {
+                        var receiptNumber = document.getElementById('receipt_number');
+                        if (receiptNumber && !receiptNumber.value.trim()) {
+                            event.preventDefault();
+                            window.alert('현금영수증 번호를 입력해 주세요.');
+                            receiptNumber.focus();
+                            return;
                         }
                     }
                 }
@@ -215,9 +333,19 @@
                     event.preventDefault();
                     window.alert('결제 이용 약관 및 개인정보 처리 동의에 체크해주세요.');
                     termsCheckbox.focus();
+                    return;
+                }
+                if (selectedPayment && selectedPayment.value === 'card') {
+                    event.preventDefault();
+                    try {
+                        await requestTossPayment();
+                    } catch (error) {
+                        window.alert('토스페이먼츠 결제창을 여는 중 오류가 발생했습니다.');
+                    }
                 }
             });
         }
+        updatePlanSummary();
         handlePaymentLayoutToggle();
         updateSubmitButton();
     }

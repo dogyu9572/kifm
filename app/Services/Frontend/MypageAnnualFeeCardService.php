@@ -29,6 +29,17 @@ class MypageAnnualFeeCardService
         $bankAccount = (string) config('mypage.membership_bank_account_no');
         $bankHolder = (string) config('mypage.membership_bank_holder');
 
+        if ($this->isExemptMember($user)) {
+            return [
+                'mode' => 'paid',
+                'paid_at_formatted' => null,
+                'pending_payment' => null,
+                'bank_name' => $bankName,
+                'bank_account_no' => $bankAccount,
+                'bank_holder' => $bankHolder,
+            ];
+        }
+
         $latestCompleted = MembershipPayment::query()
             ->where('member_id', $user->id)
             ->where('payment_status', 'completed')
@@ -83,5 +94,10 @@ class MypageAnnualFeeCardService
         }
 
         return $dt->timezone(config('app.timezone'))->format('Y년 m월 d일 H:i:s');
+    }
+
+    private function isExemptMember(User $user): bool
+    {
+        return in_array($user->member_level, ['lifetime', 'senior'], true);
     }
 }

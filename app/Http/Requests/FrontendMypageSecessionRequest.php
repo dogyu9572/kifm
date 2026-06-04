@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class FrontendMypageSecessionRequest extends FormRequest
 {
@@ -45,5 +47,13 @@ class FrontendMypageSecessionRequest extends FormRequest
             'withdrawal_reason.required' => '탈퇴 사유를 입력해주세요.',
             'withdrawal_reason.max' => '탈퇴 사유는 1000자 이내로 입력해주세요.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        $this->session()->flash('alert', $validator->errors()->first());
+
+        throw (new ValidationException($validator))
+            ->redirectTo($this->getRedirectUrl());
     }
 }

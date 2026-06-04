@@ -257,6 +257,14 @@ class AcademicEventController extends Controller
         try {
             $payment = $this->trainingCourseService->createPayment($training, $validated, $this->frontendUser());
         } catch (\RuntimeException $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                    'errors' => ['round_ids' => [$e->getMessage()]],
+                ], 422);
+            }
+
             return back()->withInput()->withErrors(['round_ids' => $e->getMessage()]);
         }
 
@@ -314,7 +322,7 @@ class AcademicEventController extends Controller
         if (! $coupon) {
             return response()->json([
                 'success' => false,
-                'message' => '사용 가능한 쿠폰이 아닙니다.',
+                'message' => '사용이 불가한 쿠폰입니다.',
             ], 422);
         }
 

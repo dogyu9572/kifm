@@ -8,6 +8,8 @@
 	$statusLabel = $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status;
 	$paymentStatusLabel = $paymentStatusLabels[$enrollment->payment_status] ?? $enrollment->payment_status;
 	$methodLabel = $paymentMethodLabels[$enrollment->payment_method] ?? $enrollment->payment_method;
+	$memberGradeLabel = $memberGradeLabels[$enrollment->member_grade_at] ?? ($enrollment->member_grade_at ?: '-');
+	$examStatusLabel = $examStatusLabels[$enrollment->exam_status] ?? ($enrollment->exam_status ?: '-');
 	$receiptIssueValue = strtoupper((string) $enrollment->receipt_issue);
 	$isReceiptIssued = in_array($receiptIssueValue, ['YES', 'Y', '1', 'TRUE'], true);
 	$receiptTypeValue = strtoupper((string) $enrollment->receipt_type);
@@ -56,7 +58,7 @@
 						<th scope="row">이름</th>
 						<td>{{ $enrollment->member_name ?: '-' }}</td>
 						<th scope="row">회원 등급</th>
-						<td>{{ $enrollment->member_grade_at ?: '-' }}</td>
+						<td>{{ $memberGradeLabel }}</td>
 					</tr>
 					<tr>
 						<th scope="row">수강 상태</th>
@@ -72,7 +74,7 @@
 					</tr>
 					<tr>
 						<th scope="row">시험 상태</th>
-						<td>{{ $enrollment->exam_status ?: '-' }}</td>
+						<td>{{ $examStatusLabel }}</td>
 						<th scope="row">시험 점수</th>
 						<td>{{ $enrollment->exam_score !== null ? $enrollment->exam_score.'점' : '-' }}</td>
 					</tr>

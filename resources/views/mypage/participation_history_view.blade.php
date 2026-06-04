@@ -50,28 +50,28 @@
 						<td>-</td>
 					</tr>
 					<tr>
-						<th scope="row">이름(한글)</th>
+						<th scope="row">한글 이름</th>
 						<td>{{ $registration->name ?: ($member?->name ?? '-') }}</td>
-						<th scope="row">이름(영문)</th>
+						<th scope="row">영문 이름</th>
 						<td>{{ $member?->name_en ?: '-' }}</td>
 					</tr>
 					<tr>
-						<th scope="row">전화번호</th>
-						<td>{{ $member?->workplace_phone ?: '-' }}</td>
 						<th scope="row">휴대폰번호</th>
 						<td>{{ $registration->phone ?: ($member?->phone_number ?? '-') }}</td>
-					</tr>
-					<tr>
 						<th scope="row">이메일</th>
 						<td>{{ $registration->email ?: ($member?->email ?? '-') }}</td>
-						<th scope="row">전공과목</th>
-						<td>{{ $member?->specialty ?: '-' }}</td>
 					</tr>
 					<tr>
-						<th scope="row">면허번호</th>
+						<th scope="row">의사면허번호</th>
 						<td>{{ $registration->license_no ?: ($member?->license_number ?? '-') }}</td>
-						<th scope="row">소속병의원명</th>
+<!-- 						<th scope="row">전공과목</th>
+						<td>{{ $member?->specialty ?: '-' }}</td> -->
+					</tr>
+					<tr>
+						<th scope="row">직장명</th>
 						<td>{{ $member?->workplace_name ?: '-' }}</td>
+						<th scope="row">직장 전화</th>
+						<td>{{ $member?->workplace_phone ?: '-' }}</td>
 					</tr>
 					<tr>
 						<th scope="row">주소</th>
@@ -126,15 +126,16 @@
 			</table>
 		</div>
 
+		@if($registration->receipt_issue === 'YES')
 		<div class="num_tit"><span>3</span>현금 영수증 발급</div>
 		<div class="tbl row_th_bg">
 			<table>
 				<tbody>
 					<tr>
 						<th scope="row">현금 영수증</th>
-						<td>{{ $registration->receipt_issue === 'YES' ? '발행 신청' : '미신청' }}</td>
+						<td>발행 신청</td>
 						<th scope="row">발급 구분</th>
-						<td>{{ $registration->receipt_type ?: '-' }}</td>
+						<td>{{ ['PERSONAL' => '개인소득공제용', 'BUSINESS' => '현금영수증 카드번호'][$registration->receipt_type] ?? ($registration->receipt_type ?: '-') }}</td>
 					</tr>
 					<tr>
 						<th scope="row">휴대폰 번호</th>
@@ -145,6 +146,7 @@
 				</tbody>
 			</table>
 		</div>
+		@endif
 
 	</div>
 </section>

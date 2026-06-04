@@ -40,29 +40,29 @@
 				<form action="{{ route('academic_conference.site.abstract.store_non_member', $event->folder_name) }}" method="post" enctype="multipart/form-data" data-abstract-form>
 					@csrf
 					<fieldset>
-						<legend class="form_tit mt0">결제자 정보</legend>
+						<legend class="form_tit mt0">제출자 정보</legend>
 						<ul class="inputs float">
 							<li>
-								<label for="user_name" class="tit">이름(국문)</label>
-								<input type="text" id="user_name" name="author_name" class="text" value="{{ old('author_name') }}" placeholder="이름(국문)을 입력해주세요">
+								<label for="user_name" class="tit">한글 이름</label>
+								<input type="text" id="user_name" name="author_name" class="text" value="{{ old('author_name') }}" placeholder="한글 이름을 입력해주세요">
 								@error('author_name')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
-								<label for="user_name_eng" class="tit">이름(영문)</label>
-								<input type="text" id="user_name_eng" name="author_name_en" class="text" value="{{ old('author_name_en') }}" placeholder="이름(영문)을 입력해주세요">
+								<label for="user_name_eng" class="tit">영문 이름</label>
+								<input type="text" id="user_name_eng" name="author_name_en" class="text" value="{{ old('author_name_en') }}" placeholder="영문 이름을 입력해주세요">
 								@error('author_name_en')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-							<li>
+<!-- 							<li>
 								<label for="user_phone" class="tit">전화번호</label>
 								<input type="tel" id="user_phone" name="author_phone" class="text" value="{{ old('author_phone') }}" placeholder="전화번호를 입력해주세요">
 								@error('author_phone')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
-							</li>
+							</li> -->
 							<li>
 								<label for="user_tel" class="tit">휴대폰번호</label>
 								<input type="tel" id="user_tel" name="author_mobile" class="text" value="{{ old('author_mobile') }}" placeholder="휴대폰번호를 입력해주세요" inputmode="numeric" autocomplete="tel" maxlength="13">

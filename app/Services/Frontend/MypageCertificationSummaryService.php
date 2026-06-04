@@ -44,7 +44,8 @@ class MypageCertificationSummaryService
             ->where('enrollment_status', 'completed')
             ->exists();
 
-        $feePaid = ($user->annual_fee_status === 'paid')
+        $feePaid = in_array($user->member_level, ['lifetime', 'senior'], true)
+            || ($user->annual_fee_status === 'paid')
             || MembershipPayment::query()
                 ->where('member_id', $user->id)
                 ->where('payment_status', 'completed')

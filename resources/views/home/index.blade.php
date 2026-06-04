@@ -72,14 +72,8 @@
 						@csrf
 						<label for="main-login-id" class="sound_only">아이디</label>
 						<input type="text" id="main-login-id" name="login_id" class="text w100p" placeholder="아이디" value="{{ old('login_id') }}" required autocomplete="username">
-						@error('login_id')
-							<p class="c_red" role="alert">{{ $message }}</p>
-						@enderror
 						<label for="main-login-password" class="sound_only">비밀번호</label>
 						<input type="password" id="main-login-password" name="password" class="text w100p" placeholder="비밀번호" required autocomplete="current-password">
-						@error('password')
-							<p class="c_red" role="alert">{{ $message }}</p>
-						@enderror
 						<button type="submit" class="btn">로그인</button>
 						<ul class="mem_links">
 							<li><a href="{{ route('member.find_id') }}">아이디 찾기</a></li>

@@ -182,6 +182,9 @@
 
 @php
     $pendingPayment = ($annualFeeCard['pending_payment'] ?? null);
+    $pendingRefundHolder = $pendingPayment?->refund_holder_name ?: $user->name;
+    $pendingRefundBank = $pendingPayment?->refund_bank_name ?: '-';
+    $pendingRefundAccount = $pendingPayment?->refund_account_no ?: '-';
 @endphp
 <div class="popup pop_account" id="pop_cancel">
 	<div class="dm" data-layer-close="pop_cancel"></div>
@@ -203,9 +206,9 @@
 					<div>
 						<dt>환불 받으실 계좌</dt>
 						<dd>
-							<p>{{ $pendingPayment->refund_holder_name ?? $user->name }}</p>
-							<p>{{ $pendingPayment->refund_bank_name }}</p>
-							<p>{{ $pendingPayment->refund_account_no }}</p>
+							<p>{{ $pendingRefundHolder }}</p>
+							<p>{{ $pendingRefundBank }}</p>
+							<p>{{ $pendingRefundAccount }}</p>
 						</dd>
 					</div>
 				</dl>

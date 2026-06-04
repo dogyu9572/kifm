@@ -283,13 +283,14 @@
                 if (!response.ok || !data.success) {
                     resetCoupon();
                     updateSummary();
-                    window.alert(data.message || '사용 가능한 쿠폰이 아닙니다.');
+                    window.alert(data.message || '사용이 불가한 쿠폰입니다.');
                     return;
                 }
                 appliedCouponCode = code.toUpperCase();
                 appliedDiscount = Number(data.discount) || 0;
                 if (couponHidden) { couponHidden.value = appliedCouponCode; }
                 if (couponResult) { couponResult.textContent = appliedCouponCode + ' / ' + numberFormat(appliedDiscount) + '원 할인'; }
+                window.alert('쿠폰이 적용되었습니다.');
                 updateSummary();
             } catch (error) {
                 window.alert('쿠폰 확인 중 오류가 발생했습니다.');

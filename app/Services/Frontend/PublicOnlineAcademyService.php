@@ -268,20 +268,36 @@ class PublicOnlineAcademyService
 
     public function activeEnrollment(EduCourse $course, User $user): ?EduCourseEnrollment
     {
+        if (! $this->isWithinCoursePeriod($course)) {
+            return null;
+        }
+
         return EduCourseEnrollment::query()
             ->where('edu_course_id', $course->id)
             ->where('member_id', $user->id)
             ->whereNotIn('payment_status', ['cancel_requested', 'cancelled'])
+            ->where(function ($query): void {
+                $query->whereNull('expire_at')
+                    ->orWhere('expire_at', '>=', now());
+            })
             ->orderByDesc('id')
             ->first();
     }
 
     public function completedEnrollment(EduCourse $course, User $user): ?EduCourseEnrollment
     {
+        if (! $this->isWithinCoursePeriod($course)) {
+            return null;
+        }
+
         return EduCourseEnrollment::query()
             ->where('edu_course_id', $course->id)
             ->where('member_id', $user->id)
             ->whereIn('payment_status', self::PAYMENT_COMPLETED_STATUSES)
+            ->where(function ($query): void {
+                $query->whereNull('expire_at')
+                    ->orWhere('expire_at', '>=', now());
+            })
             ->orderByDesc('id')
             ->first();
     }
@@ -348,6 +364,15 @@ class PublicOnlineAcademyService
         $gradeLabels = \App\Services\Backoffice\MemberService::memberLevelLabels();
         $gradeLabel = $gradeLabels[$grade] ?? ($grade !== '' ? $grade : '회원');
 
+        if (! $this->isWithinCoursePeriod($course)) {
+            return [
+                'eligible' => false,
+                'price' => 0,
+                'grade_label' => $gradeLabel,
+                'message' => '수강 기간이 아닙니다.',
+            ];
+        }
+
         if ($this->isFreeCourse($course)) {
             return [
                 'eligible' => true,
@@ -374,6 +399,24 @@ class PublicOnlineAcademyService
             'grade_label' => $gradeLabel,
             'message' => '',
         ];
+    }
+
+    public function courseGradeLabelText(EduCourse $course): string
+    {
+        if ($this->isFreeCourse($course)) {
+            return '전체 회원';
+        }
+
+        $course->loadMissing('gradePrices');
+        $labels = \App\Services\Backoffice\MemberService::memberLevelLabels();
+        $enabled = $course->gradePrices
+            ->filter(static fn ($price): bool => (bool) $price->is_enabled)
+            ->map(static fn ($price): string => $labels[$price->grade_code] ?? (string) $price->grade_code)
+            ->filter()
+            ->values()
+            ->all();
+
+        return $enabled !== [] ? implode(', ', $enabled) : '신청 가능 회원 없음';
     }
 
     public function createOrRefreshEnrollment(EduCourse $course, User $user): EduCourseEnrollment
@@ -744,6 +787,23 @@ class PublicOnlineAcademyService
         $days = max(1, (int) ($course->duration_days ?: 30));
 
         return now()->addDays($days)->endOfDay();
+    }
+
+    private function isWithinCoursePeriod(EduCourse $course): bool
+    {
+        if ($course->period_type !== 'range') {
+            return true;
+        }
+
+        $now = now();
+        if ($course->period_start && $course->period_start->copy()->startOfDay()->gt($now)) {
+            return false;
+        }
+        if ($course->period_end && $course->period_end->copy()->endOfDay()->lt($now)) {
+            return false;
+        }
+
+        return true;
     }
 
     private function generatePaymentNo(): string
