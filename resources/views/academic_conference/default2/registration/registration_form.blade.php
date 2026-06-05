@@ -132,7 +132,7 @@
                         @error('payment')
                             <p class="c_red" role="alert">{{ $message }}</p>
                         @enderror
-                        
+
 						<div class="type_bank_hide bank_info_area">
                             <ul>
 								<li>
@@ -176,7 +176,7 @@
                                 <label for="cash_receipt"><span>발행</span></label>
                             </li>
                         </ul>
-                        
+
 						<ul class="bdt long_label cash_receipt_area">
 							<li>
 								<label for="receipt_type">발급 구분</label>
@@ -197,6 +197,7 @@
                 </fieldset>
 
                 <article class="abso_application">
+					<div class="mobile_opcl" aria-hidden="true"></div>
                     <h2 class="tit">결제자 정보</h2>
                     <dl class="price_info">
                         <div>
@@ -216,7 +217,7 @@
                             <dd><strong id="academic-summary-total">{{ number_format((int) $subtotal) }}</strong>원</dd>
                         </div>
                     </dl>
-                    
+
                     <div class="check_area checkbox">
                         <input type="checkbox" name="terms_agree" id="terms_agree" value="1" required @checked(old('terms_agree'))>
                         <label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>

@@ -78,7 +78,7 @@
 	.header .member .i2 {background:#222;}
 	.header .member .i1:before {background:#222; mask-image:url('/images/icon_academic_header01.svg'); -webkit-mask-image:url('/images/icon_academic_header01.svg');}
 	.header .member .i2:before {background:#fff; mask-image:url('/images/icon_academic_header02.svg'); -webkit-mask-image:url('/images/icon_academic_header02.svg');}
-	
+
 	.header.main {background:none;}
 	.header.main .logo {background:url('/images/logo_w.png') no-repeat 50% 50% / contain;}
 	.header.main .logo img {opacity:0;}
@@ -86,7 +86,7 @@
 	.header.main .member .btn {background:#FFFFFF1A;}
 	.header.main .member .i1 {border:none;}
 	.header.main .member .i1:before {background:#fff;}
-	
+
 	.header.fixed {background:#fff;}
 	.header.fixed .logo {background:none;}
 	.header.fixed .logo img {opacity:1;}
@@ -117,7 +117,7 @@
 	.footer .contact li + li {margin-top:4px;}
 	.footer .contact label {width:60px; opacity:.4;}
 	.footer .contact a {width:calc(100% - 68px);}
-	
+
 /* main */
 	.container_wrap.main {overflow:hidden; margin-top:0; min-height:100vh;}
 	body.ios_safe .container_wrap.main {margin-top:calc(var(--safe-top));}
@@ -292,7 +292,7 @@
 	.speakers_area .txt {width:calc(100% - 228px); padding:40px;}
 	.speakers_area .top {display:flex; gap:12px; align-items:center;}
 	.speakers_area .time {font-size:16px;}
-	.speakers_area h2 {font-size:24px; height:72px; margin:16px 0 22px; overflow:hidden; text-overflow:ellipsis; white-space:normal; word-wrap:break-word; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2;}
+	.speakers_area h2 {font-size:24px; height:58px; margin:16px 0 22px; overflow:hidden; text-overflow:ellipsis; white-space:normal; word-wrap:break-word; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2;}
 	.speakers_area p {font-size:16px;}
 	.speakers_area .name {margin-top:4px;}
 	.speakers_area .btn {display:block; font-size:16px; font-weight:600; line-height:36px; height:36px; width:80px; border-radius:8px; margin-top:16px; transition:.2s linear;}
@@ -370,6 +370,10 @@
 	.radios .radio input[disabled] + label strong {color:#888;}
 	.radios .radio input:checked + label {background:#fff;}
 	.radios .radio input:checked + label:before {opacity:1;}
+	.payment_option_group {float:left; width:100%;}
+	.payment_option_group + .payment_option_group {margin-top:48px;}
+	.payment_option_group .option_tit {font-size:18px; font-weight:600; padding:0 0 16px; border-bottom:#ebebeb 1px solid; margin:0 0 24px;}
+	.payment_option_group .c_red + .radios {margin-top:8px;}
 	.coupon_sale {margin-top:8px; display:flex; align-items:center; gap:12px;}
 	.coupon_sale dt {font-size:12px; color:#FF7200; font-weight:600; line-height:26px; height:26px; padding:0 8px; border-radius:13px; background:#FFF3E6;}
 	.coupon_sale dd {font-size:16px; font-weight:600;}
@@ -393,14 +397,17 @@
 	.registration_form_wrap .abso_application .tit {font-size:26px; font-weight:700; line-height:1.5; margin-bottom:16px;}
 	.registration_form_wrap .abso_application .selected_item {color:#222; line-height:1.6; margin-bottom:28px;}
 	.registration_form_wrap .abso_application .price_info {font-size:16px; line-height:1.6;}
-	.registration_form_wrap .abso_application .price_info div {display:flex; justify-content:space-between; align-items:center;}
+	.registration_form_wrap .abso_application .price_info div {display:flex; justify-content:space-between; align-items:flex-start;}
 	.registration_form_wrap .abso_application .price_info div + div {margin-top:10px;}
-	.registration_form_wrap .abso_application .price_info dd {display:flex; align-items:center; gap:4px;}
+	.registration_form_wrap .abso_application .price_info dt {width:110px;}
+	.registration_form_wrap .abso_application .price_info dd {width:calc(100% - 110px); display:flex; justify-content:flex-end; align-items:center; gap:4px; text-align:right;}
 	.registration_form_wrap .abso_application .price_info dd strong {font-size:20px; font-weight:600; letter-spacing:-.4px;}
-	.registration_form_wrap .abso_application .price_info .total {padding-top:20px; margin-top:20px; border-top:#ebebeb 1px solid;}
+	.registration_form_wrap .abso_application .price_info .total {padding-top:20px; margin-top:20px; border-top:#ebebeb 1px solid; align-items:center;}
 	.registration_form_wrap .abso_application .price_info .total dt {font-weight:700;}
 	.registration_form_wrap .abso_application .price_info .total dd strong {font-size:24px;}
 	.registration_form_wrap .abso_application .check_area {margin:35px 0 16px; font-size:16px; display:flex; align-items:center; gap:8px;}
+	.registration_form_wrap .abso_application .check_area input {top:10px;}
+	.registration_form_wrap .abso_application .check_area i {top:3px; transform:none;}
 	.registration_form_wrap .abso_application .check_area .view {font-size:14px; color:#0088B8; font-weight:400; text-decoration:underline;}
 	.registration_form_wrap .abso_application .btn_submit,
 	.registration_form_wrap .abso_application .btn_cancel {display:block; width:100%; height:60px; border-radius:8px; border:1px solid;}
@@ -452,7 +459,7 @@
 	.registration_check_wrap dd strong {font-weight:600;}
 /* Abstract */
 	.normal_tit {font-weight:400;}
-/* Abstract - Submission*/
+/* Abstract - Submission */
 	.abstract_form_wrap .input_wrap {margin-top:40px;}
 	.abstract_form_wrap .form_tit {font-size:24px; font-weight:700; padding:10px 0; border-bottom:#222 1px solid;}
 	.abstract_form_wrap .inputs {display:flex; flex-direction:column; gap:24px;}
@@ -460,14 +467,14 @@
 	.abstract_form_wrap .inputs .tit {font-weight:600;}
 	.abstract_form_wrap .inputs .text {border-radius:8px;}
 	.abstract_form_wrap .inputs .btn {height:60px; height:60px;}
-	
+
 	.select_abstract {display:flex; flex-wrap:wrap; gap:8px;}
 	.select_abstract .select_check {position:relative; width:calc((100% - 32px)/5);}
 	.select_abstract .select_check input {position:absolute; top:50%; left:50%; width:10px; height:10px; transform:translate(-50%,-50%);}
 	.select_abstract .select_check label {position:relative; display:flex; z-index:1;}
 	.select_abstract .select_check span {display:block; width:100%; height:50px; line-height:48px; text-align:center; border:#ccc 1px solid; border-radius:8px; background:#fff; transition:.2s linear;}
 	.select_abstract .select_check input:checked + label span {color:#0088B8; border-color:#0088B8;}
-	
+
 	.file_wrap .flex {gap:10px;}
 	.file_wrap .flex + .flex {margin-top:8px;}
 	.file_wrap .flex .text {flex:1 1 calc(100% - 200px);}
@@ -484,7 +491,7 @@
 	.file_list.none {padding-top:0;}
 	.file_list a {position:relative; display:flex; align-items:center; gap:10px; line-height:20px; padding:0 22px; background:url('/images/icon_file.svg') no-repeat 0 50% / 16px; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 	.file_list a:after {content:""; position:absolute; top:0; right:0; width:16px; height:100%; background:url('/images/icon_del.svg') no-repeat 50% 50% / contain;}
-	
+
 	.abstract_type .title_area:before {display:none;}
 	.abstract_type .title_area strong {font-weight:600;}
 	.abstract_type .inbox {max-width:580px;}

@@ -10,8 +10,8 @@
 	<img src="/images/logo.png" alt="대한기능의학회" class="logo" aria-hidden="true">
 	<div class="intro_contents inner">
 		<div class="tac">
-			<p>KIFM 2026 The 2026 Korean Institute for Functional Medicine</p>
-			<h2 class="title">2026 학술대회 <strong class="c_iden">현장등록</strong> 시스템</h2>
+			<p>KIFM 2026 The 2026 <br class="mo_w">Korean Institute for Functional Medicine</p>
+			<h2 class="title">2026 학술대회 <br class="mo_w"><strong class="c_iden">현장등록</strong> 시스템</h2>
 		</div>
 		<div class="links">
 			<a href="/academic_conference/onsite_info" class="i1"><h3>현장 등록 신청하기</h3><p>아직 등록을 하지 않으신 분께서는 <br class="pc_vw" aria-hidden="true">여기서 현장 등록을 진행해 주세요.</p><i class="btn">신청하기</i></a>

@@ -81,6 +81,7 @@ Route::prefix('subcommittee')->name('subcommittee.')->middleware(['auth', 'front
         Route::get('/discussion/write', [SubcommitteeController::class, 'discussionWrite'])->name('discussion_write');
         Route::post('/discussion/write', [SubcommitteeController::class, 'discussionStore'])->name('discussion_store');
         Route::get('/discussion/{id}', [SubcommitteeController::class, 'discussionShow'])->whereNumber('id')->name('discussion_show');
+        Route::post('/discussion/{id}/comments', [SubcommitteeController::class, 'discussionCommentStore'])->whereNumber('id')->name('discussion_comment_store');
         Route::get('/archives', [SubcommitteeController::class, 'archives'])->name('archives');
         Route::get('/archives/{id}', [SubcommitteeController::class, 'archivesShow'])->whereNumber('id')->name('archives_show');
     });

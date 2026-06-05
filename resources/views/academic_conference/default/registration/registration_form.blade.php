@@ -5,12 +5,20 @@
 @section('content')
 @php
     $member = $currentMember ?? null;
-    $selectedPlanIds = collect(old('payment_plan_ids', $paymentPlans->pluck('id')->take(1)->all()))
+    $defaultMembershipPlanId = ($showMembershipFeeNotice ?? false) ? (int) ($membershipPlans->first()?->id ?? 0) : 0;
+    $selectedMembershipPlanId = (int) old('membership_plan_id', $defaultMembershipPlanId);
+    $selectedMembershipPlan = $membershipPlans->firstWhere('id', $selectedMembershipPlanId);
+    $effectiveGrade = $selectedMembershipPlan?->grades?->pluck('grade')->first() ?: ($member?->member_level ?? '');
+    $eligiblePaymentPlans = $paymentPlans->filter(fn ($plan) => $plan->grades->pluck('grade')->contains($effectiveGrade))->values();
+    $selectedPlanIds = collect(old('payment_plan_ids', $eligiblePaymentPlans->pluck('id')->take(1)->all()))
         ->map(fn ($id) => (int) $id)
+        ->take(1)
         ->all();
     $subtotal = $paymentPlans
         ->whereIn('id', $selectedPlanIds)
         ->sum(fn ($plan) => (int) $plan->price_early);
+    $membershipSubtotal = $selectedMembershipPlan ? (int) ($selectedMembershipPlan->price ?? $selectedMembershipPlan->price_early ?? 0) : 0;
+    $subtotal += $membershipSubtotal;
 @endphp
 <main class="sub_area">
 
@@ -18,13 +26,11 @@
 	<div class="inner">
 		<h1 class="sound_only" id="registration-form-heading">{{ $sName }}</h1>
         <div class="inbox">
-            @if ($errors->any())
-                <div class="gbox">
-                    <p class="c_red" role="alert">입력 내용을 확인해주세요.</p>
-                </div>
-            @endif
-			<form action="{{ route('academic_conference.site.registration.store', $event->folder_name) }}" method="post" id="academic-registration-form" data-coupon-url="{{ route('academic_conference.site.registration.coupon', $event->folder_name) }}">
+			<form action="{{ route('academic_conference.site.registration.store', $event->folder_name) }}" method="post" id="academic-registration-form" data-coupon-url="{{ route('academic_conference.site.registration.coupon', $event->folder_name) }}" data-current-grade="{{ $member?->member_level }}">
                 @csrf
+                @error('registration')
+                    <p class="c_red" role="alert">{{ $message }}</p>
+                @enderror
                 <fieldset>
                     <legend class="form_tit mt0">결제자 정보</legend>
                     <ul class="inputs">
@@ -76,21 +82,52 @@
                 </fieldset>
 
                 <fieldset>
-                    <legend class="form_tit">결제 항목 선택</legend>
-					<ul class="radios float">
-                        @forelse ($paymentPlans as $plan)
-                            <li>
-                                <div class="checkbox">
-                                    <input type="checkbox" name="payment_plan_ids[]" id="payment_plan_{{ $plan->id }}" value="{{ $plan->id }}" data-price="{{ (int) $plan->price_early }}" data-label="{{ $plan->plan_name }}" @checked(in_array((int) $plan->id, $selectedPlanIds, true))>
-                                    <label for="payment_plan_{{ $plan->id }}"><i aria-hidden="true"></i><span>{{ $plan->plan_name }} <strong>{{ number_format((int) $plan->price_early) }}원</strong></span></label>
-                                </div>
-                            </li>
-                        @empty
-                            <li>
-                                <p class="c_red">회원정보와 일치하는 결제 항목이 없습니다. 관리자에게 문의해주세요.</p>
-                            </li>
-                        @endforelse
-					</ul>
+                    <legend class="form_tit">{{ (($showMembershipFeeNotice ?? false) && $membershipPlans->isNotEmpty()) ? '회비 납부' : '결제 항목 선택' }}</legend>
+                    @if (($showMembershipFeeNotice ?? false) && $membershipPlans->isNotEmpty())
+                        <div class="payment_option_group">
+                            <p class="c_red">회비 미납 상태입니다. 연회비를 함께 결제하면 선택한 회비 등급 기준으로 등록비를 선택할 수 있습니다.</p>
+                            <ul class="radios float">
+                                @foreach ($membershipPlans as $membershipPlan)
+                                    @php
+                                        $membershipGrade = $membershipPlan->grades->pluck('grade')->first() ?: $member?->member_level;
+                                        $membershipPrice = (int) ($membershipPlan->price ?? $membershipPlan->price_early ?? 0);
+                                    @endphp
+                                    <li>
+                                        <div class="radio">
+                                            <input type="radio" name="membership_plan_id" id="membership_plan_{{ $membershipPlan->id }}" value="{{ $membershipPlan->id }}" data-price="{{ $membershipPrice }}" data-label="{{ $membershipPlan->plan_name }}" data-grade="{{ $membershipGrade }}" @checked($selectedMembershipPlanId === (int) $membershipPlan->id) @if($loop->first) required @endif>
+                                            <label for="membership_plan_{{ $membershipPlan->id }}"><i aria-hidden="true"></i><span>{{ $membershipPlan->plan_name }} <strong>{{ number_format($membershipPrice) }}원</strong></span></label>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    @error('membership_plan_id')
+                        <p class="c_red" role="alert">{{ $message }}</p>
+                    @enderror
+                    <div class="payment_option_group">
+                        @if (($showMembershipFeeNotice ?? false) && $membershipPlans->isNotEmpty())
+                            <h2 class="option_tit">결제항목</h2>
+                        @endif
+                        <ul class="radios float">
+                            @forelse ($paymentPlans as $plan)
+                                @php
+                                    $planGrades = $plan->grades->pluck('grade')->filter()->values();
+                                    $isPlanEnabled = $planGrades->contains($effectiveGrade);
+                                @endphp
+                                <li @class(['end' => ! $isPlanEnabled])>
+                                    <div class="radio">
+                                        <input type="radio" name="payment_plan_ids[]" id="payment_plan_{{ $plan->id }}" value="{{ $plan->id }}" data-price="{{ (int) $plan->price_early }}" data-label="{{ $plan->plan_name }}" data-grades="{{ $planGrades->implode(',') }}" @checked(in_array((int) $plan->id, $selectedPlanIds, true)) @disabled(! $isPlanEnabled)>
+                                        <label for="payment_plan_{{ $plan->id }}"><i aria-hidden="true"></i><span>{{ $plan->plan_name }} <strong>{{ number_format((int) $plan->price_early) }}원</strong></span></label>
+                                    </div>
+                                </li>
+                            @empty
+                                <li>
+                                    <p class="c_red">회원정보와 일치하는 결제 항목이 없습니다. 관리자에게 문의해주세요.</p>
+                                </li>
+                            @endforelse
+                        </ul>
+                    </div>
                     @error('payment_plan_ids')
                         <p class="c_red" role="alert">{{ $message }}</p>
                     @enderror
@@ -127,7 +164,7 @@
                                     <label for="payment_type_bank"><span>무통장입금</span></label>
                                 </li>
                             </ul>
-                        <input type="hidden" name="payment_method" id="academic-payment-method" value="">
+                        <input type="hidden" name="payment_method" id="academic-payment-method" value="card">
 						<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
                         @error('payment')
                             <p class="c_red" role="alert">{{ $message }}</p>
@@ -197,6 +234,7 @@
                 </fieldset>
 
                 <article class="abso_application">
+					<div class="mobile_opcl" aria-hidden="true"></div>
                     <h2 class="tit">결제자 정보</h2>
                     <dl class="price_info">
                         <div>

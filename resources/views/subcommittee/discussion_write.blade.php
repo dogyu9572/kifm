@@ -17,8 +17,8 @@
 				<h2>심도있는 <strong class="c_iden">학술적 교류를 <br/>위한 토론의 장</strong>입니다.</h2>
 				<p>함께 나누고 싶은 토론 주제를 등록해 주세요</p>
 			</div>
-			
-			<form method="POST" action="{{ route('subcommittee.discussion_store', $committee) }}">
+
+			<form method="POST" action="{{ route('subcommittee.discussion_store', $committee) }}" data-subcommittee-discussion-form data-validation-message="{{ $errors->first() }}">
 				@csrf
 				<div class="discussion_body">
 					<dl class="glbox">
@@ -26,9 +26,6 @@
 							<dt>토론주제<span class="c_iden">*</span></dt>
 							<dd>
 								<input type="text" name="title" class="text w100p" value="{{ old('title') }}" placeholder="토론 주제를 입력해 주세요.">
-								@error('title')
-									<p class="c_red" role="alert">{{ $message }}</p>
-								@enderror
 							</dd>
 						</div>
 						<div>
@@ -39,9 +36,6 @@
 									<button type="button" class="obj btn_re" data-captcha-refresh aria-label="숫자 이미지 변경"></button>
 									<input type="text" name="captcha" class="obj text" maxlength="6" autocomplete="off">
 								</div>
-								@error('captcha')
-									<p class="c_red" role="alert">{{ $message }}</p>
-								@enderror
 							</dd>
 						</div>
 					</dl>
@@ -58,7 +52,11 @@
 
 	</div>
 </section>
-	
+
 </main>
 
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/frontend/subcommittee-discussion.js') }}"></script>
+@endpush

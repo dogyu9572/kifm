@@ -42,10 +42,12 @@
     @endif
 
     <div class="board-container" id="bo-session-abstracts-page">
-        <div class="board-header">
-            <a href="{{ $cancelUrl }}" class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left"></i> 행사로
-            </a>
+        <div class="board-page-header">
+            <div class="board-page-buttons">
+                <a href="{{ $cancelUrl }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> 행사로
+                </a>
+            </div>
         </div>
 
         <div class="board-card">

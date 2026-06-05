@@ -19,7 +19,6 @@
 /* 반응형 */
 @media (max-width:768px) {
 .popup-layer {width:90% !important; max-width:none !important; left:50% !important; top:50% !important; transform:translate(-50%, -50%); height:40% !important;}
-/* 레이어팝업은 모든 팝업이 동일한 크기로 */
 .popup-layer[data-display-type="layer"] {width:90% !important; max-width:none !important; height:40% !important;}
 .popup-body {padding:20px 20px 15px;}
 .popup-footer label,

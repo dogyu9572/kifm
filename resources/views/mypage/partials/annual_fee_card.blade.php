@@ -23,7 +23,13 @@
             @if (! empty($card['paid_at_formatted']))
                 <p>납부완료 일시: {{ $card['paid_at_formatted'] }}</p>
             @endif
-            <a href="{{ route('mypage.print_receipt') }}" class="btn btn_wkk" target="_blank">영수증 출력</a>
+            @if (! empty($card['exempt_without_payment']))
+                <p>평생회원 및 시니어회원은 연회비 납부 완료로 처리됩니다.</p>
+                <p>영수증이 필요할 경우 학회에 문의해주세요.</p>
+            @endif
+            @if (! empty($card['receipt_available']))
+                <a href="{{ route('mypage.print_receipt') }}" class="btn btn_wkk" target="_blank">영수증 출력</a>
+            @endif
         </div>
     @endif
 </section>

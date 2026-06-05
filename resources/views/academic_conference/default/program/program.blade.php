@@ -12,7 +12,7 @@
 <section class="scon" aria-labelledby="program-heading">
 	<div class="inner">
 		<h1 class="sub_title" id="program-heading">{{ $sName }}</h1>
-		
+
 		<div class="program_area" data-program-area>
 			@if ($sessionGroups->isNotEmpty())
 				<ul class="tabs full_line">
@@ -20,7 +20,7 @@
 						<li><a href="#session{{ $group['session']->id }}" data-program-tab>{{ $group['session']->name }}</a></li>
 					@endforeach
 				</ul>
-				
+
 				<div class="session_wrap">
 					@foreach ($sessionGroups as $group)
 						<section class="session_area" id="session{{ $group['session']->id }}">
@@ -68,12 +68,12 @@
 			@else
 				<div class="session_wrap">
 					<section class="session_area">
-						<h2>등록된 프로그램이 없습니다.</h2>
+						<h2 class="tac w100p">등록된 프로그램이 없습니다.</h2>
 					</section>
 				</div>
 			@endif
 		</div>
-		
+
 		<div class="btns_btm">
 			<a href="{{ $conferenceBaseUrl }}/registration/reg" class="btn btn_wbb">사전등록 바로가기</a>
 		</div>

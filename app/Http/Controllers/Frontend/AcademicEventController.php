@@ -26,7 +26,7 @@ class AcademicEventController extends Controller
         private readonly PublicTrainingCourseService $trainingCourseService,
         private readonly PublicBoardService $publicBoardService,
     ) {}
-	
+
 	public function annualSchedule(): View
     {
         $page_type = 'professional';
@@ -53,7 +53,7 @@ class AcademicEventController extends Controller
             'initialMonth',
         ));
     }
-	
+
 	public function academicHistory(Request $request): View
     {
         $page_type = 'professional';
@@ -233,6 +233,19 @@ class AcademicEventController extends Controller
             'refund_holder' => ['nullable', 'string', 'max:100'],
             'terms_agree' => ['accepted'],
         ], [
+            'round_ids.required' => '결제 항목을 선택해주세요.',
+            'round_ids.min' => '결제 항목을 선택해주세요.',
+            'name.required' => '이름을 입력해주세요.',
+            'phone.required' => '휴대폰번호를 입력해주세요.',
+            'email.required' => '이메일을 입력해주세요.',
+            'email.email' => '올바른 이메일 형식이 아닙니다.',
+            'payment_method.required' => '결제수단을 선택해주세요.',
+            'payment_method.in' => '결제수단을 확인해주세요.',
+            'bank_depositor.required_if' => '입금자명을 입력해주세요.',
+            'bank_deposit_date.required_if' => '입금 예정일을 선택해주세요.',
+            'bank_deposit_date.date' => '입금 예정일 형식을 확인해주세요.',
+            'receipt_type.required_if' => '현금영수증 발급 구분을 선택해주세요.',
+            'receipt_number.required_if' => '현금영수증 번호를 입력해주세요.',
             'terms_agree.accepted' => '결제 이용 약관, 개인정보 처리 동의가 필요합니다.',
         ]);
 
@@ -364,7 +377,12 @@ class AcademicEventController extends Controller
 
     public function downloadTrainingTextbook(EduTraining $training): StreamedResponse
     {
-        if ($training->status !== 'PUBLIC' || ! $training->textbook_file_path || ! Storage::disk('public')->exists($training->textbook_file_path)) {
+        if (
+            $training->status !== 'PUBLIC'
+            || ! $training->textbook_file_path
+            || ! $this->trainingCourseService->canDownloadTextbook($training, $this->frontendUser())
+            || ! Storage::disk('public')->exists($training->textbook_file_path)
+        ) {
             abort(404);
         }
 

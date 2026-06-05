@@ -56,7 +56,93 @@
         });
     }
 
+    function fieldValue(form, name) {
+        var input = form.querySelector('[name="' + name + '"]');
+        return input ? String(input.value || '').trim() : '';
+    }
+
+    function focusField(form, name) {
+        var input = form.querySelector('[name="' + name + '"]');
+        if (input) {
+            input.focus();
+        }
+    }
+
+    function isValidEmail(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function isValidPhone(value) {
+        return /^01[016789]\d{7,8}$/.test(String(value || '').replace(/\D/g, ''));
+    }
+
+    function alertAndFocus(form, name, message) {
+        window.alert(message);
+        focusField(form, name);
+    }
+
+    function validateFindIdForm(form) {
+        if (!fieldValue(form, 'name')) {
+            alertAndFocus(form, 'name', '이름을 입력해주세요.');
+            return false;
+        }
+        if (!fieldValue(form, 'phone_number')) {
+            alertAndFocus(form, 'phone_number', '휴대폰 번호를 입력해주세요.');
+            return false;
+        }
+        if (!isValidPhone(fieldValue(form, 'phone_number'))) {
+            alertAndFocus(form, 'phone_number', '휴대폰 번호 형식을 확인해주세요. (010 등 10~11자리)');
+            return false;
+        }
+        if (!fieldValue(form, 'email')) {
+            alertAndFocus(form, 'email', '이메일을 입력해주세요.');
+            return false;
+        }
+        if (!isValidEmail(fieldValue(form, 'email'))) {
+            alertAndFocus(form, 'email', '올바른 이메일 형식이 아닙니다.');
+            return false;
+        }
+
+        return true;
+    }
+
+    function validateFindPasswordForm(form) {
+        if (!fieldValue(form, 'login_id')) {
+            alertAndFocus(form, 'login_id', '아이디를 입력해주세요.');
+            return false;
+        }
+        if (!fieldValue(form, 'email')) {
+            alertAndFocus(form, 'email', '이메일 주소를 입력해주세요.');
+            return false;
+        }
+        if (!isValidEmail(fieldValue(form, 'email'))) {
+            alertAndFocus(form, 'email', '올바른 이메일 형식이 아닙니다.');
+            return false;
+        }
+        if (!fieldValue(form, 'phone_number')) {
+            alertAndFocus(form, 'phone_number', '휴대폰 번호를 입력해주세요.');
+            return false;
+        }
+        if (!isValidPhone(fieldValue(form, 'phone_number'))) {
+            alertAndFocus(form, 'phone_number', '휴대폰 번호 형식을 확인해주세요. (010 등 10~11자리)');
+            return false;
+        }
+
+        return true;
+    }
+
+    function bindSubmitValidation(form) {
+        form.addEventListener('submit', function (event) {
+            var isFindId = Boolean(form.querySelector('[name="name"]'));
+            var isValid = isFindId ? validateFindIdForm(form) : validateFindPasswordForm(form);
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.js-account-recovery-phone-input[name="phone_number"]').forEach(bindPhoneInput);
+        document.querySelectorAll('form.member_inbox').forEach(bindSubmitValidation);
     });
 })();

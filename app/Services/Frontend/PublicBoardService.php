@@ -3,9 +3,11 @@
 namespace App\Services\Frontend;
 
 use App\Models\Board;
+use App\Models\BoardComment;
 use App\Models\CommunityCommittee;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -170,6 +172,34 @@ class PublicBoardService
             'is_active' => true,
             'created_at' => now(),
             'updated_at' => now(),
+        ]);
+    }
+
+    public function listComments(string $slug, int $postId): Collection
+    {
+        return BoardComment::query()
+            ->forPost($slug, $postId)
+            ->whereNull('parent_id')
+            ->with(['replies' => function ($query) {
+                $query->orderBy('id');
+            }])
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function createComment(string $slug, int $postId, string $content, int $userId, string $authorName): BoardComment
+    {
+        return BoardComment::query()->create([
+            'board_slug' => $slug,
+            'post_id' => $postId,
+            'parent_id' => null,
+            'user_id' => $userId,
+            'author_name' => $authorName,
+            'password' => null,
+            'content' => $content,
+            'attachments' => null,
+            'depth' => 0,
+            'is_secret' => false,
         ]);
     }
 

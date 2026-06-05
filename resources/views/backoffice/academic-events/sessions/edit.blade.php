@@ -9,10 +9,15 @@
 
 @section('content')
     <div class="board-container">
-        <div class="board-header">
-            <a href="{{ $cancelUrl }}" class="btn btn-secondary btn-sm">
-                <i class="fas fa-arrow-left"></i> 행사로
-            </a>
+        <div class="board-page-header">
+            <div class="board-page-buttons">
+                <a href="{{ $cancelUrl }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-arrow-left"></i> 행사로
+                </a>
+                <a href="{{ route('backoffice.academic-events.sessions.abstracts', [$event, $session]) }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> 초록 등록
+                </a>
+            </div>
         </div>
 
         <div class="board-card">

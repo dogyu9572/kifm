@@ -3,14 +3,22 @@
 @section('gName', $gName)
 @section('sName', $sName)
 @section('content')
+@php
+	$isBankTransfer = $payment->payment_method === 'bank_transfer';
+@endphp
 <main class="sub_area">
 
 <section class="scon academic_event_view_end" aria-labelledby="training-course-end-heading">
     <div class="inner">
 		<div class="inbox">
 			<div class="title_area">
-				<h1 id="training-course-end-heading" class="title">결제가 <strong class="c_iden">완료</strong>되었습니다.</h1>
-				<p>신청하신 내역을 확인해 주세요.</p>
+				@if ($isBankTransfer)
+					<h1 id="training-course-end-heading" class="title">결제 신청이 <strong class="c_iden">완료</strong>되었습니다.</h1>
+					<p>아래 계좌정보로 입금하시면 확인 후 신청이 완료됩니다.</p>
+				@else
+					<h1 id="training-course-end-heading" class="title">결제가 <strong class="c_iden">완료</strong>되었습니다.</h1>
+					<p>신청하신 내역을 확인해 주세요.</p>
+				@endif
 			</div>
 
 			<div class="shadow_box">
@@ -39,27 +47,29 @@
 				</dl>
 			</div>
 
-			<div class="shadow_box">
-				<h2 class="tit">입금하실 계좌정보</h2>
-				<dl>
-					<div>
-						<dt>계좌번호</dt>
-						<dd>국민은행 287937-00-000083</dd>
-					</div>
-					<div>
-						<dt>예금주</dt>
-						<dd>대한기능의학회</dd>
-					</div>
-					<div>
-						<dt>입금자명</dt>
-						<dd>{{ $payment->bank_depositor ?: '-' }}</dd>
-					</div>
-					<div>
-						<dt>입금 예정일</dt>
-						<dd>{{ optional($payment->bank_deposit_date)->format('Y-m-d') ?: '-' }}</dd>
-					</div>
-				</dl>
-			</div>
+			@if ($isBankTransfer)
+				<div class="shadow_box">
+					<h2 class="tit">입금하실 계좌정보</h2>
+					<dl>
+						<div>
+							<dt>계좌번호</dt>
+							<dd>국민은행 287937-00-000083</dd>
+						</div>
+						<div>
+							<dt>예금주</dt>
+							<dd>대한기능의학회</dd>
+						</div>
+						<div>
+							<dt>입금자명</dt>
+							<dd>{{ $payment->bank_depositor ?: '-' }}</dd>
+						</div>
+						<div>
+							<dt>입금 예정일</dt>
+							<dd>{{ optional($payment->bank_deposit_date)->format('Y-m-d') ?: '-' }}</dd>
+						</div>
+					</dl>
+				</div>
+			@endif
 
 			<div class="shadow_box">
 				<h2 class="tit">상세 정보</h2>

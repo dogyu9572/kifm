@@ -128,7 +128,7 @@
                                 </li>
                                 <li>
                                     <label for="training-bank-date">입금 예정일<span class="required c_iden">*</span></label>
-                                    <input type="text" id="training-bank-date" name="bank_deposit_date" class="text" value="{{ old('bank_deposit_date') }}" placeholder="2026-02-15">
+                                    <input type="date" id="training-bank-date" name="bank_deposit_date" class="text" value="{{ old('bank_deposit_date', now()->toDateString()) }}">
                                     @error('bank_deposit_date')<span class="c_red">{{ $message }}</span>@enderror
                                 </li>
                             </ul>
@@ -207,7 +207,7 @@
 
                     <div class="check_area checkbox">
                         <input type="checkbox" name="terms_agree" id="training-terms-agree" required>
-                        <label for="training-terms-agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
+                        <label for="training-terms-agree"><i></i><span><strong class="c_iden">(필수)</strong> 결제 이용 약관, 개인정보 처리 동의</span></label>
                     </div>
                     @error('terms_agree')<span class="c_red">{{ $message }}</span>@enderror
                     <button type="submit" class="btn_submit btn_wgg"><span class="sound_only" id="training-submit-amount">0원 </span>결제 약관에 동의해주세요.</button>

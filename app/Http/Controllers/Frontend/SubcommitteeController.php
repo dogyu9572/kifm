@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FrontendSubcommitteeDiscussionCommentRequest;
 use App\Http\Requests\FrontendSubcommitteeDiscussionStoreRequest;
 use App\Models\CommunityCommittee;
 use App\Models\CommunityCommitteeApplication;
@@ -170,10 +171,11 @@ class SubcommitteeController extends Controller
         }
 
         ['prev' => $prev, 'next' => $next] = $this->publicBoardService->prevNext('community_committee_discussions', $id, $name);
+        $comments = $this->publicBoardService->listComments('community_committee_discussions', $id);
 
         return view('subcommittee.discussion_view', array_merge(
             $this->committeePageData($committee, '토론장', '02', 'community_committee_discussions'),
-            compact('post', 'prev', 'next'),
+            compact('post', 'prev', 'next', 'comments'),
         ));
     }
 
@@ -199,6 +201,31 @@ class SubcommitteeController extends Controller
         $request->session()->forget('captcha.discussion');
 
         return redirect()->route('subcommittee.discussion_show', [$committee, $postId]);
+    }
+
+    public function discussionCommentStore(
+        FrontendSubcommitteeDiscussionCommentRequest $request,
+        CommunityCommittee $committee,
+        int $id
+    ): RedirectResponse {
+        $this->assertMayAccessCommittee($committee);
+
+        $name = $committee->name;
+        $post = $this->publicBoardService->find('community_committee_discussions', $id, $name);
+        if ($post === null) {
+            throw new NotFoundHttpException();
+        }
+
+        $user = Auth::user();
+        $this->publicBoardService->createComment(
+            'community_committee_discussions',
+            $id,
+            $request->validated('content'),
+            (int) $user->id,
+            ($user->name ?: $user->login_id) ?: '회원'
+        );
+
+        return redirect()->route('subcommittee.discussion_show', [$committee, $id]);
     }
 
     public function archives(Request $request, CommunityCommittee $committee): View

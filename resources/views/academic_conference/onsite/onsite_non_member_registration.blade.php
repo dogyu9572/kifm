@@ -98,35 +98,35 @@
                                 <input type="radio" name="payment_type" id="payment_type_card" value="card" checked>
                                 <label for="payment_type_card"><span>신용카드</span></label>
                             </li>
-                            <li class="radio">
+                            <!-- <li class="radio">
                                 <input type="radio" name="payment_type" id="payment_type_bank" value="bank">
                                 <label for="payment_type_bank"><span>무통장입금</span></label>
-                            </li>
+                            </li> -->
                         </ul>
 						<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
-                        
-						<div class="type_bank_hide bank_info_area">
+
+						<!-- <div class="type_bank_hide bank_info_area">
 							<ul>
 								<li>
 									<label>입금하실 계좌번호</label>
-		                            <div class="text flex">
+								                            <div class="text flex">
 										<span><strong>국민은행</strong><p>287937-00-000083</p></span>
 										<span><strong>예금주</strong><p>대한기능의학회</p></span>
 									</div>
 								</li>
 								<li>
 									<label for="name">입금자명<span class="required">*</span></label>
-		                            <input type="text" id="name" name="name" class="text" placeholder="입금자명을 입력해 주세요">
+								                            <input type="text" id="name" name="name" class="text" placeholder="입금자명을 입력해 주세요">
 								</li>
 								<li>
 									<label for="date">입금 예정일<span class="required">*</span></label>
-		                            <input type="text" id="date" name="date" class="text" placeholder="2026-02-15">
+								                            <input type="text" id="date" name="date" class="text" placeholder="2026-02-15">
 								</li>
 							</ul>
 							<p class="c_red" role="alert">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
-						</div>
+						</div> -->
                     </div>
-					<div class="excl_area mt"><div class="excl_tri">현장 혼잡 방지를 위해 ‘카드 결제’만 가능합니다. 양해 부탁드리겠습니다.</div></div>
+					<div class="excl_area mt"><div class="excl_tri">현장 혼잡 방지를 위해 ‘카드 결제’만 가능합니다. <br class="mo_vw">양해 부탁드리겠습니다.</div></div>
                 </fieldset>
 
                 <fieldset class="type_bank_hide">
@@ -142,7 +142,7 @@
                                 <label for="cash_receipt"><span>발행</span></label>
                             </li>
                         </ul>
-                        
+
 						<ul class="bdt long_label cash_receipt_area">
 							<li>
 								<label for="receipt_type">발급 구분</label>
@@ -185,7 +185,7 @@
                             <dd><strong>240,000</strong>원</dd>
                         </div>
                     </dl>
-                    
+
                     <div class="check_area checkbox">
                         <input type="checkbox" name="terms_agree" id="terms_agree" required>
                         <label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
@@ -231,7 +231,7 @@
         const detailOffsetTop = $detail.offset().top;
         const detailHeight = $detail.outerHeight();
         const appHeight = $absoApp.outerHeight();
-        const fixStartPoint = detailOffsetTop - 120; 
+        const fixStartPoint = detailOffsetTop - 120;
         const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - 120;
         if (scrollTop >= fixStartPoint) {
             if (scrollTop >= unfixPoint) {
@@ -257,7 +257,7 @@
 		cardElements.forEach(el => el.style.display = isBank ? 'none' : 'block');
 		if (!isBank) {
 			document.getElementById('cash_receipt_non').checked = true;
-			handleCashReceiptChange(); 
+			handleCashReceiptChange();
 		}
 		$(window).trigger('scroll.stickyApp');
 	}

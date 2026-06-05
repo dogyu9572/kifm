@@ -80,11 +80,21 @@ class AcademicConferenceSiteController extends Controller
         $sName = $page['sName'];
         $gSlug = $page['gSlug'];
         $currentMember = $this->isFrontendMemberLoggedIn() ? auth()->user() : null;
+        if ($currentMember && in_array($normalizedPagePath, ['registration/reg', 'registration/form'], true) && $this->registrationService->hasActiveMemberRegistration($event, $currentMember)) {
+            return redirect()->to($conferenceBaseUrl . '/registration/result')
+                ->with('alert', '이미 사전등록 신청 내역이 있습니다.');
+        }
+        $membershipPlans = $currentMember && $normalizedPagePath === 'registration/form'
+            ? $this->registrationService->membershipPlansForUser($currentMember)
+            : collect();
         $paymentPlans = match (true) {
-            $currentMember && $normalizedPagePath === 'registration/form' => $this->registrationService->matchingConferencePlans($currentMember),
+            $currentMember && $normalizedPagePath === 'registration/form' => $this->registrationService->candidateConferencePlans($currentMember),
             $normalizedPagePath === 'registration/form_non_member' => $this->registrationService->nonMemberConferencePlans(),
             default => collect(),
         };
+        $showMembershipFeeNotice = $currentMember && $normalizedPagePath === 'registration/form'
+            ? $this->registrationService->shouldShowMembershipFeeNotice($currentMember)
+            : false;
         $registration = null;
         $registrationSummary = null;
         if ($normalizedPagePath === 'registration/end') {
@@ -160,6 +170,8 @@ class AcademicConferenceSiteController extends Controller
             'event',
             'currentMember',
             'paymentPlans',
+            'membershipPlans',
+            'showMembershipFeeNotice',
             'registration',
             'registrationSummary',
             'notices',
@@ -350,26 +362,28 @@ class AcademicConferenceSiteController extends Controller
         abort_unless($user?->role === 'user', 403);
 
         if (! $this->registrationService->canPreRegister($event)) {
-            return back()
-                ->withInput()
-                ->withErrors(['registration' => '사전등록 기간이 종료되었습니다.']);
+            return $this->registrationFormError($request, 'registration', '사전등록 기간이 종료되었습니다.');
         }
         if ($this->registrationService->hasActiveMemberRegistration($event, $user)) {
-            return back()
-                ->withInput()
-                ->withErrors(['registration' => '이미 사전등록 신청 내역이 있습니다.']);
+            return $this->registrationFormError($request, 'registration', '이미 사전등록 신청 내역이 있습니다.');
         }
 
-        $plans = $this->registrationService->selectedPlansForUser($user, $request->validated('payment_plan_ids'));
+        $membershipPlan = $this->registrationService->selectedMembershipPlanForUser($user, $request->validated('membership_plan_id'));
+        $requiresMembershipPlan = $this->registrationService->shouldShowMembershipFeeNotice($user)
+            && $this->registrationService->membershipPlansForUser($user)->isNotEmpty();
+        if ($requiresMembershipPlan && ! $membershipPlan) {
+            return $this->registrationFormError($request, 'membership_plan_id', '납부 가능한 연회비 항목을 선택해주세요.');
+        }
+        if ($request->filled('membership_plan_id') && ! $membershipPlan) {
+            return $this->registrationFormError($request, 'membership_plan_id', '납부 가능한 연회비 항목을 선택해주세요.');
+        }
+
+        $plans = $this->registrationService->selectedPlansForUser($user, $request->validated('payment_plan_ids'), $membershipPlan);
         if ($plans->isEmpty()) {
-            return back()
-                ->withInput()
-                ->withErrors(['payment_plan_ids' => '회원정보와 일치하는 결제 항목을 선택해주세요.']);
+            return $this->registrationFormError($request, 'payment_plan_ids', '선택한 회비 기준으로 결제 가능한 학술대회 등록비를 선택해주세요.');
         }
         if ($request->filled('coupon_code') && ! $this->registrationService->resolveCoupon($request->validated('coupon_code'), $plans)) {
-            return back()
-                ->withInput()
-                ->withErrors(['coupon_code' => '사용 가능한 쿠폰이 아닙니다.']);
+            return $this->registrationFormError($request, 'coupon_code', '사용 가능한 쿠폰이 아닙니다.');
         }
 
         if ($request->validated('payment_method') === 'card') {
@@ -381,12 +395,12 @@ class AcademicConferenceSiteController extends Controller
                 ], 422);
             }
 
-            $registration = $this->registrationService->createCardPendingRegistration($event, $user, $plans, $request->validated());
+            $registration = $this->registrationService->createCardPendingRegistration($event, $user, $plans, $request->validated(), $membershipPlan);
 
             return response()->json($this->tossPaymentPayload($event, $registration));
         }
 
-        $registration = $this->registrationService->createBankTransferRegistration($event, $user, $plans, $request->validated());
+        $registration = $this->registrationService->createBankTransferRegistration($event, $user, $plans, $request->validated(), $membershipPlan);
 
         return redirect()->to($conferenceBaseUrl . '/registration/end')
             ->with('academic_conference_registration_id', $registration->id)
@@ -399,26 +413,18 @@ class AcademicConferenceSiteController extends Controller
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
 
         if (! $this->registrationService->canPreRegister($event)) {
-            return back()
-                ->withInput()
-                ->withErrors(['registration' => '사전등록 기간이 종료되었습니다.']);
+            return $this->registrationFormError($request, 'registration', '사전등록 기간이 종료되었습니다.');
         }
         if ($this->registrationService->hasActiveNonMemberRegistration($event, $request->validated('email'), $request->validated('phone'))) {
-            return back()
-                ->withInput()
-                ->withErrors(['registration' => '이미 사전등록 신청 내역이 있습니다.']);
+            return $this->registrationFormError($request, 'registration', '이미 사전등록 신청 내역이 있습니다.');
         }
 
         $plans = $this->registrationService->selectedPlansForNonMember($request->validated('payment_plan_ids'));
         if ($plans->isEmpty()) {
-            return back()
-                ->withInput()
-                ->withErrors(['payment_plan_ids' => '비회원 결제 항목을 선택해주세요.']);
+            return $this->registrationFormError($request, 'payment_plan_ids', '비회원 결제 항목을 선택해주세요.');
         }
         if ($request->filled('coupon_code') && ! $this->registrationService->resolveCoupon($request->validated('coupon_code'), $plans)) {
-            return back()
-                ->withInput()
-                ->withErrors(['coupon_code' => '사용 가능한 쿠폰이 아닙니다.']);
+            return $this->registrationFormError($request, 'coupon_code', '사용 가능한 쿠폰이 아닙니다.');
         }
 
         if ($request->validated('payment_method') === 'card') {
@@ -649,6 +655,21 @@ class AcademicConferenceSiteController extends Controller
     {
         return (string) config('services.toss.client_key') !== ''
             && (string) config('services.toss.secret_key') !== '';
+    }
+
+    private function registrationFormError(Request $request, string $field, string $message): JsonResponse|RedirectResponse
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+                'errors' => [$field => [$message]],
+            ], 422);
+        }
+
+        return back()
+            ->withInput()
+            ->withErrors([$field => $message]);
     }
 
     private function tossPaymentPayload(AcademicEvent $event, AcademicEventRegistration $registration): array

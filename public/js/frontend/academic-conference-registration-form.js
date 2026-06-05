@@ -5,6 +5,7 @@
     }
 
     const paymentInputs = Array.from(form.querySelectorAll('input[name="payment_plan_ids[]"]'));
+    const membershipInputs = Array.from(form.querySelectorAll('input[name="membership_plan_id"]'));
     const couponInput = document.getElementById('coupon_num');
     const couponButton = document.getElementById('academic-coupon-apply-btn');
     const couponResult = document.querySelector('#academic-coupon-result dd');
@@ -65,8 +66,20 @@
         return paymentInputs.filter((input) => input.checked);
     }
 
+    function selectedMembershipPlan() {
+        return membershipInputs.find((input) => input.checked) || null;
+    }
+
+    function effectiveGrade() {
+        const membershipPlan = selectedMembershipPlan();
+        return membershipPlan?.dataset.grade || form.dataset.currentGrade || '';
+    }
+
     function subtotal() {
-        return selectedPlans().reduce((total, input) => total + (Number(input.dataset.price) || 0), 0);
+        const conferenceTotal = selectedPlans().reduce((total, input) => total + (Number(input.dataset.price) || 0), 0);
+        const membershipTotal = Number(selectedMembershipPlan()?.dataset.price || 0) || 0;
+
+        return conferenceTotal + membershipTotal;
     }
 
     function setCouponMessage(message) {
@@ -86,9 +99,12 @@
         const currentSubtotal = subtotal();
         const discount = Math.min(appliedDiscount, currentSubtotal);
         const total = Math.max(0, currentSubtotal - discount);
-        const itemLabel = plans.length > 0
-            ? plans.map((input) => input.dataset.label || input.value).join(', ')
-            : '-';
+        const itemLabels = plans.map((input) => input.dataset.label || input.value);
+        const membershipPlan = selectedMembershipPlan();
+        if (membershipPlan && membershipPlan.value && membershipPlan.dataset.label) {
+            itemLabels.unshift(membershipPlan.dataset.label);
+        }
+        const itemLabel = itemLabels.length > 0 ? itemLabels.join(', ') : '-';
 
         if (summaryItems) {
             summaryItems.textContent = itemLabel;
@@ -162,6 +178,25 @@
         return form.querySelector('input[name="payment_method_display"]:checked')?.value || 'card';
     }
 
+    function updateConferencePlanAvailability() {
+        const grade = effectiveGrade();
+        paymentInputs.forEach((input) => {
+            const grades = String(input.dataset.grades || '').split(',').filter(Boolean);
+            const enabled = grades.length === 0 || grades.includes(grade);
+            input.disabled = !enabled;
+            if (!enabled && input.checked) {
+                input.checked = false;
+            }
+        });
+
+        if (selectedPlans().length === 0) {
+            const firstEnabled = paymentInputs.find((input) => !input.disabled);
+            if (firstEnabled) {
+                firstEnabled.checked = true;
+            }
+        }
+    }
+
     function togglePaymentMethod() {
         const isBank = selectedPaymentMethod() === 'bank';
         if (paymentMethodInput) {
@@ -187,34 +222,154 @@
         }
     }
 
-    function bindStickySummary() {
-        if (!window.jQuery) {
+    function validateRequiredSelections() {
+        if (membershipInputs.length > 0 && !selectedMembershipPlan()) {
+            window.alert('연회비 결제 항목을 선택해주세요.');
+            membershipInputs[0]?.focus();
+            return false;
+        }
+        if (selectedPlans().length === 0) {
+            window.alert('결제 항목을 선택해주세요.');
+            paymentInputs[0]?.focus();
+            return false;
+        }
+
+        const terms = form.querySelector('input[name="terms_agree"]');
+        if (terms && !terms.checked) {
+            window.alert('결제 이용 약관, 개인정보 처리 동의가 필요합니다.');
+            terms.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    function validateBankTransferFields() {
+        if (selectedPaymentMethod() !== 'bank') {
+            return true;
+        }
+
+        const depositor = form.querySelector('input[name="bank_depositor"]');
+        if (depositor && !depositor.value.trim()) {
+            window.alert('입금자명을 입력해주세요.');
+            depositor.focus();
+            return false;
+        }
+
+        const depositDate = form.querySelector('input[name="bank_deposit_date"]');
+        if (depositDate && !depositDate.value.trim()) {
+            window.alert('입금 예정일을 선택해주세요.');
+            depositDate.focus();
+            return false;
+        }
+
+        const isReceipt = form.querySelector('input[name="receipt_issue"]:checked')?.value === 'YES';
+        const receiptNumber = form.querySelector('input[name="receipt_number"]');
+        if (isReceipt && receiptNumber && !receiptNumber.value.trim()) {
+            window.alert('현금영수증 번호를 입력해주세요.');
+            receiptNumber.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    function focusFirstInvalidField() {
+        const firstError = form.querySelector('.c_red[role="alert"]:not(.type_card)');
+        if (!firstError) {
             return;
         }
 
-        const $window = window.jQuery(window);
-        const $detail = window.jQuery('.registration_form_wrap');
-        const $absoApp = window.jQuery('.abso_application');
-        $window.on('scroll.stickyApp', function () {
-            const scrollTop = $window.scrollTop();
-            const detailOffsetTop = $detail.offset().top;
-            const detailHeight = $detail.outerHeight();
-            const appHeight = $absoApp.outerHeight();
-            const fixStartPoint = detailOffsetTop - 120;
-            const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - 120;
+        const container = firstError.closest('li, fieldset, form') || firstError.parentElement;
+        if (!container) {
+            return;
+        }
 
-            if (scrollTop >= fixStartPoint) {
-                if (scrollTop >= unfixPoint) {
-                    $detail.addClass('unfixed').removeClass('fixed');
-                } else {
-                    $detail.addClass('fixed').removeClass('unfixed');
-                }
-            } else {
-                $detail.removeClass('fixed unfixed');
+        const target = container.querySelector('input:not([type="hidden"]):not([disabled]):not([readonly]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])');
+        window.setTimeout(function () {
+            (target || firstError).scrollIntoView({ block: 'center' });
+            if (target) {
+                target.focus({ preventScroll: true });
             }
-        });
-        $window.trigger('scroll.stickyApp');
+        }, 80);
     }
+
+    function bindStickySummary() {
+		if (!window.jQuery || !document.querySelector('.registration_form_wrap .abso_application')) { return; }
+		const $window = window.jQuery(window);
+		const $detail = window.jQuery('.registration_form_wrap');
+		const $inbox = $detail.find('.inbox');
+		const $absoApp = window.jQuery('.abso_application');
+		let touchStartY = 0, startBottom = 0, isDragging = false, isUserOpened = true;
+		function handleStickyLayout() {
+			if (!$detail.length || !$absoApp.length) { return; }
+			const scrollTop = $window.scrollTop(), windowHeight = $window.height(), windowWidth = $window.width();
+			const detailOffsetTop = $detail.offset().top, detailHeight = $detail.outerHeight(), appHeight = $absoApp.outerHeight();
+			if (windowWidth <= 767) {
+				$inbox.css('padding-bottom', (appHeight + 20) + 'px');
+				const mobileUnfixPoint = (detailOffsetTop + detailHeight) - windowHeight;
+				if (scrollTop >= mobileUnfixPoint) {
+					$detail.addClass('unfixed').removeClass('fixed');
+					if (!isDragging) {
+						$absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)').addClass('open').css('bottom', '0px');
+					}
+				} else {
+					$detail.removeClass('unfixed').addClass('fixed');
+					if (!isDragging) {
+						if (isUserOpened) {
+							$absoApp.addClass('open').css('bottom', '0px');
+						} else {
+							$absoApp.removeClass('open');
+							$absoApp.css('bottom', `calc(-100% + (100vh - ${appHeight}px) + 33px)`);
+						}
+					}
+				}
+			} else {
+				$inbox.css('padding-bottom', '');
+				$absoApp.removeClass('open').css({ 'bottom': '', 'transition': '' });
+				const fixStartPoint = detailOffsetTop - 120;
+				const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - 120;
+				if (scrollTop >= fixStartPoint) {
+					if (scrollTop >= unfixPoint) { $detail.addClass('unfixed').removeClass('fixed'); }
+					else { $detail.addClass('fixed').removeClass('unfixed'); }
+				} else { $detail.removeClass('fixed unfixed'); }
+			}
+		}
+		$absoApp.on('touchstart.stickyApp', function (e) {
+			if ($window.width() > 767 || $detail.hasClass('unfixed')) { return; }
+			touchStartY = e.originalEvent.touches[0].clientY;
+			isDragging = true;
+			$absoApp.css('transition', 'none');
+			startBottom = window.innerHeight - $absoApp[0].getBoundingClientRect().bottom;
+		});
+		$absoApp.on('touchmove.stickyApp', function (e) {
+			if (!isDragging || $window.width() > 767 || $detail.hasClass('unfixed')) { return; }
+			const diffY = touchStartY - e.originalEvent.touches[0].clientY;
+			if (Math.abs(diffY) > 5 && e.cancelable) { e.preventDefault(); }
+			let currentBottom = startBottom + diffY;
+			if (currentBottom > 0) { currentBottom = 0; }
+			$absoApp.css('bottom', currentBottom + 'px');
+		});
+		$absoApp.on('touchend.stickyApp touchcancel.stickyApp', function (e) {
+			if (!isDragging || $window.width() > 767) { return; }
+			isDragging = false;
+			const diffY = touchStartY - e.originalEvent.changedTouches[0].clientY, appHeight = $absoApp.outerHeight(), isUnfixed = $detail.hasClass('unfixed');
+			$absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
+			const closedBottom = isUnfixed ? `-${appHeight - 33}px` : `calc(-100% + (100vh - ${appHeight}px) + 33px)`;
+			if (diffY > 30) {
+				$absoApp.addClass('open').css('bottom', '0px');
+				isUserOpened = true;
+			} else if (diffY < -30) {
+				$absoApp.removeClass('open').css('bottom', closedBottom);
+				isUserOpened = false;
+			} else {
+				if ($absoApp.hasClass('open')) { $absoApp.css('bottom', '0px'); isUserOpened = true; }
+				else { $absoApp.css('bottom', closedBottom); isUserOpened = false; }
+			}
+		});
+		$window.on('scroll.stickyApp resize.stickyApp', handleStickyLayout);
+		$window.trigger('scroll.stickyApp');
+	}
 
     function bindPopup() {
         document.querySelectorAll('[data-popup-open]').forEach((button) => {
@@ -364,12 +519,27 @@
             updateSummary();
         });
     });
+    membershipInputs.forEach((input) => {
+        input.addEventListener('change', function () {
+            if (appliedCouponCode) {
+                resetCoupon();
+            }
+            updateConferencePlanAvailability();
+            updateSummary();
+        });
+    });
     receiptRadios.forEach((input) => input.addEventListener('change', toggleReceiptArea));
     paymentMethodRadios.forEach((input) => input.addEventListener('change', togglePaymentMethod));
     if (couponButton) {
         couponButton.addEventListener('click', applyCoupon);
     }
     form.addEventListener('submit', async function (event) {
+        togglePaymentMethod();
+        if (!validateRequiredSelections() || !validateBankTransferFields()) {
+            event.preventDefault();
+            return;
+        }
+
         if (selectedPaymentMethod() === 'bank') {
             return;
         }
@@ -393,6 +563,8 @@
     bindPopup();
     bindAddressSearch();
     bindPhoneInput();
+    updateConferencePlanAvailability();
     togglePaymentMethod();
     updateSummary();
+    focusFirstInvalidField();
 })();

@@ -6,6 +6,7 @@
 @php
     $selectedPlanIds = collect(old('payment_plan_ids', $paymentPlans->pluck('id')->take(1)->all()))
         ->map(fn ($id) => (int) $id)
+        ->take(1)
         ->all();
     $subtotal = $paymentPlans
         ->whereIn('id', $selectedPlanIds)
@@ -17,13 +18,11 @@
 	<div class="inner">
 		<h1 class="sound_only" id="registration-form-heading">{{ $sName }}</h1>
         <div class="inbox">
-            @if ($errors->any())
-                <div class="gbox">
-                    <p class="c_red" role="alert">입력 내용을 확인해주세요.</p>
-                </div>
-            @endif
 			<form action="{{ route('academic_conference.site.registration.store_non_member', $event->folder_name) }}" method="post" id="academic-registration-form" data-coupon-url="{{ route('academic_conference.site.registration.coupon', $event->folder_name) }}">
                 @csrf
+                @error('registration')
+                    <p class="c_red" role="alert">{{ $message }}</p>
+                @enderror
                 <fieldset>
                     <legend class="form_tit mt0">결제자 정보</legend>
                     <ul class="inputs">
@@ -102,8 +101,8 @@
 					<ul class="radios float">
                         @forelse ($paymentPlans as $plan)
                             <li>
-                                <div class="checkbox">
-                                    <input type="checkbox" name="payment_plan_ids[]" id="payment_plan_{{ $plan->id }}" value="{{ $plan->id }}" data-price="{{ (int) $plan->price_early }}" data-label="{{ $plan->plan_name }}" @checked(in_array((int) $plan->id, $selectedPlanIds, true))>
+                                <div class="radio">
+                                    <input type="radio" name="payment_plan_ids[]" id="payment_plan_{{ $plan->id }}" value="{{ $plan->id }}" data-price="{{ (int) $plan->price_early }}" data-label="{{ $plan->plan_name }}" @checked(in_array((int) $plan->id, $selectedPlanIds, true))>
                                     <label for="payment_plan_{{ $plan->id }}"><i aria-hidden="true"></i><span>{{ $plan->plan_name }} <strong>{{ number_format((int) $plan->price_early) }}원</strong></span></label>
                                 </div>
                             </li>
@@ -149,7 +148,7 @@
                                 <label for="payment_type_bank"><span>무통장입금</span></label>
                             </li>
                         </ul>
-                        <input type="hidden" name="payment_method" id="academic-payment-method" value="">
+                        <input type="hidden" name="payment_method" id="academic-payment-method" value="card">
 						<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
                         @error('payment')
                             <p class="c_red" role="alert">{{ $message }}</p>

@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator as ValidationContract;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 
 class FrontendMemberResetPasswordRequest extends FormRequest
@@ -51,5 +53,12 @@ class FrontendMemberResetPasswordRequest extends FormRequest
             'password_confirmation.required' => '새 비밀번호 확인을 입력해주세요.',
             'password_confirmation.same' => '비밀번호 확인이 일치하지 않습니다.',
         ];
+    }
+
+    protected function failedValidation(ValidationContract $validator): void
+    {
+        $this->session()->flash('alert', $validator->errors()->first());
+
+        throw (new ValidationException($validator))->redirectTo($this->getRedirectUrl());
     }
 }

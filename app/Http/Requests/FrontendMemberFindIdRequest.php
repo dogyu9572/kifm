@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class FrontendMemberFindIdRequest extends FormRequest
 {
@@ -37,5 +39,12 @@ class FrontendMemberFindIdRequest extends FormRequest
             'email.required' => '이메일을 입력해주세요.',
             'email.email' => '올바른 이메일 형식이 아닙니다.',
         ];
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        $this->session()->flash('alert', $validator->errors()->first());
+
+        throw (new ValidationException($validator))->redirectTo($this->getRedirectUrl());
     }
 }

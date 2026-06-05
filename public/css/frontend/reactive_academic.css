@@ -83,154 +83,26 @@
 	.program_area .session_area + .session_area {margin-top:80px;}
 	.program_area .session_list > li {padding:24px 200px;}
 /* Speakers */
-.speakers_area {gap:40px;}
-.speakers_area li {width:calc(50% - 20px);}
-.speakers_area .imgfit {width:228px;}
-.speakers_area .txt {width:calc(100% - 228px); padding:40px;}
-.speakers_area .top {gap:12px;}
-.speakers_area .time {font-size:16px;}
-.speakers_area h2 {font-size:24px; height:72px; margin:16px 0 22px;}
-.speakers_area p {font-size:16px;}
-.speakers_area .name {margin-top:4px;}
-.speakers_area .btn {font-size:16px; line-height:36px; height:36px; width:80px; margin-top:16px;}
-.pop_speakers .head {margin-bottom:24px;}
-.pop_speakers .head .imgfit {width:106px; height:106px;}
-.pop_speakers .head .txt {width:calc(100% - 106px); padding-left:24px;}
-.pop_speakers .head .name {font-size:28px;}
-.pop_speakers .head .position {font-size:16px; margin-top:4px;}
-.pop_speakers .gbox {font-size:14px; padding:10px 24px;}
-.pop_speakers .gbox .scroll {max-height:280px;}
-.pop_speakers .gbox div + div {margin-top:16px;}
-.pop_speakers .gbox dt {margin-bottom:8px;}
-.pop_speakers .gbox dd p {padding-left:22px;}
-.pop_speakers .gbox dd p:before {top:9px; left:9px; width:3px; height:3px;}
+	.speakers_area {gap:30px;}
+	.speakers_area li {width:calc(50% - 15px);}
+	.speakers_area .imgfit {width:200px;}
+	.speakers_area .txt {width:calc(100% - 200px); padding:30px;}
+	.speakers_area .top {gap:10px;}
+	.speakers_area .time {font-size:15px;}
+	.speakers_area h2 {font-size:22px; height:58px;}
 
 /* Registration - Information */
-.info_section + .info_section {margin-top:48px;}
-.info_section .gbox dl {gap:8px;}
-.info_section .gbox dt {width:138px;}
-.info_section .gbox dd {width:calc(100% - 138px);}
-.dots_list li {padding-left:22px;}
-.dots_list li:before {top:12px; left:9px; width:3px; height:3px;}
 /* Registration - registration */
-.member_inbox {max-width:580px;}
-.member_inbox .inputs .input_row label {font-size:16px; margin-bottom:12px;}
-.member_inbox .inputs .input_row + .input_row {margin-top:20px;}
-.member_inbox .btn {height:60px; line-height:58px;}
-.member_inbox .btn + .btn {margin-top:12px;}
-.member_inbox .btn.mt {margin-top:32px;}
-.member_inbox .id_set {padding:12px 0 32px;}
-.member_inbox .id_set .btns {gap:33px;}
-.member_inbox .id_set .btns li + li:before {left:-18px; height:16px;}
-.member_inbox .id_set .btns li a {font-size:16px;}
-.member_inbox .after_info {margin-top:24px;}
-.member_inbox .after_info .tt {font-size:24px; margin-bottom:10px;}
-.member_inbox .after_info .tel_mail_infobox {gap:24px; margin-top:20px;}
-.member_inbox .after_info .tel_mail_infobox li {padding-left:30px;}
-.member_inbox .after_info .tel_mail_infobox li + li:after {left:-12px;}
 /* Registration - 결제 */
-.registration_form_wrap .inbox {padding-right:440px;}
-fieldset .float.mt {margin-top:10px;}
-.form_tit {font-size:22px; padding:10px 0 10px; margin:64px 0 32px;}
-.registration_form_wrap .inputs li {gap:8px; font-size:16px;}
-.registration_form_wrap .inputs > li + li {margin-top:16px;}
-.registration_form_wrap .text {height:48px;}
-.inbtn {gap:10px;}
-.inbtn .text {flex-basis:calc(100% - 130px);}
-.inbtn .btn {width:120px; height:48px; line-height:48px; font-size:17px;}
-.radios {gap:12px;}
-.radios .radio input {left:42px;}
-.radios .radio label {padding:20px 20px 20px 62px;}
-.radios .radio i {left:32px;}
-.coupon_sale {margin-top:8px; gap:12px;}
-.coupon_sale dt {font-size:12px; color:#FF7200; line-height:26px; height:26px; padding:0 8px;}
-.coupon_sale dd {font-size:16px;}
-.btns_flex {gap:8px;}
-.btns_flex .radio {width:calc(50% - 4px); margin:0 !important;}
-.btns_flex .radio span {height:50px; line-height:48px;}
-.btns_flex .radio input:checked + label span {line-height:46px;}
-.registration_form_wrap .c_red {font-size:16px; margin-top:10px;}
-.registration_form_wrap.fixed .abso_application {top:120px; margin-right:-720px;}
-.registration_form_wrap .bank_info_area {padding-top:32px;}
-.member_type_select {gap:8px;}
-.member_type_select .radio {width:calc((100% - 32px)/5);}
-.member_type_select .radio span {height:50px; line-height:48px;}
-.registration_form_wrap .abso_application {width:380px; box-shadow:0 4px 10px 0 rgba(0, 136, 184, 0.10); padding:30px;}
-.registration_form_wrap .abso_application .tit {font-size:26px; margin-bottom:16px;}
-.registration_form_wrap .abso_application .selected_item {margin-bottom:28px;}
-.registration_form_wrap .abso_application .price_info {font-size:16px;}
-.registration_form_wrap .abso_application .price_info div + div {margin-top:10px;}
-.registration_form_wrap .abso_application .price_info dd {gap:4px;}
-.registration_form_wrap .abso_application .price_info dd strong {font-size:20px;}
-.registration_form_wrap .abso_application .price_info .total {padding-top:20px; margin-top:20px;}
-.registration_form_wrap .abso_application .price_info .total dd strong {font-size:24px;}
-.registration_form_wrap .abso_application .check_area {margin:35px 0 16px; font-size:16px; gap:8px;}
-.registration_form_wrap .abso_application .check_area .view {font-size:14px;}
-.registration_form_wrap .abso_application .btn_submit,
-.registration_form_wrap .abso_application .btn_cancel {height:60px;}
-.registration_form_wrap .abso_application .btn_cancel {margin-top:8px;}
-.type_bank_hide {padding-top:5px; margin-top:16px;}
-.type_bank_hide ul li + li {margin-top:32px;}
-.type_bank_hide ul li .text.flex {gap:17px;}
-.type_bank_hide ul li .text.flex span {gap:8px; padding:11px 0;}
-.type_bank_hide ul li .text.flex span + span:before {left:-9px; height:12px;}
-.type_bank_hide ul li .flex.bank {gap:10px;}
-.type_bank_hide ul li .flex.bank select {width:200px;}
-.type_bank_hide ul li .flex.bank input {width:calc(100% - 210px);}
-.type_bank_hide .bdt {padding-top:16px; margin-top:16px;}
-/* Registration - 결제 완료 */
-.academic_event_view_end .title_area {margin-bottom:60px;}
-.academic_event_view_end .title_area.mb24 {margin-bottom:24px;}
-.academic_event_view_end .title_area:before {width:66px; height:64px; margin:0 auto 16px;}
-.academic_event_view_end .title_area .title {font-size:36px;}
-.academic_event_view_end .title_area p {font-size:20px; margin-top:10px;}
-.academic_event_view_end .gbox {padding:40px;}
-.academic_event_view_end .gbox + .gbox {margin-top:16px;}
-.academic_event_view_end .gbox .tit {font-size:20px; padding-left:26px; margin-bottom:24px;}
-.academic_event_view_end .gbox dl {gap:8px;}
-.academic_event_view_end .gbox dt {width:120px;}
-.academic_event_view_end .gbox dd {width:calc(100% - 120px);}
+	.registration_form_wrap .inbox {padding-right:320px;}
+	.registration_form_wrap.fixed .abso_application {right:20px; margin-right:0;}
+	.registration_form_wrap .abso_application {width:300px; /* padding:30px; */}
 /* 학술대회 등록 확인 */
-.tabs.type_member {margin:40px 0; padding:6px 10px;}
-.tabs.type_member a {font-size:16px; line-height:40px; height:40px; border-radius:20px;}
-.tabs.type_member + .tb {margin-bottom:40px;}
 /* 학술대회 등록 확인 완료 */
-.print_area:before {width:64px; height:64px; margin:0 auto 16px;}
-.print_area .btns {margin-top:24px; gap:8px;}
-.print_area .btns .btn {width:223px; max-width:calc(50% - 4px);}
-.registration_check_wrap {padding-top:40px;}
-.registration_check_wrap .infobox ~ .infobox {margin-top:80px;}
-.registration_check_wrap .tit {font-size:24px; padding:10px 0;}
-.registration_check_wrap dl {font-size:18px;}
-.registration_check_wrap dl > div {gap:10px; padding:24px 0;}
-.registration_check_wrap dt {width:160px;}
-.registration_check_wrap dd {width:calc(100% - 170px);}
-.registration_check_wrap dd.flex {gap:0 10px;}
+	.registration_check_wrap dt {width:140px;}
+	.registration_check_wrap dd {width:calc(100% - 150px);}
 /* Abstract */
-/* Abstract - Submission*/
-.abstract_form_wrap .input_wrap {margin-top:40px;}
-.abstract_form_wrap .form_tit {font-size:24px; padding:10px 0;}
-.abstract_form_wrap .inputs {gap:24px;}
-.abstract_form_wrap .inputs li {gap:8px;}
-.abstract_form_wrap .inputs .btn {height:60px; height:60px;}
-
-.select_abstract {gap:8px;}
-.select_abstract .select_check {width:calc((100% - 32px)/5);}
-.select_abstract .select_check input {width:10px; height:10px;}
-.select_abstract .select_check span {height:50px; line-height:48px;}
-
-.file_wrap .flex {gap:10px;}
-.file_wrap .flex + .flex {margin-top:8px;}
-.file_wrap .flex .text {flex:1 1 calc(100% - 200px);}
-.file_wrap .flex .file_input {width:120px;}
-.file_wrap .flex .file_input input {width:10px; height:10px;}
-.file_wrap .flex .file_input label {height:60px; line-height:60px;}
-.file_wrap .flex .btn_plma {width:60px; height:60px;}
-.file_wrap .flex .btn_plma:before {width:16px;}
-.file_wrap .flex .btn_plma:after {width:2px; height:16px;}
-.file_list {gap:10px; padding-top:10px;}
-.file_list a {gap:10px; line-height:20px; padding:0 22px;}
-.file_list a:after {width:16px;}
+/* Abstract - Submission */
 
 /* Notice */
 /* 게시판 상단 */
@@ -242,41 +114,23 @@ fieldset .float.mt {margin-top:10px;}
 	.board_list col.reply {width:150px;}
 	.board_list td .btn {font-size:13px;}
 /* Sponsors */
-.sponsors_wrap {gap:48px;}
-.sponsors_wrap .tit {width:240px; gap:4px;}
-.sponsors_wrap .tit span {font-size:14px;}
-.sponsors_wrap .tit h2 {font-size:32px;}
-.sponsors_wrap .con {width:calc(100% - 240px); gap:24px;}
-.sponsors_wrap .con li {width:calc((100% - 72px)/4);}
+	.sponsors_wrap {gap:40px;}
+	.sponsors_wrap .tit {width:200px;}
+	.sponsors_wrap .tit h2 {font-size:30px;}
+	.sponsors_wrap .con {width:calc(100% - 200px); gap:20px;}
+	.sponsors_wrap .con li {width:calc((100% - 60px)/4);}
 
 /* 현장 등록 & 온라인 심사 */
-.onsite_intro_wrap .logo {top:48px; left:48px;}
-.onsite_intro_wrap:before {width:588px;}
-.onsite_intro_wrap:after {width:543px;}
-.onsite_intro_wrap .tac p {font-size:16px;}
-.onsite_intro_wrap .title {font-size:56px; margin:8px 0 48px;}
-.onsite_intro_wrap .links {gap:40px;}
-.onsite_intro_wrap .links a {width:calc(50% - 20px); padding:48px 30px;}
-.onsite_intro_wrap .links a:before {height:120px;}
-.onsite_intro_wrap .links h3 {font-size:32px; margin:24px 0 16px;}
-.onsite_intro_wrap .links p {line-height:1.55;}
-.onsite_intro_wrap .links .btn {line-height:60px; height:60px; width:200px; margin:24px auto 0;}
-.onsite_intro_wrap .intro_footer {font-size:20px; margin-top:40px;}
-
-.onsite_wrap {padding-bottom:80px;}
-.excl_area {padding:18px 16px;}
-.excl_area.mt {margin-top:32px;}
-.excl_tri {font-size:16px; padding-left:32px;}
-.go_main_timer {font-size:16px; margin-top:60px;}
-.go_main_timer strong {padding-left:16px;}
-.after_txt {margin-top:40px;}
-.after_txt p {color:#666;}
-.after_txt .btn_link {line-height:58px; height:60px; width:200px; margin:24px auto 0;}
-.user_info {margin-bottom:20px; padding:40px;}
-.user_info .name {font-size:28px;}
-.user_info .eng_name {font-size:16px; margin:8px 0 24px;}
-.user_info p {font-size:16px;}
-
+	.onsite_intro_wrap .logo {top:40px; left:40px;}
+	.onsite_intro_wrap:before {width:500px;}
+	.onsite_intro_wrap:after {width:480px;}
+	.onsite_intro_wrap .tac p {font-size:15px;}
+	.onsite_intro_wrap .title {font-size:48px; margin:8px 0 36px;}
+	.onsite_intro_wrap .links {gap:20px;}
+	.onsite_intro_wrap .links a {width:calc(50% - 10px); padding:40px 24px;}
+	.onsite_intro_wrap .links a:before {height:100px;}
+	.onsite_intro_wrap .links h3 {font-size:26px; margin:20px 0 12px;}
+	.onsite_intro_wrap .intro_footer {font-size:18px; margin-top:30px;}
 }
 
 /* ------------------------------ Hover ------------------------------ */
@@ -301,6 +155,9 @@ fieldset .float.mt {margin-top:10px;}
 
 /* ------------------------------ Tablet PC ------------------------------ */
 @media screen and (max-width:1023px){
+/* 공통 */
+	input.text,
+	select.text {height:50px; padding:0 14px;}
 /* 사무국 */
 	.secretariat_contact {margin-bottom:40px; padding:20px;}
 	.secretariat_contact h2 {width:240px; font-size:22px; padding-left:80px; min-height:60px;}
@@ -439,6 +296,68 @@ fieldset .float.mt {margin-top:10px;}
 	.program_area .session_list > li + li {margin-top:10px;}
 	.program_area .session_list .time,
 	.program_area .session_list .presentation {font-size:15px;}
+/* Speakers */
+	.speakers_area {gap:20px;}
+	.speakers_area li {width:calc(50% - 10px);}
+	.speakers_area .imgfit {width:140px;}
+	.speakers_area .txt {width:calc(100% - 140px); padding:20px;}
+	.speakers_area .top {gap:8px;}
+	.speakers_area h2 {font-size:20px; height:48px; margin:12px 0 20px;}
+	.speakers_area p {font-size:14px;}
+	.speakers_area .name {margin-top:2px;}
+	.speakers_area .btn {font-size:14px; line-height:32px; height:32px; width:100px; margin-top:12px;}
+
+/* Registration - registration */
+	.member_inbox .btn {height:50px; line-height:48px;}
+	.member_inbox .btn + .btn {margin-top:10px;}
+/* Registration - 결제 */
+	.registration_form_wrap .inbox {padding-right:260px;}
+	.inbtn .text {flex-basis:calc(100% - 110px);}
+	.inbtn .btn {width:100px; height:50px; font-size:15px;}
+	.registration_form_wrap .abso_application {width:240px; padding:20px;}
+	.registration_form_wrap .abso_application .tit {font-size:22px; margin-bottom:12px;}
+	.registration_form_wrap .abso_application .selected_item {margin-bottom:20px;}
+	.registration_form_wrap .abso_application .price_info {font-size:14px;}
+	.registration_form_wrap .abso_application .price_info div + div {margin-top:8px;}
+	.registration_form_wrap .abso_application .price_info dd {gap:2px;}
+	.registration_form_wrap .abso_application .price_info dd strong {font-size:16px;}
+	.registration_form_wrap .abso_application .price_info .total {padding-top:16px; margin-top:16px;}
+	.registration_form_wrap .abso_application .price_info .total dd strong {font-size:20px;}
+	.registration_form_wrap .abso_application .check_area {margin:24px 0 12px; font-size:14px;}
+	.registration_form_wrap .abso_application .check_area .view {font-size:14px;}
+	.registration_form_wrap .abso_application .check_area i {top:1px;}
+	.registration_form_wrap .abso_application .btn_submit,
+	.registration_form_wrap .abso_application .btn_cancel {height:50px;}
+	.registration_form_wrap .abso_application .btn_cancel {margin-top:6px;}
+	.type_bank_hide ul li + li {margin-top:8px;}
+	.type_bank_hide ul li .text.flex {gap:0; flex-direction:column;}
+	.type_bank_hide ul li .text.flex span {gap:6px; padding:4px 0;}
+	.type_bank_hide ul li .text.flex span + span:before {display:none;}
+	.type_bank_hide ul li .flex.bank {gap:4px; flex-direction:column;}
+	.type_bank_hide ul li .flex.bank select,
+	.type_bank_hide ul li .flex.bank input {width:100%;}
+	.type_bank_hide .bdt {padding-top:12px; margin-top:12px;}
+/* Registration - 결제 완료 */
+	.academic_event_view_end .title_area .title {font-size:32px;}
+	.academic_event_view_end .title_area p {font-size:18px;}
+	.academic_event_view_end .gbox {padding:24px;}
+/* 학술대회 등록 확인 */
+	.tabs.type_member {margin:30px 0; padding:6px;}
+	.tabs.type_member a {font-size:15px;}
+	.tabs.type_member + .tb {margin-bottom:30px;}
+/* 학술대회 등록 확인 완료 */
+	.print_area .btns {margin-top:20px;}
+	.registration_check_wrap {padding-top:30px;}
+	.registration_check_wrap .infobox ~ .infobox {margin-top:60px;}
+	.registration_check_wrap dl {font-size:16px;}
+	.registration_check_wrap dt {width:120px;}
+	.registration_check_wrap dd {width:calc(100% - 130px);}
+/* Abstract */
+/* Abstract - Submission */
+	.abstract_form_wrap .input_wrap {margin-top:30px;}
+	.abstract_form_wrap .form_tit {font-size:20px;}
+	.abstract_form_wrap .inputs {gap:20px;}
+	.abstract_form_wrap .inputs .btn {height:50px; height:50px;}
 
 /* Notice */
 /* 게시판 상단 */
@@ -491,7 +410,31 @@ fieldset .float.mt {margin-top:10px;}
 	.board_view .prev_next a {line-height:50px;}
 	.board_view .prev_next strong {width:90px; padding-left:28px;}
 	.board_view .prev_next p {width:calc(100% - 90px);}
+/* Sponsors */
+	.sponsors_wrap {gap:30px;}
+	.sponsors_wrap .tit {width:160px;}
+	.sponsors_wrap .tit span {font-size:13px;}
+	.sponsors_wrap .tit h2 {font-size:28px;}
+	.sponsors_wrap .con {width:calc(100% - 160px);}
 
+/* 현장 등록 & 온라인 심사 */
+	.onsite_intro_wrap .logo {top:30px; left:30px;}
+	.onsite_intro_wrap:before {width:400px;}
+	.onsite_intro_wrap:after {width:380px;}
+	.onsite_intro_wrap .tac p {font-size:14px;}
+	.onsite_intro_wrap .title {font-size:40px; margin:8px 0 30px;}
+	.onsite_intro_wrap .links a {padding:30px 20px;}
+	.onsite_intro_wrap .links a:before {height:80px;}
+	.onsite_intro_wrap .links h3 {font-size:24px;}
+	.onsite_intro_wrap .links .btn {line-height:50px; height:50px; width:160px; margin-top:20px;}
+	.onsite_intro_wrap .intro_footer {font-size:16px; margin-top:24px;}
+
+	.after_txt {margin-top:30px;}
+	.after_txt .btn_link {line-height:48px; height:50px; margin-top:20px;}
+	.user_info {padding:30px;}
+	.user_info .name {font-size:24px;}
+	.user_info .eng_name {font-size:15px; margin:6px 0 20px;}
+	.user_info p {font-size:15px;}
 }
 
 /* ------------------------------ Mobile ------------------------------ */
@@ -501,6 +444,8 @@ fieldset .float.mt {margin-top:10px;}
 /* 공통 */
 	.container_wrap {margin-top:60px; min-height:calc(100vh - 60px);}
 	body.ios_safe .container_wrap {margin-top:calc(var(--safe-top) + 60px);}
+	input.text,
+	select.text {height:40px; padding:0 12px;}
 /* 사무국 */
 	.secretariat_contact {margin-bottom:20px; padding:16px; flex-direction:column; gap:20px;}
 	.secretariat_contact h2 {width:100%; font-size:18px; padding-left:60px; min-height:50px;}
@@ -612,7 +557,7 @@ fieldset .float.mt {margin-top:10px;}
 	.sub_menu_area ul {gap:4px;}
 	.sub_menu_area li {width:calc((100% - 8px)/3);}
 	.sub_menu_area a {height:40px; line-height:18px; font-size:13px; display:flex; justify-content:center; align-items:center; text-align:center;}
-	.sub_title {font-size:30px; margin-bottom:30px;}
+	.sub_title {font-size:28px; margin-bottom:30px;}
 	.sub_title + .tb {margin:8px 0 30px;}
 	p.p_small {font-size:14px;}
 	.stit {font-size:18px; margin-bottom:6px;}
@@ -644,7 +589,7 @@ fieldset .float.mt {margin-top:10px;}
 	.venue_area .kifm_kakao_map_canvas {height:240px;}
 	.venue_area .txt_area {padding:16px;}
 	.venue_area .txt_area h2 {font-size:18px; margin-bottom:16px;}
-	.venue_area .txt_area dl > div {flex-direction: column;}
+	.venue_area .txt_area dl > div {flex-direction:column;}
 	.venue_area .txt_area dl > div + div {margin-top:6px;}
 	.venue_area .txt_area dt,
 	.venue_area .txt_area dd {width:100%; padding-left:30px;}
@@ -653,23 +598,163 @@ fieldset .float.mt {margin-top:10px;}
 	.venue_area .txt_area .small {font-size:14px; margin-top:6px;}
 
 /* Program */
-.program_area.fixed {padding-top:32px;}
-.program_area .tabs {flex-wrap:nowrap; overflow:auto;}
-.program_area .tabs::-webkit-scrollbar {width:0; height:1px;}
-.program_area .tabs li {flex:0 0 auto;}
-.program_area.fixed .tabs {/* top:80px; */ left:20px; width:calc(100% - 40px); padding:0; transform:none;}
-.program_area .session_wrap {padding-top:60px;}
-.program_area .session_area + .session_area {margin-top:60px;}
-.session {font-size:12px; line-height:26px; height:26px; padding:0 10px; border-radius:13px;}
-.program_area h2 {font-size:20px; margin:10px 0;}
-.program_area .chair {font-size:14px;}
-.program_area .session_list {margin-top:16px; padding-top:20px;}
-.program_area .session_list > li {padding:20px 140px;}
-.program_area .session_list > li + li {margin-top:10px;}
-.program_area .session_list .time,
-.program_area .session_list .presentation {font-size:15px;}
-.program_area .session_list .time {left:20px;}
-.program_area .session_list .presentation {right:20px;}
+	.program_area.fixed {padding-top:25px;}
+	.program_area .tabs::-webkit-scrollbar {width:0; height:0;}
+	.program_area.fixed .tabs {top:60px;}
+	.program_area .session_wrap {padding-top:40px;}
+	.program_area .session_area + .session_area {margin-top:40px;}
+	.session {font-size:11px; line-height:22px; height:22px; padding:0 8px;}
+	.program_area h2 {font-size:18px; margin:6px 0;}
+	.program_area .chair {font-size:13px;}
+	.program_area .session_list {margin-top:12px; padding-top:16px;}
+	.program_area .session_list > li {padding:16px;}
+	.program_area .session_list > li + li {margin-top:6px;}
+	.program_area .session_list .time,
+	.program_area .session_list .presentation {font-size:13px;}
+	.program_area .session_list .time {position:relative; left:0; transform:none; margin-bottom:8px;}
+	.program_area .session_list .presentation {top:16px; right:16px; transform:none;}
+/* Speakers */
+	.speakers_area {gap:16px;}
+	.speakers_area li {width:100%;}
+	.speakers_area .imgfit {width:120px;}
+	.speakers_area .txt {width:calc(100% - 120px); padding:16px;}
+	.speakers_area .top {gap:4px;}
+	.speakers_area .time {font-size:13px;}
+	.speakers_area h2 {font-size:18px; height:42px; margin:6px 0 12px;}
+	.speakers_area p {font-size:13px;}
+	.speakers_area .btn {font-size:13px; line-height:30px; height:30px; width:100%; margin-top:6px;}
+	.pop_speakers .head {margin-bottom:16px;}
+	.pop_speakers .head .imgfit {width:80px; height:80px;}
+	.pop_speakers .head .txt {width:calc(100% - 80px); padding-left:16px;}
+	.pop_speakers .head .name {font-size:20px;}
+	.pop_speakers .head .position {font-size:13px; margin-top:2px;}
+	.pop_speakers .gbox {font-size:13px; padding:10px 16px;}
+	.pop_speakers .gbox .scroll {max-height:calc(100vh - 244px);}
+	.pop_speakers .gbox div + div {margin-top:12px;}
+	.pop_speakers .gbox dt {margin-bottom:6px;}
+	.pop_speakers .gbox dd p {padding-left:12px;}
+	.pop_speakers .gbox dd p:before {top:8px; left:2px;}
+
+/* Registration - Information */
+	.info_section + .info_section {margin-top:24px;}
+	.info_section .gbox dl {gap:4px; flex-direction:column;}
+	.info_section .gbox dt,
+	.info_section .gbox dd {width:100%;}
+	.dots_list li {padding-left:18px;}
+	.dots_list li:before {top:10px; left:2px;}
+/* Registration - registration */
+	.member_inbox .inputs .input_row label {font-size:14px; margin-bottom:10px;}
+	.member_inbox .inputs .input_row + .input_row {margin-top:16px;}
+	.member_inbox .btn {height:40px; line-height:38px;}
+	.member_inbox .btn + .btn {margin-top:6px;}
+	.member_inbox .btn.mt {margin-top:24px;}
+	.member_inbox .id_set {padding:10px 0 24px;}
+	.member_inbox .id_set .btns {gap:25px;}
+	.member_inbox .id_set .btns li + li:before {left:-13px; height:12px;}
+	.member_inbox .id_set .btns li a {font-size:14px;}
+	.member_inbox .after_info {margin-top:20px;}
+	.member_inbox .after_info .tt {font-size:20px; margin-bottom:6px;}
+	.member_inbox .after_info .tel_mail_infobox {flex-direction: column; gap:12px; margin-top:12px;}
+	.member_inbox .after_info .tel_mail_infobox li {padding-left:24px;}
+	.member_inbox .after_info .tel_mail_infobox li + li:after {left:-10px;}
+/* Registration - 결제 */
+	.registration_form_wrap .inbox {padding-right:0;}
+	fieldset .float.mt {margin-top:6px;}
+	.form_tit {font-size:18px; padding:10px 0; margin:30px 0 12px;}
+	.registration_form_wrap .inputs li {gap:4px; font-size:14px;}
+	.registration_form_wrap .inputs > li + li {margin-top:12px;}
+	.registration_form_wrap .text {height:40px;}
+	.inbtn {gap:4px; flex:1 1 calc(100% - 136px);}
+	.inbtn .text {flex-basis:calc(100% - 84px); width:calc(100% - 84px) !important;}
+	.inbtn .btn {width:80px; height:40px; line-height:40px; font-size:14px;}
+	.radios {gap:12px;}
+	.radios .radio input {opacity:0;}
+	.radios .radio label {padding:10px 10px 10px 50px;}
+	.radios .radio i {left:20px;}
+	.payment_option_group + .payment_option_group {margin-top:32px;}
+	.payment_option_group .option_tit {font-size:16px; padding-bottom:12px; margin-bottom:16px;}
+	.coupon_sale {margin-top:6px; gap:8px;}
+	.coupon_sale dt {line-height:22px; height:22px; padding:0 6px;}
+	.coupon_sale dd {font-size:14px;}
+	.btns_flex {gap:4px;}
+	.btns_flex .radio {width:calc(50% - 2px);}
+	.btns_flex .radio span {height:40px; line-height:38px;}
+	.btns_flex .radio input:checked + label span {line-height:36px;}
+	.registration_form_wrap .c_red {font-size:13px; margin-top:6px;}
+	.registration_form_wrap .bank_info_area {padding-top:24px;}
+	.member_type_select {gap:4px;}
+	.member_type_select .radio {width:calc(50% - 2px);}
+	.member_type_select .radio span {height:40px; line-height:38px;}
+	.registration_form_wrap .abso_application {position:fixed; top:auto; right:auto; left:50%; width:calc(100% - 40px); padding:34px 16px 16px; z-index:30; transform:translateX(-50%);}
+	.registration_form_wrap .abso_application,
+	.registration_form_wrap.fixed .abso_application {top:auto; bottom:calc(-100% + (100vh - 315px) + 33px);}
+	.registration_form_wrap.unfixed .abso_application {position:absolute; left:0; width: 100%; transform:none;}
+	.registration_form_wrap.unfixed .abso_application.open {bottom:0;}
+	.registration_form_wrap .abso_application .mobile_opcl {position:absolute; top:16px; left:50%; width:50%; height:2px; background:#ddd; transform:translateX(-50%);}
+	.registration_form_wrap .abso_application .tit {font-size:20px; margin-bottom:10px;}
+	.registration_form_wrap .abso_application .selected_item {margin-bottom:12px;}
+	.registration_form_wrap .abso_application .price_info {font-size:13px;}
+	.registration_form_wrap .abso_application .price_info div + div {margin-top:6px;}
+	.registration_form_wrap .abso_application .price_info dd strong {font-size:14px;}
+	.registration_form_wrap .abso_application .price_info .total {padding-top:12px; margin-top:12px;}
+	.registration_form_wrap .abso_application .price_info .total dd strong {font-size:16px;}
+	.registration_form_wrap .abso_application .check_area {margin:16px 0 10px; font-size:13px; line-height:20px;}
+	.registration_form_wrap .abso_application .check_area.checkbox input {top:6px;}
+	.registration_form_wrap .abso_application .check_area.checkbox i {top:0;}
+	.registration_form_wrap .abso_application .btn_submit,
+	.registration_form_wrap .abso_application .btn_cancel {height:40px;}
+	.registration_form_wrap .abso_application .btn_cancel {margin-top:4px;}
+	.type_bank_hide {padding-top:4px; margin-top:12px;}
+	.type_bank_hide ul li .text.flex {height:auto;}
+	.type_bank_hide ul li .text.bank_number {padding:10px; border:#CDD1D5 1px solid; border-radius:4px;}
+	.type_bank_hide ul li .text.bank_number span {gap:4px; padding:0;}
+	.type_bank_hide ul li .text.bank_number span strong {width:50px;}
+/* Registration - 결제 완료 */
+	.academic_event_view_end .title_area {margin-bottom:30px;}
+	.academic_event_view_end .title_area.mb24 {margin-bottom:12px;}
+	.academic_event_view_end .title_area:before {width:50px; height:50px; margin-bottom:12px; background-size:contain;}
+	.academic_event_view_end .title_area .title {font-size:24px;}
+	.academic_event_view_end .title_area p {font-size:14px; margin-top:5px;}
+	.academic_event_view_end .gbox {padding:16px;}
+	.academic_event_view_end .gbox + .gbox {margin-top:12px;}
+	.academic_event_view_end .gbox .tit {font-size:18px; padding-left:22px; margin-bottom:16px;}
+	.academic_event_view_end .gbox dl {gap:4px;}
+	.academic_event_view_end .gbox dt {width:100px;}
+	.academic_event_view_end .gbox dd {width:calc(100% - 100px);}
+/* 학술대회 등록 확인 */
+	.tabs.type_member {margin:20px 0; padding:4px;}
+	.tabs.type_member a {font-size:14px; line-height:30px; height:30px;}
+	.tabs.type_member + .tb {margin-bottom:20px;}
+/* 학술대회 등록 확인 완료 */
+	.print_area:before {width:50px; height:50px; margin-bottom:12px;}
+	.print_area .btns {margin-top:16px; gap:4px;}
+	.print_area .btns .btn {width:200px; max-width:calc(50% - 2px);}
+	.registration_check_wrap {padding-top:20px;}
+	.registration_check_wrap .infobox ~ .infobox {margin-top:40px;}
+	.registration_check_wrap .tit {font-size:18px; padding:6px 0;}
+	.registration_check_wrap dl {font-size:14px;}
+	.registration_check_wrap dl > div {gap:4px; flex-direction: column; padding:20px 0;}
+	.registration_check_wrap dt,
+	.registration_check_wrap dd {width:100%;}
+	.registration_check_wrap dd.flex {gap:0 6px;}
+/* Abstract */
+/* Abstract - Submission */
+	.abstract_form_wrap .input_wrap {margin-top:20px;}
+	.abstract_form_wrap .form_tit {font-size:18px; padding:8px 0;}
+	.abstract_form_wrap .inputs {gap:12px;}
+	.abstract_form_wrap .inputs li {gap:4px;}
+	.abstract_form_wrap .inputs .btn {height:40px; height:40px;}
+	.select_abstract {gap:4px;}
+	.select_abstract .select_check {width:calc((100% - 8px)/3);}
+	.select_abstract .select_check span {height:40px; line-height:38px;}
+	.file_wrap .flex {gap:4px;}
+	.file_wrap .flex + .flex {margin-top:4px;}
+	.file_wrap .flex .text {width:calc(100% - 128px);}
+	.file_wrap .flex .file_input {width:80px;}
+	.file_wrap .flex .file_input label {height:40px; line-height:40px;}
+	.file_wrap .flex .btn_plma {width:40px; height:40px;}
+	.file_list {gap:6px; padding-top:6px;}
+	.file_list a {gap:4px; padding:0 16px;}
 
 /* Notice */
 /* 게시판 상단 */
@@ -692,7 +777,7 @@ fieldset .float.mt {margin-top:10px;}
 	.board-pagination {margin-top:24px;}
 	.board-pagination .pagination {gap:2px;}
 	.board-pagination .pagination .page-link {width:32px; line-height:32px;}
-	.board-pagination .btn_abso {position: relative; top:0; margin: 0 0 10px auto;}
+	.board-pagination .btn_abso {position:relative; top:0; margin:0 0 10px auto;}
 	.board_bottom {padding-top:20px; margin-top:20px;}
 	.btn_abso {gap:4px;}
 	.btn_abso .btn {gap:2px; font-size:13px;}
@@ -716,9 +801,9 @@ fieldset .float.mt {margin-top:10px;}
 	.mo_break_list .num {position:absolute; top:50%; left:0; width:20px; height:100%; transform:translateY(-50%);}
 	.mo_break_list .tal,
 	.mo_break_list .date {width:100%;}
-	.mo_break_list .reply {position: absolute; bottom:20px; right:0;}
+	.mo_break_list .reply {position:absolute; bottom:20px; right:0;}
 	.mo_break_list tr.empty {background:#f8f8f8;}
-	.mo_break_list tr.empty td {background:none; text-align: center;}
+	.mo_break_list tr.empty td {background:none; text-align:center;}
 /* 게시판 상세 */
 	.board_view .tit_area {padding:16px 36px 16px 0;}
 	.board_view .tit_area .tit {font-size:18px;}
@@ -737,5 +822,37 @@ fieldset .float.mt {margin-top:10px;}
 	.board_view .prev_next strong {width:90px; padding-left:28px;}
 	.board_view .prev_next strong:before {width:20px;}
 	.board_view .prev_next p {width:calc(100% - 90px);}
+/* Sponsors */
+	.sponsors_wrap {gap:20px;}
+	.sponsors_wrap .sponsor_group {flex-direction: column;}
+	.sponsors_wrap .tit {width:100%; gap:2px;}
+	.sponsors_wrap .tit span {font-size:12px;}
+	.sponsors_wrap .tit h2 {font-size:22px;}
+	.sponsors_wrap .con {width:100%; gap:10px;}
+	.sponsors_wrap .con li {width:calc((100% - 20px)/3);}
 
+/* 현장 등록 & 온라인 심사 */
+	.onsite_intro_wrap .logo {top:20px; left:20px; width:140px;}
+	.onsite_intro_wrap:before {width:320px;}
+	.onsite_intro_wrap:after {width:280px;}
+	.onsite_intro_wrap .tac p {font-size:13px;}
+	.onsite_intro_wrap .title {font-size:30px; line-height:1.4; margin:6px 0 20px;}
+	.onsite_intro_wrap .links {gap:10px;}
+	.onsite_intro_wrap .links a {width:calc(50% - 5px); padding:20px 12px;}
+	.onsite_intro_wrap .links a:before {height:60px;}
+	.onsite_intro_wrap .links h3 {font-size:20px; margin:16px 0 10px;}
+	.onsite_intro_wrap .links .btn {line-height:40px; height:40px; width:100%; margin-top:16px;}
+	.onsite_intro_wrap .intro_footer {font-size:13px; margin-top:16px;}
+
+	.onsite_wrap {padding-bottom:60px;}
+	.excl_area {padding:16px 12px;}
+	.excl_area.mt {margin-top:16px;}
+	.excl_tri {font-size:14px; padding-left:30px;}
+	.go_main_timer {font-size:14px; margin-top:40px;}
+	.after_txt {margin-top:20px;}
+	.after_txt .btn_link {line-height:38px; height:40px; width:100%; margin-top:16px;}
+	.user_info {margin-bottom:16px; padding:20px;}
+	.user_info .name {font-size:20px;}
+	.user_info .eng_name {font-size:13px; margin:4px 0 16px;}
+	.user_info p {font-size:14px;}
 }

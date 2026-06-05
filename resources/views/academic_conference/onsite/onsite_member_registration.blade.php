@@ -112,7 +112,7 @@
 
                 <fieldset>
                     <legend class="form_tit">결제 수단</legend>
-                    <div class="excl_area"><div class="excl_tri">현장 혼잡 방지를 위해 ‘카드 결제’만 가능합니다. 양해 부탁드리겠습니다.</div></div>
+                    <div class="excl_area"><div class="excl_tri">현장 혼잡 방지를 위해 ‘카드 결제’만 가능합니다. <br class="mo_vw">양해 부탁드리겠습니다.</div></div>
                 </fieldset>
 
                 <fieldset class="type_bank_hide">
@@ -128,7 +128,7 @@
                                 <label for="cash_receipt"><span>발행</span></label>
                             </li>
                         </ul>
-                        
+
 						<ul class="bdt long_label cash_receipt_area">
 							<li>
 								<label for="receipt_type">발급 구분</label>
@@ -170,7 +170,7 @@
                             <dd><strong>240,000</strong>원</dd>
                         </div>
                     </dl>
-                    
+
                     <div class="check_area checkbox">
                         <input type="checkbox" name="terms_agree" id="terms_agree" required>
                         <label for="terms_agree"><i></i><span>[필수] 결제 이용 약관, 개인정보 처리 동의</span></label>
@@ -216,7 +216,7 @@
         const detailOffsetTop = $detail.offset().top;
         const detailHeight = $detail.outerHeight();
         const appHeight = $absoApp.outerHeight();
-        const fixStartPoint = detailOffsetTop - 120; 
+        const fixStartPoint = detailOffsetTop - 120;
         const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - 120;
         if (scrollTop >= fixStartPoint) {
             if (scrollTop >= unfixPoint) {
@@ -242,7 +242,7 @@
 		cardElements.forEach(el => el.style.display = isBank ? 'none' : 'block');
 		if (!isBank) {
 			document.getElementById('cash_receipt_non').checked = true;
-			handleCashReceiptChange(); 
+			handleCashReceiptChange();
 		}
 		$(window).trigger('scroll.stickyApp');
 	}

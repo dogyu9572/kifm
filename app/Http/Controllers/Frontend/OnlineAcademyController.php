@@ -392,6 +392,15 @@ class OnlineAcademyController extends Controller
             'receipt_number' => ['required_if:receipt_issue,YES', 'nullable', 'string', 'max:100'],
             'terms_agree' => ['accepted'],
         ], [
+            'course_id.required' => '강의 정보를 확인할 수 없습니다.',
+            'course_id.exists' => '강의 정보를 확인할 수 없습니다.',
+            'payment_method.required' => '결제수단을 선택해주세요.',
+            'payment_method.in' => '결제수단을 확인해주세요.',
+            'bank_depositor.required_if' => '입금자명을 입력해주세요.',
+            'bank_deposit_date.required_if' => '입금 예정일을 선택해주세요.',
+            'bank_deposit_date.date' => '입금 예정일 형식을 확인해주세요.',
+            'receipt_type.required_if' => '현금영수증 발급 구분을 선택해주세요.',
+            'receipt_number.required_if' => '현금영수증 번호를 입력해주세요.',
             'terms_agree.accepted' => '결제 이용 약관, 개인정보 처리 동의가 필요합니다.',
         ]);
 

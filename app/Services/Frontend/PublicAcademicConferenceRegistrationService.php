@@ -6,6 +6,7 @@ use App\Models\AcademicEvent;
 use App\Models\AcademicEventRegistration;
 use App\Models\Coupon;
 use App\Models\MemberExecutive;
+use App\Models\MembershipPayment;
 use App\Models\PaymentPlan;
 use App\Models\User;
 use App\Services\Backoffice\AcademicEventRegistrationService;
@@ -13,6 +14,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 class PublicAcademicConferenceRegistrationService
@@ -22,10 +24,10 @@ class PublicAcademicConferenceRegistrationService
     ) {}
 
     /** @return Collection<int, PaymentPlan> */
-    public function matchingConferencePlans(User $user): Collection
+    public function matchingConferencePlans(User $user, ?string $effectiveGrade = null): Collection
     {
-        $grade = trim((string) $user->member_level);
-        $memberType = trim((string) $user->job_type);
+        $grade = trim((string) ($effectiveGrade ?: $user->member_level));
+        $memberType = $this->paymentPlanMemberType((string) $user->job_type);
         $memberType = $memberType !== '' ? $memberType : 'none';
         $executive = $this->isExecutive($user) ? 'executive' : 'non-executive';
 
@@ -37,11 +39,94 @@ class PublicAcademicConferenceRegistrationService
             ->where(function ($query) use ($executive) {
                 $query->whereNull('executive')->orWhere('executive', $executive);
             })
-            ->whereHas('grades', fn ($query) => $query->where('grade', $grade))
-            ->whereHas('types', fn ($query) => $query->where('member_type', $memberType))
+            ->where(function ($query) use ($grade) {
+                $query->whereDoesntHave('grades')
+                    ->orWhereHas('grades', fn ($gradeQuery) => $gradeQuery->where('grade', $grade));
+            })
+            ->where(function ($query) use ($memberType) {
+                $query->whereDoesntHave('types')
+                    ->orWhereHas('types', fn ($typeQuery) => $typeQuery->where('member_type', $memberType));
+            })
             ->orderBy('price_early')
             ->orderBy('id')
             ->get();
+    }
+
+    public function candidateConferencePlans(User $user): Collection
+    {
+        $grades = $this->membershipPlansForUser($user)
+            ->map(fn (PaymentPlan $plan): string => $this->gradeForPlan($plan))
+            ->filter()
+            ->push(trim((string) $user->member_level))
+            ->unique()
+            ->values()
+            ->all();
+        $memberType = $this->paymentPlanMemberType((string) $user->job_type);
+        $memberType = $memberType !== '' ? $memberType : 'none';
+        $executive = $this->isExecutive($user) ? 'executive' : 'non-executive';
+
+        return PaymentPlan::query()
+            ->with(['grades', 'types'])
+            ->active()
+            ->where('category', 'conference')
+            ->where('member_status', 'member')
+            ->where(function ($query) use ($executive) {
+                $query->whereNull('executive')->orWhere('executive', $executive);
+            })
+            ->where(function ($query) use ($grades) {
+                $query->whereDoesntHave('grades')
+                    ->orWhereHas('grades', fn ($gradeQuery) => $gradeQuery->whereIn('grade', $grades));
+            })
+            ->where(function ($query) use ($memberType) {
+                $query->whereDoesntHave('types')
+                    ->orWhereHas('types', fn ($typeQuery) => $typeQuery->where('member_type', $memberType));
+            })
+            ->orderBy('price_early')
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function membershipPlansForUser(User $user): Collection
+    {
+        if (! $this->shouldShowMembershipFeeNotice($user)) {
+            return collect();
+        }
+
+        $memberType = $this->paymentPlanMemberType((string) $user->job_type);
+        $memberType = $memberType !== '' ? $memberType : 'none';
+
+        return PaymentPlan::query()
+            ->with(['grades', 'types'])
+            ->active()
+            ->where('category', 'membership')
+            ->where('member_status', 'member')
+            ->where(function ($query) use ($memberType) {
+                $query->whereDoesntHave('types')
+                    ->orWhereHas('types', fn ($typeQuery) => $typeQuery->where('member_type', $memberType));
+            })
+            ->orderBy('price')
+            ->orderBy('price_early')
+            ->orderBy('id')
+            ->get();
+    }
+
+    public function selectedMembershipPlanForUser(User $user, mixed $planId): ?PaymentPlan
+    {
+        $id = (int) $planId;
+        if ($id <= 0) {
+            return null;
+        }
+
+        return $this->membershipPlansForUser($user)->firstWhere('id', $id);
+    }
+
+    public function shouldShowMembershipFeeNotice(User $user): bool
+    {
+        if (in_array($user->member_level, ['lifetime', 'senior'], true)) {
+            return false;
+        }
+
+        return $user->annual_fee_status !== 'paid';
     }
 
     /** @return Collection<int, PaymentPlan> */
@@ -57,9 +142,10 @@ class PublicAcademicConferenceRegistrationService
     }
 
     /** @param array<int|string> $ids */
-    public function selectedPlansForUser(User $user, array $ids): Collection
+    public function selectedPlansForUser(User $user, array $ids, ?PaymentPlan $membershipPlan = null): Collection
     {
-        $allowed = $this->matchingConferencePlans($user)->keyBy('id');
+        $effectiveGrade = $membershipPlan ? $this->gradeForPlan($membershipPlan) : null;
+        $allowed = $this->matchingConferencePlans($user, $effectiveGrade)->keyBy('id');
         $selected = collect($ids)
             ->map(fn ($id) => (int) $id)
             ->filter(fn (int $id) => $id > 0 && $allowed->has($id))
@@ -324,27 +410,32 @@ class PublicAcademicConferenceRegistrationService
     }
 
     /** @param Collection<int, PaymentPlan> $plans */
-    public function createBankTransferRegistration(AcademicEvent $event, User $user, Collection $plans, array $data): AcademicEventRegistration
+    public function createBankTransferRegistration(AcademicEvent $event, User $user, Collection $plans, array $data, ?PaymentPlan $membershipPlan = null): AcademicEventRegistration
     {
-        return $this->createMemberRegistration($event, $user, $plans, $data, 'bank_transfer', 'pending');
+        return $this->createMemberRegistration($event, $user, $plans, $data, 'bank_transfer', 'pending', $membershipPlan);
     }
 
     /** @param Collection<int, PaymentPlan> $plans */
-    public function createCardPendingRegistration(AcademicEvent $event, User $user, Collection $plans, array $data): AcademicEventRegistration
+    public function createCardPendingRegistration(AcademicEvent $event, User $user, Collection $plans, array $data, ?PaymentPlan $membershipPlan = null): AcademicEventRegistration
     {
-        return $this->createMemberRegistration($event, $user, $plans, $data, 'card', 'pending_payment');
+        return $this->createMemberRegistration($event, $user, $plans, $data, 'card', 'pending_payment', $membershipPlan);
     }
 
     /** @param Collection<int, PaymentPlan> $plans */
-    private function createMemberRegistration(AcademicEvent $event, User $user, Collection $plans, array $data, string $paymentMethod, string $paymentStatus): AcademicEventRegistration
+    private function createMemberRegistration(AcademicEvent $event, User $user, Collection $plans, array $data, string $paymentMethod, string $paymentStatus, ?PaymentPlan $membershipPlan = null): AcademicEventRegistration
     {
-        $subtotal = $this->totalForPlans($plans);
+        $conferenceSubtotal = $this->totalForPlans($plans);
+        $membershipAmount = $membershipPlan ? (int) ($membershipPlan->price ?? $membershipPlan->price_early ?? 0) : 0;
+        $subtotal = $conferenceSubtotal + $membershipAmount;
         $couponResult = $this->resolveCoupon($data['coupon_code'] ?? null, $plans);
         $discount = (int) ($couponResult['discount'] ?? 0);
         $coupon = $couponResult['coupon'] ?? null;
         $finalAmount = max(0, $subtotal - $discount);
 
-        return DB::transaction(function () use ($event, $user, $plans, $data, $subtotal, $discount, $coupon, $finalAmount, $paymentMethod, $paymentStatus) {
+        return DB::transaction(function () use ($event, $user, $plans, $data, $conferenceSubtotal, $membershipAmount, $membershipPlan, $subtotal, $discount, $coupon, $finalAmount, $paymentMethod, $paymentStatus) {
+            $membershipPayment = $membershipPlan
+                ? $this->createLinkedMembershipPayment($user, $membershipPlan, $paymentMethod, $membershipAmount, $paymentStatus, $data)
+                : null;
             $registration = AcademicEventRegistration::query()->create([
                 'registration_no' => $this->registrationService->nextRegistrationNo($event),
                 'academic_event_id' => $event->id,
@@ -372,6 +463,12 @@ class PublicAcademicConferenceRegistrationService
                     'address_postcode' => $data['address_postcode'] ?? ($user->workplace_zipcode ?: $user->address_postcode),
                     'address_base' => $data['address_base'] ?? ($user->workplace_address ?: $user->address_base),
                     'address_detail' => $data['address_detail'] ?? ($user->workplace_address_detail ?: $user->address_detail),
+                    'conference_subtotal_amount' => $conferenceSubtotal,
+                    'membership_payment_id' => $membershipPayment?->id,
+                    'membership_plan_id' => $membershipPlan?->id,
+                    'membership_plan_name' => $membershipPlan?->plan_name,
+                    'membership_grade' => $membershipPlan ? $this->gradeForPlan($membershipPlan) : null,
+                    'membership_amount' => $membershipAmount,
                     'subtotal_amount' => $subtotal,
                     'coupon_code' => $coupon?->coupon_code,
                     'coupon_name' => $coupon?->coupon_name,
@@ -394,7 +491,17 @@ class PublicAcademicConferenceRegistrationService
                 'category' => $plan->category,
                 'member_scope' => $plan->member_status,
                 'price' => (int) $plan->price_early,
-            ])->all();
+            ]);
+            if ($membershipPlan) {
+                $items->push([
+                    'payment_plan_id' => $membershipPlan->id,
+                    'item_name' => $membershipPlan->plan_name,
+                    'category' => $membershipPlan->category,
+                    'member_scope' => $this->gradeForPlan($membershipPlan),
+                    'price' => $membershipAmount,
+                ]);
+            }
+            $items = $items->all();
             $this->registrationService->syncItems($registration, $items);
 
             if ($coupon && $paymentMethod === 'bank_transfer') {
@@ -541,7 +648,36 @@ class PublicAcademicConferenceRegistrationService
             'source_row_json' => $source,
         ]);
 
+        if ($isCompleted) {
+            $this->completeLinkedMembershipPayment($registration->refresh());
+        }
+
         return $registration->refresh()->loadMissing(['items', 'member']);
+    }
+
+    public function completeLinkedMembershipPayment(AcademicEventRegistration $registration): void
+    {
+        $source = $registration->source_row_json ?? [];
+        $paymentId = (int) ($source['membership_payment_id'] ?? 0);
+        if ($paymentId <= 0 || ! $registration->member) {
+            return;
+        }
+
+        $payment = MembershipPayment::query()
+            ->whereKey($paymentId)
+            ->where('member_id', $registration->member_id)
+            ->first();
+        if (! $payment || $payment->payment_status === 'completed') {
+            return;
+        }
+
+        $payment->update([
+            'payment_status' => 'completed',
+            'paid_at' => $registration->paid_at ?: now(),
+        ]);
+
+        $targetGrade = (string) ($source['membership_grade'] ?? $payment->member_grade ?? '');
+        $this->syncMemberAnnualFee($registration->member, $targetGrade);
     }
 
     private function isExecutive(User $user): bool
@@ -557,5 +693,77 @@ class PublicAcademicConferenceRegistrationService
                     ->orWhereDate('term_end_date', '>=', $today);
             })
             ->exists();
+    }
+
+    private function paymentPlanMemberType(string $jobType): string
+    {
+        return [
+            'public_doctor' => 'public',
+            'military_doctor' => 'military',
+        ][$jobType] ?? trim($jobType);
+    }
+
+    public function gradeForPlan(PaymentPlan $plan): string
+    {
+        $plan->loadMissing('grades');
+
+        return (string) ($plan->grades->pluck('grade')->first() ?? '');
+    }
+
+    private function createLinkedMembershipPayment(User $user, PaymentPlan $plan, string $paymentMethod, int $amount, string $registrationPaymentStatus, array $data): MembershipPayment
+    {
+        $legacy = [
+            'source' => 'academic_conference_registration',
+            'deposit_expected_date' => $data['bank_deposit_date'] ?? null,
+        ];
+
+        return MembershipPayment::query()->create([
+            'payment_no' => $this->nextMembershipPaymentNo(),
+            'member_id' => $user->id,
+            'membership_plan_id' => $plan->id,
+            'amount' => $amount,
+            'member_grade' => $this->gradeForPlan($plan) ?: $user->member_level,
+            'payment_method' => $paymentMethod,
+            'payment_status' => $registrationPaymentStatus === 'completed' ? 'completed' : 'pending',
+            'requested_at' => now(),
+            'paid_at' => $registrationPaymentStatus === 'completed' ? now() : null,
+            'depositor_name' => $paymentMethod === 'bank_transfer' ? ($data['bank_depositor'] ?? $user->name) : null,
+            'receipt_issue' => (string) ($data['receipt_issue'] ?? 'NO'),
+            'receipt_type' => ($data['receipt_issue'] ?? 'NO') === 'YES' ? ($data['receipt_type'] ?? null) : null,
+            'receipt_number' => ($data['receipt_issue'] ?? 'NO') === 'YES' ? ($data['receipt_number'] ?? null) : null,
+            'legacy_import_json' => $legacy,
+        ]);
+    }
+
+    private function syncMemberAnnualFee(User $user, string $targetGrade): void
+    {
+        $updates = [
+            'annual_fee_status' => 'paid',
+            'membership_fee_basis_at' => now()->toDateString(),
+        ];
+        if ($targetGrade !== '' && $this->gradeRank($targetGrade) > $this->gradeRank((string) $user->member_level)) {
+            $updates['member_level'] = $targetGrade;
+        }
+
+        $user->forceFill($updates)->save();
+    }
+
+    private function gradeRank(string $grade): int
+    {
+        return [
+            'associate' => 1,
+            'regular' => 2,
+            'lifetime' => 3,
+            'senior' => 4,
+        ][$grade] ?? 0;
+    }
+
+    private function nextMembershipPaymentNo(): string
+    {
+        do {
+            $no = 'PAY-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(4));
+        } while (MembershipPayment::query()->where('payment_no', $no)->exists());
+
+        return $no;
     }
 }

@@ -4,6 +4,10 @@
 @section('sName', $sName)
 @section('content')
 @inject('trainingCourse', 'App\Services\Frontend\PublicTrainingCourseService')
+@php
+	$canApplyTraining = $trainingCourse->hasApplicableRound($training, $user);
+	$canDownloadTextbook = $trainingCourse->canDownloadTextbook($training, $user);
+@endphp
 <main class="sub_area">
 
 <div class="sub_title">{{ $sName }}</div>
@@ -58,8 +62,10 @@
 				<p class="limit">{{ $trainingCourse->status($training)['label'] }}</p>
 			</div>
 				<div class="cont">
-					<a href="{{ $trainingCourse->paymentUrl($training) }}" class="btn btn_wrr btn_outlink">사전등록 바로가기</a>
-					@if ($trainingCourse->fileUrl($training->textbook_file_path))
+					@if ($canApplyTraining)
+						<a href="{{ $trainingCourse->paymentUrl($training) }}" class="btn btn_wrr btn_outlink">사전등록 바로가기</a>
+					@endif
+					@if ($canDownloadTextbook)
 						<a href="{{ route('academic_event.training_course_textbook.download', $training) }}" title="파일 다운로드" class="btn btn_kwg btn_download">교제 다운로드</a>
 					@endif
 					@if ($training->attachments->isNotEmpty())
@@ -153,7 +159,7 @@
 			if (scrollTop >= mobileUnfixPoint) {
 				$detail.addClass('unfixed').removeClass('fixed');
 			} else {
-				$detail.removeClass('unfixed').addClass('fixed'); 
+				$detail.removeClass('unfixed').addClass('fixed');
 			}
 		} else {
 			$inbox.css('padding-bottom', '');
@@ -191,6 +197,6 @@
 	}
 
 //mobile
-	
+
 </script>
 @endpush

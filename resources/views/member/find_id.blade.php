@@ -8,7 +8,7 @@
 <section class="scon" aria-labelledby="find-id-heading">
 	<div class="inner">
 		<h1 class="sub_title" id="find-id-heading">{{ $sName }}</h1>
-		
+
 		<form action="{{ route('member.find_id.store') }}" method="POST" class="member_inbox" novalidate>
 			@csrf
 			<div class="tabs">
@@ -22,32 +22,23 @@
 					<li>
 						<label for="dormant_id" class="tit">이름<span class="c_iden">*</span></label>
 						<input type="text" id="dormant_id" name="name" class="text w100p" placeholder="이름을 입력해주세요." value="{{ old('name') }}" required>
-						@error('name')
-							<p class="c_red" role="alert">{{ $message }}</p>
-						@enderror
 					</li>
 					<li>
 						<label for="dormant_phone" class="tit">휴대폰번호<span class="c_iden">*</span></label>
 						<input type="text" id="dormant_phone" name="phone_number" class="text w100p js-account-recovery-phone-input" placeholder="휴대폰번호를 입력해주세요." value="{{ old('phone_number') }}" required inputmode="numeric" autocomplete="tel" maxlength="13">
-						@error('phone_number')
-							<p class="c_red" role="alert">{{ $message }}</p>
-						@enderror
 					</li>
 					<li>
 						<label for="dormant_email" class="tit">이메일<span class="c_iden">*</span></label>
 						<input type="email" id="dormant_email" name="email" class="text w100p" placeholder="이메일을 입력해주세요." value="{{ old('email') }}" required>
-						@error('email')
-							<p class="c_red" role="alert">{{ $message }}</p>
-						@enderror
 					</li>
 				</ul>
 			</div>
 			<button type="submit" class="btn btn_wbb">아이디 찾기</button>
 		</form>
-		
+
 	</div>
 </section>
-	
+
 </main>
 
 @endsection

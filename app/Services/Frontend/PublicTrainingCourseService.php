@@ -271,6 +271,60 @@ class PublicTrainingCourseService
             && $this->priceForRound($round, $user)['eligible'];
     }
 
+    public function hasApplicableRound(EduTraining $training, ?User $user): bool
+    {
+        return $this->publicRounds($training)
+            ->contains(fn (EduTrainingRound $round): bool => $this->canApplyRound($round, $user));
+    }
+
+    public function canDownloadTextbook(EduTraining $training, ?User $user): bool
+    {
+        if (! $user || $user->role !== 'user' || ! $training->textbook_file_path) {
+            return false;
+        }
+
+        $training->loadMissing('rounds');
+        $paidRoundIds = EduTrainingPayment::query()
+            ->where('edu_training_id', $training->id)
+            ->where('member_id', $user->id)
+            ->where('payment_status', 'completed')
+            ->whereHas('items', function (Builder $query): void {
+                $query->where('category', 'like', self::ROUND_ITEM_CATEGORY_PREFIX . '%');
+            })
+            ->with('items')
+            ->get()
+            ->flatMap(function (EduTrainingPayment $payment): array {
+                return $payment->items
+                    ->map(static function ($item): ?int {
+                        $category = (string) $item->category;
+                        if (! str_starts_with($category, self::ROUND_ITEM_CATEGORY_PREFIX)) {
+                            return null;
+                        }
+
+                        return (int) str_replace(self::ROUND_ITEM_CATEGORY_PREFIX, '', $category);
+                    })
+                    ->filter()
+                    ->values()
+                    ->all();
+            })
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($paidRoundIds)) {
+            return false;
+        }
+
+        return $this->publicRounds($training)
+            ->filter(fn (EduTrainingRound $round): bool => in_array((int) $round->id, $paidRoundIds, true))
+            ->contains(fn (EduTrainingRound $round): bool => $this->isRoundLectureAvailable($round));
+    }
+
+    private function isRoundLectureAvailable(EduTrainingRound $round): bool
+    {
+        return $round->lecture_date === null || Carbon::today()->gte($round->lecture_date);
+    }
+
     /** @param list<int> $roundIds */
     public function selectedRoundSummary(EduTraining $training, array $roundIds, ?User $user): array
     {

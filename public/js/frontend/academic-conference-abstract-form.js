@@ -32,6 +32,29 @@
         }
     }
 
+    function focusFirstInvalidField(form) {
+        const firstError = form.querySelector('.c_red[role="alert"]');
+        if (!firstError) {
+            return;
+        }
+
+        const container = firstError.closest('li') || firstError.parentElement;
+        if (!container) {
+            return;
+        }
+
+        const target = container.querySelector('input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])');
+        if (!target) {
+            firstError.scrollIntoView({ block: 'center' });
+            return;
+        }
+
+        window.setTimeout(function () {
+            target.scrollIntoView({ block: 'center' });
+            target.focus({ preventScroll: true });
+        }, 80);
+    }
+
     document.querySelectorAll('[data-history-back]').forEach((button) => {
         button.addEventListener('click', function () {
             window.history.back();
@@ -55,6 +78,7 @@
         const removedFiles = form.querySelector('[data-abstract-removed-files]');
 
         refreshFileList(fileList);
+        focusFirstInvalidField(form);
 
         if (fileInput) {
             fileInput.addEventListener('change', function () {

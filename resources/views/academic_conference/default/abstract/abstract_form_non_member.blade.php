@@ -12,7 +12,7 @@
 <section class="scon abstract_form_wrap" aria-labelledby="abstract-form-heading">
 	<div class="inner">
 		<h1 class="sub_title mb0" id="abstract-form-heading">{{ $sName }}</h1>
-		
+
 		<div class="member_inbox">
 			<div class="gbox after_info print_area">
 				<h2 class="tt">발표 양식 다운로드</h2>
@@ -27,13 +27,8 @@
 					</div>
 				@endif
 			</div>
-			
+
 			<div class="inbox input_wrap">
-				@if ($errors->any())
-					<div class="gbox">
-						<p class="c_red" role="alert">입력 내용을 확인해주세요.</p>
-					</div>
-				@endif
 				@error('submission')
 					<p class="c_red" role="alert">{{ $message }}</p>
 				@enderror
@@ -145,14 +140,14 @@
 							</li>
 						</ul>
 					</fieldset>
-					
+
 					<div class="btns_btm flex_center">
 						<button type="button" class="btn btn_kwg" data-history-back>뒤로가기</button>
 						<button type="submit" class="btn btn_wbb">초록신청</button>
 					</div>
 				</form>
 			</div>
-			
+
 		</div>
 	</div>
 </section>

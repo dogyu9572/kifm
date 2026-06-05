@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
 class FrontendMemberFindPasswordRequest extends FormRequest
 {
@@ -37,5 +39,12 @@ class FrontendMemberFindPasswordRequest extends FormRequest
             'phone_number.required' => '휴대폰 번호를 입력해주세요.',
             'phone_number.regex' => '휴대폰 번호 형식을 확인해주세요. (010 등 10~11자리)',
         ];
+    }
+
+    protected function failedValidation(Validator $validator): void
+    {
+        $this->session()->flash('alert', $validator->errors()->first());
+
+        throw (new ValidationException($validator))->redirectTo($this->getRedirectUrl());
     }
 }

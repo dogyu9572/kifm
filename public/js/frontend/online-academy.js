@@ -725,6 +725,36 @@
             toggleReceiptArea();
         }
 
+        function validateBankTransferFields() {
+            if (syncPaymentMethod() !== 'bank_transfer') {
+                return true;
+            }
+
+            const depositor = form.querySelector('#bank_depositor');
+            if (depositor && !depositor.value.trim()) {
+                window.alert('입금자명을 입력해주세요.');
+                depositor.focus();
+                return false;
+            }
+
+            const depositDate = form.querySelector('#bank_deposit_date');
+            if (depositDate && !depositDate.value.trim()) {
+                window.alert('입금 예정일을 선택해주세요.');
+                depositDate.focus();
+                return false;
+            }
+
+            const isReceipt = form.querySelector('input[name="receipt_issue"]:checked')?.value === 'YES';
+            const receiptNumber = form.querySelector('#receipt_number');
+            if (isReceipt && receiptNumber && !receiptNumber.value.trim()) {
+                window.alert('현금영수증 번호를 입력해주세요.');
+                receiptNumber.focus();
+                return false;
+            }
+
+            return true;
+        }
+
         function loadTossSdk() {
             if (window.TossPayments) {
                 return Promise.resolve(window.TossPayments);
@@ -804,6 +834,11 @@
         receiptRadios.forEach((input) => input.addEventListener('change', toggleReceiptArea));
         form.addEventListener('submit', async function (event) {
             if (syncPaymentMethod() === 'bank_transfer' || currentTotal() <= 0) {
+                if (!validateBankTransferFields()) {
+                    event.preventDefault();
+                    return;
+                }
+
                 if (csrfPreparedForSubmit) {
                     return;
                 }

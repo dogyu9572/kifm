@@ -17,6 +17,8 @@ class MypageAnnualFeeCardService
      * @return array{
      *   mode: 'paid'|'pending_bank'|'unpaid',
      *   paid_at_formatted: string|null,
+     *   receipt_available: bool,
+     *   exempt_without_payment: bool,
      *   pending_payment: \App\Models\MembershipPayment|null,
      *   bank_name: string,
      *   bank_account_no: string,
@@ -29,17 +31,6 @@ class MypageAnnualFeeCardService
         $bankAccount = (string) config('mypage.membership_bank_account_no');
         $bankHolder = (string) config('mypage.membership_bank_holder');
 
-        if ($this->isExemptMember($user)) {
-            return [
-                'mode' => 'paid',
-                'paid_at_formatted' => null,
-                'pending_payment' => null,
-                'bank_name' => $bankName,
-                'bank_account_no' => $bankAccount,
-                'bank_holder' => $bankHolder,
-            ];
-        }
-
         $latestCompleted = MembershipPayment::query()
             ->where('member_id', $user->id)
             ->where('payment_status', 'completed')
@@ -51,6 +42,21 @@ class MypageAnnualFeeCardService
             return [
                 'mode' => 'paid',
                 'paid_at_formatted' => $this->formatKoreanDateTime($latestCompleted->paid_at),
+                'receipt_available' => true,
+                'exempt_without_payment' => false,
+                'pending_payment' => null,
+                'bank_name' => $bankName,
+                'bank_account_no' => $bankAccount,
+                'bank_holder' => $bankHolder,
+            ];
+        }
+
+        if ($this->isExemptMember($user)) {
+            return [
+                'mode' => 'paid',
+                'paid_at_formatted' => null,
+                'receipt_available' => false,
+                'exempt_without_payment' => true,
                 'pending_payment' => null,
                 'bank_name' => $bankName,
                 'bank_account_no' => $bankAccount,
@@ -70,6 +76,8 @@ class MypageAnnualFeeCardService
             return [
                 'mode' => 'pending_bank',
                 'paid_at_formatted' => null,
+                'receipt_available' => false,
+                'exempt_without_payment' => false,
                 'pending_payment' => $pendingBank,
                 'bank_name' => $bankName,
                 'bank_account_no' => $bankAccount,
@@ -80,6 +88,8 @@ class MypageAnnualFeeCardService
         return [
             'mode' => 'unpaid',
             'paid_at_formatted' => null,
+            'receipt_available' => false,
+            'exempt_without_payment' => false,
             'pending_payment' => null,
             'bank_name' => $bankName,
             'bank_account_no' => $bankAccount,

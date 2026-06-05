@@ -57,6 +57,23 @@ class AcademicConferenceAbstractUpdateRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute 항목을 확인해주세요.',
+            'title.required' => '초록 제목을 입력해주세요.',
+            'presentation_type.required' => '발표구분을 선택해주세요.',
+            'email' => ':attribute 형식이 올바르지 않습니다.',
+            'regex' => ':attribute 형식이 올바르지 않습니다.',
+            'in' => ':attribute 항목을 올바르게 선택해주세요.',
+            'integer' => ':attribute 항목을 올바르게 선택해주세요.',
+            'exists' => ':attribute 항목을 올바르게 선택해주세요.',
+            'array' => ':attribute 항목을 올바르게 등록해주세요.',
+            'max' => ':attribute은(는) 허용 범위를 초과할 수 없습니다.',
+            'file' => ':attribute은(는) 파일만 등록할 수 있습니다.',
+        ];
+    }
+
     public function withValidator($validator): void
     {
         $validator->after(function ($validator): void {

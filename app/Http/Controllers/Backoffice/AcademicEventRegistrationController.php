@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Backoffice\AcademicEventRegistrationRequest;
 use App\Models\AcademicEvent;
 use App\Models\AcademicEventRegistration;
+use App\Models\MembershipPayment;
 use App\Models\PaymentPlan;
 use App\Models\User;
 use App\Services\Backoffice\AcademicEventRegistrationService;
@@ -167,6 +168,7 @@ class AcademicEventRegistrationController extends Controller
                 'total_amount' => $this->registrationService->sumItems($items),
             ]);
             $this->registrationService->syncItems($academic_event_registration, $items);
+            $this->syncLinkedMembershipPayment($academic_event_registration->refresh());
         });
 
         return redirect()->route('backoffice.academic-event-registrations.index')
@@ -179,6 +181,57 @@ class AcademicEventRegistrationController extends Controller
 
         return redirect()->route('backoffice.academic-event-registrations.index')
             ->with('success', '삭제되었습니다.');
+    }
+
+    private function syncLinkedMembershipPayment(AcademicEventRegistration $registration): void
+    {
+        if ($registration->payment_status !== 'completed') {
+            return;
+        }
+
+        $source = $registration->source_row_json ?? [];
+        $paymentId = (int) ($source['membership_payment_id'] ?? 0);
+        if ($paymentId <= 0 || ! $registration->member_id) {
+            return;
+        }
+
+        $payment = MembershipPayment::query()
+            ->whereKey($paymentId)
+            ->where('member_id', $registration->member_id)
+            ->first();
+        if (! $payment || $payment->payment_status === 'completed') {
+            return;
+        }
+
+        $payment->update([
+            'payment_status' => 'completed',
+            'paid_at' => $registration->paid_at ?: now(),
+        ]);
+
+        $member = $registration->member;
+        if (! $member) {
+            return;
+        }
+
+        $targetGrade = (string) ($source['membership_grade'] ?? $payment->member_grade ?? '');
+        $updates = [
+            'annual_fee_status' => 'paid',
+            'membership_fee_basis_at' => now()->toDateString(),
+        ];
+        if ($targetGrade !== '' && $this->gradeRank($targetGrade) > $this->gradeRank((string) $member->member_level)) {
+            $updates['member_level'] = $targetGrade;
+        }
+        $member->forceFill($updates)->save();
+    }
+
+    private function gradeRank(string $grade): int
+    {
+        return [
+            'associate' => 1,
+            'regular' => 2,
+            'lifetime' => 3,
+            'senior' => 4,
+        ][$grade] ?? 0;
     }
 
     public function printReceipt(AcademicEventRegistration $academic_event_registration): View

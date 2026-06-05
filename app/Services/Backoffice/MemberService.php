@@ -17,6 +17,8 @@ class MemberService
             'regular' => '정회원',
             'lifetime' => '평생회원',
             'senior' => '시니어회원',
+            'nonmember' => '비회원',
+            'guest' => '비회원',
         ];
     }
 

@@ -27,11 +27,11 @@
         const $detail = window.jQuery('.training_course_view_wrap');
         const $inbox = $detail.find('.inbox');
         const $absoApp = window.jQuery('.abso_application');
-        
+
         let touchStartY = 0;
         let startBottom = 0;
         let isDragging = false;
-        let isUserOpened = true; 
+        let isUserOpened = true;
 
         function handleStickyLayout() {
             if (!$detail.length || !$absoApp.length) { return; }
@@ -45,7 +45,7 @@
             if (windowWidth <= 767) {
                 $inbox.css('padding-bottom', (appHeight + 20) + 'px');
                 const mobileUnfixPoint = (detailOffsetTop + detailHeight) - windowHeight;
-                
+
                 if (scrollTop >= mobileUnfixPoint) {
                     $detail.addClass('unfixed').removeClass('fixed');
                     if (!isDragging) {
@@ -113,8 +113,8 @@
             const isUnfixed = $detail.hasClass('unfixed');
 
             $absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
-            const closedBottom = isUnfixed 
-                ? `-${appHeight - 33}px` 
+            const closedBottom = isUnfixed
+                ? `-${appHeight - 33}px`
                 : `calc(-100% + (100vh - ${appHeight}px) + 33px)`;
 
             if (diffY > 30) {
@@ -312,6 +312,30 @@
             if (receiptArea) { receiptArea.style.display = selectedPaymentMethod() === 'bank_transfer' && issue ? 'block' : 'none'; }
             if (window.jQuery) { window.jQuery(window).trigger('scroll.trainingCourseSticky'); }
         }
+        function validateBankTransferFields() {
+            if (selectedPaymentMethod() !== 'bank_transfer') { return true; }
+            const depositor = form.querySelector('#training-bank-depositor');
+            if (depositor && !depositor.value.trim()) {
+                window.alert('입금자명을 입력해주세요.');
+                depositor.focus();
+                return false;
+            }
+            const depositDate = form.querySelector('#training-bank-date');
+            if (depositDate && !depositDate.value.trim()) {
+                window.alert('입금 예정일을 선택해주세요.');
+                depositDate.focus();
+                return false;
+            }
+            const isReceipt = form.querySelector('input[name="receipt_issue"]:checked')?.value === 'YES';
+            const receiptNumber = form.querySelector('#training-receipt-number');
+            if (isReceipt && receiptNumber && !receiptNumber.value.trim()) {
+                window.alert('현금영수증 번호를 입력해주세요.');
+                receiptNumber.focus();
+                return false;
+            }
+
+            return true;
+        }
         function loadTossSdk() {
             if (window.TossPayments) { return Promise.resolve(window.TossPayments); }
             if (tossSdkPromise) { return tossSdkPromise; }
@@ -377,7 +401,12 @@
                 window.alert('결제 이용 약관 및 개인정보 처리 동의에 체크해주세요.');
                 return;
             }
-            if (selectedPaymentMethod() === 'bank_transfer' || currentTotal() <= 0) { return; }
+            if (selectedPaymentMethod() === 'bank_transfer' || currentTotal() <= 0) {
+                if (!validateBankTransferFields()) {
+                    event.preventDefault();
+                }
+                return;
+            }
             event.preventDefault();
             if (submitButton) { submitButton.disabled = true; }
             try {

@@ -800,6 +800,7 @@
                         <td>{{ $sess->session_date?->format('Y-m-d') }}</td>
                         <td>{{ substr((string) $sess->start_time, 0, 5) }}~{{ substr((string) $sess->end_time, 0, 5) }}</td>
                         <td>
+                        <a href="{{ route('backoffice.academic-events.sessions.abstracts', [$e, $sess]) }}" class="btn btn-sm btn-success">초록 관리</a>
                             <a href="{{ route('backoffice.academic-events.sessions.edit', [$e, $sess]) }}" class="btn btn-sm btn-primary">수정</a>
                             <button type="button" class="btn btn-sm btn-danger js-academic-session-delete-btn" data-delete-form-id="bo-session-delete-form-{{ $sess->id }}">삭제</button>
                         </td>

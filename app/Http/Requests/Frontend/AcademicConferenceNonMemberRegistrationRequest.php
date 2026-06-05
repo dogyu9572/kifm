@@ -70,4 +70,31 @@ class AcademicConferenceNonMemberRegistrationRequest extends FormRequest
             'terms_agree' => '결제 이용 약관, 개인정보 처리 동의',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => '이름을 입력해주세요.',
+            'email.required' => '이메일을 입력해주세요.',
+            'email.email' => '올바른 이메일 형식이 아닙니다.',
+            'phone.required' => '휴대폰번호를 입력해주세요.',
+            'phone.regex' => '휴대폰 번호 형식을 확인해주세요. (010 등 10~11자리)',
+            'name_en.required' => '영문 이름을 입력해주세요.',
+            'affiliated_hospital.required' => '직장명을 입력해주세요.',
+            'address_postcode.required' => '우편번호를 입력해주세요.',
+            'address_base.required' => '주소를 입력해주세요.',
+            'address_detail.required' => '상세주소를 입력해주세요.',
+            'payment_plan_ids.required' => '결제 항목을 선택해주세요.',
+            'payment_plan_ids.min' => '결제 항목을 선택해주세요.',
+            'payment_plan_ids.*.exists' => '결제 항목을 확인해주세요.',
+            'payment_method.required' => '결제수단을 선택해주세요.',
+            'payment_method.in' => '결제수단을 확인해주세요.',
+            'bank_depositor.required_if' => '입금자명을 입력해주세요.',
+            'bank_deposit_date.required_if' => '입금 예정일을 선택해주세요.',
+            'bank_deposit_date.date' => '입금 예정일 형식을 확인해주세요.',
+            'receipt_type.required_if' => '현금영수증 발급 구분을 선택해주세요.',
+            'receipt_number.required_if' => '현금영수증 번호를 입력해주세요.',
+            'terms_agree.accepted' => '결제 이용 약관, 개인정보 처리 동의가 필요합니다.',
+        ];
+    }
 }
