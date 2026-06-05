@@ -5,6 +5,8 @@ namespace App\Services\Frontend;
 use App\Models\OneOnOneInquiry;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use stdClass;
 
@@ -16,15 +18,63 @@ use stdClass;
  */
 class MypageInquiryService
 {
-    public function paginateForMember(User $user, int $perPage = 20): LengthAwarePaginator
+    public function paginateForMember(User $user, ?Request $request = null, int $perPage = 20): LengthAwarePaginator
     {
+        $filters = $this->filters($request);
+
         return OneOnOneInquiry::query()
             ->where('user_id', $user->id)
+            ->when($filters['status'] !== 'all', function (Builder $query) use ($filters): void {
+                if ($filters['status'] === 'answered') {
+                    $query->where(function (Builder $statusQuery): void {
+                        $statusQuery->where('answer_status', 'DONE')
+                            ->orWhereNotNull('answer_content');
+                    });
+                    return;
+                }
+
+                $query->where(function (Builder $statusQuery): void {
+                    $statusQuery->whereNull('answer_content')
+                        ->where(function (Builder $pendingQuery): void {
+                            $pendingQuery->whereNull('answer_status')
+                                ->orWhere('answer_status', '!=', 'DONE');
+                        });
+                });
+            })
+            ->when($filters['keyword'] !== '', function (Builder $query) use ($filters): void {
+                $keyword = '%' . $filters['keyword'] . '%';
+                if ($filters['search_field'] === 'title') {
+                    $query->where('title', 'like', $keyword);
+                    return;
+                }
+                if ($filters['search_field'] === 'content') {
+                    $query->where('content', 'like', $keyword);
+                    return;
+                }
+
+                $query->where(function (Builder $searchQuery) use ($keyword): void {
+                    $searchQuery->where('title', 'like', $keyword)
+                        ->orWhere('content', 'like', $keyword);
+                });
+            })
             ->orderByDesc('created_at')
             ->orderByDesc('id')
             ->paginate($perPage)
             ->withQueryString()
             ->through(fn (OneOnOneInquiry $inquiry) => $this->decorateRow($inquiry));
+    }
+
+    /** @return array{status: string, search_field: string, keyword: string} */
+    public function filters(?Request $request = null): array
+    {
+        $status = (string) $request?->query('status', 'all');
+        $searchField = (string) $request?->query('search_field', 'all');
+
+        return [
+            'status' => in_array($status, ['all', 'pending', 'answered'], true) ? $status : 'all',
+            'search_field' => in_array($searchField, ['all', 'title', 'content'], true) ? $searchField : 'all',
+            'keyword' => trim((string) $request?->query('keyword', '')),
+        ];
     }
 
     /**

@@ -137,6 +137,8 @@ class EduCourseService
 
     protected function fillCourse(EduCourse $course, array $validated): void
     {
+        $annualFeeTarget = (string) $validated['annual_fee_target'];
+        $freeYn = $annualFeeTarget === 'paid' ? 'N' : (string) $validated['free_yn'];
         $professorMember = null;
         if (! empty($validated['professor_member_id'])) {
             $professorMember = User::query()
@@ -161,10 +163,10 @@ class EduCourseService
             'duration_min' => (int) $validated['duration_min'],
             'duration_sec' => (int) ($validated['duration_sec'] ?? ((int) $validated['duration_min'] * 60)),
             'completion_score' => (int) $validated['completion_score'],
-            'annual_fee_target' => $validated['annual_fee_target'],
-            'free_yn' => $validated['free_yn'],
-            'free_start_date' => $validated['free_yn'] === 'Y' ? ($validated['free_start_date'] ?? null) : null,
-            'free_end_date' => $validated['free_yn'] === 'Y' ? ($validated['free_end_date'] ?? null) : null,
+            'annual_fee_target' => $annualFeeTarget,
+            'free_yn' => $freeYn,
+            'free_start_date' => $freeYn === 'Y' ? ($validated['free_start_date'] ?? null) : null,
+            'free_end_date' => $freeYn === 'Y' ? ($validated['free_end_date'] ?? null) : null,
             'period_type' => $validated['period_type'],
             'duration_days' => $validated['period_type'] === 'days' ? ((int) ($validated['duration_days'] ?? 30)) : null,
             'period_start' => $validated['period_type'] === 'range' ? ($validated['period_start'] ?? null) : null,
@@ -177,12 +179,14 @@ class EduCourseService
 
     protected function syncChildRows(EduCourse $course, array $validated): void
     {
+        $isFreeCourse = ($validated['free_yn'] ?? 'N') === 'Y';
         $course->gradePrices()->delete();
         foreach (($validated['grade_prices'] ?? []) as $grade => $row) {
+            $enabled = ! $isFreeCourse && (bool) ($row['enabled'] ?? false);
             $course->gradePrices()->create([
                 'grade_code' => $grade,
-                'is_enabled' => (bool) ($row['enabled'] ?? false),
-                'price' => ($row['enabled'] ?? false) ? (int) ($row['price'] ?? 0) : null,
+                'is_enabled' => $enabled,
+                'price' => $enabled ? (int) ($row['price'] ?? 0) : null,
             ]);
         }
 

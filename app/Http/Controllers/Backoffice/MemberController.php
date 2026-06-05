@@ -9,6 +9,9 @@ use App\Models\User;
 use App\Services\Backoffice\MemberHistoryService;
 use App\Services\Backoffice\MemberService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class MemberController extends Controller
 {
@@ -143,10 +146,41 @@ class MemberController extends Controller
 
     public function update(BackofficeMemberRequest $request, User $user)
     {
-        $this->memberService->updateMember($user->id, $request->validated());
+        $beforeLevel = (string) ($user->member_level ?? '');
+        $member = $this->memberService->updateMember($user->id, $request->validated());
+
+        if ($beforeLevel === 'pending' && $member->member_level !== 'pending') {
+            $this->sendWelcomeApprovedMail($member);
+        }
 
         return redirect()->route('backoffice.members.index')
             ->with('success', '회원 정보가 수정되었습니다.');
+    }
+
+    private function sendWelcomeApprovedMail(User $member): void
+    {
+        if (blank($member->email)) {
+            return;
+        }
+
+        try {
+            $memberLevelLabels = MemberService::memberLevelLabels();
+            Mail::send('mailform.mail_welcome_approved', [
+                'member' => $member,
+                'approvedAt' => now(),
+                'memberLevelLabel' => $memberLevelLabels[$member->member_level] ?? (string) $member->member_level,
+            ], function ($message) use ($member): void {
+                $message
+                    ->to($member->email, $member->name)
+                    ->subject('회원 가입 승인 및 환영 안내');
+            });
+        } catch (Throwable $e) {
+            Log::warning('회원 가입 승인 메일 발송 실패', [
+                'member_id' => $member->id,
+                'email' => $member->email,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function destroy(User $user)
@@ -158,7 +192,7 @@ class MemberController extends Controller
         }
 
         return redirect()->route('backoffice.members.index')
-            ->with('success', '회원이 삭제되었습니다.');
+            ->with('success', '회원이 탈퇴 처리되었습니다.');
     }
 
     public function destroyMultiple(Request $request)
@@ -169,7 +203,7 @@ class MemberController extends Controller
         }
 
         $this->memberService->deleteMembers($ids);
-        return response()->json(['success' => true, 'message' => '선택된 회원이 삭제되었습니다.']);
+        return response()->json(['success' => true, 'message' => '선택된 회원이 탈퇴 처리되었습니다.']);
     }
 
     public function checkDuplicateEmail(Request $request)

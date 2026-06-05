@@ -27,25 +27,33 @@
 						? asset('storage/'.$c->thumbnail_path)
 						: asset('images/bg_sample_subcommittee_list.jpg');
 					$canEnter = isset($accessibleCommitteeIdSet[(string) $c->id]);
+					$isPending = isset($pendingCommitteeIdSet[(string) $c->id]);
 				@endphp
-				<li @if (! $canEnter) class="is-locked" @endif>
+				<li @if ($isPending) class="is-locked" @endif>
 					@if ($canEnter)
 					<a href="{{ route('subcommittee.notice', $c) }}">
-					@else
+					@elseif ($isPending)
 					<span class="subcommittee_list_card" aria-disabled="true">
+					@else
+					<form method="POST" action="{{ route('subcommittee.apply', $c) }}" class="subcommittee_apply_form" data-committee-name="{{ $c->name }}">
+						@csrf
+						<button type="submit" class="subcommittee_list_card">
 					@endif
 						<span class="imgfit" aria-hidden="true"><img src="{{ $thumbUrl }}" alt=""></span>
 						<span class="txt">
 							<h3>{{ $c->name }}</h3>
 							<span class="con">
 								<p>{{ $c->description ?? '' }}</p>
-								<i class="btn btn_wbb">위원회 가입 신청</i>
+								<i class="btn btn_wbb">{{ $canEnter ? '위원회 바로가기' : ($isPending ? '승인 대기' : '위원회 가입 신청') }}</i>
 							</span>
 						</span>
 					@if ($canEnter)
 					</a>
-					@else
+					@elseif ($isPending)
 					</span>
+					@else
+						</button>
+					</form>
 					@endif
 				</li>
 			@empty

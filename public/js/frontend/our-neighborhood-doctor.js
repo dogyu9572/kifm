@@ -82,6 +82,7 @@
             }
             const previous = resetSelection ? '' : sigunguSelect.value;
             sigunguSelect.innerHTML = '<option value="">군/구</option>';
+            sigunguSelect.disabled = false;
             list.forEach((name) => {
                 const opt = document.createElement('option');
                 opt.value = name;

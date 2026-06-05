@@ -34,7 +34,7 @@
 				<a href="{{ isset($course) ? route('online_academy.show', $course) : route('online_academy.view') }}" class="btn btn_kwg">강의로 돌아가기</a>
 				<a href="{{ isset($course) ? route('online_academy.exam', $course) : route('online_academy.test') }}" class="btn btn_wkk">다시 응시하기</a>
 				@if ($passed)
-					<a href="{{ route('home.alt') }}" class="btn btn_woo2">수강 완료하기</a>
+					<a href="{{ route('home') }}" class="btn btn_woo2">수강 완료하기</a>
 				@endif
 			</div>
 		</div>

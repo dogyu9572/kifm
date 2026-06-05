@@ -36,8 +36,8 @@ use App\Http\Controllers\Frontend\AcademicConferenceSiteController;
 
 // 인트로 페이지
 Route::get('/intro', [FrontendHomeController::class, 'intro'])->name('intro');
-// 전문인 메인 페이지 (퍼블리싱 별칭 /home)
-Route::get('/home', [FrontendHomeController::class, 'index'])->name('home.alt');
+// 전문인 메인 페이지
+Route::get('/home', [FrontendHomeController::class, 'index'])->name('home');
 
 // 학회소개
 Route::prefix('introduction')->name('introduction.')->group(function () {
@@ -73,6 +73,7 @@ Route::prefix('academic_event')->name('academic_event.')->group(function () {
 Route::prefix('subcommittee')->name('subcommittee.')->middleware(['auth', 'frontend.member'])->group(function () {
     Route::get('/', [SubcommitteeController::class, 'index'])->name('index');
     Route::get('/captcha/discussion', [CaptchaController::class, 'discussion'])->name('captcha.discussion');
+    Route::post('/{committee}/apply', [SubcommitteeController::class, 'apply'])->whereNumber('committee')->name('apply');
     Route::prefix('{committee}')->whereNumber('committee')->group(function () {
         Route::get('/notice', [SubcommitteeController::class, 'notice'])->name('notice');
         Route::get('/notice/{id}', [SubcommitteeController::class, 'noticeShow'])->whereNumber('id')->name('notice_show');

@@ -124,7 +124,7 @@
 						<a href="javascript:alert('준비중입니다.')" role="tab" aria-selected="{{ $page_type == 'general' ? 'true' : 'false' }}" {!! $page_type == 'general' ? 'aria-current="page"' : '' !!}>일반인</a>
 					</li>
 					<li role="presentation" class="c2 {{ $page_type == 'professional' ? 'on' : '' }}">
-						<a href="/" role="tab" aria-selected="{{ $page_type == 'professional' ? 'true' : 'false' }}" {!! $page_type == 'professional' ? 'aria-current="page"' : '' !!}>전문인</a>
+						<a href="{{ route('home') }}" role="tab" aria-selected="{{ $page_type == 'professional' ? 'true' : 'false' }}" {!! $page_type == 'professional' ? 'aria-current="page"' : '' !!}>전문인</a>
 					</li>
 					<li role="presentation" class="c3 {{ $page_type == 'online_academy' ? 'on' : '' }}">
 						<a href="/online_academy/" role="tab" aria-selected="{{ $page_type == 'online_academy' ? 'true' : 'false' }}" {!! $page_type == 'online_academy' ? 'aria-current="page"' : '' !!}>온라인 아카데미</a>
@@ -152,7 +152,7 @@
 		<div class="btm">
 			<div class="inner">
 				<div class="left">
-					<a href="/" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+					<a href="{{ route('home') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
 				</div>
 				<div class="center">
 					<form method="GET" action="{{ route('total_search') }}" class="search_area">
@@ -236,29 +236,31 @@
 	<header class="header {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }}">
 		<div class="inner">
 			<a href="{{ $academicConferenceBaseUrl }}" class="logo" aria-label="대한기능의학회 학술대회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
-			<ul class="gnb">
-				<li class="menu {{ ($gNum ?? '') == '01' ? 'on' : '' }}">
-					<a href="{{ $academicConferenceBaseUrl }}/invitation" id="academic-menu-01" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01') aria-current="page" @endif>KIFM</a>
-				</li>
-				<li class="menu {{ ($gNum ?? '') == '02' ? 'on' : '' }}">
-					<a href="{{ $academicConferenceBaseUrl }}/program" id="academic-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>Program</a>
-				</li>
-				<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}">
-					<a href="{{ $academicConferenceBaseUrl }}/registration" id="academic-menu-03" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '03' ? 'true' : 'false' }}" @if(($gNum ?? '') == '03') aria-current="page" @endif>Registration</a>
-				</li>
-				<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}">
-					<a href="{{ $academicConferenceBaseUrl }}/abstract" id="academic-menu-04" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>Abstract</a>
-				</li>
-				<li class="menu {{ ($gNum ?? '') == '05' ? 'on' : '' }}">
-					<a href="{{ $academicConferenceBaseUrl }}/notice" id="academic-menu-05" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '05' ? 'true' : 'false' }}" @if(($gNum ?? '') == '05') aria-current="page" @endif>Notice</a>
-				</li>
-				<li class="menu {{ ($gNum ?? '') == '06' ? 'on' : '' }}">
-					<a href="{{ $academicConferenceBaseUrl }}/sponsors" id="academic-menu-06" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '06' ? 'true' : 'false' }}" @if(($gNum ?? '') == '06') aria-current="page" @endif>Sponsors</a>
-				</li>
-				<li class="menu {{ ($gNum ?? '') == '07' ? 'on' : '' }}">
-					<a href="{{ $academicConferenceBaseUrl }}/exhibition" id="academic-menu-07" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '07' ? 'true' : 'false' }}" @if(($gNum ?? '') == '07') aria-current="page" @endif>Exhibition</a>
-				</li>
-			</ul>
+			<div class="gnb">
+				<ul>
+					<li class="menu {{ ($gNum ?? '') == '01' ? 'on' : '' }}">
+						<a href="{{ $academicConferenceBaseUrl }}/invitation" id="academic-menu-01" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01') aria-current="page" @endif>KIFM</a>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '02' ? 'on' : '' }}">
+						<a href="{{ $academicConferenceBaseUrl }}/program" id="academic-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>Program</a>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}">
+						<a href="{{ $academicConferenceBaseUrl }}/registration" id="academic-menu-03" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '03' ? 'true' : 'false' }}" @if(($gNum ?? '') == '03') aria-current="page" @endif>Registration</a>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}">
+						<a href="{{ $academicConferenceBaseUrl }}/abstract" id="academic-menu-04" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>Abstract</a>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '05' ? 'on' : '' }}">
+						<a href="{{ $academicConferenceBaseUrl }}/notice" id="academic-menu-05" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '05' ? 'true' : 'false' }}" @if(($gNum ?? '') == '05') aria-current="page" @endif>Notice</a>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '06' ? 'on' : '' }}">
+						<a href="{{ $academicConferenceBaseUrl }}/sponsors" id="academic-menu-06" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '06' ? 'true' : 'false' }}" @if(($gNum ?? '') == '06') aria-current="page" @endif>Sponsors</a>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '07' ? 'on' : '' }}">
+						<a href="{{ $academicConferenceBaseUrl }}/exhibition" id="academic-menu-07" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '07' ? 'true' : 'false' }}" @if(($gNum ?? '') == '07') aria-current="page" @endif>Exhibition</a>
+					</li>
+				</ul>
+			</div>
 			<div class="member">
 				@if($frontendMember === null)
 				<a href="{{ route('member.login') }}" class="btn i1">로그인</a>
@@ -270,12 +272,16 @@
 				</form>
 				@endif
 			</div>
+			<button type="button" class="btn_menu mo_vw" aria-label="전체 메뉴 열기" aria-controls="main-navi" aria-expanded="false">
+				<span class="line t" aria-hidden="true"></span>
+				<span class="line b" aria-hidden="true"></span>
+			</button>
 		</div>
 	</header>
 	<!-- //학술대회 -->
 	@endif
 	<div class="container_wrap {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'sub_wrap' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'g'.$gNum : '' }} {{ (isset($gNum) && $gNum == 'intro') ? 'mt0' : '' }} {{ (isset($gNum) && $gNum == 'print') ? 'print_wrap' : '' }} {{ (isset($page_type) && $page_type == 'online_academy') ? 'online_academy_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference') ? 'academic_conference_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference' && $gNum == 'main') ? 'main' : '' }}">
-		@if(isset($gNum) && $gNum !== 'main' && $gNum !== 'intro' && $gNum !== 'print' && $gNum !== 'total_search')
+		@if(isset($gNum) && $gNum !== 'main' && $gNum !== 'intro' && $gNum !== 'print' && $gNum !== 'total_search' && $page_type !== 'academic_conference')
 		<div class="svisual g{{ $gNum }} s{{ $sNum }} {{ ($gNum == 'online_academy' && $sNum != '00') ? 'hide' : '' }}">
 			@if(isset($gNum) && $gNum !== 'online_academy')
 			
@@ -379,8 +385,12 @@
 						<li class="{{ ($sNum ?? '') == '06' ? 'on' : '' }}"><a href="/mypage/bookmark" @if(($sNum ?? '') == '06') aria-current="page" @endif>북마크</a></li>
 						<li class="{{ ($sNum ?? '') == '07' ? 'on' : '' }}"><a href="/mypage/hospital_information" @if(($sNum ?? '') == '07') aria-current="page" @endif>병원 정보 관리</a></li>
 						<li class="{{ ($sNum ?? '') == '08' ? 'on' : '' }}"><a href="/mypage/executive_activities" @if(($sNum ?? '') == '08') aria-current="page" @endif>회원 활동(임원)</a></li>
-						<li class="{{ ($sNum ?? '') == '09' ? 'on' : '' }}"><a href="/mypage/committee_participation" @if(($sNum ?? '') == '09') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 일반회원 -->
-						<li class="{{ ($sNum ?? '') == '10' ? 'on' : '' }}"><a href="/mypage/committee_participation_admin" @if(($sNum ?? '') == '10') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 관리자 회원 -->
+						@if(! empty($hasCommitteeAccess))
+							<li class="{{ ($sNum ?? '') == '09' ? 'on' : '' }}"><a href="/mypage/committee_participation" @if(($sNum ?? '') == '09') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 일반회원 -->
+						@endif
+						@if(! empty($showCommitteeAdminTab))
+							<li class="{{ ($sNum ?? '') == '10' ? 'on' : '' }}"><a href="/mypage/committee_participation_admin" @if(($sNum ?? '') == '10') aria-current="page" @endif>위원회 참여 현황</a></li> <!-- 관리자 회원 -->
+						@endif
 					@endif
 				</ul>
 			</div>
@@ -549,7 +559,7 @@
 					<div class="tit">기능의학회 사무국</div>
 					<ul>
 						<li><label for="footer_tel">TEL</label><a href="tel:01084414484" id="footer_tel">010-8441-4484</a></li>
-						<li><label for="footer_email">TEL</label><a href="mailto:0182253645@naver.com" id="footer_tel">0182253645@naver.com</a></li>
+						<li><label for="footer_email">E-MAIL</label><a href="mailto:0182253645@naver.com" id="footer_tel">0182253645@naver.com</a></li>
 					</ul>
 				</div>
 			</div>

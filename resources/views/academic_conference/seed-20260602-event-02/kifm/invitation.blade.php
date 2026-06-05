@@ -16,7 +16,7 @@
 	<div class="inner">
 		<h1 class="sub_title" id="invitation-title">{{ $sName }}</h1>
 		
-		<div class="invitation_area">
+		<div class="invitation_area{{ $greetingImage ? '' : ' no_image' }}">
 			<div class="txt">
 				<h2>{!! nl2br(e($greetingTitle)) !!}</h2>
 				<div class="con">
@@ -27,7 +27,9 @@
 					@endif					
 				</div>
 			</div>
-			<div class="img" aria-hidden="true"><img src="{{ $greetingImage ?: asset('images/img_invitation.png') }}" alt=""></div>
+			@if ($greetingImage)
+				<div class="img" aria-hidden="true"><img src="{{ $greetingImage }}" alt=""></div>
+			@endif
 		</div>
 	</div>
 	<div class="marquee_container" data-kifm-marquee>

@@ -205,5 +205,9 @@
 
 @push('scripts')
 <script charset="UTF-8" class="daum_roughmap_loader_script" src="https://ssl.daumcdn.net/dmaps/map_js_init/roughmapLoader.js"></script>
-<script src="{{ asset('js/frontend/our-neighborhood-doctor.js') }}"></script>
+@php
+    $ourDoctorJsPath = public_path('js/frontend/our-neighborhood-doctor.js');
+    $ourDoctorJsVersion = file_exists($ourDoctorJsPath) ? filemtime($ourDoctorJsPath) : time();
+@endphp
+<script src="{{ asset('js/frontend/our-neighborhood-doctor.js') }}?v={{ $ourDoctorJsVersion }}"></script>
 @endpush

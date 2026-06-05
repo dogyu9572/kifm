@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FrontendSubcommitteeDiscussionStoreRequest;
 use App\Models\CommunityCommittee;
+use App\Models\CommunityCommitteeApplication;
 use App\Models\Popup;
 use App\Services\Frontend\PublicBoardService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -40,6 +42,13 @@ class SubcommitteeController extends Controller
             ? $committees->map(static fn (CommunityCommittee $committee): string => (string) $committee->id)->all()
             : $user->communityCommitteeAccessIdStrings();
         $accessibleCommitteeIdSet = array_flip($accessibleCommitteeIds);
+        $pendingCommitteeIds = CommunityCommitteeApplication::query()
+            ->where('user_id', $user->id)
+            ->where('status', 'PENDING')
+            ->pluck('community_committee_id')
+            ->map(static fn ($id): string => (string) $id)
+            ->all();
+        $pendingCommitteeIdSet = array_flip($pendingCommitteeIds);
 
         $committeePopups = collect();
 
@@ -53,8 +62,53 @@ class SubcommitteeController extends Controller
             'gSlug',
             'committees',
             'accessibleCommitteeIdSet',
+            'pendingCommitteeIdSet',
             'committeePopups',
         ));
+    }
+
+    public function apply(Request $request, CommunityCommittee $committee): RedirectResponse
+    {
+        if ($committee->visibility_yn !== 'Y') {
+            throw new NotFoundHttpException();
+        }
+
+        $user = Auth::user();
+        if ($user === null) {
+            abort(403);
+        }
+        if ($user->isAdmin() || $user->canAccessCommunityCommitteeId((string) $committee->id)) {
+            return redirect()->route('subcommittee.notice', $committee);
+        }
+
+        DB::transaction(function () use ($committee, $user) {
+            CommunityCommitteeApplication::query()->updateOrCreate(
+                [
+                    'community_committee_id' => $committee->id,
+                    'user_id' => $user->id,
+                ],
+                [
+                    'applicant_name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone_number,
+                    'status' => 'PENDING',
+                    'reject_reason' => null,
+                    'applied_at' => now(),
+                    'processed_at' => null,
+                    'processed_by' => null,
+                ]
+            );
+
+            $committee->pending_count = CommunityCommitteeApplication::query()
+                ->where('community_committee_id', $committee->id)
+                ->where('status', 'PENDING')
+                ->count();
+            $committee->save();
+        });
+
+        return redirect()
+            ->route('subcommittee.index')
+            ->with('alert', "가입 신청이 완료되었습니다.\n관리자 승인 후 알림을 드리겠습니다.");
     }
 
     public function notice(Request $request, CommunityCommittee $committee): View

@@ -59,7 +59,31 @@
             });
 
             if (currentIndex !== -1) {
-                $tabs.removeClass('on').eq(currentIndex).addClass('on');
+                var $activeTab = $tabs.eq(currentIndex);
+                
+                // 활성화된 탭이 변경될 때만 스크롤 실행 (버벅임 방지)
+                if (!$activeTab.hasClass('on')) {
+                    $tabs.removeClass('on');
+                    $activeTab.addClass('on');
+
+                    // [수정] 1023px 이하일 때 가로 스크롤 이동 (패딩 감안)
+                    if ($window.width() <= 1023) {
+                        // .tabs의 padding-left 값을 가져옴 (숫자만 추출, 없으면 0)
+                        var tabsPaddingLeft = parseInt($tabsArea.css('padding-left'), 10) || 0;
+                        
+                        // 현재 탭의 부모(.tabs) 내부에서의 상대적 왼쪽 위치
+                        var tabLeft = $activeTab.position().left;
+                        var currentScrollLeft = $tabsArea.scrollLeft();
+                        
+                        // [핵심] 현재 스크롤 위치 + 탭의 위치에서 패딩만큼을 빼주어 여백을 유지함
+                        var targetScrollLeft = currentScrollLeft + tabLeft - tabsPaddingLeft;
+
+                        // 부드럽게 가로 스크롤 이동
+                        $tabsArea.stop().animate({
+                            scrollLeft: targetScrollLeft
+                        }, 300);
+                    }
+                }
             } else {
                 $tabs.removeClass('on');
             }

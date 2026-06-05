@@ -14,6 +14,8 @@ class EduCourseRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $annualFeeTarget = (string) $this->input('annual_fee_target', 'all');
+        $freeYn = $annualFeeTarget === 'paid' ? 'N' : (string) $this->input('free_yn', 'N');
         $gradeKeys = ['nonmember', 'associate', 'regular', 'lifetime', 'senior'];
         $grades = [];
 
@@ -27,6 +29,7 @@ class EduCourseRequest extends FormRequest
         }
 
         $this->merge([
+            'free_yn' => $freeYn,
             'grade_prices' => $grades,
             'exam_questions' => is_array($this->input('exam_questions')) ? $this->input('exam_questions') : [],
             'link_round_ids' => is_array($this->input('link_round_ids')) ? $this->input('link_round_ids') : [],
@@ -100,16 +103,18 @@ class EduCourseRequest extends FormRequest
                 }
             }
 
-            $enabledGrades = collect($this->input('grade_prices', []))
-                ->filter(fn ($row) => (bool) ($row['enabled'] ?? false));
-            if ($enabledGrades->isEmpty()) {
-                $validator->errors()->add('grade_prices', '수강 가능 회원을 1개 이상 선택하세요.');
-            }
-            $enabledGrades->each(function ($row, $grade) use ($validator) {
-                if (($row['price'] ?? null) === null || $row['price'] === '') {
-                    $validator->errors()->add("grade_prices.$grade.price", '선택한 회원의 금액을 입력하세요.');
+            if ($this->input('free_yn') !== 'Y') {
+                $enabledGrades = collect($this->input('grade_prices', []))
+                    ->filter(fn ($row) => (bool) ($row['enabled'] ?? false));
+                if ($enabledGrades->isEmpty()) {
+                    $validator->errors()->add('grade_prices', '무료 미제공 강좌는 수강 가능 회원을 1개 이상 선택하세요.');
                 }
-            });
+                $enabledGrades->each(function ($row, $grade) use ($validator) {
+                    if (($row['price'] ?? null) === null || $row['price'] === '') {
+                        $validator->errors()->add("grade_prices.$grade.price", '무료 미제공 강좌는 선택한 회원의 금액을 입력하세요.');
+                    }
+                });
+            }
 
             if ($this->input('course_type') === 'conference' && ! $this->filled('linked_event_id')) {
                 $validator->errors()->add('linked_event_id', '학술대회 연계 과정은 연계 학술대회 선택이 필요합니다.');
@@ -119,5 +124,66 @@ class EduCourseRequest extends FormRequest
                 $validator->errors()->add('link_round_ids', '차수별 연동 사용 시 차수를 1개 이상 선택하세요.');
             }
         });
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute을(를) 입력해주세요.',
+            'required_if' => ':attribute을(를) 입력해주세요.',
+            'integer' => ':attribute은(는) 숫자로 입력해주세요.',
+            'min' => ':attribute은(는) :min 이상으로 입력해주세요.',
+            'max' => ':attribute은(는) :max 이하로 입력해주세요.',
+            'string.max' => ':attribute은(는) :max자 이하로 입력해주세요.',
+            'date' => ':attribute은(는) 올바른 날짜로 입력해주세요.',
+            'after_or_equal' => ':attribute은(는) :date 이후 날짜로 입력해주세요.',
+            'url' => ':attribute은(는) 올바른 URL로 입력해주세요.',
+            'file' => ':attribute은(는) 파일로 등록해주세요.',
+            'mimes' => ':attribute은(는) 허용된 파일 형식만 등록할 수 있습니다.',
+            'in' => ':attribute을(를) 올바르게 선택해주세요.',
+            'exists' => '선택한 :attribute 정보를 찾을 수 없습니다.',
+            'professor_member_id.required' => '강사를 선택해주세요.',
+            'free_start_date.required_if' => '무료 제공 시작일을 입력해주세요.',
+            'free_end_date.required_if' => '무료 제공 종료일을 입력해주세요.',
+            'duration_days.required_if' => '수강 기간을 입력해주세요.',
+            'period_start.required_if' => '수강 시작일을 입력해주세요.',
+            'period_end.required_if' => '수강 종료일을 입력해주세요.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'course_type' => '과정 유형',
+            'open_year' => '개설연도',
+            'linked_event_id' => '연계 학술대회',
+            'keywords' => '강의 키워드',
+            'topics' => '강의 주제',
+            'thumbnail' => '썸네일',
+            'title' => '강의 제목',
+            'professor_member_id' => '강사',
+            'topic_detail' => '강의주제 상세',
+            'content' => '강의 내용',
+            'lecture_file' => '강의록',
+            'video_url' => '강의 URL',
+            'duration_min' => '강의시간',
+            'duration_seconds' => '강의 초',
+            'duration_sec' => '강의 총 시간',
+            'completion_score' => '수강 완료 평점',
+            'annual_fee_target' => '연회비 납부 대상 강의',
+            'free_yn' => '무료 제공 여부',
+            'free_start_date' => '무료 제공 시작일',
+            'free_end_date' => '무료 제공 종료일',
+            'period_type' => '유료 강좌 기간',
+            'duration_days' => '수강 기간',
+            'period_start' => '수강 시작일',
+            'period_end' => '수강 종료일',
+            'exam_yn' => '시험 여부',
+            'expose_yn' => '상단 노출여부',
+            'use_yn' => '사용여부',
+            'grade_prices' => '수강 가능 회원',
+            'grade_prices.*.price' => '회원별 금액',
+            'link_round_ids' => '연동 차수',
+        ];
     }
 }

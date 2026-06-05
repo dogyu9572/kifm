@@ -11,6 +11,8 @@
     if (! is_array($link)) {
         $link = [];
     }
+    $annualFeeTargetValue = old('annual_fee_target', $course->annual_fee_target ?? 'all');
+    $freeYnValue = $annualFeeTargetValue === 'paid' ? 'N' : old('free_yn', $course->free_yn ?? 'N');
 @endphp
 
 <div class="bo-round-toolbar mb-3">
@@ -230,12 +232,13 @@
     <div class="board-form-group">
         <label class="board-form-label">연회비 납부 대상 강의 <span class="required">*</span></label>
         <div class="board-radio-group">
-            <label class="board-radio-item"><input type="radio" name="annual_fee_target" value="all" @checked(old('annual_fee_target', $course->annual_fee_target ?? 'all') === 'all')> <span>전체</span></label>
-            <label class="board-radio-item"><input type="radio" name="annual_fee_target" value="paid" @checked(old('annual_fee_target', $course->annual_fee_target) === 'paid')> <span>납부대상</span></label>
+            <label class="board-radio-item"><input type="radio" name="annual_fee_target" value="all" class="js-annual-fee-target" @checked($annualFeeTargetValue === 'all')> <span>전체</span></label>
+            <label class="board-radio-item"><input type="radio" name="annual_fee_target" value="paid" class="js-annual-fee-target" @checked($annualFeeTargetValue === 'paid')> <span>납부대상</span></label>
         </div>
+        @error('annual_fee_target')<span class="bo-inline-error">{{ $message }}</span>@enderror
     </div>
 
-    <div class="board-form-group">
+    <div id="bo-grade-price-wrap" class="board-form-group @if($freeYnValue === 'Y') bo-hidden @endif">
         <label class="board-form-label">수강 가능 회원 <span class="required">*</span></label>
         <div class="bo-grade-row-list">
             @foreach ($gradeLabels as $gradeCode => $gradeLabel)
@@ -263,24 +266,28 @@
                 </div>
             @endforeach
         </div>
+        @error('grade_prices')<span class="bo-inline-error">{{ $message }}</span>@enderror
     </div>
 
     <div class="board-form-group">
         <label class="board-form-label">무료 제공 여부 <span class="required">*</span></label>
         <div class="board-radio-group">
-            <label class="board-radio-item"><input type="radio" name="free_yn" value="Y" class="js-free-yn" @checked(old('free_yn', $course->free_yn ?? 'N') === 'Y')> <span>제공</span></label>
-            <label class="board-radio-item"><input type="radio" name="free_yn" value="N" class="js-free-yn" @checked(old('free_yn', $course->free_yn ?? 'N') === 'N')> <span>미제공</span></label>
+            <label class="board-radio-item"><input type="radio" name="free_yn" value="Y" class="js-free-yn" @checked($freeYnValue === 'Y') @disabled($annualFeeTargetValue === 'paid')> <span>제공</span></label>
+            <label class="board-radio-item"><input type="radio" name="free_yn" value="N" class="js-free-yn" @checked($freeYnValue === 'N')> <span>미제공</span></label>
         </div>
+        @error('free_yn')<span class="bo-inline-error">{{ $message }}</span>@enderror
     </div>
 
-    <div id="bo-free-period-wrap" class="bo-edu-form-row @if(old('free_yn', $course->free_yn ?? 'N') !== 'Y') bo-hidden @endif">
+    <div id="bo-free-period-wrap" class="bo-edu-form-row @if($freeYnValue !== 'Y') bo-hidden @endif">
         <div class="board-form-group mb-0">
             <label class="board-form-label">무료 제공 시작일</label>
             <input type="date" name="free_start_date" class="board-form-control board-form-control--max-xs" value="{{ old('free_start_date', optional($course->free_start_date)->format('Y-m-d')) }}">
+            @error('free_start_date')<span class="bo-inline-error">{{ $message }}</span>@enderror
         </div>
         <div class="board-form-group mb-0">
             <label class="board-form-label">무료 제공 종료일</label>
             <input type="date" name="free_end_date" class="board-form-control board-form-control--max-xs" value="{{ old('free_end_date', optional($course->free_end_date)->format('Y-m-d')) }}">
+            @error('free_end_date')<span class="bo-inline-error">{{ $message }}</span>@enderror
         </div>
     </div>
 
@@ -290,6 +297,7 @@
             <label class="board-radio-item"><input type="radio" name="period_type" value="days" class="js-period-type" @checked(old('period_type', $course->period_type ?? 'days') === 'days')> <span>신청일부터</span></label>
             <label class="board-radio-item"><input type="radio" name="period_type" value="range" class="js-period-type" @checked(old('period_type', $course->period_type) === 'range')> <span>특정 기간 설정</span></label>
         </div>
+        @error('period_type')<span class="bo-inline-error">{{ $message }}</span>@enderror
     </div>
     <div id="bo-period-days-wrap" class="board-form-group @if(old('period_type', $course->period_type ?? 'days') !== 'days') bo-hidden @endif">
         <label class="board-form-label">수강 기간</label>
@@ -297,15 +305,18 @@
             <input type="number" name="duration_days" class="board-form-control board-form-control--max-xs" min="1" value="{{ old('duration_days', $course->duration_days ?? 30) }}">
             <span class="ml-2">일</span>
         </div>
+        @error('duration_days')<span class="bo-inline-error">{{ $message }}</span>@enderror
     </div>
     <div id="bo-period-range-wrap" class="bo-edu-form-row @if(old('period_type', $course->period_type ?? 'days') !== 'range') bo-hidden @endif">
         <div class="board-form-group mb-0">
             <label class="board-form-label">수강 시작일</label>
             <input type="date" name="period_start" class="board-form-control board-form-control--max-xs" value="{{ old('period_start', optional($course->period_start)->format('Y-m-d')) }}">
+            @error('period_start')<span class="bo-inline-error">{{ $message }}</span>@enderror
         </div>
         <div class="board-form-group mb-0">
             <label class="board-form-label">수강 종료일</label>
             <input type="date" name="period_end" class="board-form-control board-form-control--max-xs" value="{{ old('period_end', optional($course->period_end)->format('Y-m-d')) }}">
+            @error('period_end')<span class="bo-inline-error">{{ $message }}</span>@enderror
         </div>
     </div>
 </div>

@@ -29,7 +29,12 @@
 			</section>
 
             <section class="guide_section member_type">
-				<div class="tit_flex"><h2 class="tit mb0">회원 구분 및 혜택 안내</h2><a href="/member/register" class="btn_abso btn_wkk btn_link">회원가입 바로가기</a></div>
+				<div class="tit_flex">
+					<h2 class="tit mb0">회원 구분 및 혜택 안내</h2>
+					@guest
+						<a href="/member/register" class="btn_abso btn_wkk btn_link">회원가입 바로가기</a>
+					@endguest
+				</div>
 				<div class="tbl tac">
 					<table>
 						<caption class="blind">회원 구분(준회원, 정회원, 평생회원)에 따른 신청 대상, 회비, 주요 혜택 안내</caption>
@@ -93,9 +98,11 @@
 				</div>
 			</article>
 			
-			<div class="btns_btm">
-				<a href="/member/register" class="btn btn_wbb btn_short">회원가입 바로가기</a>
-			</div>
+			@guest
+				<div class="btns_btm">
+					<a href="/member/register" class="btn btn_wbb btn_short">회원가입 바로가기</a>
+				</div>
+			@endguest
 		</div>
 		
 	</div>

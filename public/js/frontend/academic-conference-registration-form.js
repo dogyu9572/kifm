@@ -97,7 +97,7 @@
             summarySubtotal.textContent = numberFormat(currentSubtotal);
         }
         if (summaryDiscount) {
-            summaryDiscount.textContent = '-' + numberFormat(discount);
+            summaryDiscount.textContent = discount > 0 ? '-' + numberFormat(discount) : '0';
         }
         if (summaryTotal) {
             summaryTotal.textContent = numberFormat(total);

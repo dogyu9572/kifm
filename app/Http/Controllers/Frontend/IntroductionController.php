@@ -198,10 +198,11 @@ class IntroductionController extends Controller
             ->orderByDesc('id')
             ->get(['id', 'name', 'regulation']);
 
-        $selectedCommitteeId = (int) $request->query('committee_id', 0);
-        $selectedCommittee = $selectedCommitteeId > 0
-            ? $committees->firstWhere('id', $selectedCommitteeId)
-            : null;
+        $requestedCommitteeId = (int) $request->query('committee_id', 0);
+        $selectedCommittee = $requestedCommitteeId > 0
+            ? $committees->firstWhere('id', $requestedCommitteeId)
+            : $committees->first();
+        $selectedCommitteeId = (int) ($selectedCommittee?->id ?? 0);
 
         return view('introduction.bylaws_operation', compact(
             'page_type',
@@ -237,10 +238,11 @@ class IntroductionController extends Controller
             ->orderByDesc('id')
             ->get(['id', 'name', 'protocol']);
 
-        $selectedCommitteeId = (int) $request->query('committee_id', 0);
-        $selectedCommittee = $selectedCommitteeId > 0
-            ? $committees->firstWhere('id', $selectedCommitteeId)
-            : null;
+        $requestedCommitteeId = (int) $request->query('committee_id', 0);
+        $selectedCommittee = $requestedCommitteeId > 0
+            ? $committees->firstWhere('id', $requestedCommitteeId)
+            : $committees->first();
+        $selectedCommitteeId = (int) ($selectedCommittee?->id ?? 0);
 
         return view('introduction.bylaws_protocol', compact(
             'page_type',

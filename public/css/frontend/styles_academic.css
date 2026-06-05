@@ -25,7 +25,7 @@
 	.tabs.mb48 {margin-bottom:48px;}
 	.tabs li {display:flex;}
 	.tabs a,
-	.tabs button {position:relative; color:#888; font-weight:600; line-height:1.5; padding-bottom:9px;}
+	.tabs button {position:relative; color:#888; font-weight:600; line-height:1.5; padding-bottom:9px; text-align:center; display:flex; justify-content:center; align-items:center;}
 	.tabs a:after,
 	.tabs button:after {content:""; position:absolute; bottom:0; left:50%; width:0; height:2px; background:#E60012; transform:translateX(-50%); transition:.2s linear;}
 	.tabs .on a,
@@ -67,8 +67,9 @@
 	.header {position:fixed; top:0; left:0; width:100%; color:#222; background:#fff; z-index:100; transition:background .2s linear;}
 	.header .inner {position:relative;}
 	.header .logo {position:absolute; top:0; left:20px; height:80px; display:flex; justify-content:center; align-items:center; transition:none;}
-	.header .gnb {display:flex; justify-content:center;}
+	.header .gnb ul {display:flex; justify-content:center;}
 	.header .gnb li > a {display:block; font-size:16px; font-weight:500; line-height:80px; padding:0 27px;}
+	.header .gnb li.on > a {color:#0088B8;}
 	.header .member {position:absolute; top:0; right:20px; height:100%; display:flex; align-items:center; gap:8px;}
 	.header .member form.member-nav-logout-form--academic {display:inline;margin:0;padding:0;border:0;background:none;}
 	.header .member .btn {position:relative; display:block; width:40px; height:40px; background:no-repeat 50% 50%; border-radius:4px; font-size:0;}
@@ -79,7 +80,7 @@
 	.header .member .i2:before {background:#fff; mask-image:url('/images/icon_academic_header02.svg'); -webkit-mask-image:url('/images/icon_academic_header02.svg');}
 	
 	.header.main {background:none;}
-	.header.main .logo {background:url('/images/logo_w.png') no-repeat 50% 50%;}
+	.header.main .logo {background:url('/images/logo_w.png') no-repeat 50% 50% / contain;}
 	.header.main .logo img {opacity:0;}
 	.header.main .gnb li > a {color:#fff;}
 	.header.main .member .btn {background:#FFFFFF1A;}
@@ -134,7 +135,7 @@
 	.mvisual .dead_line dt {margin-bottom:8px; opacity:.8;}
 	.mvisual .dead_line .date {font-size:24px; font-weight:600; line-height:32px;}
 	.mvisual .dead_line .ani_date {font-size:16px; font-weight:600; display:flex; align-items:center; gap:15px; margin-top:12px;}
-	.mvisual .dead_line .ani_date strong {position:relative; font-size:48px; font-weight:600; line-height:80px; height:80px; width:54px; text-align:center; background:#222; border-radius:8px;}
+	.mvisual .dead_line .ani_date strong {position:relative; font-size:48px; font-weight:600; line-height:80px; height:80px; padding:0 20px; text-align:center; background:#222; border-radius:8px;}
 	.mvisual .dead_line .ani_date strong:before {content:""; position:absolute; top:50%; left:0; width:100%; height:3px; background:#111; transform:translateY(-50%);}
 	.main_links {margin:-92px 0 65px;}
 	.main_links .link_list {display:flex; height:184px; background:#fff; border-radius:8px; padding:32px 0;}
@@ -166,6 +167,8 @@
 	.mc02 .list .subject {font-weight:600;}
 	.mc02 .list .date {position:absolute; top:50%; right:0; font-size:16px; color:#888; transform:translateY(-50%);}
 	.mc03 .slide_area + .slide_area {margin-top:24px;}
+	.mc03 .sponsors_slide a {display:block; aspect-ratio:269/80;}
+	.mc03 .sponsors_slide a img {width:100%; height:100%; object-fit:contain;}
 	.mc03 .tit {display:flex; align-items:center; gap:13px; margin-bottom:12px;}
 	.mc03 .tit h3 {font-size:16px; font-weight:600;}
 	.mc03 .tit .navi {display:flex; gap:4px;}
@@ -232,6 +235,7 @@
 	.invitation_area .txt .name p {color:#888; line-height:1.6; margin-top:2px;}
 	.invitation_area .img {position:absolute; top:0; right:0;}
 	.invitation_area .img:before {content:""; position:absolute; top:50%; right:-18px; transform:translateY(-50%); width:510px; height:420px; border-radius:0 180px 63px 180px; background:linear-gradient(145deg, var(--CI_01, #0088B8) 3.68%, #003D52 105.06%); z-index:-1;}
+	.invitation_area.no_image .txt .con {padding-right:0;}
 	.marquee_container {position:relative; width:100%; overflow:hidden; padding:18px 0; margin-top:10px; pointer-events:none; user-select:none;}
 	.marquee_wrapper {display:flex; white-space:nowrap; width:max-content; will-change:transform;}
 	.marquee_group {display:flex; align-items:center;}
@@ -264,8 +268,8 @@
 	.venue_area .txt_area .i3 dt {background-image:url('/images/icon_venue03.svg');}
 
 /* Program */
-	.program_area.fixed {padding-top:36px;}
-	.program_area.fixed .tabs {position:fixed; top:80px; left:50%; width:100%; max-width:1440px; transform:translateX(-50%); z-index:10;}
+	.program_area.fixed {padding-top:63px;}
+	.program_area.fixed .tabs {position:fixed; top:80px; left:50%; width:100%; max-width:1480px; padding:0 20px; transform:translateX(-50%); z-index:10;}
 	.program_area .session_wrap {padding-top:70px;}
 	.program_area .session_area {display:flex; flex-direction:column; justify-content:center; align-items:flex-start;}
 	.program_area .session_area + .session_area {margin-top:100px;}
@@ -273,8 +277,8 @@
 	.program_area h2 {font-size:24px; margin:12px 0;}
 	.program_area .chair {font-size:16px; color:#666; font-weight:600;}
 	.program_area .session_list {margin-top:20px; padding-top:24px; border-top:#222 1px solid; width:100%;}
-	.program_area .session_list li {position:relative; padding:24px 220px; border-radius:8px; background:#F7F8F9;}
-	.program_area .session_list li + li {margin-top:12px;}
+	.program_area .session_list > li {position:relative; padding:24px 220px; border-radius:8px; background:#F7F8F9;}
+	.program_area .session_list > li + li {margin-top:12px;}
 	.program_area .session_list .time,
 	.program_area .session_list .presentation {position:absolute; top:50%; font-size:16px; transform:translateY(-50%);}
 	.program_area .session_list .time {left:20px;}
@@ -494,6 +498,7 @@
 	.board_list th {font-weight:600; line-height:80px; border-bottom:#000 1px solid;}
 	.board_list td {font-weight:300; line-height:88px; border-bottom:#ddd 1px solid;}
 	.board_list td.tal a {display:inline-block; vertical-align:top; max-width:100%; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+	.board_list .notice td.num {font-size:0; display:flex; align-items:center;}
 	.board_list .notice td.num:before {content:""; display:block; width:23px; height:23px; border-radius:50%; background:#E60012 url('/images/icon_notice_w.svg') no-repeat 50% 50%; margin:0 auto;}
 	.board_list span.state {display:block; width:80px; height:30px; line-height:30px; text-align:center; border-radius:4px; font-size:16px; margin:0 auto;}
 	.board_list span.state.ing {background:#2222220D;}

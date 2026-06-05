@@ -15,11 +15,11 @@
 		
 		<div class="program_area" data-program-area>
 			@if ($sessionGroups->isNotEmpty())
-				<div class="tabs full_line">
+				<ul class="tabs full_line">
 					@foreach ($sessionGroups as $group)
 						<li><a href="#session{{ $group['session']->id }}" data-program-tab>{{ $group['session']->name }}</a></li>
 					@endforeach
-				</div>
+				</ul>
 				
 				<div class="session_wrap">
 					@foreach ($sessionGroups as $group)

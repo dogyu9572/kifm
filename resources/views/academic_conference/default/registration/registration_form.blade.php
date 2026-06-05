@@ -54,14 +54,15 @@
                             <label for="doctor_license">의사면허번호<span class="required c_iden">*</span></label>
 							<input type="text" id="doctor_license" name="license_no" class="text" value="{{ $member?->license_number }}" placeholder="면허번호를 입력해주세요" required title="면허번호 입력 필수" readonly>
                         </li>
-                        <li>
-                            <label for="major_subject">전공과목<span class="required c_iden">*</span></label>
-							<input type="text" id="major_subject" name="major_subject" class="text" value="{{ $member?->medical_department ?: $member?->specialty }}" placeholder="전공과목을 입력해주세요" required title="전공과목 입력 필수">
-                        </li>
 <!--                         <li>
+                            <label for="major_subject">전공과목<span class="required c_iden">*</span></label>
+                            <input type="text" id="major_subject" name="major_subject" class="text" value="{{ $member?->medical_department ?: $member?->specialty }}" placeholder="전공과목을 입력해주세요" required title="전공과목 입력 필수">
+                        </li> -->
+                         <li>
                             <label for="affiliated_hospital">직장명<span class="required c_iden">*</span></label>
                             <input type="text" id="affiliated_hospital" name="affiliated_hospital" class="text" value="{{ $member?->workplace_name }}" placeholder="소속병의원명을 입력해주세요" required title="소속병의원명 입력 필수" readonly>
-                        </li> -->
+                            <input type="hidden" name="workplace_phone" value="{{ $member?->workplace_phone }}">
+                        </li>
                         <li>
                             <label for="address">직장 주소<span class="required c_iden">*</span></label>
 							<div class="inbtn">
@@ -127,7 +128,7 @@
                                 </li>
                             </ul>
                         <input type="hidden" name="payment_method" id="academic-payment-method" value="">
-						<p class="c_red type_card" role="alert">* 신용카드 결제는 토스페이먼츠 테스트 결제창으로 진행됩니다.</p>
+						<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
                         @error('payment')
                             <p class="c_red" role="alert">{{ $message }}</p>
                         @enderror
@@ -208,7 +209,7 @@
                         </div>
                         <div>
                             <dt>할인 금액</dt>
-                            <dd><strong class="c_iden" id="academic-summary-discount">-0</strong>원</dd>
+                            <dd><strong class="c_iden" id="academic-summary-discount">0</strong>원</dd>
                         </div>
                         <div class="total">
                             <dt>최종 결제 금액</dt>

@@ -77,8 +77,8 @@
 		@endif
 
 		<article class="abso_application">
-			<h2 class="tit">결제정보</h2>
-			<dl class="price_info">
+			<h2 class="tit">신청 정보</h2>
+<!-- 			<dl class="price_info">
 				<div>
 					<dt>결제항목</dt>
 					<dd><strong>수강료</strong></dd>
@@ -91,10 +91,10 @@
 					<dt>최종 결제 금액</dt>
 					<dd><strong>{{ number_format($price) }}</strong>원</dd>
 				</div>
-			</dl>
+			</dl> -->
 
 			@if (! $isEligible)
-				<p class="c_red tb" role="alert"><strong>{{ $pricing['message'] ?? '신청할 수 없는 강좌입니다.' }}</strong></p>
+				<p class="c_red tb" role="alert"><strong class="c_iden">{{ $pricing['message'] ?? '신청할 수 없는 강좌입니다.' }}</strong></p>
 			@elseif ($isPending)
 				<p class="c_red" role="status">이미 신청 접수된 강좌입니다. 입금 확인 후 수강이 가능합니다.</p>
 			@endif

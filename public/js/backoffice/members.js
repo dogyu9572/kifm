@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+    bindMemberDeleteActions();
+
     if (typeof jQuery === 'undefined') {
         return;
     }
@@ -93,8 +95,10 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        const start = parseDateValue(filter.querySelector('.bo-history-date-start')?.value || '');
-        const end = parseDateValue(filter.querySelector('.bo-history-date-end')?.value || '');
+        const startInput = filter.querySelector('.bo-history-date-start');
+        const endInput = filter.querySelector('.bo-history-date-end');
+        const start = parseDateValue(startInput ? startInput.value : '');
+        const end = parseDateValue(endInput ? endInput.value : '');
         document.querySelectorAll('[data-membership-payment-row]').forEach(function (row) {
             const rowDate = parseDateValue(row.getAttribute('data-history-date') || '');
             const visible = !rowDate || ((!start || rowDate >= start) && (!end || rowDate <= end));
@@ -298,23 +302,6 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#select-all').prop('checked', total > 0 && total === checked);
     });
 
-    $(document).on('click', '#btnDeleteMultiple', function () {
-        const ids = $('.bo-row-checkbox:checked').map(function () { return $(this).val(); }).get();
-        if (ids.length === 0) return alert('삭제할 회원을 선택해주세요.');
-        if (!confirm(`선택한 ${ids.length}명의 회원을 삭제하시겠습니까?`)) return;
-        postJson('/backoffice/members/delete-multiple', { ids }).then(function () { location.reload(); });
-    });
-
-    $(document).on('click', '.btn-delete-member', function () {
-        const memberId = $(this).data('id');
-        if (!confirm('정말로 삭제하시겠습니까?')) return;
-        fetch(`/backoffice/members/${memberId}`, {
-            method: 'DELETE',
-            headers: jsonHeaders(),
-            body: JSON.stringify({ _token: csrfToken() }),
-        }).then(function () { location.reload(); });
-    });
-
     $(document).on('click', '#btnExport', function () {
         const formData = new FormData(document.getElementById('searchForm'));
         const params = new URLSearchParams(formData);
@@ -322,8 +309,80 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+function bindMemberDeleteActions() {
+    document.addEventListener('click', function (event) {
+        const deleteButton = event.target.closest('.btn-delete-member');
+        if (deleteButton) {
+            event.preventDefault();
+            submitMemberDelete(deleteButton);
+            return;
+        }
+
+        const bulkDeleteButton = event.target.closest('#btnDeleteMultiple');
+        if (bulkDeleteButton) {
+            event.preventDefault();
+            submitSelectedMemberDelete();
+        }
+    });
+}
+
+function submitMemberDelete(button) {
+    const actionUrl = button.getAttribute('data-url');
+    if (!actionUrl) {
+        alert('탈퇴 처리 URL을 찾을 수 없습니다.');
+        return;
+    }
+    if (!confirm('정말로 탈퇴 처리하시겠습니까?')) {
+        return;
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = actionUrl;
+    form.style.display = 'none';
+    form.appendChild(hiddenInput('_token', csrfToken()));
+    form.appendChild(hiddenInput('_method', 'DELETE'));
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function submitSelectedMemberDelete() {
+    const ids = Array.from(document.querySelectorAll('.bo-row-checkbox:checked')).map(function (checkbox) {
+        return checkbox.value;
+    });
+
+    if (ids.length === 0) {
+        alert('삭제할 회원을 선택해주세요.');
+        return;
+    }
+    if (!confirm('선택한 ' + ids.length + '명의 회원을 탈퇴 처리하시겠습니까?')) {
+        return;
+    }
+
+    postJson('/backoffice/members/delete-multiple', { ids: ids })
+        .then(function (result) {
+            if (result && result.success === false) {
+                alert(result.message || '탈퇴 처리 중 오류가 발생했습니다.');
+                return;
+            }
+            location.reload();
+        })
+        .catch(function () {
+            alert('탈퇴 처리 중 오류가 발생했습니다.');
+        });
+}
+
 function csrfToken() {
-    return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    return meta ? meta.getAttribute('content') : '';
+}
+
+function hiddenInput(name, value) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    return input;
 }
 
 function jsonHeaders() {
@@ -335,10 +394,12 @@ function jsonHeaders() {
 }
 
 function postJson(url, data) {
+    const payload = Object.assign({}, data, { _token: csrfToken() });
+
     return fetch(url, {
         method: 'POST',
         headers: jsonHeaders(),
-        body: JSON.stringify({ ...data, _token: csrfToken() }),
+        body: JSON.stringify(payload),
     }).then((r) => r.json());
 }
 
@@ -349,7 +410,12 @@ function checkDuplicate(url, payload, resultSelector, focusSelector) {
             if (!target) return;
             target.textContent = result.message;
             target.className = 'check-result ' + (result.available ? 'success' : 'error');
-            if (!result.available) document.querySelector(focusSelector)?.focus();
+            if (!result.available) {
+                const focusTarget = document.querySelector(focusSelector);
+                if (focusTarget) {
+                    focusTarget.focus();
+                }
+            }
         })
         .catch(function () {
             alert('중복 확인 중 오류가 발생했습니다.');

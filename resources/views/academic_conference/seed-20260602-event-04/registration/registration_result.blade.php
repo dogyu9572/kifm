@@ -14,9 +14,9 @@
 		default => $phone,
 	};
 	$address = trim(implode(' ', array_filter([
-		$member?->address_postcode ? '(' . $member->address_postcode . ')' : (! empty($source['address_postcode']) ? '(' . $source['address_postcode'] . ')' : null),
-		$member?->address_base ?: ($source['address_base'] ?? null),
-		$member?->address_detail ?: ($source['address_detail'] ?? null),
+		! empty($source['address_postcode']) ? '(' . $source['address_postcode'] . ')' : ($member?->workplace_zipcode ? '(' . $member->workplace_zipcode . ')' : null),
+		$source['address_base'] ?? $member?->workplace_address,
+		$source['address_detail'] ?? $member?->workplace_address_detail,
 	])));
 	$paymentStatusLabel = [
 		'pending_payment' => '결제 대기',
@@ -102,7 +102,7 @@
 						</div>
 						<div>
 							<dt>전화번호</dt>
-							<dd>{{ $member?->workplace_phone ?: '-' }}</dd>
+							<dd>{{ $source['workplace_phone'] ?? $member?->workplace_phone ?: '-' }}</dd>
 						</div>
 						<div>
 							<dt>이메일</dt>

@@ -22,8 +22,8 @@ trait RendersMypageViews
     protected function renderMypage(string $view, string $sNum, string $sName, string $slug, array $with = []): View
     {
         $user = $this->currentMember();
-        $committeeCodes = is_array($user->committee_codes) ? $user->committee_codes : [];
-        $showCommitteeAdminTab = $user->isAdmin();
+        $committeeCodes = $user->communityCommitteeAccessIdStrings();
+        $showCommitteeAdminTab = $user->canManageCommunityCommittee();
 
         return view('mypage.'.$view, array_merge([
             'page_type' => 'professional',
@@ -34,7 +34,7 @@ trait RendersMypageViews
             'geName' => 'My Page',
             'gSlug' => $slug,
             'showCommitteeAdminTab' => $showCommitteeAdminTab,
-            'hasCommitteeAccess' => $committeeCodes !== [],
+            'hasCommitteeAccess' => $committeeCodes !== [] && ! $showCommitteeAdminTab,
         ], $with));
     }
 }

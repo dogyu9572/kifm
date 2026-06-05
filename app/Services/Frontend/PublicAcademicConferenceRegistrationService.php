@@ -167,6 +167,42 @@ class PublicAcademicConferenceRegistrationService
         $registration->update(['payment_status' => 'cancel_requested']);
     }
 
+    public function canPreRegister(AcademicEvent $event): bool
+    {
+        $today = Carbon::today();
+
+        if ($event->pre_reg_start && $today->lt($event->pre_reg_start)) {
+            return false;
+        }
+        if ($event->pre_reg_end && $today->gt($event->pre_reg_end)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function hasActiveMemberRegistration(AcademicEvent $event, User $user): bool
+    {
+        return AcademicEventRegistration::query()
+            ->where('academic_event_id', $event->id)
+            ->where('member_id', $user->id)
+            ->whereNotIn('payment_status', ['cancel_requested', 'cancelled'])
+            ->exists();
+    }
+
+    public function hasActiveNonMemberRegistration(AcademicEvent $event, string $email, string $phone): bool
+    {
+        $phone = preg_replace('/\D+/', '', $phone);
+
+        return AcademicEventRegistration::query()
+            ->where('academic_event_id', $event->id)
+            ->whereNull('member_id')
+            ->where('email', trim($email))
+            ->where('phone', $phone)
+            ->whereNotIn('payment_status', ['cancel_requested', 'cancelled'])
+            ->exists();
+    }
+
     public function cancelRegistration(AcademicEventRegistration $registration): string
     {
         if (in_array($registration->payment_status, ['cancel_requested', 'cancelled'], true)) {
@@ -330,6 +366,12 @@ class PublicAcademicConferenceRegistrationService
                 'receipt_type' => $data['receipt_type'] ?? null,
                 'receipt_number' => $data['receipt_number'] ?? null,
                 'source_row_json' => [
+                    'name_en' => $user->name_en,
+                    'affiliated_hospital' => $user->workplace_name,
+                    'workplace_phone' => $user->workplace_phone,
+                    'address_postcode' => $data['address_postcode'] ?? ($user->workplace_zipcode ?: $user->address_postcode),
+                    'address_base' => $data['address_base'] ?? ($user->workplace_address ?: $user->address_base),
+                    'address_detail' => $data['address_detail'] ?? ($user->workplace_address_detail ?: $user->address_detail),
                     'subtotal_amount' => $subtotal,
                     'coupon_code' => $coupon?->coupon_code,
                     'coupon_name' => $coupon?->coupon_name,
@@ -410,6 +452,7 @@ class PublicAcademicConferenceRegistrationService
                     'name_en' => $data['name_en'] ?? null,
                     'major_subject' => $data['major_subject'] ?? null,
                     'affiliated_hospital' => $data['affiliated_hospital'] ?? null,
+                    'workplace_phone' => $data['workplace_phone'] ?? null,
                     'address_postcode' => $data['address_postcode'] ?? null,
                     'address_base' => $data['address_base'] ?? null,
                     'address_detail' => $data['address_detail'] ?? null,

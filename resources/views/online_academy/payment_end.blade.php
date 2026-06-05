@@ -39,7 +39,7 @@
 					</div>
 					<div>
 						<dt>쿠폰 할인</dt>
-						<dd>-{{ number_format((int) $summary['discount']) }}원</dd>
+						<dd>{{ number_format((int) $summary['discount']) }}원</dd>
 					</div>
 					<div>
 						<dt>최종 결제 금액</dt>

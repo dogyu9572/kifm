@@ -29,7 +29,7 @@ class AcademicConferenceNonMemberRegistrationRequest extends FormRequest
             'phone' => ['required', 'string', 'regex:/^01[016789]\d{7,8}$/'],
             'name_en' => ['required', 'string', 'max:100'],
             'license_no' => ['nullable', 'string', 'max:80'],
-            'major_subject' => ['required', 'string', 'max:100'],
+            'major_subject' => ['nullable', 'string', 'max:100'],
             'affiliated_hospital' => ['required', 'string', 'max:200'],
             'address_postcode' => ['required', 'string', 'max:20'],
             'address_base' => ['required', 'string', 'max:300'],

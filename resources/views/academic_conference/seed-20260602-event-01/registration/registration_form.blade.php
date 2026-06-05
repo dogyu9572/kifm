@@ -61,6 +61,7 @@
                         <li>
                             <label for="affiliated_hospital">소속병의원명<span class="required">*</span></label>
 							<input type="text" id="affiliated_hospital" name="affiliated_hospital" class="text" value="{{ $member?->workplace_name }}" placeholder="소속병의원명을 입력해주세요" required title="소속병의원명 입력 필수" readonly>
+                            <input type="hidden" name="workplace_phone" value="{{ $member?->workplace_phone }}">
                         </li>
                         <li>
                             <label for="address">직장 주소<span class="required">*</span></label>
@@ -208,7 +209,7 @@
                         </div>
                         <div>
                             <dt>할인 금액</dt>
-                            <dd><strong class="c_iden" id="academic-summary-discount">-0</strong>원</dd>
+                            <dd><strong class="c_iden" id="academic-summary-discount">0</strong>원</dd>
                         </div>
                         <div class="total">
                             <dt>최종 결제 금액</dt>

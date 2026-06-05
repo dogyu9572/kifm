@@ -147,18 +147,23 @@ class User extends Authenticatable
     public function communityCommitteeAccessIdStrings(): array
     {
         $raw = $this->committee_codes ?? [];
-        if (! is_array($raw)) {
-            return [];
-        }
         $out = [];
-        foreach ($raw as $id) {
-            $s = trim((string) $id);
-            if ($s !== '' && ctype_digit($s)) {
-                $out[] = $s;
+        if (is_array($raw)) {
+            foreach ($raw as $id) {
+                $s = trim((string) $id);
+                if ($s !== '' && ctype_digit($s)) {
+                    $out[] = $s;
+                }
             }
         }
 
-        return array_values(array_unique($out));
+        $memberCommitteeIds = CommunityCommitteeMember::query()
+            ->where('user_id', $this->id)
+            ->pluck('community_committee_id')
+            ->map(static fn ($id): string => (string) $id)
+            ->all();
+
+        return array_values(array_unique(array_merge($out, $memberCommitteeIds)));
     }
 
     public function canAccessCommunityCommitteeId(int|string $committeeId): bool
@@ -166,6 +171,28 @@ class User extends Authenticatable
         $id = trim((string) $committeeId);
 
         return $id !== '' && in_array($id, $this->communityCommitteeAccessIdStrings(), true);
+    }
+
+    public function communityCommitteeAdminIdStrings(): array
+    {
+        if ($this->isAdmin()) {
+            return CommunityCommittee::query()
+                ->pluck('id')
+                ->map(static fn ($id): string => (string) $id)
+                ->all();
+        }
+
+        return CommunityCommitteeMember::query()
+            ->where('user_id', $this->id)
+            ->whereIn('role', ['chairman', 'secretary'])
+            ->pluck('community_committee_id')
+            ->map(static fn ($id): string => (string) $id)
+            ->all();
+    }
+
+    public function canManageCommunityCommittee(): bool
+    {
+        return $this->communityCommitteeAdminIdStrings() !== [];
     }
 
     /**
@@ -255,6 +282,22 @@ class User extends Authenticatable
         $like = '%' . $term . '%';
 
         return match ($field) {
+            'all' => $query->where(function ($q) use ($like) {
+                $q->where('name', 'like', $like)
+                    ->orWhere('login_id', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('phone_number', 'like', $like)
+                    ->orWhere('address_base', 'like', $like)
+                    ->orWhere('address_detail', 'like', $like)
+                    ->orWhere('workplace_address', 'like', $like)
+                    ->orWhere('workplace_address_detail', 'like', $like)
+                    ->orWhere('license_number', 'like', $like)
+                    ->orWhere('specialist_number', 'like', $like)
+                    ->orWhere('specialty', 'like', $like)
+                    ->orWhere('workplace_name', 'like', $like)
+                    ->orWhere('school_name', 'like', $like)
+                    ->orWhere('graduate_year', 'like', $like);
+            }),
             'name' => $query->where('name', 'like', $like),
             'id' => $query->where('login_id', 'like', $like),
             'email' => $query->where('email', 'like', $like),

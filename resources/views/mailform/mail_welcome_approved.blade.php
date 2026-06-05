@@ -15,6 +15,11 @@
 html,body {margin:0; padding:0;}
 </style>
 <body>
+@php
+	$approvedMemberName = $member->name ?? '{회원명}';
+	$approvedDate = isset($approvedAt) ? $approvedAt->format('Y.m.d') : '2026.04.02';
+	$approvedMemberLevel = $memberLevelLabel ?? '{준회원}';
+@endphp
 
 <!-- form -->
 <table style="table-layout:fixed; border-collapse:collapse; border-spacing:0; width:640px; margin:0 auto; font-family:'Pretendard';">
@@ -26,7 +31,7 @@ html,body {margin:0; padding:0;}
 			<td style="padding:0 40px 48px;">
 				<div style="font-size:24px; color:#222; font-weight:700; line-height:1.4; letter-spacing:-.02em;">회원 가입 승인 및 환영 안내</div>
 				<p style="font-size:16px; color:#222; line-height:1.5; letter-spacing:-.02em; margin:16px 0 40px;">
-					안녕하세요, {회원명} 선생님.<br>
+					안녕하세요, {{ $approvedMemberName }} 선생님.<br>
 					질병의 근본 원인을 탐구하고 환자 중심의 의료를 실천하는 대한기능의학회(KAFM)에<br>
 					가입해 주셔서 진심으로 감사드립니다. <br>
 					선생님의 회원 가입 신청이 최종 승인되었음을 기쁘게 안내 드립니다.
@@ -36,11 +41,11 @@ html,body {margin:0; padding:0;}
 						<tbody>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">가입승인일</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026.04.02</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $approvedDate }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">회원 등급</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{준회원}</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $approvedMemberLevel }}</td>
 							</tr>
 						</tbody>
 					</table>

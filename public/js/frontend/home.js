@@ -377,11 +377,23 @@
             $(this).closest('.popup').fadeOut(300);
         });
 
+        $(document).on('click', '.js-main-login-popup-close', function () {
+            $('#' + $(this).data('popup')).fadeOut(300);
+        });
+
         $(document).on('keydown', function (event) {
             if (event.key === 'Escape' || event.keyCode === 27) {
-                $('.calendar_event_popup:visible, .popup_login_start:visible').fadeOut(300);
+                $('.calendar_event_popup:visible, .popup_login_start:visible, #pop_awaiting:visible, #pop_sleep:visible').fadeOut(300);
             }
         });
+
+        var mainLoginPopup = $('.main_wrap').data('main-login-popup');
+        if (mainLoginPopup === 'pending') {
+            $('#pop_awaiting').fadeIn(200);
+        }
+        if (mainLoginPopup === 'dormant') {
+            $('#pop_sleep').fadeIn(200);
+        }
     }
 
     $(document).ready(function () {

@@ -9,6 +9,7 @@ use App\Http\Requests\FrontendMemberLoginRequest;
 use App\Http\Requests\FrontendMemberRegisterRequest;
 use App\Http\Requests\FrontendMemberResetPasswordRequest;
 use App\Models\CommunityCommittee;
+use App\Models\CommunityCommitteeApplication;
 use App\Models\User;
 use App\Services\Backoffice\MemberService;
 use App\Services\Frontend\MemberAccountRecoveryService;
@@ -17,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -75,24 +77,29 @@ class MemberController extends Controller
             Auth::logout();
             $request->session()->regenerate();
 
-            return redirect()
-                ->route('member.login')
-                ->with('member_login_popup', 'pending');
+            return $this->redirectAfterBlockedLogin($request, 'pending');
         }
 
         if ($user->isDormantMember()) {
             Auth::logout();
             $request->session()->regenerate();
 
-            return redirect()
-                ->route('member.login')
-                ->with('member_login_popup', 'dormant');
+            return $this->redirectAfterBlockedLogin($request, 'dormant');
         }
 
         $request->session()->regenerate();
         $user->forceFill(['last_login_at' => now()])->save();
 
         return redirect()->intended(route('home'));
+    }
+
+    private function redirectAfterBlockedLogin(Request $request, string $popup): RedirectResponse
+    {
+        $route = $request->input('login_context') === 'home' ? 'home' : 'member.login';
+
+        return redirect()
+            ->route($route)
+            ->with('member_login_popup', $popup);
     }
 
     private function isSafeIntendedUrl(string $url): bool
@@ -156,7 +163,7 @@ class MemberController extends Controller
         if (! $user) {
             return back()
                 ->withInput($request->only(['name', 'phone_number', 'email']))
-                ->withErrors(['email' => '입력하신 정보와 일치하는 회원을 찾을 수 없습니다.']);
+                ->with('alert', '입력하신 정보와 일치하는 회원을 찾을 수 없습니다.');
         }
 
         $request->session()->put(
@@ -194,7 +201,7 @@ class MemberController extends Controller
         if (! $user) {
             return back()
                 ->withInput($request->only(['login_id', 'email', 'phone_number']))
-                ->withErrors(['phone_number' => '입력하신 정보와 일치하는 회원을 찾을 수 없습니다.']);
+                ->with('alert', '입력하신 정보와 일치하는 회원을 찾을 수 없습니다.');
         }
 
         $token = Str::random(64);
@@ -290,11 +297,40 @@ class MemberController extends Controller
     public function registerStore(FrontendMemberRegisterRequest $request): RedirectResponse
     {
         $validated = $request->validated();
+        $committeeIds = $validated['committee_codes'] ?? [];
         unset($validated['privacy_agreed'], $validated['terms_agreed'], $validated['password_confirmation']);
+        unset($validated['committee_codes']);
         $validated['join_type'] = 'email';
         $validated['member_level'] = 'pending';
 
-        $this->memberService->createMember($validated);
+        DB::transaction(function () use ($validated, $committeeIds) {
+            $member = $this->memberService->createMember($validated);
+
+            foreach ($committeeIds as $committeeId) {
+                CommunityCommitteeApplication::query()->create([
+                    'community_committee_id' => (int) $committeeId,
+                    'user_id' => $member->id,
+                    'applicant_name' => $member->name,
+                    'email' => $member->email,
+                    'phone' => $member->phone_number,
+                    'status' => 'PENDING',
+                    'applied_at' => now(),
+                ]);
+            }
+
+            if ($committeeIds !== []) {
+                CommunityCommittee::query()
+                    ->whereIn('id', array_map('intval', $committeeIds))
+                    ->get()
+                    ->each(function (CommunityCommittee $committee) {
+                        $committee->pending_count = CommunityCommitteeApplication::query()
+                            ->where('community_committee_id', $committee->id)
+                            ->where('status', 'PENDING')
+                            ->count();
+                        $committee->save();
+                    });
+            }
+        });
 
         return redirect()->route('member.register_success');
     }

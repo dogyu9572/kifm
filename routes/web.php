@@ -12,8 +12,8 @@ use App\Http\Controllers\Backoffice\PopupController;
 // 기본 라우트 파일
 // =============================================================================
 
-// 메인 페이지
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// 최초 진입 페이지
+Route::redirect('/', '/intro');
 
 // 팝업 표시 (일반 팝업용)
 Route::get('/popup/{popup}', [PopupController::class, 'showPopup'])->name('popup.show');

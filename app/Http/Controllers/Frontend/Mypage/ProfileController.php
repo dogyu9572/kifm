@@ -198,7 +198,7 @@ class ProfileController extends Controller
 
     public function committeeParticipationAdmin(Request $request): View
     {
-        abort_unless($this->currentMember()->isAdmin(), 403);
+        abort_unless($this->currentMember()->canManageCommunityCommittee(), 403);
 
         $applications = $this->committeeApplicationsForAdmin($request);
 
@@ -219,14 +219,12 @@ class ProfileController extends Controller
     private function resolveCommitteesForMember(bool $adminView): \Illuminate\Support\Collection
     {
         $user = $this->currentMember();
-        if ($adminView && $user->isAdmin()) {
-            return CommunityCommittee::query()
-                ->orderBy('sort_order')
-                ->orderBy('name')
-                ->get();
+        if ($adminView && $user->canManageCommunityCommittee()) {
+            $codes = $user->communityCommitteeAdminIdStrings();
+        } else {
+            $codes = $user->communityCommitteeAccessIdStrings();
         }
 
-        $codes = is_array($user->committee_codes) ? $user->committee_codes : [];
         if ($codes === []) {
             return collect();
         }
@@ -243,9 +241,11 @@ class ProfileController extends Controller
     {
         $status = strtoupper(trim((string) $request->get('status', '')));
         $keyword = trim((string) $request->get('keyword', ''));
+        $committeeIds = array_map('intval', $this->currentMember()->communityCommitteeAdminIdStrings());
 
         return CommunityCommitteeApplication::query()
             ->with('committee:id,name')
+            ->whereIn('community_committee_id', $committeeIds)
             ->when(in_array($status, ['PENDING', 'APPROVED', 'REJECTED'], true), fn ($query) => $query->where('status', $status))
             ->when($keyword !== '', function ($query) use ($keyword) {
                 $like = '%'.$keyword.'%';
@@ -264,9 +264,15 @@ class ProfileController extends Controller
     /** @return array{committee_capacity:int, member_count:int, total:int, pending:int, approved:int, rejected:int} */
     private function committeeApplicationStats(): array
     {
-        $capacity = (int) CommunityCommittee::query()->sum('member_limit');
-        $memberCount = CommunityCommitteeMember::query()->count();
+        $committeeIds = array_map('intval', $this->currentMember()->communityCommitteeAdminIdStrings());
+        $capacity = (int) CommunityCommittee::query()
+            ->whereIn('id', $committeeIds)
+            ->sum('member_limit');
+        $memberCount = CommunityCommitteeMember::query()
+            ->whereIn('community_committee_id', $committeeIds)
+            ->count();
         $statusCounts = CommunityCommitteeApplication::query()
+            ->whereIn('community_committee_id', $committeeIds)
             ->selectRaw('status, COUNT(*) as aggregate')
             ->groupBy('status')
             ->pluck('aggregate', 'status');

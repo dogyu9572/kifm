@@ -12,21 +12,32 @@
 		@include('mypage.mypage_tab')
 
 		<div class="board_top">
-			<div class="left">
-				<select name="" id="" class="text">
-					<option value="">전체보기</option>
-				</select>
+			<div class="left mo_w100p">
+				<form method="GET" action="{{ route('mypage.inquiry') }}">
+					<input type="hidden" name="search_field" value="{{ $filters['search_field'] ?? 'all' }}">
+					<input type="hidden" name="keyword" value="{{ $filters['keyword'] ?? '' }}">
+					<label for="inquiry-status" class="sound_only">답변 상태</label>
+					<select name="status" id="inquiry-status" class="text" data-auto-submit-form>
+						<option value="all" @selected(($filters['status'] ?? 'all') === 'all')>전체보기</option>
+						<option value="pending" @selected(($filters['status'] ?? 'all') === 'pending')>답변대기</option>
+						<option value="answered" @selected(($filters['status'] ?? 'all') === 'answered')>답변완료</option>
+					</select>
+				</form>
 			</div>
 			<div class="right flex">
-				<select name="" id="" class="text">
-					<option value="">전체</option>
-					<option value="">제목</option>
-					<option value="">내용</option>
-				</select>
-				<form class="search_area">
-					<label for="event-search" class="sound_only">제목 검색</label>
-					<input type="text" id="event-search" class="text" placeholder="제목을 입력해주세요">
-					<button type="submit" class="btn_search">검색</button>
+				<form method="GET" action="{{ route('mypage.inquiry') }}">
+					<input type="hidden" name="status" value="{{ $filters['status'] ?? 'all' }}">
+					<label for="inquiry-search-field" class="sound_only">검색 조건</label>
+					<select name="search_field" id="inquiry-search-field" class="text">
+						<option value="all" @selected(($filters['search_field'] ?? 'all') === 'all')>전체</option>
+						<option value="title" @selected(($filters['search_field'] ?? 'all') === 'title')>제목</option>
+						<option value="content" @selected(($filters['search_field'] ?? 'all') === 'content')>내용</option>
+					</select>
+					<div class="search_area">
+						<label for="event-search" class="sound_only">검색어 입력</label>
+						<input type="text" id="event-search" name="keyword" class="text" value="{{ $filters['keyword'] ?? '' }}" placeholder="검색어를 입력해주세요">
+						<button type="submit" class="btn_search">검색</button>
+					</div>
 				</form>
 				<a href="{{ route('mypage.inquiry_write') }}" class="btn btn_wkk btn_write">문의하기</a>
 			</div>

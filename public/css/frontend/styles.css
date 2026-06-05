@@ -3,7 +3,10 @@
 
 /* for styles */
 @import url("default.css");
-/* common */
+
+/* 공통 추가*/
+.no_result {color:#2222224d; background:#f8f8f8; font-size:1.3rem; text-align:center; padding:80px 10px !important;}
+.no_board {width:100% !important;}
 /* 인트로 */
 	.intro_wrap {position:relative; min-height:100vh; background:url('/images/bg_intro.svg') no-repeat 50% 50% / cover;}
 	.intro_wrap .link_btns {position:absolute; top:50px; right:160px; display:flex; gap:20px;}
@@ -715,7 +718,7 @@
 	.academic_event_body .list {display:flex; flex-wrap:wrap; gap:30px;}
 	.academic_event_body .list > li {position:relative; width:calc((100% - 60px)/3); border-radius:8px;}
 	li.no_board {width:100%; text-align:center;}
-	li.no_board h4 {font-size: 1.2rem; font-weight: 500; background: #ededed; padding: 2rem;}
+	li.no_board h4 {font-size:1.2rem; font-weight:500; background:#ededed; padding:2rem;}
 	.academic_event_body .list > li a {position:relative; padding:30px; display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-start; border-radius:inherit;}
 	.academic_event_body .list > li a:before {content:""; position:absolute; top:0; left:0; width:100%; height:100%; border:#ebebeb 1px solid; border-radius:inherit; transition:.2s linear;}
 	.academic_event_body .list .states_area {gap:8px;}
@@ -792,6 +795,7 @@
 	.num_tit.radius4 span {border-radius:4px; width:24px; height:24px; line-height:24px; font-size:16px;} /* 회원가입 */
 	.check_box_line {border:#ddd 1px solid; border-radius:8px; overflow:hidden;}
 	.check_box_line li {position:relative; border-bottom:#ddd 1px solid; overflow:hidden;}
+	.check_box_line li:last-child {border-bottom:0;}
 	.check_box_line li.end {pointer-events:none;}
 	.check_box_line li.end:after {content:""; position:absolute; top:0; left:0; width:100%; height:100%; background:#F8F8F880; z-index:1;}
 	.check_box_line li .checkbox input,
@@ -824,7 +828,6 @@
 	.btns_flex .radio span {display:block; width:100%; height:60px; line-height:58px; text-align:center; border:#ddd 1px solid; border-radius:8px; transition:color .2s linear, border-color .2s linear;}
 	.btns_flex .radio input:checked + label span {color:#0088B8; font-weight:600; border-color:#0088B8; border-width:2px; line-height:56px;}
 	.training_course_view_wrap .c_red {font-size:16px; margin-top:10px; border-top:0; padding-top:0;}
-	.training_course_view_wrap .c_iden {font-size:16px; margin-top:10px; border-top:0; padding-top:0;}
 	.training_course_view_wrap .abso_application {width:380px; border-color:#0088B8; box-shadow:0 4px 10px 0 rgba(0, 136, 184, 0.10); padding:30px;}
 	.training_course_view_wrap .abso_application .tit {font-size:26px; font-weight:700; line-height:1.5; margin-bottom:16px;}
 	.training_course_view_wrap .abso_application .selected_item {color:#222; line-height:1.6; margin-bottom:28px;}
@@ -1120,7 +1123,7 @@
 	.register_step li.on i:before {background:#0088B8;}
 	.register_step li.on p {color:#0088B8;}
 	.num_tit_area {position:relative;}
-	.num_tit_area .abso {/* position:absolute;  */top:50%; right:0; font-size:16px; transform:translateY(-50%);}
+	.num_tit_area .abso {position:absolute; top:50%; right:0; font-size:16px; transform:translateY(-50%);}
 	.register_wrap fieldset {overflow:visible;}
 	.register_wrap .text,
 	.register_wrap .btn {border-radius:8px;}
@@ -1253,8 +1256,8 @@
 	.participation_history_wrap td {line-height:1.2; height:88px; font-weight:inherit; padding:17px 10px;}
 	.participation_history_wrap .btn {display:block; font-size:14px; line-height:28px; height:30px; width:110px; max-width:100%; border-radius:15px; margin:0 auto;}
 	.participation_history_wrap .btn_un {font-size:14px; text-decoration:underline;}
-	.board_list .empty td {font-size:16px; color:#2222224d; padding:120px 10px; background:#f8f8f8;}
-	.board_list .empty td:before {content:""; display:block; width:24px; height:24px; background:url('/images/icon_empty.svg') no-repeat 50% 50% / contain; margin:0 auto 13px; opacity:.3;}
+	.board_list .empty td {font-size:16px; color:#2222224d; padding:80px 10px; background:#f8f8f8;}
+/* 	.board_list .empty td:before {content:""; display:block; width:24px; height:24px; background:url('/images/icon_empty.svg') no-repeat 50% 50% / contain; margin:0 auto 13px; opacity:.3;} */
 	.excl_wrap {margin-top:48px;}
 	.excl_wrap .excl {font-size:inherit; color:inherit !important; line-height:1.6 !important; font-weight:600; padding-left:28px; margin-bottom:12px;}
 	.excl_wrap .excl:before {top:4px; width:20px; background-image:url('/images/icon_excl_black.svg');}
@@ -1492,7 +1495,7 @@
 	.search_group .tit_area .more {position:absolute; top:0; right:0; padding-right:28px; background:url('/images/arrow_more_k.svg') no-repeat 100% 50%;}
 	.search_group .list {display:flex;}
 	.search_group .list a {display:block; width:100%; padding:24px; border-radius:8px;}
-	.search_group .list h3 {font-size:20px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+	.search_group .list h3 {font-size:20px; max-width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 	.search_group .list p {font-size:16px; color:#666; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
 	.search_group.type1 .list {gap:24px;}
 	.search_group.type1 .list li {width:calc(50% - 12px);}

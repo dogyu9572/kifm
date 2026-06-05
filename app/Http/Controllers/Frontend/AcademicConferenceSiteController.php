@@ -349,6 +349,17 @@ class AcademicConferenceSiteController extends Controller
         $user = auth()->user();
         abort_unless($user?->role === 'user', 403);
 
+        if (! $this->registrationService->canPreRegister($event)) {
+            return back()
+                ->withInput()
+                ->withErrors(['registration' => '사전등록 기간이 종료되었습니다.']);
+        }
+        if ($this->registrationService->hasActiveMemberRegistration($event, $user)) {
+            return back()
+                ->withInput()
+                ->withErrors(['registration' => '이미 사전등록 신청 내역이 있습니다.']);
+        }
+
         $plans = $this->registrationService->selectedPlansForUser($user, $request->validated('payment_plan_ids'));
         if ($plans->isEmpty()) {
             return back()
@@ -386,6 +397,17 @@ class AcademicConferenceSiteController extends Controller
     {
         $event = $this->conferenceService->findPublicEventByFolder($folderName);
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
+
+        if (! $this->registrationService->canPreRegister($event)) {
+            return back()
+                ->withInput()
+                ->withErrors(['registration' => '사전등록 기간이 종료되었습니다.']);
+        }
+        if ($this->registrationService->hasActiveNonMemberRegistration($event, $request->validated('email'), $request->validated('phone'))) {
+            return back()
+                ->withInput()
+                ->withErrors(['registration' => '이미 사전등록 신청 내역이 있습니다.']);
+        }
 
         $plans = $this->registrationService->selectedPlansForNonMember($request->validated('payment_plan_ids'));
         if ($plans->isEmpty()) {
@@ -520,7 +542,7 @@ class AcademicConferenceSiteController extends Controller
         if (! $registration) {
             return back()
                 ->withInput()
-            ->withErrors(['lookup' => '입력하신 정보와 일치하는 사전등록 내역이 없습니다.']);
+                ->with('alert', '조회된 내역이 없습니다.');
         }
 
         session(['academic_conference_registration_lookup_id' => $registration->id]);
@@ -545,8 +567,8 @@ class AcademicConferenceSiteController extends Controller
                 ->with('alert', $e->getMessage());
         }
 
-        return redirect()->to($this->conferenceService->baseUrl($event) . '/registration/result')
-            ->with('success', $message);
+        return redirect()->to($this->conferenceService->baseUrl($event))
+            ->with('alert', $message === '취소되었습니다.' ? '취소가 완료되었습니다.' : $message);
     }
 
     public function printParticipation(string $folderName, AcademicEventRegistration $registration): View

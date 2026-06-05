@@ -150,7 +150,7 @@
                             </li>
                         </ul>
                         <input type="hidden" name="payment_method" id="academic-payment-method" value="">
-						<p class="c_red type_card" role="alert">* 신용카드 결제는 토스페이먼츠 테스트 결제창으로 진행됩니다.</p>
+						<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
                         @error('payment')
                             <p class="c_red" role="alert">{{ $message }}</p>
                         @enderror

@@ -17,7 +17,7 @@
 @endphp
 
 @section('content')
-<main class="main_wrap" data-calendar-schedules="{!! $calendarPayload !!}">
+<main class="main_wrap" data-calendar-schedules="{!! $calendarPayload !!}"@if(! empty($loginPopup)) data-main-login-popup="{{ $loginPopup }}"@endif>
 <h1 class="sound_only">대한기능의학회 메인</h1>
 
 <!-- main_visual -->
@@ -70,6 +70,7 @@
 					<h2><strong>로그인 후</strong> 맞춤정보를 확인해보세요</h2>
 					<form method="POST" action="{{ route('member.login.store') }}" class="inputs" novalidate>
 						@csrf
+						<input type="hidden" name="login_context" value="home">
 						<label for="main-login-id" class="sound_only">아이디</label>
 						<input type="text" id="main-login-id" name="login_id" class="text w100p" placeholder="아이디" value="{{ old('login_id') }}" required autocomplete="username">
 						<label for="main-login-password" class="sound_only">비밀번호</label>
@@ -345,6 +346,29 @@
 		@endif
 	@endforeach
 @endif
+
+<div class="popup" id="pop_awaiting">
+	<div class="dm js-main-login-popup-close" data-popup="pop_awaiting" role="button" tabindex="0" aria-label="닫기"></div>
+	<div class="inbox">
+		<h2 class="ptit">회원가입 승인이 <strong class="c_iden">대기 중</strong>입니다.</h2>
+		<div class="glbox">
+			<p>관리자가 회원 정보를 확인하고 있습니다.<br/>승인이 완료되면 등록된 메일로 안내드리겠습니다.</p>
+		</div>
+		<div class="btns flex_center"><button type="button" class="btn btn_wkk js-main-login-popup-close" data-popup="pop_awaiting">닫기</button></div>
+	</div>
+</div>
+
+<div class="popup" id="pop_sleep">
+	<div class="dm js-main-login-popup-close" data-popup="pop_sleep" role="button" tabindex="0" aria-label="닫기"></div>
+	<div class="inbox">
+		<button type="button" class="btn_close js-main-login-popup-close" data-popup="pop_sleep">Close</button>
+		<h2 class="ptit">계정이 휴면 상태로 전환되었습니다.</h2>
+		<div class="glbox">
+			<p>개인정보 보호를 위해 1년 이상 서비스 이용이 없어 <br class="pc_vw">계정이 휴면 처리되었습니다.<br/>본인 확인 후 다시 서비스를 이용하실 수 있습니다.</p>
+		</div>
+		<div class="btns flex_center"><a href="{{ route('member.dormant_auth') }}" class="btn btn_wbb">활성화 하기</a></div>
+	</div>
+</div>
 @endsection
 
 @push('scripts')

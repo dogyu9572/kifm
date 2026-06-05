@@ -30,14 +30,35 @@ document.addEventListener('DOMContentLoaded', () => {
     courseTypeSelect?.addEventListener('change', syncCourseType);
     syncCourseType();
 
+    const annualFeeRadios = document.querySelectorAll('.js-annual-fee-target');
     const freeRadios = document.querySelectorAll('.js-free-yn');
     const freeWrap = document.getElementById('bo-free-period-wrap');
+    const gradePriceWrap = document.getElementById('bo-grade-price-wrap');
     const syncFreeWrap = () => {
         const value = form.querySelector('input[name="free_yn"]:checked')?.value;
         freeWrap?.classList.toggle('bo-hidden', value !== 'Y');
+        gradePriceWrap?.classList.toggle('bo-hidden', value === 'Y');
     };
+    const syncAnnualFeeTarget = () => {
+        const annualFeeTarget = form.querySelector('input[name="annual_fee_target"]:checked')?.value || 'all';
+        const freeYes = form.querySelector('input[name="free_yn"][value="Y"]');
+        const freeNo = form.querySelector('input[name="free_yn"][value="N"]');
+        if (annualFeeTarget === 'paid') {
+            if (freeYes) {
+                freeYes.checked = false;
+                freeYes.disabled = true;
+            }
+            if (freeNo) {
+                freeNo.checked = true;
+            }
+        } else if (freeYes) {
+            freeYes.disabled = false;
+        }
+        syncFreeWrap();
+    };
+    annualFeeRadios.forEach((radio) => radio.addEventListener('change', syncAnnualFeeTarget));
     freeRadios.forEach((radio) => radio.addEventListener('change', syncFreeWrap));
-    syncFreeWrap();
+    syncAnnualFeeTarget();
 
     const periodRadios = document.querySelectorAll('.js-period-type');
     const periodDaysWrap = document.getElementById('bo-period-days-wrap');
@@ -416,4 +437,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const escapeAttr = (value) => escapeHtml(value).replaceAll('`', '&#096;');
 });
-

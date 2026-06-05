@@ -9,7 +9,7 @@
 	<div class="inner">
 		<h1 class="sub_title" id="invitation-title">{{ $sName }}</h1>
 		
-		<div class="invitation_area">
+		<div class="invitation_area no_image">
 			<div class="txt">
 				<h2>정밀 의료의 완성, <br/><strong class="c_iden">기능의학으로 여는 건강한 미래</strong></h2>
 				<div class="con">
@@ -27,7 +27,6 @@
 					</div>
 				</div>
 			</div>
-			<div class="img" aria-hidden="true"><img src="/images/img_invitation.png" alt=""></div>
 		</div>
 	</div>
 	<div class="marquee_container">

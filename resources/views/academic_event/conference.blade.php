@@ -87,8 +87,7 @@
 					</li>
 				@empty
 					<li class="no_board">
-						<span class="state"></span>
-						<h4>검색 조건에 해당하는 학술대회가 없습니다.</h4>
+						<div class="no_result">검색 조건에 해당하는 학술대회가 없습니다.</div>
 					</li>
 				@endforelse
 			</ul>

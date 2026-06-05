@@ -34,7 +34,7 @@
 						@enderror
 					</li>
 				</ul>
-				<p class="excl mt">* 영문, 숫자, 특수문자 중 2종류 이상을 조합하여 10자리 이상으로 입력해주세요.</p>
+				<p class="excl mt">영문, 숫자, 특수문자 중 2종류 이상을 조합하여 10자리 이상으로 입력해주세요.</p>
 				@error('reset_token')
 					<p class="c_red" role="alert">{{ $message }}</p>
 				@enderror

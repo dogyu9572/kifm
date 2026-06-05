@@ -10,7 +10,11 @@
 
 @section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ asset('js/backoffice/members.js') }}"></script>
+@php
+    $membersJsPath = public_path('js/backoffice/members.js');
+    $membersJsVersion = file_exists($membersJsPath) ? filemtime($membersJsPath) : time();
+@endphp
+<script src="{{ asset('js/backoffice/members.js') }}?v={{ $membersJsVersion }}"></script>
 @endsection
 
 @section('content')
@@ -205,6 +209,7 @@
                             <div class="bo-member-inline-group">
                                 <select id="search_field" name="search_field" class="filter-select bo-member-search-field">
                                     <option value="">선택</option>
+                                    <option value="all" @selected(($filters['search_field'] ?? '') === 'all')>전체</option>
                                     <option value="name" @selected(($filters['search_field'] ?? '') === 'name')>회원 이름</option>
                                     <option value="id" @selected(($filters['search_field'] ?? '') === 'id')>아이디</option>
                                     <option value="email" @selected(($filters['search_field'] ?? '') === 'email')>이메일</option>
@@ -316,7 +321,7 @@
                                         <a href="{{ route('backoffice.members.edit', $member->id) }}" class="btn btn-primary btn-sm">
                                             <i class="fas fa-edit"></i> 수정
                                         </a>
-                                        <button type="button" class="btn btn-danger btn-sm btn-delete-member" data-id="{{ $member->id }}">
+                                        <button type="button" class="btn btn-danger btn-sm btn-delete-member" data-id="{{ $member->id }}" data-url="{{ route('backoffice.members.destroy', $member->id) }}">
                                             <i class="fas fa-trash"></i> 삭제
                                         </button>
                                     </div>

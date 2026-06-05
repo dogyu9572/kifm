@@ -26,6 +26,11 @@ class AcademicConferenceRegistrationRequest extends FormRequest
         return [
             'email' => ['required', 'email', 'max:100'],
             'phone' => ['required', 'string', 'max:30'],
+            'affiliated_hospital' => ['nullable', 'string', 'max:200'],
+            'workplace_phone' => ['nullable', 'string', 'max:40'],
+            'address_postcode' => ['nullable', 'string', 'max:20'],
+            'address_base' => ['nullable', 'string', 'max:300'],
+            'address_detail' => ['nullable', 'string', 'max:300'],
             'payment_plan_ids' => ['required', 'array', 'min:1'],
             'payment_plan_ids.*' => ['integer', 'exists:payment_plans,id'],
             'coupon_code' => ['nullable', 'string', 'max:50'],
@@ -45,6 +50,11 @@ class AcademicConferenceRegistrationRequest extends FormRequest
         return [
             'email' => '이메일',
             'phone' => '휴대폰번호',
+            'affiliated_hospital' => '직장명',
+            'workplace_phone' => '직장 전화',
+            'address_postcode' => '우편번호',
+            'address_base' => '주소',
+            'address_detail' => '상세주소',
             'payment_plan_ids' => '결제 항목',
             'bank_depositor' => '입금자명',
             'bank_deposit_date' => '입금 예정일',

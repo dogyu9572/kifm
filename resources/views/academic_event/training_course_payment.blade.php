@@ -62,17 +62,17 @@
                     <legend class="num_tit"><span>2</span>결제자 정보</legend>
                     <ul class="glbox">
                         <li>
-                            <label for="training-user-name">이름<span class="required">*</span></label>
+                            <label for="training-user-name">이름<span class="required c_iden">*</span></label>
                             <input type="text" id="training-user-name" name="name" class="text" value="{{ old('name', $user->name ?? '') }}" placeholder="이름을 입력해주세요" required>
                             @error('name')<span class="c_red">{{ $message }}</span>@enderror
                         </li>
                         <li>
-                            <label for="training-user-email">이메일<span class="required">*</span></label>
+                            <label for="training-user-email">이메일<span class="required c_iden">*</span></label>
                             <input type="email" id="training-user-email" name="email" class="text" value="{{ old('email', $user->email ?? '') }}" placeholder="이메일을 입력해주세요" required>
                             @error('email')<span class="c_red">{{ $message }}</span>@enderror
                         </li>
                         <li>
-                            <label for="training-user-phone">휴대폰번호<span class="required">*</span></label>
+                            <label for="training-user-phone">휴대폰번호<span class="required c_iden">*</span></label>
                             <input type="tel" id="training-user-phone" name="phone" class="text" value="{{ old('phone', $user->phone_number ?? '') }}" placeholder="휴대폰 번호를 입력해주세요" required>
                             @error('phone')<span class="c_red">{{ $message }}</span>@enderror
                         </li>
@@ -109,9 +109,9 @@
                                 <label for="training-payment-bank"><span>무통장입금</span></label>
                             </li>
                         </ul>
-                        <p class="c_red type_card" role="alert">* 신용카드 결제는 토스페이먼츠 테스트 결제창으로 진행됩니다.</p>
+						<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
                         @error('payment')<span class="c_red">{{ $message }}</span>@enderror
-                        <p class="c_red type_bank_hide" role="alert">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
+                        <p class="c_red type_bank_hide" role="alert c_iden">* 온라인 입금의 경우 입금확인 후 승인처리까지 하루에서 이틀정도의 시간이 소요됩니다.</p>
                         <div class="type_bank_hide">
                             <ul class="long_label">
                                 <li>
@@ -122,12 +122,12 @@
                                     </div>
                                 </li>
                                 <li>
-                                    <label for="training-bank-depositor">입금자명<span class="required">*</span></label>
+                                    <label for="training-bank-depositor">입금자명<span class="required c_iden">*</span></label>
                                     <input type="text" id="training-bank-depositor" name="bank_depositor" class="text" value="{{ old('bank_depositor') }}" placeholder="입금자명을 입력해 주세요">
                                     @error('bank_depositor')<span class="c_red">{{ $message }}</span>@enderror
                                 </li>
                                 <li>
-                                    <label for="training-bank-date">입금 예정일<span class="required">*</span></label>
+                                    <label for="training-bank-date">입금 예정일<span class="required c_iden">*</span></label>
                                     <input type="text" id="training-bank-date" name="bank_deposit_date" class="text" value="{{ old('bank_deposit_date') }}" placeholder="2026-02-15">
                                     @error('bank_deposit_date')<span class="c_red">{{ $message }}</span>@enderror
                                 </li>

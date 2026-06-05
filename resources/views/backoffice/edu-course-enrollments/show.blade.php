@@ -105,7 +105,7 @@
                                     <div class="bo-form-row">
                                         <label class="bo-form-label">회원 등급 (수강 당시)</label>
                                         <div class="bo-form-field">
-                                            <input type="text" class="board-form-control" value="{{ $enrollment->member_grade_at ?: '-' }}" readonly>
+                                            <input type="text" class="board-form-control" value="{{ $memberLevelLabels[$enrollment->member_grade_at] ?? ($enrollment->member_grade_at ?: '-') }}" readonly>
                                         </div>
                                     </div>
                                 </div>

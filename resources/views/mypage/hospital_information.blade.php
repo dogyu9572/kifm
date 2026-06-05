@@ -35,11 +35,11 @@
 
         @if ($doc === null)
             <div class="hospital_information_area">
-                <p class="text">등록된 우리동네 주치의 정보가 없습니다. 병원 등록 문의는 학회로 연락주세요.</p>
+                <p class="text no_result">등록된 우리동네 주치의 정보가 없습니다. <br/>병원 등록 문의는 학회로 연락주세요.</p>
             </div>
         @elseif (! $canEdit)
             <div class="hospital_information_area">
-                <p class="text">관리자에 의해 병원 정보 직접 수정이 허용되지 않았습니다. 변경이 필요하시면 학회로 문의해 주세요.</p>
+                <p class="text no_result">관리자에 의해 병원 정보 직접 수정이 허용되지 않았습니다. <br/>변경이 필요하시면 학회로 문의해 주세요.</p>
             </div>
         @else
         <form
@@ -275,5 +275,9 @@
 
 @push('scripts')
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="{{ asset('js/frontend/mypage-hospital-information.js') }}"></script>
+@php
+    $hospitalInfoJsPath = public_path('js/frontend/mypage-hospital-information.js');
+    $hospitalInfoJsVersion = file_exists($hospitalInfoJsPath) ? filemtime($hospitalInfoJsPath) : time();
+@endphp
+<script src="{{ asset('js/frontend/mypage-hospital-information.js') }}?v={{ $hospitalInfoJsVersion }}"></script>
 @endpush

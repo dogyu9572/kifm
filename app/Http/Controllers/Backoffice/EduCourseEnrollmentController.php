@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Backoffice;
 use App\Http\Controllers\Controller;
 use App\Models\EduCourse;
 use App\Models\EduCourseEnrollment;
+use App\Services\Backoffice\MemberService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -75,6 +76,7 @@ class EduCourseEnrollmentController extends Controller
             'paymentStatusLabels' => $this->paymentStatusLabels(),
             'paymentMethodLabels' => $this->paymentMethodLabels(),
             'examStatusLabels' => $this->examStatusLabels(),
+            'memberLevelLabels' => MemberService::memberLevelLabels(),
         ]);
     }
 

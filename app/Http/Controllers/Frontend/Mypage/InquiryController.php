@@ -18,12 +18,13 @@ class InquiryController extends Controller
         private readonly MypageInquiryService $inquiryService,
     ) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $posts = $this->inquiryService->paginateForMember($this->currentMember());
+        $posts = $this->inquiryService->paginateForMember($this->currentMember(), $request);
 
         return $this->renderMypage('inquiry', '04', '1:1 문의', 'inquiry_list', [
             'posts' => $posts,
+            'filters' => $this->inquiryService->filters($request),
         ]);
     }
 
@@ -62,7 +63,9 @@ class InquiryController extends Controller
             $validated['content'],
         );
 
-        return redirect()->route('mypage.inquiry_view', ['id' => $id]);
+        return redirect()
+            ->route('mypage.inquiry_view', ['id' => $id])
+            ->with('alert', "문의하신 내용이 접수 되었습니다.\n최대한 빠른 시일내에 답변드리겠습니다.");
     }
 
     public function update(FrontendMypageInquiryStoreRequest $request, int $id): RedirectResponse

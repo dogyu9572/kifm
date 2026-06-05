@@ -59,8 +59,23 @@
         });
     }
 
+    function bindCommitteeApplyForms() {
+        document.querySelectorAll('.subcommittee_apply_form').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                var committeeName = form.getAttribute('data-committee-name') || '';
+                var message = (committeeName ? committeeName + ' 소속이 아닙니다.\n' : '')
+                    + '가입을 신청하시겠습니까?';
+
+                if (!window.confirm(message)) {
+                    event.preventDefault();
+                }
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         applyCommitteeLayerLayout();
         openCommitteeWindowPopups();
+        bindCommitteeApplyForms();
     });
 })();
