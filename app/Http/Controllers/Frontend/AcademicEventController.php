@@ -193,7 +193,14 @@ class AcademicEventController extends Controller
             return $training;
         }
         $user = $this->frontendUser();
-        $rounds = $this->trainingCourseService->publicRounds($training);
+        $rounds = $this->trainingCourseService->publicRounds($training)
+            ->filter(fn ($round): bool => $this->trainingCourseService->canApplyRound($round, $user))
+            ->values();
+        if ($rounds->isEmpty()) {
+            return redirect()
+                ->route('academic_event.training_course_view', ['training' => $training->id])
+                ->with('alert', '현재 신청 가능한 결제 항목이 없습니다.');
+        }
         $memberGrade = $this->trainingCourseService->memberGrade($user);
 
         return view('academic_event.training_course_payment', compact(
@@ -213,6 +220,16 @@ class AcademicEventController extends Controller
 
     public function storeTrainingCoursePayment(Request $request): JsonResponse|RedirectResponse
     {
+        $user = $this->frontendUser();
+        if ($user) {
+            $request->merge([
+                'name' => (string) $user->name,
+                'license_no' => $user->license_number,
+                'phone' => $user->phone_number,
+                'email' => $user->email,
+            ]);
+        }
+
         $validated = $request->validate([
             'training_id' => ['required', 'integer', 'exists:edu_trainings,id'],
             'round_ids' => ['required', 'array', 'min:1'],
@@ -268,7 +285,7 @@ class AcademicEventController extends Controller
         }
 
         try {
-            $payment = $this->trainingCourseService->createPayment($training, $validated, $this->frontendUser());
+            $payment = $this->trainingCourseService->createPayment($training, $validated, $user);
         } catch (\RuntimeException $e) {
             if ($request->expectsJson()) {
                 return response()->json([

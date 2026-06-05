@@ -244,6 +244,43 @@
         return true;
     }
 
+    function fieldLabel(field) {
+        const id = field.getAttribute('id');
+        const label = id
+            ? Array.from(form.querySelectorAll('label')).find((candidate) => candidate.getAttribute('for') === id)
+            : null;
+        return (label?.textContent || field.getAttribute('title') || field.getAttribute('placeholder') || '필수 항목')
+            .replace('*', '')
+            .trim();
+    }
+
+    function isVisibleField(field) {
+        return Boolean(field.offsetWidth || field.offsetHeight || field.getClientRects().length);
+    }
+
+    function validateRequiredFields() {
+        const fields = Array.from(form.querySelectorAll('input[required], select[required], textarea[required]'));
+        const invalid = fields.find((field) => {
+            if (field.disabled || field.readOnly || field.type === 'hidden' || !isVisibleField(field)) {
+                return false;
+            }
+            if (field.type === 'checkbox' || field.type === 'radio') {
+                return !field.checked;
+            }
+
+            return !field.value.trim();
+        });
+
+        if (!invalid) {
+            return true;
+        }
+
+        window.alert(fieldLabel(invalid) + '을(를) 입력해주세요.');
+        invalid.focus();
+
+        return false;
+    }
+
     function validateBankTransferFields() {
         if (selectedPaymentMethod() !== 'bank') {
             return true;
@@ -535,7 +572,7 @@
     }
     form.addEventListener('submit', async function (event) {
         togglePaymentMethod();
-        if (!validateRequiredSelections() || !validateBankTransferFields()) {
+        if (!validateRequiredFields() || !validateRequiredSelections() || !validateBankTransferFields()) {
             event.preventDefault();
             return;
         }

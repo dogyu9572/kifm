@@ -251,8 +251,23 @@
     margin-left: 0.5rem;
 }
 
+.bo-academic-modal .bo-sponsor-search-form {
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
+}
+
+.bo-academic-modal .bo-sponsor-search-form .board-form-control {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.bo-academic-modal .bo-sponsor-search-form .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
 /* 수강 신청 상세: 특정 섹션(현금영수증) 내 회색 행 보더 제거 */
 .bo-form-section-no-row-border .bo-form-row {
     border-bottom: none;
 }
-

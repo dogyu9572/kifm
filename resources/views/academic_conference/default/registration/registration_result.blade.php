@@ -34,6 +34,7 @@
 	$isBankTransfer = $registration?->payment_method === 'bank_transfer';
 	$isWaitingForDeposit = $isBankTransfer && $registration?->payment_status === 'pending';
 	$isCancelable = $registration && ! in_array($registration->payment_status, ['cancel_requested', 'cancelled'], true);
+	$bankAccountText = $registration?->bank_account_text ?: '국민은행 287937-00-000083 / 예금주 대한기능의학회';
 @endphp
 <main class="sub_area">
 
@@ -145,7 +146,7 @@
 						@if ($isBankTransfer)
 							<div>
 								<dt>입금 계좌</dt>
-								<dd>{{ $registration->bank_account_text ?: '-' }}</dd>
+								<dd>{{ $bankAccountText }}</dd>
 							</div>
 							<div>
 								<dt>입금자명</dt>

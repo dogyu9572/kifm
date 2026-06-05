@@ -134,13 +134,14 @@
             @error('year')<span class="bo-inline-error">{{ $message }}</span>@enderror
         </div>
         <div class="board-form-group mb-0">
-            <label class="board-form-label">시즌</label>
-            <select name="season" class="board-form-control board-form-control--max-md">
-                <option value="">미지정</option>
+            <label class="board-form-label">시즌 <span class="required">*</span></label>
+            <select name="season" class="board-form-control board-form-control--max-md @error('season') is-invalid @enderror" required>
+                <option value="">시즌 선택</option>
                 @foreach ($seasonLabels as $code => $label)
                     <option value="{{ $code }}" @selected(old('season', $e->season) === $code)>{{ $label }}</option>
                 @endforeach
             </select>
+            @error('season')<span class="bo-inline-error">{{ $message }}</span>@enderror
         </div>
     </div>
     <div class="board-form-group">
@@ -735,9 +736,10 @@
             @endforeach
         </select>
     </div>
-    <table class="board-table bo-academic-inline-table" id="bo-sponsors-table">
+    <table class="board-table sortable-table bo-academic-inline-table" id="bo-sponsors-table">
         <thead>
             <tr>
+                <th>순서</th>
                 <th>스폰서명</th>
                 <th>배치</th>
                 <th>로고</th>
@@ -747,6 +749,9 @@
         <tbody id="bo-sponsors-body">
             @foreach ($sponsorRowsForForm as $si => $row)
                 <tr class="bo-repeat-row bo-sponsor-row">
+                    <td class="text-center sort-handle-cell">
+                        <i class="fas fa-grip-vertical sort-handle" title="드래그하여 순서 변경"></i>
+                    </td>
                     <td>
                         <input type="hidden" name="sponsors[{{ $si }}][academic_sponsor_master_id]" class="bo-sponsor-master-id" value="{{ $row['academic_sponsor_master_id'] ?? '' }}">
                         <input type="hidden" name="sponsors[{{ $si }}][sort_order]" value="{{ (int) ($row['sort_order'] ?? ((int) $si + 1)) }}">
@@ -986,16 +991,19 @@
                 <button type="button" class="close bo-modal-close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
-                <div class="board-form-inline">
+                <div class="board-form-inline bo-sponsor-search-form">
                     <input type="text" id="bo-sponsor-search-keyword" class="board-form-control" placeholder="스폰서명">
                     <button type="button" class="btn btn-primary" id="bo-sponsor-search-btn">검색</button>
                 </div>
                 <div class="table-responsive mt-2">
                     <table class="board-table">
-                        <thead><tr><th>스폰서명</th><th>대표자</th><th></th></tr></thead>
-                        <tbody id="bo-sponsor-search-tbody"></tbody>
+                        <thead><tr><th>스폰서명</th><th></th></tr></thead>
+                        <tbody id="bo-sponsor-search-tbody">
+                            <tr><td colspan="2" class="text-center">스폰서 목록을 조회하고 있습니다.</td></tr>
+                        </tbody>
                     </table>
                 </div>
+                <div class="mt-3" id="bo-sponsor-search-pagination"></div>
             </div>
         </div>
     </div>

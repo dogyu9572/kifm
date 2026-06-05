@@ -11,6 +11,12 @@
 		<p class="tb">등록 시 회원혜택을 받으시려면 회원 인증이 필요합니다.</p>
 		
 		<div class="member_inbox">
+			@if (! ($canPreRegister ?? true))
+				<div class="gbox after_info">
+					<h2 class="tt">사전등록이 마감되었습니다.</h2>
+					<p>사전등록 기간이 종료되어 신규 신청을 접수할 수 없습니다.</p>
+				</div>
+			@else
 			<form action="{{ route('member.login.store') }}" method="POST" class="inputs gbox">
 				@csrf
 				<input type="hidden" name="intended" value="{{ $conferenceBaseUrl }}/registration/form">
@@ -39,7 +45,7 @@
 				@endif
 				<a href="{{ $conferenceBaseUrl }}/registration/form_non_member" class="btn btn_kwk">비회원으로 신청하기</a>
 			</form>
-			
+			@endif
 			<div class="glbox after_info">
 				<h2 class="tt">대한기능의학회 사무국</h2>
 				<p>정보조회가 어려우실 경우 대한기능의학회 사무국으로 <br class="pc_vw">문의해 주시기 바랍니다.</p>

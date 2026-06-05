@@ -8,6 +8,12 @@
 <meta name="Description" content="">
 <title>인정의 만료 안내</title>
 </head>
+@php
+	$verificationMemberName = $member->name ?? '회원';
+	$verificationExpiredDate = isset($certifiedMember) && $certifiedMember->validity_end_date
+		? $certifiedMember->validity_end_date->format('Y.m.d')
+		: '2026.04.30';
+@endphp
 <style>
 @font-face {font-family: 'Pretendard';src: url('//cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');font-weight: 400;font-display: swap;}
 @font-face {font-family: 'Pretendard';src: url('//cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');font-weight: 600;font-display: swap;}
@@ -26,8 +32,8 @@ html,body {margin:0; padding:0;}
 			<td style="padding:0 40px 48px;">
 				<div style="font-size:24px; color:#222; font-weight:700; line-height:1.4; letter-spacing:-.02em;">인정의 만료 안내</div>
 				<p style="font-size:16px; color:#222; line-height:1.5; letter-spacing:-.02em; margin:16px 0 40px;">
-					안녕하세요, 대한기능의학회입니다.<br>
-					회원님의 원활한 서비스 이용을 위하 인정의 유효기간을<br>
+					안녕하세요, {{ $verificationMemberName }} <br>
+					회원님의 원활한 서비스 이용을 위해 인정의 유효기간을<br>
 					확인해주시기 바랍니다.
 				</p>
 				<div style="background:#f8f8f8; border-radius:8px; padding:20px 24px;">
@@ -39,7 +45,7 @@ html,body {margin:0; padding:0;}
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">만료 예정일</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026.04.30</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $verificationExpiredDate }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">상태</th>

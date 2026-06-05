@@ -208,7 +208,6 @@
                             <span class="bo-member-inline-label">검색어</span>
                             <div class="bo-member-inline-group">
                                 <select id="search_field" name="search_field" class="filter-select bo-member-search-field">
-                                    <option value="">선택</option>
                                     <option value="all" @selected(($filters['search_field'] ?? '') === 'all')>전체</option>
                                     <option value="name" @selected(($filters['search_field'] ?? '') === 'name')>회원 이름</option>
                                     <option value="id" @selected(($filters['search_field'] ?? '') === 'id')>아이디</option>

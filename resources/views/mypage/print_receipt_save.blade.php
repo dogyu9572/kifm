@@ -3,18 +3,31 @@
 @section('content')
 @php
 	$isCourseReceipt = isset($enrollment);
-	$receiptNo = $isCourseReceipt
-		? ($enrollment->payment_no ?: 'ENR-'.$enrollment->id)
-		: $registration->registration_no;
-	$itemNames = $isCourseReceipt
-		? ($enrollment->payment_item_name ?: ($enrollment->course?->title ?? '-'))
-		: ($registration->items?->pluck('item_name')->filter()->implode(', ') ?: ($registration->event?->title ?? '-'));
-	$paidAt = $isCourseReceipt
-		? $enrollment->paid_at
-		: ($registration->paid_at ?: $registration->registered_at);
-	$paymentMethod = $isCourseReceipt ? $enrollment->payment_method : $registration->payment_method;
+	$isTrainingReceipt = isset($trainingPayment);
+	if ($isTrainingReceipt) {
+		$receiptNo = $trainingPayment->order_no ?: 'TRAIN-'.$trainingPayment->id;
+		$itemNames = $trainingPayment->items?->pluck('item_name')->filter()->implode(', ') ?: ($trainingPayment->training?->title ?? '-');
+		$paidAt = $trainingPayment->paid_at ?: $trainingPayment->registered_at;
+		$paymentMethod = $trainingPayment->payment_method;
+		$amount = $trainingPayment->total_amount;
+		$bankDepositor = $trainingPayment->bank_depositor;
+	} elseif ($isCourseReceipt) {
+		$receiptNo = $enrollment->payment_no ?: 'ENR-'.$enrollment->id;
+		$itemNames = $enrollment->payment_item_name ?: ($enrollment->course?->title ?? '-');
+		$paidAt = $enrollment->paid_at;
+		$paymentMethod = $enrollment->payment_method;
+		$amount = $enrollment->payment_amount;
+		$bankDepositor = $enrollment->bank_depositor;
+	} else {
+		$receiptNo = $registration->registration_no;
+		$itemNames = $registration->items?->pluck('item_name')->filter()->implode(', ') ?: ($registration->event?->title ?? '-');
+		$paidAt = $registration->paid_at ?: $registration->registered_at;
+		$paymentMethod = $registration->payment_method;
+		$amount = $registration->total_amount;
+		$bankDepositor = $registration->bank_depositor;
+	}
 	$methodLabel = $methodLabels[$paymentMethod] ?? $paymentMethod;
-	$amount = $isCourseReceipt ? $enrollment->payment_amount : $registration->total_amount;
+	$isBankTransfer = in_array($paymentMethod, ['bank', 'bank_transfer'], true);
 @endphp
 <main class="sub_area print_page">
 
@@ -41,12 +54,12 @@
 					<th>결제 수단</th>
 					<td>{{ $methodLabel }}</td>
 				</tr>
-				@if ($paymentMethod === 'bank_transfer')
+				@if ($isBankTransfer)
 				<tr>
 					<th>입금자명</th>
-					<td>{{ $isCourseReceipt ? ($enrollment->bank_depositor ?: '-') : ($registration->bank_depositor ?: '-') }}</td>
+					<td>{{ $bankDepositor ?: '-' }}</td>
 				</tr>
-				@if (! $isCourseReceipt)
+				@if (! $isCourseReceipt && ! $isTrainingReceipt)
 				<tr>
 					<th>입금계좌</th>
 					<td>{{ $registration->bank_account_text ?: '-' }}</td>

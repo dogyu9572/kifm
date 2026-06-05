@@ -129,19 +129,30 @@ class AcademicSponsorMasterController extends Controller
     public function search(Request $request): JsonResponse
     {
         $keyword = trim((string) $request->get('keyword', ''));
+        $perPage = (int) $request->get('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 50], true) ? $perPage : 10;
+
         $rows = AcademicSponsorMaster::query()
+            ->where('status', 'active')
             ->when($keyword !== '', fn ($q) => $q->where('name', 'like', '%' . $keyword . '%'))
+            ->orderBy('sort_order')
             ->orderBy('name')
-            ->limit(50)
-            ->get(['id', 'name', 'representative_name', 'logo_path']);
+            ->paginate($perPage, ['id', 'name', 'representative_name', 'logo_path'])
+            ->withQueryString();
 
         return response()->json([
-            'data' => $rows->map(fn (AcademicSponsorMaster $m) => [
+            'data' => $rows->getCollection()->map(fn (AcademicSponsorMaster $m) => [
                 'id' => $m->id,
                 'name' => $m->name,
                 'representative_name' => $m->representative_name,
                 'logo_path' => $m->logo_path,
             ]),
+            'meta' => [
+                'current_page' => $rows->currentPage(),
+                'last_page' => $rows->lastPage(),
+                'per_page' => $rows->perPage(),
+                'total' => $rows->total(),
+            ],
         ]);
     }
 

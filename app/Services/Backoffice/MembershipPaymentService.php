@@ -197,9 +197,7 @@ class MembershipPaymentService
         }
 
         if ($payment->payment_status === 'cancelled') {
-            if ($payment->refund_bank_name === null || $payment->refund_account_no === null || $payment->refund_holder_name === null) {
-                throw new \RuntimeException('환불 완료 처리 시 환불 계좌 정보를 입력해야 합니다.');
-            }
+            return;
         }
     }
 
@@ -229,4 +227,3 @@ class MembershipPaymentService
         return Carbon::parse($value);
     }
 }
-

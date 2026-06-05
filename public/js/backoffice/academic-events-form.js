@@ -910,6 +910,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const tr = document.createElement('tr');
         tr.className = 'bo-repeat-row bo-sponsor-row';
         tr.innerHTML = `
+            <td class="text-center sort-handle-cell">
+                <i class="fas fa-grip-vertical sort-handle" title="드래그하여 순서 변경"></i>
+            </td>
             <td>
                 <input type="hidden" name="sponsors[${i}][academic_sponsor_master_id]" class="bo-sponsor-master-id" value="">
                 <input type="hidden" name="sponsors[${i}][sort_order]" value="${i + 1}">
@@ -955,31 +958,155 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('bo-sponsor-add-manual-btn')?.addEventListener('click', () => addSponsorRow({}));
 
-    document.getElementById('bo-sponsor-add-master-btn')?.addEventListener('click', () => {
-        showBsModal(document.getElementById('bo-sponsor-modal'));
-    });
+    const sponsorRowsBody = document.getElementById('bo-sponsors-body');
+    if (sponsorRowsBody && typeof Sortable !== 'undefined') {
+        new Sortable(sponsorRowsBody, {
+            handle: '.sort-handle',
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            dragClass: 'sortable-drag',
+            onStart(evt) {
+                evt.item.classList.add('dragging');
+            },
+            onEnd(evt) {
+                evt.item.classList.remove('dragging');
+                reindexSponsorRows();
+                applySponsorLevelFilter();
+                rebuildAllMainSponsorSelects();
+            },
+        });
+    }
 
-    document.getElementById('bo-sponsor-search-btn')?.addEventListener('click', async () => {
-        const kw = (document.getElementById('bo-sponsor-search-keyword')?.value || '').trim();
-        const url = new URL(searchSponsorsUrl, window.location.origin);
-        url.searchParams.set('keyword', kw);
-        const res = await fetch(url.toString(), { headers: { Accept: 'application/json' } });
-        const json = await res.json();
-        const tb = document.getElementById('bo-sponsor-search-tbody');
-        if (!tb) {
+    const sponsorModalEl = document.getElementById('bo-sponsor-modal');
+    const sponsorSearchKeywordInput = document.getElementById('bo-sponsor-search-keyword');
+    const sponsorSearchTbody = document.getElementById('bo-sponsor-search-tbody');
+    const sponsorSearchPagination = document.getElementById('bo-sponsor-search-pagination');
+    let sponsorCurrentPage = 1;
+
+    const escSponsor = (value) =>
+        String(value ?? '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+
+    const renderSponsorSearchPagination = (meta) => {
+        if (!sponsorSearchPagination || !meta || (meta.last_page ?? 1) <= 1) {
+            if (sponsorSearchPagination) {
+                sponsorSearchPagination.innerHTML = '';
+            }
             return;
         }
-        tb.innerHTML = '';
-        (json.data || []).forEach((s) => {
-            const tr = document.createElement('tr');
-            const pick = encodeURIComponent(JSON.stringify({ id: s.id, name: s.name }));
-            tr.innerHTML = `<td>${s.name}</td><td>${s.representative_name || ''}</td>
-                <td><button type="button" class="btn btn-sm btn-primary bo-sponsor-pick-btn" data-pick="${pick}">선택</button></td>`;
-            tb.appendChild(tr);
-        });
+
+        const current = Number(meta.current_page ?? 1);
+        const last = Number(meta.last_page ?? 1);
+        const start = Math.max(1, current - 2);
+        const end = Math.min(last, start + 4);
+        const numberButtons = [];
+        for (let page = start; page <= end; page += 1) {
+            const activeClass = page === current ? 'active' : '';
+            numberButtons.push(
+                `<li class="page-item ${activeClass}"><a class="page-link js-sponsor-page" data-page="${page}" href="#">${page}</a></li>`,
+            );
+        }
+
+        sponsorSearchPagination.innerHTML = `
+            <ul class="pagination">
+                <li class="page-item ${current <= 1 ? 'disabled' : ''}">
+                    <a class="page-link js-sponsor-page" data-page="${Math.max(1, current - 1)}" href="#" aria-label="이전 페이지">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                ${numberButtons.join('')}
+                <li class="page-item ${current >= last ? 'disabled' : ''}">
+                    <a class="page-link js-sponsor-page" data-page="${Math.min(last, current + 1)}" href="#" aria-label="다음 페이지">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>`;
+    };
+
+    const renderSponsorSearchRows = (rows) => {
+        if (!sponsorSearchTbody) {
+            return;
+        }
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            sponsorSearchTbody.innerHTML = '<tr><td colspan="2" class="text-center">검색 결과가 없습니다.</td></tr>';
+            return;
+        }
+
+        sponsorSearchTbody.innerHTML = rows
+            .map((s) => {
+                const pick = encodeURIComponent(JSON.stringify({ id: s.id, name: s.name }));
+                return `<tr>
+                    <td>${escSponsor(s.name)}</td>
+                    <td><button type="button" class="btn btn-sm btn-primary bo-sponsor-pick-btn" data-pick="${pick}">선택</button></td>
+                </tr>`;
+            })
+            .join('');
+    };
+
+    const fetchSponsors = async (page = 1) => {
+        if (!searchSponsorsUrl || !sponsorSearchTbody) {
+            return;
+        }
+        sponsorCurrentPage = page;
+        const kw = (sponsorSearchKeywordInput?.value || '').trim();
+        const url = new URL(searchSponsorsUrl, window.location.origin);
+        url.searchParams.set('keyword', kw);
+        url.searchParams.set('page', String(page));
+        url.searchParams.set('per_page', '10');
+
+        sponsorSearchTbody.innerHTML = '<tr><td colspan="2" class="text-center">조회 중입니다...</td></tr>';
+        if (sponsorSearchPagination) {
+            sponsorSearchPagination.innerHTML = '';
+        }
+
+        try {
+            const res = await fetch(url.toString(), { headers: { Accept: 'application/json' } });
+            if (!res.ok) {
+                throw new Error('스폰서 검색 요청 실패');
+            }
+            const json = await res.json();
+            renderSponsorSearchRows(json.data || []);
+            renderSponsorSearchPagination(json.meta || null);
+        } catch {
+            sponsorSearchTbody.innerHTML = '<tr><td colspan="2" class="text-center">조회 중 오류가 발생했습니다.</td></tr>';
+            if (sponsorSearchPagination) {
+                sponsorSearchPagination.innerHTML = '';
+            }
+        }
+    };
+
+    document.getElementById('bo-sponsor-add-master-btn')?.addEventListener('click', () => {
+        showBsModal(sponsorModalEl);
+        fetchSponsors(1);
+        sponsorSearchKeywordInput?.focus();
     });
 
-    document.getElementById('bo-sponsor-modal')?.addEventListener('click', (e) => {
+    document.getElementById('bo-sponsor-search-btn')?.addEventListener('click', () => fetchSponsors(1));
+
+    sponsorSearchKeywordInput?.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') {
+            return;
+        }
+        event.preventDefault();
+        fetchSponsors(1);
+    });
+
+    sponsorSearchPagination?.addEventListener('click', (event) => {
+        const link = event.target.closest('.js-sponsor-page');
+        if (!link || link.closest('.page-item')?.classList.contains('disabled')) {
+            return;
+        }
+        event.preventDefault();
+        fetchSponsors(Number(link.dataset.page || sponsorCurrentPage || 1));
+    });
+
+    sponsorModalEl?.addEventListener('click', (e) => {
         const b = e.target.closest('.bo-sponsor-pick-btn');
         if (!b) {
             return;
@@ -991,7 +1118,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         addSponsorRow({ master_id: String(d.id), name: d.name });
-        hideBsModal(document.getElementById('bo-sponsor-modal'));
+        hideBsModal(sponsorModalEl);
     });
 
     document.getElementById('bo-sponsor-level-filter')?.addEventListener('change', applySponsorLevelFilter);
@@ -1010,6 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             reindexSponsorRows();
             applySponsorLevelFilter();
+            rebuildAllMainSponsorSelects();
         }, 0);
     });
     document.getElementById('bo-speakers-body')?.addEventListener('click', (e) => {

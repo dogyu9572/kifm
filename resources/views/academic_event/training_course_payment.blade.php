@@ -63,22 +63,22 @@
                     <ul class="glbox">
                         <li>
                             <label for="training-user-name">이름<span class="required c_iden">*</span></label>
-                            <input type="text" id="training-user-name" name="name" class="text" value="{{ old('name', $user->name ?? '') }}" placeholder="이름을 입력해주세요" required>
+                            <input type="text" id="training-user-name" name="name" class="text" value="{{ old('name', $user->name ?? '') }}" placeholder="이름을 입력해주세요" required @readonly($user)>
                             @error('name')<span class="c_red">{{ $message }}</span>@enderror
                         </li>
                         <li>
                             <label for="training-user-email">이메일<span class="required c_iden">*</span></label>
-                            <input type="email" id="training-user-email" name="email" class="text" value="{{ old('email', $user->email ?? '') }}" placeholder="이메일을 입력해주세요" required>
+                            <input type="email" id="training-user-email" name="email" class="text" value="{{ old('email', $user->email ?? '') }}" placeholder="이메일을 입력해주세요" required @readonly($user)>
                             @error('email')<span class="c_red">{{ $message }}</span>@enderror
                         </li>
                         <li>
                             <label for="training-user-phone">휴대폰번호<span class="required c_iden">*</span></label>
-                            <input type="tel" id="training-user-phone" name="phone" class="text" value="{{ old('phone', $user->phone_number ?? '') }}" placeholder="휴대폰 번호를 입력해주세요" required>
+                            <input type="tel" id="training-user-phone" name="phone" class="text" value="{{ old('phone', $user->phone_number ?? '') }}" placeholder="휴대폰 번호를 입력해주세요" required @readonly($user)>
                             @error('phone')<span class="c_red">{{ $message }}</span>@enderror
                         </li>
                         <li>
                             <label for="training-license-no">의사면허번호</label>
-                            <input type="text" id="training-license-no" name="license_no" class="text" value="{{ old('license_no', $user->license_number ?? '') }}" placeholder="의사면허번호를 입력해주세요">
+                            <input type="text" id="training-license-no" name="license_no" class="text" value="{{ old('license_no', $user->license_number ?? '') }}" placeholder="의사면허번호를 입력해주세요" @readonly($user)>
                             @error('license_no')<span class="c_red">{{ $message }}</span>@enderror
                         </li>
                     </ul>

@@ -7,13 +7,17 @@
 	$course = $enrollment->course;
 	$statusLabel = $statusLabels[$enrollment->enrollment_status] ?? $enrollment->enrollment_status;
 	$paymentStatusLabel = $paymentStatusLabels[$enrollment->payment_status] ?? $enrollment->payment_status;
-	$methodLabel = $paymentMethodLabels[$enrollment->payment_method] ?? $enrollment->payment_method;
+	$paymentMethodValue = strtolower((string) $enrollment->payment_method);
+	$isBankTransfer = in_array($paymentMethodValue, ['bank', 'bank_transfer'], true);
+	$methodLabel = $isBankTransfer ? '무통장입금' : ($paymentMethodLabels[$paymentMethodValue] ?? $enrollment->payment_method);
 	$memberGradeLabel = $memberGradeLabels[$enrollment->member_grade_at] ?? ($enrollment->member_grade_at ?: '-');
 	$examStatusLabel = $examStatusLabels[$enrollment->exam_status] ?? ($enrollment->exam_status ?: '-');
 	$receiptIssueValue = strtoupper((string) $enrollment->receipt_issue);
-	$isReceiptIssued = in_array($receiptIssueValue, ['YES', 'Y', '1', 'TRUE'], true);
+	$isReceiptIssued = in_array($receiptIssueValue, ['YES', 'Y', '1', 'TRUE', 'ISSUED', '발행'], true);
 	$receiptTypeValue = strtoupper((string) $enrollment->receipt_type);
 	$receiptTypeLabel = $receiptTypeLabels[$receiptTypeValue] ?? ($enrollment->receipt_type ?: '-');
+	$isPersonalReceipt = in_array($receiptTypeValue, ['PERSONAL', 'PHONE', '휴대폰'], true) || ($receiptTypeValue === '' && $isReceiptIssued);
+	$isCardReceipt = in_array($receiptTypeValue, ['CARD', 'BUSINESS', '사업자증빙용'], true);
 	$isCompleted = $enrollment->enrollment_status === 'completed';
 	$isPaymentCompleted = in_array($enrollment->payment_status, ['completed', 'paid'], true);
 	$periodEnd = $enrollment->expire_at ?: $course?->period_end;
@@ -101,7 +105,7 @@
 					<tr>
 						<th scope="row">결제 수단</th>
 						<td>{{ $methodLabel ?: '-' }}</td>
-						@if ($enrollment->payment_method === 'bank_transfer')
+						@if ($isBankTransfer)
 						<th scope="row">입금자명</th>
 						<td>{{ $enrollment->bank_depositor ?: '-' }}</td>
 						@else
@@ -109,7 +113,7 @@
 						<td>{{ $enrollment->payment_no ?: '-' }}</td>
 						@endif
 					</tr>
-					@if ($enrollment->payment_method === 'bank_transfer')
+					@if ($isBankTransfer)
 					<tr>
 						<th scope="row">입금 예정일</th>
 						<td>{{ optional($enrollment->bank_deposit_date)->format('Y.m.d') ?: '-' }}</td>
@@ -133,9 +137,9 @@
 					</tr>
 					<tr>
 						<th scope="row">휴대폰 번호</th>
-						<td>-</td>
+						<td>{{ $isReceiptIssued && $isPersonalReceipt ? ($enrollment->receipt_number ?: '-') : '-' }}</td>
 						<th scope="row">현금영수증 <br>카드 번호</th>
-						<td>{{ $isReceiptIssued ? ($enrollment->receipt_number ?: '-') : '-' }}</td>
+						<td>{{ $isReceiptIssued && $isCardReceipt ? ($enrollment->receipt_number ?: '-') : '-' }}</td>
 					</tr>
 				</tbody>
 			</table>

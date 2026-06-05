@@ -4,6 +4,7 @@ namespace App\Services\Frontend;
 
 use App\Models\AcademicEventRegistration;
 use App\Models\EduCourseEnrollment;
+use App\Models\EduTrainingPayment;
 use App\Models\MemberExecutive;
 use App\Models\MembershipPayment;
 use App\Models\User;
@@ -46,6 +47,16 @@ class MypagePrintService
             ->first();
     }
 
+    public function trainingPaymentReceipt(User $user, int $paymentId): ?EduTrainingPayment
+    {
+        return EduTrainingPayment::query()
+            ->with(['training', 'items'])
+            ->where('member_id', $user->id)
+            ->whereKey($paymentId)
+            ->where('payment_status', 'completed')
+            ->first();
+    }
+
     public function participationCertificate(User $user, int $registrationId): ?AcademicEventRegistration
     {
         return AcademicEventRegistration::query()
@@ -79,6 +90,9 @@ class MypagePrintService
     /** @return array<string, string> */
     public function paymentMethodLabels(): array
     {
-        return MembershipPaymentService::paymentMethodLabels();
+        return array_merge(MembershipPaymentService::paymentMethodLabels(), [
+            'bank' => '무통장입금',
+            'bank_transfer' => '무통장입금',
+        ]);
     }
 }

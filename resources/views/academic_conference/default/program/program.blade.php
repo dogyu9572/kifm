@@ -75,7 +75,11 @@
 		</div>
 
 		<div class="btns_btm">
-			<a href="{{ $conferenceBaseUrl }}/registration/reg" class="btn btn_wbb">사전등록 바로가기</a>
+			@if ($canPreRegister ?? true)
+				<a href="{{ $conferenceBaseUrl }}/registration/reg" class="btn btn_wbb">사전등록 바로가기</a>
+			@else
+				<button type="button" class="btn btn_wbb" disabled>사전등록 마감</button>
+			@endif
 		</div>
 	</div>
 </section>

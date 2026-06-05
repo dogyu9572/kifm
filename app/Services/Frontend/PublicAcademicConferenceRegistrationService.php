@@ -267,6 +267,24 @@ class PublicAcademicConferenceRegistrationService
         return true;
     }
 
+    public function canOnsiteRegister(AcademicEvent $event): bool
+    {
+        if ($event->onsite_reg_allowed === 'disallowed') {
+            return false;
+        }
+
+        $today = Carbon::today();
+
+        if ($event->onsite_reg_start && $today->lt($event->onsite_reg_start)) {
+            return false;
+        }
+        if ($event->onsite_reg_end && $today->gt($event->onsite_reg_end)) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function hasActiveMemberRegistration(AcademicEvent $event, User $user): bool
     {
         return AcademicEventRegistration::query()

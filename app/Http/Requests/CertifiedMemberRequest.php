@@ -24,5 +24,30 @@ class CertifiedMemberRequest extends FormRequest
             'exam_passed' => ['nullable', 'boolean'],
         ];
     }
-}
 
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute을(를) 입력해주세요.',
+            'integer' => ':attribute은(는) 숫자로 입력해주세요.',
+            'date' => ':attribute은(는) 올바른 날짜로 입력해주세요.',
+            'exists' => '선택한 :attribute 정보를 찾을 수 없습니다.',
+            'validity_end_date.after_or_equal' => '인정의 종료일은 인정의 시작일 이후여야 합니다.',
+            'acquired_validity_end.after_or_equal' => '취득 인정의 종료일은 취득 인정의 시작일 이후여야 합니다.',
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'member_id' => '회원',
+            'validity_start_date' => '인정의 시작일',
+            'validity_end_date' => '인정의 종료일',
+            'acquired_date' => '취득일',
+            'acquired_validity_start' => '취득 인정의 시작일',
+            'acquired_validity_end' => '취득 인정의 종료일',
+            'winter_course_completed' => '동계 강좌 이수 여부',
+            'exam_passed' => '시험 합격 여부',
+        ];
+    }
+}

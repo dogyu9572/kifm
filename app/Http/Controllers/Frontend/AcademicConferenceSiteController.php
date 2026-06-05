@@ -12,6 +12,7 @@ use App\Http\Requests\Frontend\AcademicConferenceRegistrationRequest;
 use App\Models\AcademicEvent;
 use App\Models\AcademicEventAbstract;
 use App\Models\AcademicEventRegistration;
+use App\Services\Frontend\MailformNotificationService;
 use App\Services\Frontend\PublicAcademicConferenceAbstractService;
 use App\Services\Frontend\PublicAcademicConferenceService;
 use App\Services\Frontend\PublicAcademicConferenceRegistrationService;
@@ -29,6 +30,7 @@ class AcademicConferenceSiteController extends Controller
         private readonly PublicAcademicConferenceService $conferenceService,
         private readonly PublicAcademicConferenceRegistrationService $registrationService,
         private readonly PublicAcademicConferenceAbstractService $abstractService,
+        private readonly MailformNotificationService $mailNotifier,
     ) {}
 
     public function show(Request $request, string $folderName, ?string $pagePath = null): View|RedirectResponse
@@ -46,6 +48,17 @@ class AcademicConferenceSiteController extends Controller
 
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
         $normalizedPagePath = trim((string) $pagePath, '/');
+        $canPreRegister = $this->registrationService->canPreRegister($event);
+        $canOnsiteRegister = $this->registrationService->canOnsiteRegister($event);
+
+        if (in_array($normalizedPagePath, ['registration/form', 'registration/form_non_member'], true) && ! $canPreRegister) {
+            return redirect()->to($conferenceBaseUrl . '/registration')
+                ->with('alert', '사전등록 기간이 종료되었습니다.');
+        }
+        if (in_array($normalizedPagePath, ['onsite_member_registration', 'onsite_non_member_registration'], true) && ! $canOnsiteRegister) {
+            return redirect()->to($conferenceBaseUrl . '/onsite_info')
+                ->with('alert', '현장등록 기간이 아니거나 현장등록이 불가합니다.');
+        }
 
         if ($this->isFrontendMemberLoggedIn() && $normalizedPagePath === 'registration/reg') {
             return redirect()->to($conferenceBaseUrl . '/registration/form');
@@ -187,6 +200,8 @@ class AcademicConferenceSiteController extends Controller
             'abstractSummary',
             'memberAbstracts',
             'hasMemberAbstractSubmission',
+            'canPreRegister',
+            'canOnsiteRegister',
             'page_type',
             'gNum',
             'sNum',
@@ -401,6 +416,7 @@ class AcademicConferenceSiteController extends Controller
         }
 
         $registration = $this->registrationService->createBankTransferRegistration($event, $user, $plans, $request->validated(), $membershipPlan);
+        $this->mailNotifier->sendAcademicConferencePreRegistrationComplete($registration);
 
         return redirect()->to($conferenceBaseUrl . '/registration/end')
             ->with('academic_conference_registration_id', $registration->id)
@@ -442,6 +458,7 @@ class AcademicConferenceSiteController extends Controller
         }
 
         $registration = $this->registrationService->createBankTransferNonMemberRegistration($event, $plans, $request->validated());
+        $this->mailNotifier->sendAcademicConferencePreRegistrationComplete($registration);
 
         return redirect()->to($conferenceBaseUrl . '/registration/end')
             ->with('academic_conference_registration_id', $registration->id)
@@ -477,6 +494,9 @@ class AcademicConferenceSiteController extends Controller
         session(['academic_conference_registration_id' => $registration->id]);
         if (! $registration->member_id) {
             session(['academic_conference_registration_lookup_id' => $registration->id]);
+        }
+        if ($registration->payment_status === 'completed') {
+            $this->mailNotifier->sendAcademicConferencePreRegistrationComplete($registration);
         }
 
         return redirect()->to($conferenceBaseUrl . '/registration/end')

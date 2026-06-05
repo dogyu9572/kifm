@@ -150,6 +150,7 @@ class MemberService
         }
 
         unset($data['password_confirmation']);
+        unset($data['withdrawn_at']);
 
         if (isset($data['phone_number']) && ! str_starts_with((string) $data['phone_number'], 'sns_')) {
             $data['phone_number'] = User::normalizePhone($data['phone_number']);

@@ -12,6 +12,7 @@ use App\Models\CommunityCommittee;
 use App\Models\CommunityCommitteeApplication;
 use App\Models\User;
 use App\Services\Backoffice\MemberService;
+use App\Services\Frontend\MailformNotificationService;
 use App\Services\Frontend\MemberAccountRecoveryService;
 use App\Services\Frontend\TermsContentService;
 use Illuminate\Http\JsonResponse;
@@ -29,6 +30,7 @@ class MemberController extends Controller
         private readonly MemberService $memberService,
         private readonly MemberAccountRecoveryService $accountRecoveryService,
         private readonly TermsContentService $termsContentService,
+        private readonly MailformNotificationService $mailNotifier,
     ) {}
 
     public function login(Request $request): View
@@ -260,7 +262,13 @@ class MemberController extends Controller
                 ->withErrors(['phone_number' => '회원 정보를 찾을 수 없습니다. 다시 진행해주세요.']);
         }
 
+        $wasDormant = $user->isDormantMember();
         $this->accountRecoveryService->resetPassword($user, (string) $request->validated('password'));
+        if ($wasDormant) {
+            $this->mailNotifier->sendDormantAccountRecovery($user);
+        } else {
+            $this->mailNotifier->sendPasswordChanged($user);
+        }
         $request->session()->forget('member_password_reset');
 
         return redirect()

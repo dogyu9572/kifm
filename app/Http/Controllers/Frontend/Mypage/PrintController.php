@@ -32,6 +32,17 @@ class PrintController extends Controller
 
     public function receiptSave(Request $request): View
     {
+        $trainingPaymentId = (int) $request->query('training_payment_id', 0);
+        if ($trainingPaymentId > 0) {
+            $trainingPayment = $this->printService->trainingPaymentReceipt($this->currentMember(), $trainingPaymentId);
+            abort_if($trainingPayment === null, 404);
+
+            return $this->renderPrint('print_receipt_save', '영수증', 'print_receipt_save', [
+                'trainingPayment' => $trainingPayment,
+                'methodLabels' => $this->printService->paymentMethodLabels(),
+            ]);
+        }
+
         $enrollmentId = (int) $request->query('enrollment_id', 0);
         if ($enrollmentId > 0) {
             $enrollment = $this->printService->courseReceipt($this->currentMember(), $enrollmentId);

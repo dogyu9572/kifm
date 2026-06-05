@@ -70,8 +70,8 @@
 						$isCompleted = $row->payment_status === 'completed';
 					@endphp
 					<tr>
-						<td class="part_his1">{{ $row->event?->title ?? '-' }}</td>
-						<td class="part_his2">-</td>
+						<td class="part_his1">{{ $row->title ?? '-' }}</td>
+						<td class="part_his2">{{ $row->credit ?? '-' }}</td>
 						<td class="part_his3">{{ number_format((int) $row->total_amount) }}원</td>
 						<td class="part_his4">{{ $methodLabel }}</td>
 						<td class="part_his5">
@@ -84,21 +84,21 @@
 						</td>
 						<td class="part_his6">{{ $statusLabel }}</td>
 						<td class="part_his7">
-							@if ($isCompleted)
-								<a href="{{ route('mypage.print_participation', ['registration_id' => $row->id]) }}" class="btn btn_kwk" target="_blank">참가 증명서</a>
+							@if ($isCompleted && $row->participation_print_url)
+								<a href="{{ $row->participation_print_url }}" class="btn btn_kwk" target="_blank">참가 증명서</a>
 							@else
 								-
 							@endif
 						</td>
 						<td class="part_his8">
-							@if ($isCompleted)
-								<a href="{{ route('mypage.print_receipt_save', ['registration_id' => $row->id]) }}" class="btn btn_kwk" target="_blank">영수증 출력</a>
+							@if ($isCompleted && $row->receipt_url)
+								<a href="{{ $row->receipt_url }}" class="btn btn_kwk" target="_blank">영수증 출력</a>
 							@else
 								-
 							@endif
 						</td>
 						<td class="part_his9">
-							<a href="{{ route('mypage.participation_history_view', ['id' => $row->id]) }}" class="btn btn_kwk">신청 내역 보기</a>
+							<a href="{{ $row->detail_url }}" class="btn btn_kwk">신청 내역 보기</a>
 						</td>
 					</tr>
 					@empty

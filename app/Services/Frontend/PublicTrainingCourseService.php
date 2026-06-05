@@ -25,6 +25,10 @@ class PublicTrainingCourseService
     public const FALLBACK_HEAD_IMAGE = 'images/img_sample_training_course_top.jpg';
     public const ROUND_ITEM_CATEGORY_PREFIX = 'training_round:';
 
+    public function __construct(
+        private readonly MailformNotificationService $mailNotifier,
+    ) {}
+
     /** @return array<string, string> */
     public function statusLabels(): array
     {
@@ -411,7 +415,7 @@ class PublicTrainingCourseService
         $method = (string) ($data['payment_method'] ?? 'card');
         $paymentStatus = $finalAmount <= 0 ? 'completed' : ($method === 'card' ? 'pending_payment' : 'pending');
 
-        return DB::transaction(function () use ($training, $data, $user, $summary, $subtotal, $discount, $coupon, $finalAmount, $method, $paymentStatus): EduTrainingPayment {
+        $payment = DB::transaction(function () use ($training, $data, $user, $summary, $subtotal, $discount, $coupon, $finalAmount, $method, $paymentStatus): EduTrainingPayment {
             $payment = EduTrainingPayment::query()->create([
                 'order_no' => $this->nextOrderNo(),
                 'edu_training_id' => $training->id,
@@ -454,6 +458,12 @@ class PublicTrainingCourseService
 
             return $payment->fresh(['training', 'items']);
         });
+
+        if ($method === 'bank_transfer' || $paymentStatus === 'completed') {
+            $this->mailNotifier->sendTrainingCourseApplicationComplete($payment);
+        }
+
+        return $payment;
     }
 
     public function confirmTossPayment(string $orderId, string $paymentKey, int $amount): EduTrainingPayment
@@ -488,7 +498,12 @@ class PublicTrainingCourseService
             'admin_memo' => trim($memo . ';toss_payment_key=' . $paymentKey, ';'),
         ]);
 
-        return $payment->refresh()->loadMissing(['training', 'items']);
+        $payment = $payment->refresh()->loadMissing(['training', 'items']);
+        if ($isCompleted) {
+            $this->mailNotifier->sendTrainingCourseApplicationComplete($payment);
+        }
+
+        return $payment;
     }
 
     private function requestTossConfirm(string $paymentKey, string $orderId, int $amount): array

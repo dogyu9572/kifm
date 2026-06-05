@@ -8,6 +8,7 @@ use App\Models\CommunityCommittee;
 use App\Models\CommunityCommitteeApplication;
 use App\Models\User;
 use App\Services\Backoffice\CommunityCommitteeService;
+use App\Services\Frontend\MailformNotificationService;
 use App\Support\BackofficeFile;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -21,7 +22,8 @@ use Illuminate\Support\Facades\Storage;
 class CommunityCommitteeController extends Controller
 {
     public function __construct(
-        protected CommunityCommitteeService $communityCommitteeService
+        protected CommunityCommitteeService $communityCommitteeService,
+        protected MailformNotificationService $mailNotifier,
     ) {}
 
     public function index(Request $request)
@@ -222,6 +224,8 @@ class CommunityCommitteeController extends Controller
             $committee->save();
         });
 
+        $this->mailNotifier->sendCommitteeApplicationApproved($application->refresh());
+
         return redirect($this->applicantsReturnUrl($request))->with('success', '신청을 승인했습니다.');
     }
 
@@ -249,6 +253,8 @@ class CommunityCommitteeController extends Controller
                 $committee->save();
             }
         });
+
+        $this->mailNotifier->sendCommitteeApplicationRejected($application->refresh());
 
         return redirect($this->applicantsReturnUrl($request))->with('success', '신청을 반려 처리했습니다.');
     }
@@ -287,6 +293,8 @@ class CommunityCommitteeController extends Controller
                 ->count();
             $committee->save();
         });
+
+        $this->mailNotifier->sendCommitteeApplicationRejected($application->refresh());
 
         return redirect($this->applicantsReturnUrl($request))->with('success', '승인을 취소했습니다.');
     }

@@ -37,14 +37,14 @@
                 @csrf
                 @method('PUT')
                 @include('backoffice.members._form')
-                @include('backoffice.members._history_placeholders')
-                <div class="board-form-actions board-form-actions--member-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> 저장
-                    </button>
-                    <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
-                </div>
             </form>
+            @include('backoffice.members._history_placeholders')
+            <div class="board-form-actions board-form-actions--member-footer">
+                <button type="submit" class="btn btn-primary" form="memberForm" data-skip-button>
+                    <i class="fas fa-save"></i> 저장
+                </button>
+                <a href="{{ route('backoffice.members.index') }}" class="btn btn-secondary">취소</a>
+            </div>
         </div>
     </div>
 </div>

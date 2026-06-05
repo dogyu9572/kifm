@@ -8,6 +8,7 @@ use App\Http\Requests\FrontendSubcommitteeDiscussionStoreRequest;
 use App\Models\CommunityCommittee;
 use App\Models\CommunityCommitteeApplication;
 use App\Models\Popup;
+use App\Services\Frontend\MailformNotificationService;
 use App\Services\Frontend\PublicBoardService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class SubcommitteeController extends Controller
 {
     public function __construct(
         private readonly PublicBoardService $publicBoardService,
+        private readonly MailformNotificationService $mailNotifier,
     ) {}
 
     public function index(): View
@@ -82,8 +84,9 @@ class SubcommitteeController extends Controller
             return redirect()->route('subcommittee.notice', $committee);
         }
 
-        DB::transaction(function () use ($committee, $user) {
-            CommunityCommitteeApplication::query()->updateOrCreate(
+        $application = null;
+        DB::transaction(function () use ($committee, $user, &$application) {
+            $application = CommunityCommitteeApplication::query()->updateOrCreate(
                 [
                     'community_committee_id' => $committee->id,
                     'user_id' => $user->id,
@@ -106,6 +109,10 @@ class SubcommitteeController extends Controller
                 ->count();
             $committee->save();
         });
+
+        if ($application instanceof CommunityCommitteeApplication) {
+            $this->mailNotifier->sendCommitteeApplicationReceived($application);
+        }
 
         return redirect()
             ->route('subcommittee.index')

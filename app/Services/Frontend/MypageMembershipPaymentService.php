@@ -17,18 +17,23 @@ class MypageMembershipPaymentService
     /**
      * @return array<int, array{id: int, label: string, amount: int}>
      */
-    public function activePlanOptions(): array
+    public function activePlanOptions(User $user): array
     {
         return PaymentPlan::query()
+            ->with('grades')
             ->where('category', 'membership')
+            ->where('member_status', 'member')
             ->where('use_status', 'active')
-            ->orderByDesc('id')
+            ->orderBy('price')
+            ->orderBy('id')
             ->get()
+            ->filter(fn (PaymentPlan $plan): bool => $this->isEligiblePlanForUser($user, $plan))
             ->map(static fn (PaymentPlan $plan): array => [
                 'id' => (int) $plan->id,
                 'label' => (string) $plan->plan_name,
                 'amount' => (int) ($plan->price ?? 0),
             ])
+            ->values()
             ->all();
     }
 
@@ -39,9 +44,15 @@ class MypageMembershipPaymentService
         }
 
         $plan = PaymentPlan::query()
+            ->with('grades')
             ->where('category', 'membership')
+            ->where('member_status', 'member')
             ->where('use_status', 'active')
             ->findOrFail($planId);
+
+        if (! $this->isEligiblePlanForUser($user, $plan)) {
+            throw new \RuntimeException('납부 가능한 연회비 항목을 선택해주세요.');
+        }
 
         $hasCompleted = MembershipPayment::query()
             ->where('member_id', $user->id)
@@ -155,6 +166,37 @@ class MypageMembershipPaymentService
     private function isExemptMember(User $user): bool
     {
         return in_array($user->member_level, ['lifetime', 'senior'], true);
+    }
+
+    private function isEligiblePlanForUser(User $user, PaymentPlan $plan): bool
+    {
+        if ($this->isExemptMember($user)) {
+            return false;
+        }
+
+        $targetGrade = $this->gradeForPlan($plan);
+        if ($targetGrade === '') {
+            return true;
+        }
+
+        return $this->gradeRank($targetGrade) >= $this->gradeRank((string) $user->member_level);
+    }
+
+    private function gradeForPlan(PaymentPlan $plan): string
+    {
+        $plan->loadMissing('grades');
+
+        return (string) ($plan->grades->pluck('grade')->first() ?? '');
+    }
+
+    private function gradeRank(string $grade): int
+    {
+        return [
+            'associate' => 1,
+            'regular' => 2,
+            'lifetime' => 3,
+            'senior' => 4,
+        ][$grade] ?? 0;
     }
 
     private function requestTossConfirm(string $paymentKey, string $orderId, int $amount): array

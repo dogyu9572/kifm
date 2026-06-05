@@ -17,8 +17,6 @@ class MembershipPaymentRequest extends FormRequest
         $isBank = (string) $this->input('payment_method') === 'bank_transfer';
         $isCompleted = (string) $this->input('payment_status') === 'completed';
         $isReceiptIssued = (string) $this->input('receipt_issue') === 'YES';
-        $isCancelled = (string) $this->input('payment_status') === 'cancelled';
-
         return [
             'membership_plan_id' => ['nullable', 'integer', 'exists:payment_plans,id'],
             'payment_status' => ['required', Rule::in(['pending', 'completed', 'cancelled'])],
@@ -28,9 +26,9 @@ class MembershipPaymentRequest extends FormRequest
             'receipt_issue' => ['required', Rule::in(['NO', 'YES'])],
             'receipt_type' => [Rule::requiredIf($isReceiptIssued), 'nullable', Rule::in(['PERSONAL', 'CARD'])],
             'receipt_number' => [Rule::requiredIf($isReceiptIssued), 'nullable', 'string', 'max:120'],
-            'refund_bank_name' => [Rule::requiredIf($isCancelled), 'nullable', 'string', 'max:100'],
-            'refund_account_no' => [Rule::requiredIf($isCancelled), 'nullable', 'string', 'max:120'],
-            'refund_holder_name' => [Rule::requiredIf($isCancelled), 'nullable', 'string', 'max:120'],
+            'refund_bank_name' => ['nullable', 'string', 'max:100'],
+            'refund_account_no' => ['nullable', 'string', 'max:120'],
+            'refund_holder_name' => ['nullable', 'string', 'max:120'],
         ];
     }
 

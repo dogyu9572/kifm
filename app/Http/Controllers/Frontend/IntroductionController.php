@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\CommunityCommittee;
+use App\Models\SocietyExecutive;
 use App\Services\Frontend\PublicBoardService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class IntroductionController extends Controller
@@ -270,7 +272,61 @@ class IntroductionController extends Controller
         $geName = 'introduction';
         $gSlug = 'introduction_officers';
 
-        return view('introduction.officers', compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'geName', 'gSlug'));
+        $executives = SocietyExecutive::query()
+            ->where('is_active', true)
+            ->orderBy('group_no')
+            ->orderByDesc('sort_order')
+            ->orderByDesc('id')
+            ->get();
+
+        $headExecutiveIds = $executives
+            ->where('group_no', 1)
+            ->take(2)
+            ->pluck('id')
+            ->all();
+
+        $headFallbackImages = [
+            asset('images/img_officers02.png'),
+            asset('images/img_officers01.png'),
+        ];
+
+        $headExecutives = $executives
+            ->whereIn('id', $headExecutiveIds)
+            ->values()
+            ->map(fn (SocietyExecutive $executive, int $index): array => $this->buildExecutiveViewData(
+                $executive,
+                $headFallbackImages[$index] ?? asset('images/img_officers01.png')
+            ));
+
+        $bodyExecutives = $executives
+            ->reject(fn (SocietyExecutive $executive): bool => in_array($executive->id, $headExecutiveIds, true))
+            ->values()
+            ->map(fn (SocietyExecutive $executive): array => $this->buildExecutiveViewData($executive));
+
+        return view('introduction.officers', compact(
+            'page_type',
+            'gNum',
+            'sNum',
+            'gName',
+            'sName',
+            'geName',
+            'gSlug',
+            'headExecutives',
+            'bodyExecutives'
+        ));
+    }
+
+    private function buildExecutiveViewData(SocietyExecutive $executive, ?string $fallbackPhotoUrl = null): array
+    {
+        return [
+            'name' => $executive->name,
+            'position' => $executive->position,
+            'organization' => $executive->organization,
+            'email' => $executive->email,
+            'photo_url' => $executive->photo_path
+                ? Storage::disk('public')->url($executive->photo_path)
+                : $fallbackPhotoUrl,
+        ];
     }
 
     public function location(): View

@@ -31,7 +31,7 @@ class AcademicEventRequest extends FormRequest
 
         return [
             'year' => ['required', 'integer', 'min:1990', 'max:2100'],
-            'season' => ['nullable', 'string', Rule::in(array_keys(\App\Services\Backoffice\AcademicEventService::seasonLabels()))],
+            'season' => ['required', 'string', Rule::in(array_keys(\App\Services\Backoffice\AcademicEventService::seasonLabels()))],
             'folder_name' => $folderRules,
             'title' => ['required', 'string', 'max:255'],
             'main_title_1' => ['nullable', 'string', 'max:255'],
@@ -177,7 +177,7 @@ class AcademicEventRequest extends FormRequest
     {
         return [
             'year' => '연도',
-            'season' => '분기',
+            'season' => '시즌',
             'folder_name' => '폴더명',
             'title' => '행사명',
             'main_title_1' => '타이틀 1',
@@ -231,6 +231,7 @@ class AcademicEventRequest extends FormRequest
             'folder_name.regex' => '폴더명은 영문·숫자·하이픈·밑줄만 사용할 수 있습니다.',
             'title.required' => '행사명을 입력해 주세요.',
             'year.required' => '연도를 선택해 주세요.',
+            'season.required' => '시즌을 선택해 주세요.',
             'is_public.required' => '공개 여부를 선택해 주세요.',
             'is_public.in' => '공개 여부 값이 올바르지 않습니다.',
             'end_at.after_or_equal' => '종료 일시는 시작 일시 이후여야 합니다.',

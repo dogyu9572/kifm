@@ -8,6 +8,7 @@ use App\Http\Requests\FrontendMypageAnnualFeeStoreRequest;
 use App\Models\MembershipPayment;
 use App\Services\Backoffice\MemberService;
 use App\Services\Frontend\MypageAnnualFeeCardService;
+use App\Services\Frontend\MailformNotificationService;
 use App\Services\Frontend\MypageMembershipPaymentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -21,6 +22,7 @@ class AnnualFeeController extends Controller
     public function __construct(
         private readonly MypageMembershipPaymentService $membershipPaymentService,
         private readonly MypageAnnualFeeCardService $annualFeeCardService,
+        private readonly MailformNotificationService $mailNotifier,
     ) {}
 
     public function index(): View
@@ -29,7 +31,7 @@ class AnnualFeeController extends Controller
 
         return $this->renderMypage('annual_fee', '01', '연회비 납부', 'annual_fee', [
             'user' => $user,
-            'plans' => $this->membershipPaymentService->activePlanOptions(),
+            'plans' => $this->membershipPaymentService->activePlanOptions($user),
             'annualFeeCard' => $this->annualFeeCardService->resolve($user),
             'memberLevelLabel' => MemberService::memberLevelLabels()[$user->member_level] ?? $user->member_level,
         ]);
@@ -65,6 +67,7 @@ class AnnualFeeController extends Controller
                     'refund_holder_name' => $validated['refund_holder_name'] ?? null,
                     'legacy_import_json' => $legacy,
                 ]);
+                $this->mailNotifier->sendMembershipFeePaid($payment->refresh());
             }
         } catch (\RuntimeException $e) {
             if ($request->expectsJson()) {
@@ -96,12 +99,15 @@ class AnnualFeeController extends Controller
         ]);
 
         try {
-            $this->membershipPaymentService->confirmTossPayment(
+            $payment = $this->membershipPaymentService->confirmTossPayment(
                 $validated['orderId'],
                 $validated['paymentKey'],
                 (int) $validated['amount'],
                 $user,
             );
+            if ($payment->payment_status === 'completed') {
+                $this->mailNotifier->sendMembershipFeePaid($payment);
+            }
         } catch (\RuntimeException $e) {
             return redirect()->route('mypage.annual_fee')
                 ->with('alert', $e->getMessage());

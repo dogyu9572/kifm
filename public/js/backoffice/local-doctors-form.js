@@ -65,6 +65,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     rebuildSigungu(false);
 
+    const memberSelector = form.querySelector('.js-member-selector');
+    const doctorNameInput = document.getElementById('doctor_name');
+    const licenseInput = document.getElementById('license_no');
+
+    memberSelector?.addEventListener('bo-member-selected', (event) => {
+        const member = event.detail || {};
+        if (doctorNameInput) {
+            doctorNameInput.value = member.name || '';
+        }
+        if (licenseInput) {
+            licenseInput.value = member.license_number || '';
+        }
+    });
+
     if (typeof window.initBoardImageFilePreview === 'function') {
         window.initBoardImageFilePreview({
             inputId: 'doctor_photo_file',
