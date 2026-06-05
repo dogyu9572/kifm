@@ -428,6 +428,7 @@ fieldset .float.mt {margin-top:10px;}
 /* Program */
 	.program_area.fixed {padding-top:32px;}
 	.program_area .tabs {flex-wrap:nowrap; overflow:auto;}
+	.program_area .tabs::-webkit-scrollbar {width:0; height:1px;}
 	.program_area .tabs li {flex:0 0 auto;}
 	.program_area.fixed .tabs {/* top:80px; */ left:20px; width:calc(100% - 40px); padding:0; transform:none;}
 .program_area .session_wrap {padding-top:60px;}
