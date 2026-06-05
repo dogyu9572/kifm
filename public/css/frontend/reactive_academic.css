@@ -430,19 +430,15 @@ fieldset .float.mt {margin-top:10px;}
 	.program_area .tabs {flex-wrap:nowrap; overflow:auto;}
 	.program_area .tabs::-webkit-scrollbar {width:0; height:1px;}
 	.program_area .tabs li {flex:0 0 auto;}
-	.program_area.fixed .tabs {/* top:80px; */ left:20px; width:calc(100% - 40px); padding:0; transform:none;}
-.program_area .session_wrap {padding-top:60px;}
-.program_area .session_area + .session_area {margin-top:80px;}
-.session {font-size:12px; line-height:26px; height:26px; padding:0 10px; border-radius:13px;}
+	.program_area.fixed .tabs {left:20px; width:calc(100% - 40px); padding:0; transform:none;}
+	.program_area .session_area + .session_area {margin-top:60px;}
 	.program_area h2 {font-size:20px; margin:10px 0;}
 	.program_area .chair {font-size:14px;}
 	.program_area .session_list {margin-top:16px; padding-top:20px;}
 	.program_area .session_list > li {padding:20px 140px;}
 	.program_area .session_list > li + li {margin-top:10px;}
-.program_area .session_list .time,
-.program_area .session_list .presentation {font-size:16px;}
-.program_area .session_list .time {left:20px;}
-.program_area .session_list .presentation {right:20px;}
+	.program_area .session_list .time,
+	.program_area .session_list .presentation {font-size:15px;}
 
 /* Notice */
 /* 게시판 상단 */
@@ -655,6 +651,25 @@ fieldset .float.mt {margin-top:10px;}
 	.venue_area .txt_area dt {line-height:24px; background-size:24px;}
 	.venue_area .txt_area .btn_copy {font-size:13px;}
 	.venue_area .txt_area .small {font-size:14px; margin-top:6px;}
+
+/* Program */
+.program_area.fixed {padding-top:32px;}
+.program_area .tabs {flex-wrap:nowrap; overflow:auto;}
+.program_area .tabs::-webkit-scrollbar {width:0; height:1px;}
+.program_area .tabs li {flex:0 0 auto;}
+.program_area.fixed .tabs {/* top:80px; */ left:20px; width:calc(100% - 40px); padding:0; transform:none;}
+.program_area .session_wrap {padding-top:60px;}
+.program_area .session_area + .session_area {margin-top:60px;}
+.session {font-size:12px; line-height:26px; height:26px; padding:0 10px; border-radius:13px;}
+.program_area h2 {font-size:20px; margin:10px 0;}
+.program_area .chair {font-size:14px;}
+.program_area .session_list {margin-top:16px; padding-top:20px;}
+.program_area .session_list > li {padding:20px 140px;}
+.program_area .session_list > li + li {margin-top:10px;}
+.program_area .session_list .time,
+.program_area .session_list .presentation {font-size:15px;}
+.program_area .session_list .time {left:20px;}
+.program_area .session_list .presentation {right:20px;}
 
 /* Notice */
 /* 게시판 상단 */
