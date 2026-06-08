@@ -41,6 +41,7 @@ class MailformNotificationService
 
     public function sendTrainingCourseApplicationComplete(EduTrainingPayment $payment): void
     {
+        $payment->loadMissing(['training', 'items']);
         $this->send(
             (string) $payment->email,
             (string) ($payment->name ?: $payment->email),
@@ -105,12 +106,17 @@ class MailformNotificationService
 
     private function sendToApplication(CommunityCommitteeApplication $application, string $view, string $subject): void
     {
+        $application->loadMissing(['committee', 'member']);
+        $member = $application->member;
+        $email = (string) ($member?->email ?: $application->email);
+        $name = (string) (($member?->name ?: $application->applicant_name) ?: $email);
+
         $this->send(
-            (string) $application->email,
-            (string) ($application->applicant_name ?: $application->email),
+            $email,
+            $name,
             $view,
             $subject,
-            ['application' => $application->loadMissing('committee')]
+            ['application' => $application]
         );
     }
 
@@ -123,7 +129,7 @@ class MailformNotificationService
 
         try {
             Mail::send($view, $data, function ($message) use ($email, $name, $subject): void {
-                $message->to($email, $name)->subject($subject);
+                $message->to($email, $name)->subject($this->prefixedSubject($subject));
             });
         } catch (Throwable $e) {
             Log::warning('메일폼 발송 실패', [
@@ -132,5 +138,20 @@ class MailformNotificationService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function prefixedSubject(string $subject): string
+    {
+        $subject = trim($subject);
+        $prefix = '[대한기능의학회]';
+
+        if ($subject === '') {
+            return $prefix;
+        }
+        if (str_starts_with($subject, $prefix)) {
+            return $subject;
+        }
+
+        return $prefix.' '.$subject;
     }
 }

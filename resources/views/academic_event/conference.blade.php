@@ -19,7 +19,7 @@
 					<ul class="info_list">
 						<li class="i1"><strong>일시</strong>{{ $publicAcademicEvent->eventDateText($featuredConference) }}</li>
 						<li class="i2"><strong>사전등록</strong>{{ $publicAcademicEvent->preRegistrationText($featuredConference) }}</li>
-						<li class="i3"><strong>장소</strong>{{ $featuredConference->venue ?: '-' }}</li>
+						<li class="i3"><strong>장소</strong>{{ $publicAcademicEvent->venueText($featuredConference) }}</li>
 					</ul>
 					<div class="btns">
 						<a href="{{ $publicAcademicEvent->eventUrl($featuredConference) }}" target="_blank" title="새창 열림" class="btn btn_wkk btn_outlink">홈페이지 바로가기</a>
@@ -52,8 +52,9 @@
 				<div class="left">
 					<label for="event-year" class="sound_only">행사년도 선택</label>
 					<input type="hidden" name="status" value="{{ ($filters['status'] ?? 'all') !== 'all' ? $filters['status'] : '' }}">
+					<span aria-hidden="true" class="tt">행사년도</span>
 					<select name="year" id="event-year" class="years" data-auto-submit-form>
-						<option value="">행사년도</option>
+						<option value="">전체</option>
 						@foreach ($yearOptions as $year)
 							<option value="{{ $year }}" @selected((string) ($filters['year'] ?? '') === (string) $year)>{{ $year }}년</option>
 						@endforeach
@@ -80,7 +81,7 @@
 							<ul class="details">
 								<li><strong>일시</strong> {{ $publicAcademicEvent->eventDateText($conference) }}</li>
 								<li><strong>사전등록</strong> {{ $publicAcademicEvent->preRegistrationText($conference) }}</li>
-								<li><strong>장소</strong> {{ $conference->venue ?: '-' }}</li>
+								<li><strong>장소</strong> {{ $publicAcademicEvent->venueText($conference) }}</li>
 							</ul>
 						</a>
 						<x-frontend.bookmark-button content-type="academic_event" :content-id="$conference->id" :title="$conference->title" :menu-label="$sName" :url="$publicAcademicEvent->eventUrl($conference)" label="이 행사를 북마크에 추가" />

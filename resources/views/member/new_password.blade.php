@@ -21,20 +21,20 @@
 				<ul>
 					<li>
 						<label for="dormant_pw" class="sound_only">새 비밀번호</label>
-						<input type="password" id="dormant_pw" name="password" class="text w100p" placeholder="새 비밀번호" required autocomplete="new-password">
+						<input type="password" id="dormant_pw" name="password" class="text w100p" placeholder="새 비밀번호" minlength="8" maxlength="10" required autocomplete="new-password">
 						@error('password')
 							<p class="c_red" role="alert">{{ $message }}</p>
 						@enderror
 					</li>
 					<li>
 						<label for="dormant_pw_check" class="sound_only">새 비밀번호 확인</label>
-						<input type="password" id="dormant_pw_check" name="password_confirmation" class="text w100p" placeholder="새 비밀번호 확인" required autocomplete="new-password">
+						<input type="password" id="dormant_pw_check" name="password_confirmation" class="text w100p" placeholder="새 비밀번호 확인" minlength="8" maxlength="10" required autocomplete="new-password">
 						@error('password_confirmation')
 							<p class="c_red" role="alert">{{ $message }}</p>
 						@enderror
 					</li>
 				</ul>
-				<p class="excl mt">영문, 숫자, 특수문자 중 2종류 이상을 조합하여 10자리 이상으로 입력해주세요.</p>
+				<p class="excl mt">8~10자의 영문과 숫자를 반드시 포함해 입력해주세요. 특수문자도 사용할 수 있습니다.</p>
 				@error('reset_token')
 					<p class="c_red" role="alert">{{ $message }}</p>
 				@enderror

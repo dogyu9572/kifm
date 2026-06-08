@@ -36,6 +36,10 @@ class SubcommitteeController extends Controller
 
         $committees = CommunityCommittee::query()
             ->where('visibility_yn', 'Y')
+            ->where(function ($query): void {
+                $query->whereNull('committee_type')
+                    ->orWhere('committee_type', '!=', 'special');
+            })
             ->orderBy('sort_order')
             ->orderBy('name')
             ->get();
@@ -72,7 +76,7 @@ class SubcommitteeController extends Controller
 
     public function apply(Request $request, CommunityCommittee $committee): RedirectResponse
     {
-        if ($committee->visibility_yn !== 'Y') {
+        if (! $this->isPublicCommittee($committee)) {
             throw new NotFoundHttpException();
         }
 
@@ -86,12 +90,22 @@ class SubcommitteeController extends Controller
 
         $application = null;
         DB::transaction(function () use ($committee, $user, &$application) {
-            $application = CommunityCommitteeApplication::query()->updateOrCreate(
-                [
+            $application = CommunityCommitteeApplication::query()
+                ->where('community_committee_id', $committee->id)
+                ->where('user_id', $user->id)
+                ->where('status', 'PENDING')
+                ->first();
+
+            if ($application instanceof CommunityCommitteeApplication) {
+                $application->fill([
+                    'applicant_name' => $user->name,
+                    'email' => $user->email,
+                    'phone' => $user->phone_number,
+                ])->save();
+            } else {
+                $application = CommunityCommitteeApplication::query()->create([
                     'community_committee_id' => $committee->id,
                     'user_id' => $user->id,
-                ],
-                [
                     'applicant_name' => $user->name,
                     'email' => $user->email,
                     'phone' => $user->phone_number,
@@ -100,8 +114,8 @@ class SubcommitteeController extends Controller
                     'applied_at' => now(),
                     'processed_at' => null,
                     'processed_by' => null,
-                ]
-            );
+                ]);
+            }
 
             $committee->pending_count = CommunityCommitteeApplication::query()
                 ->where('community_committee_id', $committee->id)
@@ -181,7 +195,7 @@ class SubcommitteeController extends Controller
         $comments = $this->publicBoardService->listComments('community_committee_discussions', $id);
 
         return view('subcommittee.discussion_view', array_merge(
-            $this->committeePageData($committee, '토론장', '02', 'community_committee_discussions'),
+            $this->committeePageData($committee, '토론장', '02'),
             compact('post', 'prev', 'next', 'comments'),
         ));
     }
@@ -295,7 +309,7 @@ class SubcommitteeController extends Controller
 
     private function assertMayAccessCommittee(CommunityCommittee $committee): void
     {
-        if ($committee->visibility_yn !== 'Y') {
+        if (! $this->isPublicCommittee($committee)) {
             throw new NotFoundHttpException();
         }
 
@@ -309,5 +323,10 @@ class SubcommitteeController extends Controller
         if (! $user->canAccessCommunityCommitteeId((string) $committee->id)) {
             abort(403);
         }
+    }
+
+    private function isPublicCommittee(CommunityCommittee $committee): bool
+    {
+        return $committee->visibility_yn === 'Y' && $committee->committee_type !== 'special';
     }
 }

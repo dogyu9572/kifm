@@ -15,6 +15,14 @@
 html,body {margin:0; padding:0;}
 </style>
 <body>
+@php
+	$paymentModel = $payment ?? null;
+	$member = $paymentModel?->member;
+	$memberName = $member?->name ?: '-';
+	$planName = $paymentModel?->plan?->plan_name ?: (($paymentModel?->member_grade ? $paymentModel->member_grade.' 회비' : null) ?: '-');
+	$paymentAt = ($paymentModel?->paid_at ?: $paymentModel?->requested_at)?->format('Y년 n월 j일 H:i:s') ?: '-';
+	$amountText = $paymentModel ? number_format((int) $paymentModel->amount).'원 (결제 완료)' : '-';
+@endphp
 
 <!-- form -->
 <table style="table-layout:fixed; border-collapse:collapse; border-spacing:0; width:640px; margin:0 auto; font-family:'Pretendard', dotum;">
@@ -26,7 +34,7 @@ html,body {margin:0; padding:0;}
 			<td style="padding:0 40px 48px;">
 				<div style="font-size:24px; color:#222; font-weight:700; line-height:1.4; letter-spacing:-.02em;">회비 납부 완료 안내</div>
 				<p style="font-size:16px; color:#222; line-height:1.5; letter-spacing:-.02em; margin:16px 0 40px;">
-					안녕하세요, {회원명} 선생님.<br>
+					안녕하세요, {{ $memberName }} 선생님.<br>
 					대한기능의학회의 건강한 운영을 위해 소중한 회비를 납부해 주셔서 진심으로 감사드립니다.<br>
 					<br>
 					선생님의 회비 결제 내역을 아래와 같이 안내해 드립니다.<br>
@@ -37,19 +45,19 @@ html,body {margin:0; padding:0;}
 						<tbody>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">결제 항목</th>
-								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026년 연회비</td>
+								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $planName }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">결제 금액</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">50,000원 (결제 완료)</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $amountText }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">결제 수단</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">신용카드 (현대 1234-****-****-5678)</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">신용카드</td>
 							</tr>							
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">결제 일시</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026년 3월 4일 18:50:00</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $paymentAt }}</td>
 							</tr>
 						</tbody>
 					</table>

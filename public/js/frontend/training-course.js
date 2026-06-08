@@ -22,121 +22,129 @@
         });
     }
     function initStickySummary() {
-        if (!window.jQuery || !document.querySelector('.training_course_view_wrap .abso_application')) { return; }
-        const $window = window.jQuery(window);
-        const $detail = window.jQuery('.training_course_view_wrap');
-        const $inbox = $detail.find('.inbox');
-        const $absoApp = window.jQuery('.abso_application');
+		if (!window.jQuery || !document.querySelector('.training_course_view_wrap .abso_application')) { return; }
+		const $window = window.jQuery(window);
+		const $detail = window.jQuery('.training_course_view_wrap');
+		const $inbox = $detail.find('.inbox');
+		const $absoApp = window.jQuery('.abso_application');
 
-        let touchStartY = 0;
-        let startBottom = 0;
-        let isDragging = false;
-        let isUserOpened = true;
+		let touchStartY = 0;
+		let startBottom = 0;
+		let isDragging = false;
+		let isUserOpened = false;
 
-        function handleStickyLayout() {
-            if (!$detail.length || !$absoApp.length) { return; }
-            const scrollTop = $window.scrollTop();
-            const windowHeight = $window.height();
-            const windowWidth = $window.width();
-            const detailOffsetTop = $detail.offset().top;
-            const detailHeight = $detail.outerHeight();
-            const appHeight = $absoApp.outerHeight();
+		function getClosedBottom(appHeight) {
+			return `-${appHeight - 32}px`;
+		}
 
-            if (windowWidth <= 767) {
-                $inbox.css('padding-bottom', (appHeight + 20) + 'px');
-                const mobileUnfixPoint = (detailOffsetTop + detailHeight) - windowHeight;
+		if ($window.width() <= 767) {
+			const initialHeight = $absoApp.outerHeight() || 0;
+			$absoApp.removeClass('open').css({
+				'bottom': getClosedBottom(initialHeight),
+				'transition': 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
+			});
+		}
 
-                if (scrollTop >= mobileUnfixPoint) {
-                    $detail.addClass('unfixed').removeClass('fixed');
-                    if (!isDragging) {
-                        $absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
-                        $absoApp.addClass('open').css('bottom', '0px');
-                    }
-                } else {
-                    $detail.removeClass('unfixed').addClass('fixed');
-                    if (!isDragging) {
-                        if (isUserOpened) {
-                            $absoApp.addClass('open').css('bottom', '0px');
-                        } else {
-                            $absoApp.removeClass('open');
-                            const closedBottom = `calc(-100% + (100vh - ${appHeight}px) + 33px)`;
-                            $absoApp.css('bottom', closedBottom);
-                        }
-                    }
-                }
-            } else {
-                $inbox.css('padding-bottom', '');
-                $absoApp.removeClass('open').css({ 'bottom': '', 'transition': '' });
-                const fixStartPoint = detailOffsetTop - 190;
-                const unfixPoint = detailOffsetTop + detailHeight - appHeight - 190;
-                if (scrollTop >= fixStartPoint) {
-                    if (scrollTop >= unfixPoint) {
-                        $detail.addClass('unfixed').removeClass('fixed');
-                    } else {
-                        $detail.addClass('fixed').removeClass('unfixed');
-                    }
-                } else {
-                    $detail.removeClass('fixed unfixed');
-                }
-            }
-        }
+		function handleStickyLayout() {
+			if (!$detail.length || !$absoApp.length) { return; }
+			const scrollTop = $window.scrollTop();
+			const windowHeight = $window.height();
+			const windowWidth = $window.width();
+			const detailOffsetTop = $detail.offset().top;
+			const detailHeight = $detail.outerHeight();
+			const appHeight = $absoApp.outerHeight();
 
-        $absoApp.on('touchstart.stickyApp', function (e) {
-            if ($window.width() > 767 || $detail.hasClass('unfixed')) { return; }
-            const touch = e.originalEvent.touches[0];
-            touchStartY = touch.clientY;
-            isDragging = true;
-            $absoApp.css('transition', 'none');
-            const windowHeight = window.innerHeight;
-            const appRect = $absoApp[0].getBoundingClientRect();
-            startBottom = windowHeight - appRect.bottom;
-        });
+			if (windowWidth <= 767) {
+				$inbox.css('padding-bottom', (appHeight + 20) + 'px');
+				const mobileUnfixPoint = (detailOffsetTop + detailHeight) - windowHeight;
 
-        $absoApp.on('touchmove.stickyApp', function (e) {
-            if (!isDragging || $window.width() > 767 || $detail.hasClass('unfixed')) { return; }
-            const touch = e.originalEvent.touches[0];
-            const diffY = touchStartY - touch.clientY;
-            if (Math.abs(diffY) > 5) {
-                if (e.cancelable) { e.preventDefault(); }
-            }
-            let currentBottom = startBottom + diffY;
-            if (currentBottom > 0) { currentBottom = 0; }
-            $absoApp.css('bottom', currentBottom + 'px');
-        });
+				if (scrollTop >= mobileUnfixPoint) {
+					$detail.addClass('unfixed').removeClass('fixed');
+					if (!isDragging) {
+						$absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
+						$absoApp.addClass('open').css('bottom', '0px');
+					}
+				} else {
+					$detail.removeClass('unfixed').addClass('fixed');
+					if (!isDragging) {
+						if (isUserOpened) {
+							$absoApp.addClass('open').css('bottom', '0px');
+						} else {
+							$absoApp.removeClass('open');
+							$absoApp.css('bottom', getClosedBottom(appHeight));
+						}
+					}
+				}
+			} else {
+				$inbox.css('padding-bottom', '');
+				$absoApp.removeClass('open').css({ 'bottom': '', 'transition': '' });
+				const fixStartPoint = detailOffsetTop - 190;
+				const unfixPoint = detailOffsetTop + detailHeight - appHeight - 190;
+				if (scrollTop >= fixStartPoint) {
+					if (scrollTop >= unfixPoint) {
+						$detail.addClass('unfixed').removeClass('fixed');
+					} else {
+						$detail.addClass('fixed').removeClass('unfixed');
+					}
+				} else {
+					$detail.removeClass('fixed unfixed');
+				}
+			}
+		}
 
-        $absoApp.on('touchend.stickyApp touchcancel.stickyApp', function (e) {
-            if (!isDragging || $window.width() > 767) { return; }
-            isDragging = false;
-            const touch = e.originalEvent.changedTouches[0];
-            const diffY = touchStartY - touch.clientY;
-            const appHeight = $absoApp.outerHeight();
-            const isUnfixed = $detail.hasClass('unfixed');
+		$absoApp.on('touchstart.stickyApp', function (e) {
+			if ($window.width() > 767 || $detail.hasClass('unfixed')) { return; }
+			const touch = e.originalEvent.touches[0];
+			touchStartY = touch.clientY;
+			isDragging = true;
+			$absoApp.css('transition', 'none');
+			const windowHeight = window.innerHeight;
+			const appRect = $absoApp[0].getBoundingClientRect();
+			startBottom = windowHeight - appRect.bottom;
+		});
 
-            $absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
-            const closedBottom = isUnfixed
-                ? `-${appHeight - 33}px`
-                : `calc(-100% + (100vh - ${appHeight}px) + 33px)`;
+		$absoApp.on('touchmove.stickyApp', function (e) {
+			if (!isDragging || $window.width() > 767 || $detail.hasClass('unfixed')) { return; }
+			const touch = e.originalEvent.touches[0];
+			const diffY = touchStartY - touch.clientY;
+			if (Math.abs(diffY) > 5) {
+				if (e.cancelable) { e.preventDefault(); }
+			}
+			let currentBottom = startBottom + diffY;
+			if (currentBottom > 0) { currentBottom = 0; }
+			$absoApp.css('bottom', currentBottom + 'px');
+		});
 
-            if (diffY > 30) {
-                $absoApp.addClass('open').css('bottom', '0px');
-                isUserOpened = true;
-            } else if (diffY < -30) {
-                $absoApp.removeClass('open').css('bottom', closedBottom);
-                isUserOpened = false;
-            } else {
-                if ($absoApp.hasClass('open')) {
-                    $absoApp.css('bottom', '0px');
-                    isUserOpened = true;
-                } else {
-                    $absoApp.css('bottom', closedBottom);
-                    isUserOpened = false;
-                }
-            }
-        });
+		$absoApp.on('touchend.stickyApp touchcancel.stickyApp', function (e) {
+			if (!isDragging || $window.width() > 767) { return; }
+			isDragging = false;
+			const touch = e.originalEvent.changedTouches[0];
+			const diffY = touchStartY - touch.clientY;
+			const appHeight = $absoApp.outerHeight();
 
-        $window.on('scroll.trainingCourseSticky resize.trainingCourseSticky', handleStickyLayout);
-        $window.trigger('scroll.trainingCourseSticky');
-    }
+			$absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
+			const closedBottom = getClosedBottom(appHeight);
+
+			if (diffY > 30) {
+				$absoApp.addClass('open').css('bottom', '0px');
+				isUserOpened = true;
+			} else if (diffY < -30) {
+				$absoApp.removeClass('open').css('bottom', closedBottom);
+				isUserOpened = false;
+			} else {
+				if ($absoApp.hasClass('open')) {
+					$absoApp.css('bottom', '0px');
+					isUserOpened = true;
+				} else {
+					$absoApp.css('bottom', closedBottom);
+					isUserOpened = false;
+				}
+			}
+		});
+
+		$window.on('scroll.trainingCourseSticky resize.trainingCourseSticky', handleStickyLayout);
+		$window.trigger('scroll.trainingCourseSticky');
+	}
     function initListFilters() {
         const listSection = document.querySelector('.academic_event_body');
         const form = document.getElementById('training-course-filter-form');
@@ -326,6 +334,18 @@
                 depositDate.focus();
                 return false;
             }
+            const refundAccount = form.querySelector('#training-refund-account');
+            if (refundAccount && !refundAccount.value.trim()) {
+                window.alert('환불 계좌번호를 입력해주세요.');
+                refundAccount.focus();
+                return false;
+            }
+            const refundHolder = form.querySelector('#training-refund-holder');
+            if (refundHolder && !refundHolder.value.trim()) {
+                window.alert('예금주명을 입력해주세요.');
+                refundHolder.focus();
+                return false;
+            }
             const isReceipt = form.querySelector('input[name="receipt_issue"]:checked')?.value === 'YES';
             const receiptNumber = form.querySelector('#training-receipt-number');
             if (isReceipt && receiptNumber && !receiptNumber.value.trim()) {
@@ -421,10 +441,29 @@
         toggleReceiptArea();
         updateSummary();
     }
+	function initMobileAccordion() {
+        if (!window.jQuery) { return; }
+        const $window = window.jQuery(window);
+        const $absoApp = window.jQuery('.abso_application');
+        const $btn = $absoApp.find('.btn_opcl');
+        const $target = $absoApp.find('.mo_opcl');
+
+        if (!$btn.length || !$target.length) { return; }
+
+        $btn.on('click', function (e) {
+            if ($window.width() > 767) { return; }
+            e.preventDefault();
+            $btn.toggleClass('on');
+            $target.stop().slideToggle(300, function () {
+                $window.trigger('scroll.trainingCourseSticky');
+            });
+        });
+    }
     document.addEventListener('DOMContentLoaded', function () {
         initTabs();
         initListFilters();
         initStickySummary();
         initPaymentForm();
+		initMobileAccordion();
     });
 })();

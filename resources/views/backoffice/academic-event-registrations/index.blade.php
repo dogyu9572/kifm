@@ -109,18 +109,18 @@
                                 <th class="board-checkbox-column">
                                     <input type="checkbox" id="select-all" class="form-check-input">
                                 </th>
-                                <th class="w5">번호</th>
+                                <th class="w3">번호</th>
                                 <th class="w10">참가 번호</th>
                                 <th class="w15">행사명</th>
                                 <th class="w5">이름</th>
-                                <th class="w10">휴대폰번호</th>
+                                <th class="w8">휴대폰번호</th>
                                 <th class="w10">이메일</th>
                                 <th class="w5">등록 구분</th>
-                                <th class="w5">결제항목</th>
+                                <th class="w10">결제항목</th>
                                 <th class="w5">결제수단</th>
                                 <th class="w5">결제 상태</th>
-                                <th class="w5">서류 출력</th>
-                                <th class="w5">등록일</th>
+                                <th class="w8">서류 출력</th>
+                                <th class="w7">등록일</th>
                                 <th class="w10">관리</th>
                             </tr>
                         </thead>

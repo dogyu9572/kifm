@@ -314,7 +314,7 @@
 		</div>
 		@endif
 		
-		@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '98' && $gNum !== 'total_search' && $page_type !== 'academic_conference')
+		@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '98' && $gNum !== '03' && $gNum !== 'total_search' && $page_type !== 'academic_conference' && $gNum !== 'online_academy')
 		<nav class="sub_menu_area inner" id="sub-navi" aria-label="서브 메뉴">
 			<div class="menu set_g">
 				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-gnb-list">{{ $gName }}</button>
@@ -414,6 +414,14 @@
 			</div>
 			@endif
 		</nav>
+		@endif
+		
+		@if(isset($gNum) && $page_type == 'academic_conference' && $gNum !== 'intro' && $gNum !== 'main')
+		<div class="svisual g{{ $gNum }} s{{ $sNum }} {{ ($gNum == 'online_academy' && $sNum != '00') ? 'hide' : '' }}">
+			<div class="inner">
+				<div class="title">KIFM</div>
+			</div>
+		</div>
 		@endif
 		
 		@if(isset($gNum) && $page_type == 'academic_conference' && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '05' && $gNum !== '06' && $gNum !== '07')

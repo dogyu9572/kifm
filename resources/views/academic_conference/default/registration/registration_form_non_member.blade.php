@@ -185,6 +185,27 @@
                 </fieldset>
 
                 <fieldset class="type_bank_hide">
+                    <legend class="form_tit">환불정보</legend>
+                    <div class="inputs">
+                    	<ul class="long_label">
+                    	    <li>
+                    	        <label for="training-refund-bank">은행명/계좌번호</label>
+                    	        <div class="flex bank text">
+                    	            <select name="refund_bank" id="training-refund-bank" class="text">
+                    	                <option value="국민은행" @selected(old('refund_bank') === '국민은행')>국민은행</option>
+                    	            </select>
+	                    	            <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
+	                    	        </div>
+	                    	    </li>
+	                    	    <li>
+	                    	        <label for="training-refund-holder">예금주명</label>
+	                    	        <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="이메일을 입력해주세요">
+	                    	    </li>
+                    	</ul>
+                    </div>
+                </fieldset>
+
+                <fieldset class="type_bank_hide">
                     <legend class="form_tit">현금 영수증 발행</legend>
                     <div class="inputs">
                         <ul class="btns_flex">

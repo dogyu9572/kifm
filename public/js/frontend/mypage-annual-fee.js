@@ -318,6 +318,20 @@
                         dateInput.focus();
                         return;
                     }
+                    var refundAccountInput = document.getElementById('bank_number');
+                    var refundHolderInput = document.getElementById('refund_holder_name');
+                    if (refundAccountInput && !refundAccountInput.value.trim()) {
+                        event.preventDefault();
+                        window.alert('환불 계좌번호를 입력해 주세요.');
+                        refundAccountInput.focus();
+                        return;
+                    }
+                    if (refundHolderInput && !refundHolderInput.value.trim()) {
+                        event.preventDefault();
+                        window.alert('예금주명을 입력해 주세요.');
+                        refundHolderInput.focus();
+                        return;
+                    }
                     var selectedReceipt = document.querySelector('input[name="receipt_issue"]:checked');
                     if (selectedReceipt && selectedReceipt.value === 'YES' && cashReceiptArea) {
                         var receiptNumber = document.getElementById('receipt_number');

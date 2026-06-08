@@ -31,13 +31,15 @@
 			<table>
 				<caption>{{ $sName }} 게시글 목록입니다.</caption>
 				<colgroup>
-					<col class="num">
+					<col class="num_slim">
+					<col class="type">
 					<col>
 					<col class="date">
 				</colgroup>
 				<thead>
 					<tr>
 						<th scope="col">NO.</th>
+						<th scope="col">분류</th>
 						<th scope="col">제목</th>
 						<th scope="col">등록일</th>
 					</tr>
@@ -50,6 +52,7 @@
 							@else
 								<td class="num">{{ $posts->total() - (($posts->currentPage() - 1) * $posts->perPage()) - $loop->index }}</td>
 							@endif
+							<td class="type">학회 자료</td>
 							<td class="tal"><a href="{{ route('archives.members_show', $post->id) }}">{{ $post->title }}</a></td>
 							<td class="date">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</td>
 						</tr>

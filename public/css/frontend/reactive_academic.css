@@ -143,6 +143,7 @@
 	.tabs .on a:after,
 	.tabs .on button:after{width:100%;}
 /* main */
+	.main_links a:hover {text-decoration:underline;}
 	.mc02 .list a:hover .subject {text-decoration:underline;}
 /* Speakers */
 	.speakers_area .speakers_btn:hover {background:#fff;}
@@ -245,7 +246,7 @@
 /* sub */
 	.sub_wrap {font-size:16px;}
 	.sub_area {padding-bottom:80px;}
-	.svisual {height:220px; margin-bottom:20px;}
+	.svisual {height:200px; margin-bottom:20px;}
 	.svisual .title {font-size:30px;}
 	.sub_menu_area {margin-bottom:60px;}
 	.sub_menu_area ul {gap:12px;}
@@ -352,6 +353,13 @@
 	.registration_check_wrap dl {font-size:16px;}
 	.registration_check_wrap dt {width:120px;}
 	.registration_check_wrap dd {width:calc(100% - 130px);}
+	.shadow_box {padding:20px;}
+	.academic_event_view_end .shadow_box + .shadow_box {margin-top:12px;}
+	.academic_event_view_end .shadow_box .tit {font-size:18px; padding-bottom:16px; margin-bottom:16px;}
+	.academic_event_view_end .shadow_box dl {gap:20px;}
+	.academic_event_view_end .shadow_box dt {width:140px;}
+	.academic_event_view_end .shadow_box dd {width:calc(100% - 140px);}
+	.academic_event_view_end .shadow_box .c_iden strong {font-size:20px;}
 /* Abstract */
 /* Abstract - Submission */
 	.abstract_form_wrap .input_wrap {margin-top:30px;}
@@ -490,6 +498,8 @@
 	.btns_btm .btn_short {max-width:120px;}
 	.btn_print {gap:4px;}
 	.btn_print:after {width:14px; height:14px;}
+	.btn_outlink:after,
+	.btn_download:after {width:14px; height:14px;}
 /* 탭 */
 	.tabs {gap:2px; flex-wrap:wrap;}
 	.tabs.full_line:before {display:none;}
@@ -525,7 +535,7 @@
 	.mvisual .dead_line .ani_date {font-size:13px; gap:6px; margin-top:6px;}
 	.mvisual .dead_line .ani_date strong {font-size:24px; line-height:50px; height:50px; padding:0 12px;}
 	.main_links {margin:-120px 0 40px;}
-	.main_links .link_list {height:auto; padding:16px; flex-wrap:wrap; box-shadow:#0000001a 0 0 10px;}
+	.main_links .link_list {height:auto; padding:16px; flex-wrap:wrap; box-shadow:#0000001a 0 0 10px; border-radius:8px; border:0;}
 	.main_links li {width:50%;}
 	.main_links li:nth-child(2n-1) {border-left:0;}
 	.main_links li:nth-child(n+3) {border-top:#ebebeb 1px solid;}
@@ -551,7 +561,7 @@
 /* sub */
 	.sub_wrap {font-size:14px;}
 	.sub_area {padding-bottom:60px;}
-	.svisual {height:220px; margin-bottom:20px;}
+	.svisual {height:120px; margin-bottom:20px;}
 	.svisual .title {font-size:30px;}
 	.sub_menu_area {margin-bottom:40px;}
 	.sub_menu_area ul {gap:4px;}
@@ -574,7 +584,7 @@
 	.invitation_area .txt .con:before {height:calc(100% + 300px);}
 	.invitation_area .txt .con p + p,
 	.invitation_area .txt .name {margin-top:16px;}
-	.invitation_area .img {position:relative; width:100%; height:300px; text-align:center;}
+	.invitation_area .img {position:relative; width:100%; height:300px; max-width:100%; text-align:center;}
 	.invitation_area .img:before {right:0; width:100%; height:240px; border-radius:0 80px 20px 100px;}
 	.invitation_area .img img {max-height:300px;}
 	.marquee_container {padding:10px 0; margin-top:6px;}
@@ -718,9 +728,16 @@
 	.academic_event_view_end .gbox {padding:16px;}
 	.academic_event_view_end .gbox + .gbox {margin-top:12px;}
 	.academic_event_view_end .gbox .tit {font-size:18px; padding-left:22px; margin-bottom:16px;}
-	.academic_event_view_end .gbox dl {gap:4px;}
+	.academic_event_view_end .gbox dl {gap:4px; font-size:13px;}
 	.academic_event_view_end .gbox dt {width:100px;}
 	.academic_event_view_end .gbox dd {width:calc(100% - 100px);}
+	.shadow_box {padding:16px;}
+	.academic_event_view_end .shadow_box + .shadow_box {margin-top:8px;}
+	.academic_event_view_end .shadow_box .tit {font-size:16px; padding-bottom:12px; margin-bottom:12px;}
+	.academic_event_view_end .shadow_box dl {gap:12px;}
+	.academic_event_view_end .shadow_box dt {width:100px;}
+	.academic_event_view_end .shadow_box dd {width:calc(100% - 116px);}
+	.academic_event_view_end .shadow_box .c_iden strong {font-size:16px;}
 /* 학술대회 등록 확인 */
 	.tabs.type_member {margin:20px 0; padding:4px;}
 	.tabs.type_member a {font-size:14px; line-height:30px; height:30px;}

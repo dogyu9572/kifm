@@ -65,17 +65,29 @@ $(document).ready(function() {
     const $tabItems = $('.history_tabs li');
     const $tabLinks = $('.history_tabs a');
     const $articles = $('article[id^="history"]');
+    function scrollTabToFront($activeItem) {
+        if (!$activeItem.length) return;
+        let tabsScrollLeft = $tabs.scrollLeft();
+        let tabsOffsetLeft = $tabs.offset().left;
+        let itemOffsetLeft = $activeItem.offset().left;
+        let targetScrollLeft = tabsScrollLeft + itemOffsetLeft - tabsOffsetLeft;
+        $tabs.stop().animate({
+            scrollLeft: targetScrollLeft
+        }, 300);
+    }
 
     $(window).on('scroll', function() {
         let scrollTop = $(window).scrollTop();
         let headerH = $header.outerHeight();
         let tabsH = $tabs.outerHeight();
         let triggerPoint = headerH + tabsH + 50;
+        
         if (scrollTop >= $historyBody.offset().top - headerH) {
             $historyBody.addClass('fixed');
         } else {
             $historyBody.removeClass('fixed');
         }
+        
         $articles.each(function(index) {
             let targetPos = $(this).offset().top - triggerPoint;
             let nextTargetPos = $articles.eq(index + 1).length
@@ -86,25 +98,34 @@ $(document).ready(function() {
                 $(this).addClass('on');
 
                 $tabItems.removeClass('on');
-                $tabItems.eq(index).addClass('on');
+                let $currentTab = $tabItems.eq(index);
+                $currentTab.addClass('on');
+                scrollTabToFront($currentTab);
             }
         });
+        
         if (scrollTop < $articles.first().offset().top - triggerPoint) {
             $articles.removeClass('on');
             $tabItems.removeClass('on');
         }
     });
+
     $tabLinks.on('click', function(e) {
         e.preventDefault();
         const targetId = $(this).attr('href');
         const $targetElement = $(targetId);
+        
         if ($targetElement.length) {
             let headerH = $header.outerHeight();
             let tabsH = $tabs.outerHeight();
             let movePos = $targetElement.offset().top - (headerH + tabsH);
+            
             $('html, body').stop().animate({
                 scrollTop: movePos
             }, 500);
+            let $currentTab = $(this).parent('li');
+            scrollTabToFront($currentTab);
+
             if (history.pushState) {
                 history.pushState(null, null, window.location.pathname);
             }

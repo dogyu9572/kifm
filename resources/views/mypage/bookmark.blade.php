@@ -17,7 +17,7 @@
 					<select name="content_type" class="text">
 						<option value="all" @selected(($filterContentType ?? 'all') === 'all')>전체보기</option>
 						@foreach ($contentTypeOptions as $contentType)
-						<option value="{{ $contentType }}" @selected(($filterContentType ?? 'all') === $contentType)>{{ $contentType }}</option>
+						<option value="{{ $contentType['value'] }}" @selected(($filterContentType ?? 'all') === $contentType['value'])>{{ $contentType['label'] }}</option>
 						@endforeach
 					</select>
 					@if (! empty($filterKeyword))
@@ -63,7 +63,7 @@
 				<tbody>
 					@forelse ($bookmarks as $bookmark)
 					<tr>
-						<td class="page">{{ $bookmark->snapshot_menu_label ?? $bookmark->content_type }}</td>
+						<td class="page">{{ $bookmark->display_menu_label }}</td>
 						<td class="tal">
 							@if ($bookmark->snapshot_url)
 							<a href="{{ $bookmark->snapshot_url }}">{{ $bookmark->snapshot_title ?? '-' }}</a>

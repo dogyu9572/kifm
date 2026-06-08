@@ -281,6 +281,26 @@ class PublicTrainingCourseService
             ->contains(fn (EduTrainingRound $round): bool => $this->canApplyRound($round, $user));
     }
 
+    public function hasOngoingRound(EduTraining $training): bool
+    {
+        return $this->publicRounds($training)
+            ->contains(fn (EduTrainingRound $round): bool => $this->roundStatus($round)['code'] === 'ongoing');
+    }
+
+    public function hasUserEligibleRound(EduTraining $training, ?User $user): bool
+    {
+        return $this->publicRounds($training)
+            ->contains(fn (EduTrainingRound $round): bool => $this->roundStatus($round)['code'] === 'ongoing'
+                && ! $this->isRoundFull($round)
+                && $this->priceForRound($round, $user)['eligible']);
+    }
+
+    public function canDownloadAttachment(EduTraining $training): bool
+    {
+        return $this->publicRounds($training)
+            ->contains(fn (EduTrainingRound $round): bool => $this->roundStatus($round)['code'] === 'ongoing');
+    }
+
     public function canDownloadTextbook(EduTraining $training, ?User $user): bool
     {
         if (! $user || $user->role !== 'user' || ! $training->textbook_file_path) {

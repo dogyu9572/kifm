@@ -11,7 +11,7 @@
 		
 			<div class="title_area">
 				<h1 id="abstract-end-heading" class="title">초록 제출이 완료되었습니다.</h1>
-				<p><a href="{{ $conferenceBaseUrl }}/abstract/check_member" class="c_iden"><strong>‘Abstract > Abstract Check’</strong></a> 페이지에서 진행 상태를 확인하실 수 있습니다.<br/>제출하신 초록은 검토 및 심사를 거쳐 추후 안내드립니다.</p>
+				<p><a href="{{ $conferenceBaseUrl }}/abstract/check_member" class="c_iden"><strong>‘Abstract > Abstract Check’</strong></a> 페이지에서 진행 상태를 <br class="pc_vw">확인하실 수 있습니다.<br/>제출하신 초록은 검토 및 심사를 거쳐 추후 안내드립니다.</p>
 			</div>
 			
 			<div class="gbox">

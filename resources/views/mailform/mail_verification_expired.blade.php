@@ -12,7 +12,11 @@
 	$verificationMemberName = $member->name ?? '회원';
 	$verificationExpiredDate = isset($certifiedMember) && $certifiedMember->validity_end_date
 		? $certifiedMember->validity_end_date->format('Y.m.d')
-		: '2026.04.30';
+		: '-';
+	$verificationRemainingDays = isset($certifiedMember) && method_exists($certifiedMember, 'remainingDays')
+		? max(0, $certifiedMember->remainingDays())
+		: null;
+	$verificationRemainingText = $verificationRemainingDays !== null ? $verificationRemainingDays.'일' : '-';
 @endphp
 <style>
 @font-face {font-family: 'Pretendard';src: url('//cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');font-weight: 400;font-display: swap;}
@@ -33,8 +37,8 @@ html,body {margin:0; padding:0;}
 				<div style="font-size:24px; color:#222; font-weight:700; line-height:1.4; letter-spacing:-.02em;">인정의 만료 안내</div>
 				<p style="font-size:16px; color:#222; line-height:1.5; letter-spacing:-.02em; margin:16px 0 40px;">
 					안녕하세요, {{ $verificationMemberName }} <br>
-					회원님의 원활한 서비스 이용을 위해 인정의 유효기간을<br>
-					확인해주시기 바랍니다.
+					회원님의 인정의 유효기간 만료가 가까워졌습니다.<br>
+					아래 만료 예정일을 확인해주시기 바랍니다.
 				</p>
 				<div style="background:#f8f8f8; border-radius:8px; padding:20px 24px;">
 					<table style="table-layout:fixed; width:100%; border-collapse:collapse; border-spacing:0;">
@@ -46,6 +50,10 @@ html,body {margin:0; padding:0;}
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">만료 예정일</th>
 								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $verificationExpiredDate }}</td>
+							</tr>
+							<tr>
+								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">남은 기간</th>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $verificationRemainingText }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">상태</th>

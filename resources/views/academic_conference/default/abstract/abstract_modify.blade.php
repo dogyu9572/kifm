@@ -33,14 +33,14 @@
 						<legend class="form_tit mt0">제출자 정보</legend>
 						<ul class="inputs float">
 							<li>
-								<label for="user_name" class="tit">이름(국문)</label>
+								<label for="user_name" class="tit">국문 이름</label>
 								<input type="text" id="user_name" name="author_name" class="text" value="{{ old('author_name', $abstract->author_name) }}" @readonly($isMemberAbstract)>
 								@error('author_name')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
 							<li>
-								<label for="user_name_eng" class="tit">이름(영문)</label>
+								<label for="user_name_eng" class="tit">영문 이름</label>
 								<input type="text" id="user_name_eng" name="author_name_en" class="text" value="{{ old('author_name_en', $abstract->author_name_en) }}" @readonly($isMemberAbstract)>
 								@error('author_name_en')
 									<p class="c_red" role="alert">{{ $message }}</p>

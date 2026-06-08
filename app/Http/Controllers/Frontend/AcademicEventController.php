@@ -245,9 +245,9 @@ class AcademicEventController extends Controller
             'receipt_issue' => ['nullable', Rule::in(['YES', 'NO'])],
             'receipt_type' => ['required_if:receipt_issue,YES', 'nullable', Rule::in(['PERSONAL', 'CARD'])],
             'receipt_number' => ['required_if:receipt_issue,YES', 'nullable', 'string', 'max:100'],
-            'refund_bank' => ['nullable', 'string', 'max:100'],
-            'refund_account' => ['nullable', 'string', 'max:100'],
-            'refund_holder' => ['nullable', 'string', 'max:100'],
+            'refund_bank' => ['required_if:payment_method,bank_transfer', 'nullable', 'string', 'max:100'],
+            'refund_account' => ['required_if:payment_method,bank_transfer', 'nullable', 'string', 'max:100'],
+            'refund_holder' => ['required_if:payment_method,bank_transfer', 'nullable', 'string', 'max:100'],
             'terms_agree' => ['accepted'],
         ], [
             'round_ids.required' => '결제 항목을 선택해주세요.',
@@ -261,6 +261,9 @@ class AcademicEventController extends Controller
             'bank_depositor.required_if' => '입금자명을 입력해주세요.',
             'bank_deposit_date.required_if' => '입금 예정일을 선택해주세요.',
             'bank_deposit_date.date' => '입금 예정일 형식을 확인해주세요.',
+            'refund_bank.required_if' => '환불 은행을 선택해주세요.',
+            'refund_account.required_if' => '환불 계좌번호를 입력해주세요.',
+            'refund_holder.required_if' => '예금주명을 입력해주세요.',
             'receipt_type.required_if' => '현금영수증 발급 구분을 선택해주세요.',
             'receipt_number.required_if' => '현금영수증 번호를 입력해주세요.',
             'terms_agree.accepted' => '결제 이용 약관, 개인정보 처리 동의가 필요합니다.',
@@ -412,7 +415,11 @@ class AcademicEventController extends Controller
     public function downloadTrainingAttachment(EduTrainingAttachment $attachment): StreamedResponse
     {
         $attachment->loadMissing('training');
-        if ($attachment->training?->status !== 'PUBLIC' || ! Storage::disk('public')->exists($attachment->file_path)) {
+        if (
+            $attachment->training?->status !== 'PUBLIC'
+            || ! $this->trainingCourseService->canDownloadAttachment($attachment->training)
+            || ! Storage::disk('public')->exists($attachment->file_path)
+        ) {
             abort(404);
         }
 

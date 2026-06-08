@@ -15,6 +15,36 @@
 html,body {margin:0; padding:0;}
 </style>
 <body>
+@php
+	$registrationModel = $registration ?? null;
+	$event = $registrationModel?->event;
+	$registrantName = $registrationModel?->name ?: ($registrationModel?->member?->name ?: '-');
+	$registrationNo = $registrationModel?->registration_no ?: '-';
+	$paymentMethodLabels = [
+		'card' => '신용카드',
+		'bank_transfer' => '무통장입금',
+		'bank' => '무통장입금',
+	];
+	$paymentStatusLabels = [
+		'completed' => '결제 완료',
+		'pending_payment' => '결제 대기',
+		'cancel_requested' => '취소 요청',
+		'cancelled' => '취소 완료',
+	];
+	$paymentMethodText = $paymentMethodLabels[$registrationModel?->payment_method ?? ''] ?? ($registrationModel?->payment_method ?: '-');
+	$paymentStatusText = $paymentStatusLabels[$registrationModel?->payment_status ?? ''] ?? ($registrationModel?->payment_status ?: '-');
+	$amountText = $registrationModel
+		? number_format((int) $registrationModel->total_amount).'원 / '.$paymentStatusText.' ('.$paymentMethodText.')'
+		: '-';
+	$eventDateText = '-';
+	if ($event?->start_at && $event?->end_at) {
+		$eventDateText = $event->start_at->format('Y년 n월 j일 H:i').' - '.$event->end_at->format('H:i');
+	} elseif ($event?->start_at) {
+		$eventDateText = $event->start_at->format('Y년 n월 j일 H:i');
+	}
+	$venueText = $event?->venue ?: '-';
+	$eventTitle = $event?->title ?: '학술대회';
+@endphp
 
 <!-- form -->
 <table style="table-layout:fixed; border-collapse:collapse; border-spacing:0; width:640px; margin:0 auto; font-family:'Pretendard';">
@@ -27,7 +57,7 @@ html,body {margin:0; padding:0;}
 				<div style="font-size:24px; color:#222; font-weight:700; line-height:1.4; letter-spacing:-.02em;">사전등록 완료 안내</div>
 				<p style="font-size:16px; color:#222; line-height:1.5; letter-spacing:-.02em; margin:16px 0 40px;">
 					안녕하세요, 대한기능의학회입니다.<br>
-					2026년 춘계학술대회 사전등록이 성공적으로 접수 및 완료되었습니다.<br>
+					{{ $eventTitle }} 사전등록이 성공적으로 접수되었습니다.<br>
 					<br>
 					등록해 주신 내역을 아래와 같이 안내해 드리오니, 내용을 확인해 주시기 바랍니다.<br>
 					행사 당일 원활한 입장을 위해 본 안내 메일을 보관해 주세요.
@@ -37,23 +67,23 @@ html,body {margin:0; padding:0;}
 						<tbody>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">등록자명</th>
-								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">홍길동 선생님</td>
+								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $registrantName }} 선생님</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">등록 번호</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">REG-2026-0001</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $registrationNo }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">결제 금액</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">50,000원 (정회원) / 결제 완료 (신용카드)</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $amountText }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">행사 일시</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026년 4월 18일 (토) 09:00 - 18:00</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $eventDateText }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">행사 장소</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">그랜드 인터컨티넨탈 서울 파르나스 그랜드볼룸</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $venueText }}</td>
 							</tr>
 						</tbody>
 					</table>

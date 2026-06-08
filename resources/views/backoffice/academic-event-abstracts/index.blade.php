@@ -126,7 +126,7 @@
                                     <td>
                                         <input type="checkbox" value="{{ $row->id }}" class="form-check-input bo-ae-abs-checkbox bo-row-checkbox">
                                     </td>
-                                    <td>{{ $abstracts->firstItem() + $index }}</td>
+                                    <td>{{ $abstracts->total() - (($abstracts->firstItem() ?? 1) + $index) + 1 }}</td>
                                     <td>{{ $row->event->title ?? '-' }}</td>
                                     <td>{{ \Illuminate\Support\Str::limit($row->title, 60) }}</td>
                                     <td>{{ $row->author_name }}</td>

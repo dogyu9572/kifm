@@ -205,21 +205,25 @@
     }
 
     function initPopup() {
-        const popup = document.getElementById('pop_doctor');
-        if (!popup) {
-            return;
-        }
+		const popup = document.getElementById('pop_doctor');
+		if (!popup) {
+			return;
+		}
 
-        document.querySelectorAll('.js-doctor-popup-open').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                openDoctorPopup(btn.dataset.popupUrl);
-            });
-        });
+		document.querySelectorAll('.js-doctor-popup-open').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				openDoctorPopup(btn.dataset.popupUrl);
+				document.body.classList.add('over_h');
+			});
+		});
 
-        popup.querySelectorAll('.js-doctor-popup-close').forEach((el) => {
-            el.addEventListener('click', () => closeDoctorPopup());
-        });
-    }
+		popup.querySelectorAll('.js-doctor-popup-close').forEach((el) => {
+			el.addEventListener('click', () => {
+				closeDoctorPopup();
+				document.body.classList.remove('over_h');
+			});
+		});
+	}
 
     function openDoctorPopup(url) {
         if (!url) {

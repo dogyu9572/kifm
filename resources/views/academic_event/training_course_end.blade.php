@@ -107,7 +107,7 @@
 
 			<div class="btns_btm">
 				<a href="/home" class="btn btn_kwk">메인으로</a>
-				<a href="/mypage/online_training" class="btn btn_wkk">등록확인 페이지로</a>
+				<a href="{{ route('mypage.participation_history') }}" class="btn btn_wkk">참가내역 관리로</a>
 			</div>
 		</div>
 	</div>

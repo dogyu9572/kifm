@@ -24,6 +24,10 @@
     </div>
 
     @php
+        $sessionDateText = $session->session_date?->format('Y-m-d') ?: '-';
+        $sessionStartTime = $session->start_time ? substr((string) $session->start_time, 0, 5) : '-';
+        $sessionEndTime = $session->end_time ? substr((string) $session->end_time, 0, 5) : '-';
+        $sessionCategoryText = $categoryLabels[$session->category] ?? ($session->category ?: '-');
         $rows = old('items');
         if ($rows === null) {
             $rows = $session->items->map(static fn ($item) => [
@@ -55,7 +59,12 @@
                 <div class="bo-session-abstracts-header">
                     <div>
                         <h3 class="mb-1">초록 등록</h3>
-                        <p class="board-form-help mb-0">세션명: <strong>{{ $session->name }}</strong></p>
+                        <div class="board-form-help bo-session-abstracts-meta">
+                            <span>세션명: <strong>{{ $session->name }}</strong></span>
+                            <span>분류: {{ $sessionCategoryText }}</span>
+                            <span>날짜: {{ $sessionDateText }}</span>
+                            <span>시간: {{ $sessionStartTime }} ~ {{ $sessionEndTime }}</span>
+                        </div>
                     </div>
                     <div class="bo-session-abstracts-actions">
                         <button type="button" class="btn btn-secondary btn-sm" data-session-item-action="add-break">

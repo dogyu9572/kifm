@@ -16,6 +16,12 @@
 					<h2 class="tt">사전등록이 마감되었습니다.</h2>
 					<p>사전등록 기간이 종료되어 신규 신청을 접수할 수 없습니다.</p>
 				</div>
+			@elseif (auth()->check() && auth()->user()?->role === 'user' && ($hasActiveMemberRegistration ?? false))
+				<div class="gbox after_info">
+					<h2 class="tt">이미 사전등록 신청 내역이 있습니다.</h2>
+					<p>등록 확인 페이지에서 신청 내역을 확인해 주세요.</p>
+					<a href="{{ $conferenceBaseUrl }}/registration/result" class="btn btn_wkk">등록 확인</a>
+				</div>
 			@else
 			<form action="{{ route('member.login.store') }}" method="POST" class="inputs gbox">
 				@csrf

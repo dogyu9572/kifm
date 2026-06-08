@@ -1,11 +1,24 @@
 @extends('layouts.frontend')
 @section('title', $gName)
 @section('content')
+@php
+	$termStart = $executive->term_start_date?->format('Y년 n월 j일') ?: '-';
+	if ($executive->is_indefinite) {
+		$termEnd = '무기한';
+	} elseif ($executive->term_end_date) {
+		$termEnd = $executive->term_end_date->format('Y년 n월 j일');
+	} else {
+		$termEnd = '-';
+	}
+	$issuedAt = $executive->created_at ?: now();
+	$certificateNo = 'KIFM'.$issuedAt->format('YmdHis').'-'.$executive->id;
+	$organization = $user->workplace_name ?: ($user->school_name ?: '대한기능의학회');
+@endphp
 <main class="sub_area print_page">
 
 <section class="scon receipt_wrap pt_number" aria-labelledby="receipt-heading">
 	<div class="certificate_number">
-		<span>[KIRM20260223182321]</span>
+		<span>[{{ $certificateNo }}]</span>
 		<div class="btns no-print">
 			<button type="button" class="btn btn_kwg btn_down">PDF 다운</button>
 			<button type="button" class="btn btn_kwg btn_print">인쇄하기</button>
@@ -20,26 +33,26 @@
 			<tbody>
 				<tr>
 					<th>직책명</th>
-					<td>상임이사</td>
+					<td>{{ $roleLabels[$executive->executive_role] ?? $executive->executive_role }}</td>
 				</tr>
 				<tr>
 					<th>이름</th>
-					<td>홍길동</td>
+					<td>{{ $user->name ?: '-' }}</td>
 				</tr>
 				<tr>
 					<th>소속</th>
-					<td>대한기능의학회</td>
+					<td>{{ $organization }}</td>
 				</tr>
 				<tr>
 					<th>임기</th>
-					<td>2024년 1월 1일 ~ 2025년 12월 31일</td>
+					<td>{{ $termStart }} ~ {{ $termEnd }}</td>
 				</tr>
 			</tbody>
 		</table>
 		<p class="tac">위 현황은 사실과 같음을 증명합니다.</p>
 	</div>
 	<div class="foot">
-		<div class="date">YYYY년 MM월 DD일</div>
+		<div class="date">{{ now()->format('Y년 m월 d일') }}</div>
 		<div class="copy">대한기능의학회(KIFM) <!-- <img src="/images/img_stamp.png" alt=""> --></div>
 	</div>
 </section>

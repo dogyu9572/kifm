@@ -93,7 +93,10 @@ class AcademicConferenceSiteController extends Controller
         $sName = $page['sName'];
         $gSlug = $page['gSlug'];
         $currentMember = $this->isFrontendMemberLoggedIn() ? auth()->user() : null;
-        if ($currentMember && in_array($normalizedPagePath, ['registration/reg', 'registration/form'], true) && $this->registrationService->hasActiveMemberRegistration($event, $currentMember)) {
+        $hasActiveMemberRegistration = $currentMember
+            ? $this->registrationService->hasActiveMemberRegistration($event, $currentMember)
+            : false;
+        if ($currentMember && in_array($normalizedPagePath, ['registration/reg', 'registration/form'], true) && $hasActiveMemberRegistration) {
             return redirect()->to($conferenceBaseUrl . '/registration/result')
                 ->with('alert', '이미 사전등록 신청 내역이 있습니다.');
         }
@@ -151,6 +154,7 @@ class AcademicConferenceSiteController extends Controller
         $abstractSummary = null;
         $memberAbstracts = collect();
         $hasMemberAbstractSubmission = false;
+        $canModifyAbstract = false;
         if ($normalizedPagePath === 'notice') {
             $notices = $this->conferenceService->notices($event, $request);
         }
@@ -177,6 +181,7 @@ class AcademicConferenceSiteController extends Controller
                 ? $this->abstractService->memberAbstracts($event, $currentMember)
                 : collect();
             $hasMemberAbstractSubmission = $memberAbstracts->isNotEmpty();
+            $canModifyAbstract = $this->abstractService->canModify($event);
         }
 
         return view($view, compact(
@@ -187,6 +192,7 @@ class AcademicConferenceSiteController extends Controller
             'showMembershipFeeNotice',
             'registration',
             'registrationSummary',
+            'hasActiveMemberRegistration',
             'notices',
             'notice',
             'noticeAttachments',
@@ -200,6 +206,7 @@ class AcademicConferenceSiteController extends Controller
             'abstractSummary',
             'memberAbstracts',
             'hasMemberAbstractSubmission',
+            'canModifyAbstract',
             'canPreRegister',
             'canOnsiteRegister',
             'page_type',
@@ -297,7 +304,7 @@ class AcademicConferenceSiteController extends Controller
         return redirect()->to($conferenceBaseUrl . '/abstract/result');
     }
 
-    public function editAbstract(Request $request, string $folderName, AcademicEventAbstract $abstract): View
+    public function editAbstract(Request $request, string $folderName, AcademicEventAbstract $abstract): View|RedirectResponse
     {
         $event = $this->conferenceService->findPublicEventByFolder($folderName);
         abort_unless($this->abstractService->canAccess(
@@ -311,10 +318,15 @@ class AcademicConferenceSiteController extends Controller
         $abstract->loadMissing(['files', 'field', 'member']);
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
         $currentMember = $this->isFrontendMemberLoggedIn() ? auth()->user() : null;
+        $canModifyAbstract = $this->abstractService->canModify($event);
+        if (! $canModifyAbstract) {
+            return redirect()->to($conferenceBaseUrl . '/abstract/result')
+                ->with('alert', '초록 수정 기간이 종료되었습니다.');
+        }
+
         $abstractPresentationTypes = $this->abstractService->activePresentationTypeLabels($event);
         $abstractFields = $event->fields;
         $abstractBookUrl = $event->abstract_book_path ? $this->conferenceService->optionalImageUrl($event->abstract_book_path) : null;
-        $canModifyAbstract = $this->abstractService->canModify($event);
 
         return view($page['view'], [
             'event' => $event,
@@ -379,6 +391,7 @@ class AcademicConferenceSiteController extends Controller
         if (! $this->registrationService->canPreRegister($event)) {
             return $this->registrationFormError($request, 'registration', '사전등록 기간이 종료되었습니다.');
         }
+        $this->registrationService->deletePendingCardMemberRegistrations($event, $user);
         if ($this->registrationService->hasActiveMemberRegistration($event, $user)) {
             return $this->registrationFormError($request, 'registration', '이미 사전등록 신청 내역이 있습니다.');
         }
@@ -431,6 +444,11 @@ class AcademicConferenceSiteController extends Controller
         if (! $this->registrationService->canPreRegister($event)) {
             return $this->registrationFormError($request, 'registration', '사전등록 기간이 종료되었습니다.');
         }
+        $this->registrationService->deletePendingCardNonMemberRegistrations(
+            $event,
+            $request->validated('email'),
+            $request->validated('phone')
+        );
         if ($this->registrationService->hasActiveNonMemberRegistration($event, $request->validated('email'), $request->validated('phone'))) {
             return $this->registrationFormError($request, 'registration', '이미 사전등록 신청 내역이 있습니다.');
         }
@@ -506,6 +524,7 @@ class AcademicConferenceSiteController extends Controller
     public function failTossRegistrationPayment(Request $request, string $folderName): RedirectResponse
     {
         $event = $this->conferenceService->findPublicEventByFolder($folderName);
+        $this->registrationService->deletePendingCardRegistrationByOrderId($event, (string) $request->query('orderId', ''));
         $message = trim((string) $request->query('message'));
         $formPath = $this->isFrontendMemberLoggedIn() ? '/registration/form' : '/registration/form_non_member';
 
@@ -700,7 +719,7 @@ class AcademicConferenceSiteController extends Controller
         return [
             'success' => true,
             'clientKey' => (string) config('services.toss.client_key'),
-            'orderId' => $registration->registration_no,
+            'orderId' => (string) data_get($registration->source_row_json, 'toss_order_id', $registration->registration_no),
             'orderName' => mb_substr($summary['item_names'] ?: $event->title, 0, 100),
             'amount' => (int) $registration->total_amount,
             'customerName' => $registration->name,

@@ -25,10 +25,20 @@ class MypageBookmarkService
             $query->where('snapshot_title', 'like', '%'.$keyword.'%');
         }
 
-        return $query->paginate(20)->withQueryString();
+        $bookmarks = $query->paginate(20)->withQueryString();
+        $bookmarks->getCollection()->transform(function (MemberBookmark $bookmark): MemberBookmark {
+            $bookmark->display_menu_label = $this->displayMenuLabel(
+                $bookmark->content_type,
+                $bookmark->snapshot_menu_label,
+            );
+
+            return $bookmark;
+        });
+
+        return $bookmarks;
     }
 
-    /** @return Collection<int, string> */
+    /** @return Collection<int, array{value:string,label:string}> */
     public function contentTypes(User $user): Collection
     {
         return MemberBookmark::query()
@@ -36,7 +46,11 @@ class MypageBookmarkService
             ->whereNotNull('content_type')
             ->distinct()
             ->orderBy('content_type')
-            ->pluck('content_type');
+            ->pluck('content_type')
+            ->map(fn (string $contentType): array => [
+                'value' => $contentType,
+                'label' => $this->displayMenuLabel($contentType),
+            ]);
     }
 
     public function isBookmarked(User $user, string $contentType, int $contentId): bool
@@ -81,5 +95,59 @@ class MypageBookmarkService
             ->where('user_id', $user->id)
             ->whereIn('id', $ids)
             ->delete();
+    }
+
+    private function displayMenuLabel(?string $contentType, ?string $snapshotMenuLabel = null): string
+    {
+        $contentType = trim((string) $contentType);
+        $snapshotMenuLabel = trim((string) $snapshotMenuLabel);
+
+        if ($snapshotMenuLabel !== '' && ! $this->isTechnicalLabel($snapshotMenuLabel, $contentType)) {
+            return $snapshotMenuLabel;
+        }
+
+        return $this->contentTypeLabels()[$contentType] ?? $this->humanizeContentType($contentType);
+    }
+
+    private function isTechnicalLabel(string $label, string $contentType): bool
+    {
+        if ($label === $contentType) {
+            return true;
+        }
+
+        return preg_match('/^[a-z0-9_\\-\\/\\.]+$/', $label) === 1;
+    }
+
+    /** @return array<string, string> */
+    private function contentTypeLabels(): array
+    {
+        return [
+            'academic_archive' => '학술 자료실',
+            'academic_event' => '학술대회',
+            'academic_event_conference_static' => '학술대회',
+            'academic_event_training_course' => '연수강좌',
+            'community_committee_archive' => '자료실',
+            'community_committee_discussions' => '토론장',
+            'community_committee_notices' => '공지사항',
+            'general_archive' => '일반 자료실',
+            'member_archive' => '회원 자료실',
+            'member_square_album' => '회원 광장 앨범',
+            'member_square_notices' => '회원 광장 공지사항',
+            'other_notices' => '위원회 공지',
+            'conference' => '학술대회',
+            'training_course' => '연수강좌',
+            'archives' => '자료실',
+            'notice' => '공지사항',
+            'discussion' => '토론장',
+        ];
+    }
+
+    private function humanizeContentType(string $contentType): string
+    {
+        if ($contentType === '') {
+            return '-';
+        }
+
+        return str_replace(['_', '-'], ' ', $contentType);
     }
 }

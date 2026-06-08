@@ -39,11 +39,11 @@
 						<legend class="form_tit mt0">결제자 정보</legend>
 						<ul class="inputs float">
 							<li>
-								<label for="user_name" class="tit">이름(국문)</label>
+								<label for="user_name" class="tit">한글 이름</label>
 								<input type="text" id="user_name" name="author_name" class="text" value="{{ $member?->name }}" readonly>
 							</li>
 							<li>
-								<label for="user_name_eng" class="tit">이름(영문)</label>
+								<label for="user_name_eng" class="tit">영문 이름</label>
 								<input type="text" id="user_name_eng" name="author_name_en" class="text" value="{{ $member?->name_en }}" readonly>
 							</li>
 							<li>
@@ -112,7 +112,7 @@
 								<div class="file_wrap">
 									<div class="flex">
 										<input type="text" class="text" data-abstract-file-name readonly>
-										<div class="file_input"><input type="file" id="file01" name="attachments[]" data-abstract-file-input><label for="file01" class="btn_file btn_wkk">파일첨부</label></div>
+										<div class="file_input"><input type="file" id="file01" name="attachments[]" data-abstract-file-input required><label for="file01" class="btn_file btn_wkk">파일첨부</label></div>
 									</div>
 								</div>
 								<div class="file_list none" data-abstract-file-list></div>

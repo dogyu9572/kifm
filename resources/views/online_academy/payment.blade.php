@@ -77,7 +77,8 @@
 		@endif
 
 		<article class="abso_application">
-			<h2 class="tit">신청 정보</h2>
+			<div class="mobile_opcl" aria-hidden="true"></div>
+			<h2 class="tit">수강 신청</h2>
 <!-- 			<dl class="price_info">
 				<div>
 					<dt>결제항목</dt>
@@ -102,8 +103,8 @@
 			<form method="POST" action="{{ route('online_academy.payment.store') }}" @if(! $isEligible) hidden @endif>
 				@csrf
 				<input type="hidden" name="course_id" value="{{ $course->id }}">
-				<div class="check_area checkbox" @if($isPending) hidden @endif>
-					<input type="checkbox" name="terms_agree" id="terms_agree" value="1" required @checked(old('terms_agree'))>
+				<div class="check_area checkbox hide" @if($isPending) hidden @endif>
+					<input type="checkbox" name="terms_agree" id="terms_agree" value="1" required @checked(old('terms_agree')) checked>
 					<label for="terms_agree"><i></i><span><strong class="c_iden">(필수)</strong> 결제 이용 약관, 개인정보 처리 동의</span></label>
 				</div>
 				@error('terms_agree')

@@ -409,6 +409,7 @@ form#memberForm.bo-member-form .bo-form-label {
     padding-top: 0.35rem;
     padding-bottom: 0.35rem;
     color: #495057;
+	margin:0;
 }
 
 form#memberForm.bo-member-form .bo-form-field .board-form-control,

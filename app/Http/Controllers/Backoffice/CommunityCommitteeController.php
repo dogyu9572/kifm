@@ -322,7 +322,7 @@ class CommunityCommitteeController extends Controller
             ->get();
 
         $lines = [];
-        $lines[] = "\xEF\xBB\xBFNo,위원회명,신청자,이메일,연락처,신청일,상태,처리일시,반려사유";
+        $lines[] = "\xEF\xBB\xBFNo,위원회명,신청자,이메일,연락처,신청일,상태,승인/반려 일시,반려사유";
         foreach ($rows as $index => $row) {
             $statusLabel = match ($row->status) {
                 'APPROVED' => '승인',

@@ -115,7 +115,7 @@
                                 <th class="w15">연락처</th>
                                 <th class="w12">신청일</th>
                                 <th class="w10">상태</th>
-                                <th class="w12">승인날짜</th>
+                                <th class="w12">승인/반려 날짜</th>
                                 <th class="w20">관리</th>
                             </tr>
                         </thead>
@@ -136,7 +136,7 @@
                                     <td>{{ optional($application->applied_at)->format('Y-m-d') ?? '-' }}</td>
                                     <td><span class="{{ $statusTextClass }}">{{ $statusLabel }}</span></td>
                                     <td>
-                                        @if ($status === 'APPROVED')
+                                        @if (in_array($status, ['APPROVED', 'REJECTED'], true))
                                             {{ optional($application->processed_at)->format('Y-m-d') ?? '-' }}
                                         @else
                                             -
@@ -223,4 +223,3 @@
 @section('scripts')
     <script src="{{ asset('js/backoffice/community-committee-applicants.js') }}"></script>
 @endsection
-

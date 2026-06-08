@@ -137,7 +137,7 @@ class PublicAcademicConferenceAbstractService
                 'abstract_no' => $this->nextAbstractNo($event),
                 'registered_by' => 'user',
                 'status' => 'receipt',
-                'file_receipt_status' => $this->hasUploads($uploads) ? 'not_received' : 'not_submitted',
+                'file_receipt_status' => $this->hasUploads($uploads) ? 'received' : 'not_submitted',
                 'author_name' => (string) $user->name,
                 'author_name_en' => $user->name_en,
                 'author_phone' => $user->workplace_phone,
@@ -166,7 +166,7 @@ class PublicAcademicConferenceAbstractService
                 'lookup_password' => Hash::make((string) $data['lookup_password']),
                 'registered_by' => 'user',
                 'status' => 'receipt',
-                'file_receipt_status' => $this->hasUploads($uploads) ? 'not_received' : 'not_submitted',
+                'file_receipt_status' => $this->hasUploads($uploads) ? 'received' : 'not_submitted',
                 'author_name' => (string) $data['author_name'],
                 'author_name_en' => $data['author_name_en'] ?? null,
                 'author_phone' => preg_replace('/\D+/', '', (string) ($data['author_phone'] ?? '')),
@@ -203,7 +203,7 @@ class PublicAcademicConferenceAbstractService
             $this->deleteFilesForAbstract($abstract, $removeFileIds);
             $this->storeUploadedFiles($abstract, $uploads);
             $abstract->update([
-                'file_receipt_status' => $abstract->files()->exists() ? 'not_received' : 'not_submitted',
+                'file_receipt_status' => $abstract->files()->exists() ? 'received' : 'not_submitted',
             ]);
 
             return $abstract->fresh(['files', 'field']);

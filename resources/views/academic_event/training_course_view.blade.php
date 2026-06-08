@@ -6,7 +6,11 @@
 @inject('trainingCourse', 'App\Services\Frontend\PublicTrainingCourseService')
 @php
 	$canApplyTraining = $trainingCourse->hasApplicableRound($training, $user);
+	$hasOngoingRound = $trainingCourse->hasOngoingRound($training);
+	$hasUserEligibleRound = $trainingCourse->hasUserEligibleRound($training, $user);
+	$showIneligibleMessage = $user && $hasOngoingRound && ! $hasUserEligibleRound;
 	$canDownloadTextbook = $trainingCourse->canDownloadTextbook($training, $user);
+	$canDownloadAttachment = $trainingCourse->canDownloadAttachment($training);
 @endphp
 <main class="sub_area">
 
@@ -57,6 +61,7 @@
 	</div>
 
 		<aside class="abso_application">
+			<div class="mobile_opcl" aria-hidden="true"></div>
 			<div class="head">
 				<h3 class="tit">지금 바로 신청하세요</h3>
 				<p class="limit">{{ $trainingCourse->status($training)['label'] }}</p>
@@ -64,11 +69,13 @@
 				<div class="cont">
 					@if ($canApplyTraining)
 						<a href="{{ $trainingCourse->paymentUrl($training) }}" class="btn btn_wrr btn_outlink">사전등록 바로가기</a>
+					@elseif ($showIneligibleMessage)
+						<p class="limit">현재 계정은 사전등록 신청 대상이 아닙니다.</p>
 					@endif
 					@if ($canDownloadTextbook)
 						<a href="{{ route('academic_event.training_course_textbook.download', $training) }}" title="파일 다운로드" class="btn btn_kwg btn_download">교제 다운로드</a>
 					@endif
-					@if ($training->attachments->isNotEmpty())
+					@if ($canDownloadAttachment && $training->attachments->isNotEmpty())
 						<ul class="file_list">
 							@foreach ($training->attachments as $attachment)
 								<li><a href="{{ route('academic_event.training_course_attachment.download', $attachment) }}">{{ $attachment->original_name ?: basename($attachment->file_path) }}</a></li>
@@ -140,48 +147,164 @@
         });
     });
 // abso_application 고정
-    const $window = $(window);
-	const $header = $('header');
-	const $viewTop = $('.academic_event_view_top');
-	const $detail = $('.academic_event_view_detail');
-	const $inbox = $detail.find('.inbox');
-	const $absoApp = $('.abso_application');
-	function handleStickyLayout() {
-		const scrollTop = $window.scrollTop();
-		const windowHeight = $window.height();
-		const windowWidth = $window.width();
-		const detailOffsetTop = $detail.offset().top;
-		const detailHeight = $detail.outerHeight();
-		const appHeight = $absoApp.outerHeight();
-		if (windowWidth <= 767) {
-			$inbox.css('padding-bottom', (appHeight + 20) + 'px');
-			const mobileUnfixPoint = (detailOffsetTop + detailHeight) - windowHeight;
-			if (scrollTop >= mobileUnfixPoint) {
-				$detail.addClass('unfixed').removeClass('fixed');
-			} else {
-				$detail.removeClass('unfixed').addClass('fixed');
-			}
-		} else {
-			$inbox.css('padding-bottom', '');
-			const headerHeight = $header.outerHeight() || 0;
-			const topMargin = parseInt($viewTop.css('margin-bottom')) || 0;
-			const targetOffset = headerHeight + topMargin;
-			const fixStartPoint = detailOffsetTop - targetOffset;
-			const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - targetOffset;
-			if (scrollTop >= fixStartPoint) {
-				if (scrollTop >= unfixPoint) {
+    function initStickySummary() {
+		if (!window.jQuery || !document.querySelector('.academic_event_view_detail .abso_application')) { return; }
+		
+		const $window = window.jQuery(window);
+		const $header = window.jQuery('header');
+		const $viewTop = window.jQuery('.academic_event_view_top');
+		const $detail = window.jQuery('.academic_event_view_detail');
+		const $inbox = $detail.find('.inbox');
+		const $absoApp = $detail.find('.abso_application');
+		const $mobileBtn = $absoApp.find('.mobile_opcl');
+
+		let touchStartY = 0;
+		let startBottom = 0;
+		let isDragging = false;
+		let isUserOpened = false;
+
+		function getClosedBottom(appHeight) {
+			return `-${appHeight - 32}px`;
+		}
+
+		if ($window.width() <= 767) {
+			const initialHeight = $absoApp.outerHeight() || 0;
+			$absoApp.removeClass('open').css({
+				'bottom': getClosedBottom(initialHeight),
+				'transition': 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)'
+			});
+		}
+
+		function handleStickyLayout() {
+			if (!$detail.length || !$absoApp.length) { return; }
+			const scrollTop = $window.scrollTop();
+			const windowHeight = $window.height();
+			const windowWidth = $window.width();
+			const detailOffsetTop = $detail.offset().top;
+			const detailHeight = $detail.outerHeight();
+			const appHeight = $absoApp.outerHeight();
+
+			if (windowWidth <= 767) {
+				$inbox.css('padding-bottom', (appHeight + 20) + 'px');
+				const mobileUnfixPoint = (detailOffsetTop + detailHeight) - windowHeight;
+
+				if (scrollTop >= mobileUnfixPoint) {
 					$detail.addClass('unfixed').removeClass('fixed');
+					if (!isDragging) {
+						$absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
+						$absoApp.addClass('open').css('bottom', '0px');
+					}
 				} else {
-					$detail.addClass('fixed').removeClass('unfixed');
+					$detail.removeClass('unfixed').addClass('fixed');
+					if (!isDragging) {
+						if (isUserOpened) {
+							$absoApp.addClass('open').css('bottom', '0px');
+						} else {
+							$absoApp.removeClass('open');
+							$absoApp.css('bottom', getClosedBottom(appHeight));
+						}
+					}
 				}
 			} else {
-				$detail.removeClass('fixed unfixed');
+				$inbox.css('padding-bottom', '');
+				$absoApp.removeClass('open').css({ 'bottom': '', 'transition': '' });
+				
+				const headerHeight = $header.outerHeight() || 0;
+				const topMargin = parseInt($viewTop.css('margin-bottom')) || 0;
+				const targetOffset = headerHeight + topMargin;
+				
+				const fixStartPoint = detailOffsetTop - targetOffset;
+				const unfixPoint = (detailOffsetTop + detailHeight) - appHeight - targetOffset;
+
+				if (scrollTop >= fixStartPoint) {
+					if (scrollTop >= unfixPoint) {
+						$detail.addClass('unfixed').removeClass('fixed');
+					} else {
+						$detail.addClass('fixed').removeClass('unfixed');
+					}
+				} else {
+					$detail.removeClass('fixed unfixed');
+				}
 			}
 		}
+
+		$absoApp.on('touchstart.stickyApp', function (e) {
+			if ($window.width() > 767 || $detail.hasClass('unfixed')) { return; }
+			const touch = e.originalEvent.touches[0];
+			touchStartY = touch.clientY;
+			isDragging = true;
+			$absoApp.css('transition', 'none');
+			const windowHeight = window.innerHeight;
+			const appRect = $absoApp[0].getBoundingClientRect();
+			startBottom = windowHeight - appRect.bottom;
+		});
+
+		$absoApp.on('touchmove.stickyApp', function (e) {
+			if (!isDragging || $window.width() > 767 || $detail.hasClass('unfixed')) { return; }
+			const touch = e.originalEvent.touches[0];
+			const diffY = touchStartY - touch.clientY;
+			if (Math.abs(diffY) > 5) {
+				if (e.cancelable) { e.preventDefault(); }
+			}
+			let currentBottom = startBottom + diffY;
+			if (currentBottom > 0) { currentBottom = 0; }
+			$absoApp.css('bottom', currentBottom + 'px');
+		});
+
+		$absoApp.on('touchend.stickyApp touchcancel.stickyApp', function (e) {
+			if (!isDragging || $window.width() > 767) { return; }
+			isDragging = false;
+			const touch = e.originalEvent.changedTouches[0];
+			const diffY = touchStartY - touch.clientY;
+			const appHeight = $absoApp.outerHeight();
+
+			$absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
+			const closedBottom = getClosedBottom(appHeight);
+
+			if (diffY > 30) {
+				$absoApp.addClass('open').css('bottom', '0px');
+				isUserOpened = true;
+			} else if (diffY < -30) {
+				$absoApp.removeClass('open').css('bottom', closedBottom);
+				isUserOpened = false;
+			} else {
+				if ($absoApp.hasClass('open')) {
+					$absoApp.css('bottom', '0px');
+					isUserOpened = true;
+				} else {
+					$absoApp.css('bottom', closedBottom);
+					isUserOpened = false;
+				}
+			}
+		});
+
+		if ($mobileBtn.length) {
+			$mobileBtn.on('click.stickyApp', function(e) {
+				e.preventDefault();
+				if ($window.width() > 767 || $detail.hasClass('unfixed')) { return; }
+				
+				const appHeight = $absoApp.outerHeight();
+				$absoApp.css('transition', 'bottom 0.3s cubic-bezier(0.25, 1, 0.5, 1)');
+
+				if ($absoApp.hasClass('open')) {
+					const closedBottom = getClosedBottom(appHeight);
+					$absoApp.removeClass('open').css('bottom', closedBottom);
+					isUserOpened = false;
+				} else {
+					$absoApp.addClass('open').css('bottom', '0px');
+					isUserOpened = true;
+				}
+			});
+		}
+
+		$window.on('scroll.academicSticky resize.academicSticky', handleStickyLayout);
+		$window.on('load.academicSticky', function() { handleStickyLayout(); });
+		handleStickyLayout();
 	}
-	$window.on('scroll.stickyApp resize.stickyApp', handleStickyLayout);
-	$(window).on('load', function() { handleStickyLayout(); });
-	handleStickyLayout();
+
+	$(function() {
+		initStickySummary();
+	});
 // 팝업
 	var lastFocusedElement;
 	function layerShow(id) {

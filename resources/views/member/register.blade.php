@@ -103,7 +103,7 @@
 					</div>
 					<div class="flex_inputs">
 						<ul>
-							<li>
+							<li class="w100p">
 								<label class="">구분<span class="c_iden">*</span></label>
 								<div class="radios flex" role="radiogroup" aria-label="구분">
 									<div class="radio"><input type="radio" name="job_type" id="register-type1" value="specialist" @checked(old('job_type', 'specialist') === 'specialist') required><label for="register-type1"><i aria-hidden="true"></i><span>전문의</span></label></div>
@@ -117,7 +117,7 @@
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-							<li>
+							<li class="w100p">
 								<label for="register-doctor-num">의사면허번호<span class="c_iden">*</span></label>
 								<div class="inbtn">
 									<input type="text" id="register-doctor-num" name="license_number" class="text" value="{{ old('license_number') }}" placeholder="의사면허번호를 입력해주세요." required maxlength="80">
@@ -127,28 +127,28 @@
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-<!-- 							<li>
+<!-- 							<li class="w100p">
 								<label for="register-specialist">전문의번호<span class="c_iden">*</span></label>
 								<input type="text" id="register-specialist" name="specialist_number" class="text" value="{{ old('specialist_number') }}" placeholder="전문의 번호를 입력해 주세요." required maxlength="80">
 								@error('specialist_number')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li> -->
-<!-- 							<li>
+<!-- 							<li class="w100p">
 								<label for="register-specialty">전문과<span class="c_iden">*</span></label>
 								<input type="text" id="register-specialty" name="specialty" class="text" value="{{ old('specialty') }}" placeholder="전문과를 입력해 주세요." required maxlength="120">
 								@error('specialty')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li> -->
-							<li>
+							<li class="w100p">
 								<label for="register-company">직장명<span class="c_iden">*</span></label>
 								<input type="text" id="register-company" name="workplace_name" class="text" value="{{ old('workplace_name') }}" placeholder="직장명을 입력해 주세요." required maxlength="200">
 								@error('workplace_name')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-							<li>
+							<li class="w100p">
 								<label for="register-company-tel">직장전화<span class="c_iden">*</span></label>
 								<input type="text" id="register-company-tel" name="workplace_phone" class="text js-register-workplace-phone-input" value="{{ old('workplace_phone') }}" placeholder="직장 전화번호를 입력해 주세요." required maxlength="40" inputmode="numeric">
 								@error('workplace_phone')
@@ -175,14 +175,14 @@
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-							<li>
+							<li class="w100p">
 								<label for="register-graduation">학교 졸업년도</label>
 								<input type="number" id="register-graduation" name="graduate_year" class="text" value="{{ old('graduate_year') }}" placeholder="최종 학교 졸업년도를 숫자로면 입력해주세요 (예: 2020)" min="1950" max="2100" step="1">
 								@error('graduate_year')
 									<p class="c_red" role="alert">{{ $message }}</p>
 								@enderror
 							</li>
-							<li>
+							<li class="w100p">
 								<label for="register-university">출신 대학교</label>
 								<input type="text" id="register-university" name="school_name" class="text" value="{{ old('school_name') }}" placeholder="출신 대학교를 입력해 주세요." maxlength="255">
 								@error('school_name')

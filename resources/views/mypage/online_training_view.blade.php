@@ -43,7 +43,7 @@
 				<a href="{{ route('mypage.print_receipt_save', ['enrollment_id' => $enrollment->id]) }}" target="_blank" class="btn btn_print btn_kwg btn_kwg_line8">영수증 출력</a>
 				@endif
 				@if (! $isCompleted && ! $isPaymentCompleted)
-				<span class="btn btn_print btn_kwg btn_kwg_line8">결제 완료 후 출력 가능합니다.</span>
+				<span class="btn btn_print btn_kwg btn_kwg_line8 icon_rev">결제 완료 후 출력 가능합니다.</span>
 				@endif
 			</div>
 		</div>

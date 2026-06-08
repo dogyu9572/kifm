@@ -27,6 +27,7 @@
             showInitialValidationMessage(form);
             bindRequiredTextAlert(form, [
                 { name: 'title', message: '토론 주제를 입력해 주세요.' },
+                { name: 'content', message: '내용을 입력해 주세요.' },
                 { name: 'captcha', message: '자동등록방지 문자를 입력해 주세요.' }
             ]);
         });

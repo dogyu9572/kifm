@@ -15,6 +15,7 @@ class FrontendSubcommitteeDiscussionStoreRequest extends FormRequest
     {
         $this->merge([
             'title' => trim((string) $this->input('title')),
+            'content' => trim((string) $this->input('content')),
             'captcha' => trim((string) $this->input('captcha')),
         ]);
     }
@@ -23,6 +24,7 @@ class FrontendSubcommitteeDiscussionStoreRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string', 'max:5000'],
             'captcha' => [
                 'required',
                 'string',
@@ -44,6 +46,8 @@ class FrontendSubcommitteeDiscussionStoreRequest extends FormRequest
         return [
             'title.required' => '토론 주제를 입력해 주세요.',
             'title.max' => '토론 주제는 최대 255자까지 입력 가능합니다.',
+            'content.required' => '내용을 입력해 주세요.',
+            'content.max' => '내용은 최대 5000자까지 입력 가능합니다.',
             'captcha.required' => '자동등록방지 문자를 입력해 주세요.',
             'captcha.max' => '자동등록방지 문자는 최대 6자까지 입력 가능합니다.',
         ];

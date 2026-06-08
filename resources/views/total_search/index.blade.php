@@ -44,7 +44,7 @@
                     </a>
                 </li>
                 @empty
-                <li>
+                <li class="no_search">
                     <a href="#this">
                         <span class="state end"><span class="sound_only">현재 상태:</span>검색결과 없음</span>
                         <h3>검색 결과가 없습니다.</h3>
@@ -63,14 +63,14 @@
 			</div>
             <ul class="list">
                 @forelse($group['items'] as $item)
-                <li>
+                <li class="no_search">
                     <a href="{{ $item['url'] }}">
                         <h3>{{ $item['title'] }}</h3>
                         <p>{{ $item['summary'] !== '' ? $item['summary'] : '내용이 없습니다.' }}</p>
                     </a>
                 </li>
                 @empty
-                <li>
+                <li class="no_search">
                     <a href="#this">
                         <h3>검색 결과가 없습니다.</h3>
                         <p>다른 검색어로 다시 검색해 주세요.</p>

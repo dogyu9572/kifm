@@ -147,11 +147,18 @@ class PublicLocalDoctorService
     {
         $sido = $this->normalizedSidoFromRequest($request);
         if ($sido !== '') {
-            $query->where('sido', $sido);
+            $query->where(function (Builder $q) use ($sido): void {
+                foreach ($this->sidoSearchValues($sido) as $value) {
+                    $q->orWhere('address', 'like', '%' . $value . '%');
+                }
+            });
         }
 
         if ($request->filled('sigungu')) {
-            $query->where('sigungu', (string) $request->input('sigungu'));
+            $sigungu = trim((string) $request->input('sigungu'));
+            if ($sigungu !== '') {
+                $query->where('address', 'like', '%' . $sigungu . '%');
+            }
         }
 
         if ($request->filled('doctor_category_id')) {
@@ -215,6 +222,24 @@ class PublicLocalDoctorService
         }
 
         return null;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function sidoSearchValues(string $sido): array
+    {
+        $values = [$sido];
+        $aliases = config('local_doctor_regions.sido_aliases', []);
+        if (is_array($aliases)) {
+            foreach ($aliases as $alias => $canonical) {
+                if ($canonical === $sido) {
+                    $values[] = (string) $alias;
+                }
+            }
+        }
+
+        return array_values(array_unique(array_filter($values, static fn (string $value): bool => $value !== '')));
     }
 
     protected function phoneHref(?string $phone): string

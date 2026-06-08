@@ -19,6 +19,7 @@
         'card' => '신용카드',
         'onsite' => '현장결제',
     ][$registration?->payment_method] ?? ($registration?->payment_method ?: '-');
+    $bankAccountText = $registration?->bank_account_text ?: '국민은행 287937-00-000083 / 예금주 대한기능의학회';
 @endphp
 <main class="sub_area">
 
@@ -27,7 +28,7 @@
 		<div class="inbox">
 		
 			<div class="title_area">
-				<h1 id="registration-end-heading" class="title">등록 신청이 완료되었습니다.</h1>
+				<h1 id="registration-end-heading" class="title">결제가 완료되었습니다.</h1>
 				<p>신청하신 내역을 확인해 주세요.</p>
 			</div>
             @unless ($registration && $summary)
@@ -36,7 +37,7 @@
                 </div>
             @else
 			
-			<div class="gbox">
+			<div class="shadow_box">
 				<h2 class="tit">결제 요약</h2>
 				<dl>
 					<div>
@@ -57,8 +58,30 @@
 					</div>
 				</dl>
 			</div>
+
+			<div class="shadow_box">
+				<h2 class="tit">입금하실 계좌정보</h2>
+				<dl>
+					<div>
+						<dt>계좌번호</dt>
+						<dd>국민은행 287937-00-000083</dd>
+					</div>
+					<div>
+						<dt>예금주</dt>
+						<dd>대한기능의학회</dd>
+					</div>
+					<div>
+						<dt>입금자명</dt>
+						<dd></dd>
+					</div>
+					<div>
+						<dt>입금 예정일</dt>
+						<dd></dd>
+					</div>
+				</dl>
+			</div>
 			
-			<div class="gbox">
+			<div class="shadow_box">
 				<h2 class="tit">상세 정보</h2>
 				<dl>
 					<div>
@@ -73,6 +96,16 @@
 						<dt>결제 수단</dt>
 						<dd>{{ $paymentMethodLabel }}@if($registration->payment_method === 'bank_transfer' && $registration->bank_depositor) (입금자명: {{ $registration->bank_depositor }})@endif</dd>
 					</div>
+					@if ($registration->payment_method === 'bank_transfer')
+						<div>
+							<dt>입금 계좌</dt>
+							<dd>{{ $bankAccountText }}</dd>
+						</div>
+						<div>
+							<dt>입금 예정일</dt>
+							<dd>{{ optional($registration->bank_deposit_date)->format('Y.m.d') ?: '-' }}</dd>
+						</div>
+					@endif
 					<div>
 						<dt>이름</dt>
 						<dd>{{ $registration->name }}</dd>
@@ -94,7 +127,7 @@
             @endunless
 			
 			<div class="btns_btm">
-				<a href="{{ $conferenceBaseUrl }}" class="btn btn_kwk">메인으로</a>
+				<a href="{{ $conferenceBaseUrl }}" class="btn btn_kwg">메인으로</a>
 				<a href="{{ $checkUrl }}" class="btn btn_wkk">등록확인 페이지로</a>
 			</div>
 			

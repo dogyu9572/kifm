@@ -32,34 +32,28 @@
             </div>
         </div>
 
-        <div class="bo-member-dual-row">
-            <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">아이디(ID)</label>
-                    <div class="bo-form-field">
-                        @if ($isEdit)
-                            <input type="text" class="board-form-control bo-readonly-box" id="login_id" value="{{ $member->login_id }}" readonly>
-                        @else
-                            <input type="text" class="board-form-control @error('login_id') is-invalid @enderror" id="login_id" name="login_id" value="{{ old('login_id') }}" required>
-                            @error('login_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        @endif
-                    </div>
-                </div>
-            </div>
-            <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">이름 <span class="required">*</span></label>
-                    <div class="bo-form-field">
-                        <input type="text" class="board-form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $member->name ?? '') }}" maxlength="20" required>
-                        @error('name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-        </div>
+		<div class="bo-form-row">
+			<label class="bo-form-label">아이디(ID)</label>
+			<div class="bo-form-field">
+				@if ($isEdit)
+					<input type="text" class="board-form-control bo-readonly-box" id="login_id" value="{{ $member->login_id }}" readonly>
+				@else
+					<input type="text" class="board-form-control @error('login_id') is-invalid @enderror" id="login_id" name="login_id" value="{{ old('login_id') }}" required>
+					@error('login_id')
+						<div class="invalid-feedback">{{ $message }}</div>
+					@enderror
+				@endif
+			</div>
+		</div>
+		<div class="bo-form-row">
+			<label class="bo-form-label">이름 <span class="required">*</span></label>
+			<div class="bo-form-field">
+				<input type="text" class="board-form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $member->name ?? '') }}" maxlength="20" required>
+				@error('name')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
 
         @if (! $isEdit)
             <div class="bo-form-row" id="passwordGroup">
@@ -152,63 +146,56 @@
 <div class="bo-form-section">
     <h3 class="bo-section-title">전문가/직장 정보</h3>
     <div class="bo-form-list">
-        <div class="bo-member-dual-row">
+		<div class="bo-form-row">
+			<label class="bo-form-label">의사면허번호</label>
+			<div class="bo-form-field">
+				<input type="text" class="board-form-control @error('license_number') is-invalid @enderror" name="license_number" value="{{ old('license_number', $member->license_number ?? '') }}" maxlength="80" placeholder="의사면허번호">
+				@error('license_number')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
+		<div class="bo-form-row">
+			<label class="bo-form-label">
+				전문의번호
+				<span class="bo-form-label-note">관리자 전용</span>
+				<span class="bo-form-label-sub">데이터 이관용</span>
+			</label>
+			<div class="bo-form-field">
+				<input type="text" class="board-form-control @error('specialist_number') is-invalid @enderror" name="specialist_number" value="{{ old('specialist_number', $member->specialist_number ?? '') }}" maxlength="80" placeholder="전문의번호">
+				@error('specialist_number')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
+        <!-- <div class="bo-member-dual-row">
             <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">의사면허번호</label>
-                    <div class="bo-form-field">
-                        <input type="text" class="board-form-control @error('license_number') is-invalid @enderror" name="license_number" value="{{ old('license_number', $member->license_number ?? '') }}" maxlength="80" placeholder="의사면허번호">
-                        @error('license_number')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
             </div>
             <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">
-                        전문의번호
-                        <span class="bo-form-label-note">관리자 전용</span>
-                        <span class="bo-form-label-sub">데이터 이관용</span>
-                    </label>
-                    <div class="bo-form-field">
-                        <input type="text" class="board-form-control @error('specialist_number') is-invalid @enderror" name="specialist_number" value="{{ old('specialist_number', $member->specialist_number ?? '') }}" maxlength="80" placeholder="전문의번호">
-                        @error('specialist_number')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
             </div>
-        </div>
-
-        <div class="bo-member-dual-row">
-            <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">
-                        전문과
-                        <span class="bo-form-label-note">관리자 전용</span>
-                        <span class="bo-form-label-sub">데이터 이관용</span>
-                    </label>
-                    <div class="bo-form-field">
-                        <input type="text" class="board-form-control @error('specialty') is-invalid @enderror" name="specialty" value="{{ old('specialty', $member->specialty ?? '') }}" maxlength="120" placeholder="전문과">
-                        @error('specialty')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-            <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">직장명</label>
-                    <div class="bo-form-field">
-                        <input type="text" class="board-form-control @error('workplace_name') is-invalid @enderror" name="workplace_name" value="{{ old('workplace_name', $member->workplace_name ?? '') }}" maxlength="200" placeholder="직장명">
-                        @error('workplace_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-        </div>
+        </div> -->
+		<div class="bo-form-row">
+			<label class="bo-form-label">
+				전문과
+				<span class="bo-form-label-note">관리자 전용</span>
+				<span class="bo-form-label-sub">데이터 이관용</span>
+			</label>
+			<div class="bo-form-field">
+				<input type="text" class="board-form-control @error('specialty') is-invalid @enderror" name="specialty" value="{{ old('specialty', $member->specialty ?? '') }}" maxlength="120" placeholder="전문과">
+				@error('specialty')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
+		<div class="bo-form-row">
+			<label class="bo-form-label">직장명</label>
+			<div class="bo-form-field">
+				<input type="text" class="board-form-control @error('workplace_name') is-invalid @enderror" name="workplace_name" value="{{ old('workplace_name', $member->workplace_name ?? '') }}" maxlength="200" placeholder="직장명">
+				@error('workplace_name')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
 
         <div class="bo-form-row">
             <label class="bo-form-label">진료 과목</label>
@@ -264,32 +251,24 @@
 <div class="bo-form-section">
     <h3 class="bo-section-title">학력 정보</h3>
     <div class="bo-form-list">
-        <div class="bo-member-dual-row">
-            <div class="bo-member-dual-col">
-				<div class="bo-member-dual-col">
-					<div class="bo-form-row">
-						<label class="bo-form-label">출신대학</label>
-						<div class="bo-form-field">
-							<input type="text" class="board-form-control @error('school_name') is-invalid @enderror" id="school_name" name="school_name" value="{{ old('school_name', $member->school_name ?? '') }}" placeholder="출신대학교 입력">
-							@error('school_name')
-								<div class="invalid-feedback">{{ $message }}</div>
-							@enderror
-						</div>
-					</div>
-				</div>
-            </div>
-            <div class="bo-member-dual-col">
-                <div class="bo-form-row">
-                    <label class="bo-form-label">학교 졸업년도</label>
-                    <div class="bo-form-field">
-                        <input type="number" class="board-form-control board-form-control--max-xs @error('graduate_year') is-invalid @enderror" name="graduate_year" value="{{ old('graduate_year', $member->graduate_year ?? '') }}" min="1950" max="2100" step="1" placeholder="졸업년도">
-                        @error('graduate_year')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-            </div>
-        </div>
+		<div class="bo-form-row">
+			<label class="bo-form-label">출신대학</label>
+			<div class="bo-form-field">
+				<input type="text" class="board-form-control @error('school_name') is-invalid @enderror" id="school_name" name="school_name" value="{{ old('school_name', $member->school_name ?? '') }}" placeholder="출신대학교 입력">
+				@error('school_name')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
+		<div class="bo-form-row">
+			<label class="bo-form-label">학교 졸업년도</label>
+			<div class="bo-form-field">
+				<input type="number" class="board-form-control board-form-control--max-xs @error('graduate_year') is-invalid @enderror" name="graduate_year" value="{{ old('graduate_year', $member->graduate_year ?? '') }}" min="1950" max="2100" step="1" placeholder="졸업년도">
+				@error('graduate_year')
+					<div class="invalid-feedback">{{ $message }}</div>
+				@enderror
+			</div>
+		</div>
     </div>
 </div>
 

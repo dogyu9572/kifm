@@ -172,7 +172,7 @@ class MemberController extends Controller
             ], function ($message) use ($member): void {
                 $message
                     ->to($member->email, $member->name)
-                    ->subject('회원 가입 승인 및 환영 안내');
+                    ->subject('[대한기능의학회] 회원 가입 승인 및 환영 안내');
             });
         } catch (Throwable $e) {
             Log::warning('회원 가입 승인 메일 발송 실패', [

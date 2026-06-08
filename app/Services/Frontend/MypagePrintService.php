@@ -83,7 +83,6 @@ class MypagePrintService
         return MemberExecutive::query()
             ->where('member_id', $user->id)
             ->whereKey($executiveId)
-            ->where('is_active', true)
             ->first();
     }
 

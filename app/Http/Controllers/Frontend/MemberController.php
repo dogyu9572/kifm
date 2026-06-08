@@ -134,6 +134,9 @@ class MemberController extends Controller
         }
 
         $path = (string) parse_url($previous, PHP_URL_PATH);
+        if (preg_match('#^/academic_conference/([^/]+)/registration/result$#', $path, $matches) === 1) {
+            return url('/academic_conference/' . $matches[1]);
+        }
 
         return str_starts_with($path, '/academic_conference') ? $previous : $fallback;
     }

@@ -93,8 +93,19 @@ $(document).ready(function(){
             delay: 3000,
             disableOnInteraction: false,
         },
-        slidesPerView: 'auto',
+        slidesPerView: 2,
         spaceBetween: 0,
+		breakpoints: {
+			768: {
+				slidesPerView: 3,
+			},
+			1024: {
+				slidesPerView: 4,
+			},
+			1200: {
+				slidesPerView: 5,
+			}
+		},
         a11y: {
             prevSlideMessage: '이전 슬라이드',
             nextSlideMessage: '다음 슬라이드',

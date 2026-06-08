@@ -154,11 +154,12 @@ class PublicBoardService
     public function createCommitteeDiscussion(CommunityCommittee $committee, array $data, int $userId, string $authorName): int
     {
         $title = trim((string) $data['title']);
+        $content = trim((string) $data['content']);
 
         return DB::table($this->table('community_committee_discussions'))->insertGetId([
             'user_id' => $userId,
             'title' => $title,
-            'content' => $title,
+            'content' => $content,
             'author_name' => $authorName,
             'password' => null,
             'is_notice' => false,

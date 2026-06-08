@@ -38,19 +38,20 @@
 					<button type="button">12월</button>
 				</div>
 				<div class="tag">
+
+					<!-- <label><input type="radio" name="annual_schedule_type" value="all" checked><span>전체</span></label> -->
 					<label>
-						<input type="radio" name="annual_schedule_type" value="all" checked>
-						<span>전체</span>
-					</label>
+<input type="radio" name="annual_schedule_type" value="academic_conference">
+<span class="c1">학술대회</span>
+</label>
+
 					<label>
-						<input type="radio" name="annual_schedule_type" value="academic_conference">
-						<span class="c1">학술대회</span>
-					</label>
-					<label>
-						<input type="radio" name="annual_schedule_type" value="training_course">
-						<span class="c2">연수강좌</span>
-					</label>
+<input type="radio" name="annual_schedule_type" value="training_course">
+<span class="c2">연수강좌</span>
+</label>
+
 				</div>
+
 			</div>
 		</div>
 		

@@ -169,6 +169,15 @@ class PublicAcademicEventService
         return $this->dateText($event->pre_reg_start) . ' ~ ' . $this->dateText($event->pre_reg_end);
     }
 
+    public function venueText(AcademicEvent $event): string
+    {
+        if ($this->isOnlineEvent($event)) {
+            return '온라인';
+        }
+
+        return trim((string) $event->venue) !== '' ? (string) $event->venue : '-';
+    }
+
     /** @return array{code: string, label: string, class: string} */
     public function status(AcademicEvent $event): array
     {
@@ -236,5 +245,12 @@ class PublicAcademicEventService
     private function annualScheduleTypeFromTitle(string $title): string
     {
         return preg_match('/(연수|강좌|교육)/u', $title) === 1 ? 'training_course' : 'academic_conference';
+    }
+
+    private function isOnlineEvent(AcademicEvent $event): bool
+    {
+        return trim((string) $event->online_url) !== ''
+            || str_contains((string) $event->event_type, 'online')
+            || str_contains((string) $event->event_type, '온라인');
     }
 }

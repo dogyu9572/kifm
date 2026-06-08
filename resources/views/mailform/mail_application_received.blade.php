@@ -15,6 +15,13 @@
 html,body {margin:0; padding:0;}
 </style>
 <body>
+@php
+	$applicationModel = $application ?? null;
+	$member = $applicationModel?->member;
+	$committeeName = $applicationModel?->committee?->name ?: '-';
+	$appliedAt = $applicationModel?->applied_at?->format('Y.m.d H:i') ?: '-';
+	$applicantName = $member?->name ?: ($applicationModel?->applicant_name ?: '-');
+@endphp
 
 <!-- form -->
 <table style="table-layout:fixed; border-collapse:collapse; border-spacing:0; width:640px; margin:0 auto; font-family:'Pretendard';">
@@ -35,15 +42,15 @@ html,body {margin:0; padding:0;}
 						<tbody>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">신청 위원회</th>
-								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">교육 위원회</td>
+								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $committeeName }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">신청 일시</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026.03.30 15:50</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $appliedAt }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">이름</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">홍길동</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $applicantName }}</td>
 							</tr>
 						</tbody>
 					</table>

@@ -15,6 +15,11 @@
 html,body {margin:0; padding:0;}
 </style>
 <body>
+@php
+	$applicationModel = $application ?? null;
+	$committeeName = $applicationModel?->committee?->name ?: '-';
+	$rejectReason = $applicationModel?->reject_reason ?: '-';
+@endphp
 
 <!-- form -->
 <table style="table-layout:fixed; border-collapse:collapse; border-spacing:0; width:640px; margin:0 auto; font-family:'Pretendard';">
@@ -34,11 +39,11 @@ html,body {margin:0; padding:0;}
 						<tbody>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">신청 위원회</th>
-								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">교육 위원회</td>
+								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $committeeName }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">제한 사유</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">정회원 자격 미취득</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $rejectReason }}</td>
 							</tr>
 						</tbody>
 					</table>

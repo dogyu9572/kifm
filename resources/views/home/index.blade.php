@@ -119,7 +119,7 @@
 				</div>
 			@endif
 			<ul class="page_links">
-				<li class="i1"><a href="{{ route('member.register') }}">회원가입 안내</a></li>
+				<li class="i1"><a href="{{ route('member_plaza.fee_payment_guide') }}">회원가입 안내</a></li>
 				<li class="i2"><a href="{{ route('academic_event.conference') }}">학술대회</a></li>
 				<li class="i3"><a href="{{ route('online_academy.index') }}">온라인 아카데미</a></li>
 				<li class="i4"><a href="{{ route('subcommittee.index') }}">대한기능의학 위원회</a></li>
@@ -225,10 +225,10 @@
 
 <!-- 공지사항 / 온라인 아카데미 / 회원자료실 -->
 <section class="mcon mc02" aria-labelledby="notice-title">
-	<h2 class="sound_only" id="notice-title">공지사항 및 배너 링크</h2>
+	<h2 class="sound_only" id="notice-title">학회 공지 및 배너 링크</h2>
 	<div class="inner">
 		<div class="long notice">
-			<div class="mtit"><h3>공지사항</h3><a href="{{ route('member_plaza.society_notices') }}" class="more" aria-label="대한기능의학회 공지사항으로 이동"></a></div>
+			<div class="mtit"><h3>학회 공지</h3><a href="{{ route('member_plaza.society_notices') }}" class="more" aria-label="대한기능의학회 공지사항으로 이동"></a></div>
 			<ul class="list">
 				@forelse ($noticePosts as $post)
 					<li class="{{ $post->is_notice ? 'notice' : '' }}"><a href="{{ route('member_plaza.society_notices_show', $post->id) }}">{{ $post->title }}<span class="date">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</span></a></li>

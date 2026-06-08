@@ -724,7 +724,7 @@
 
 <div class="js-academic-tab-panel @if ($activeTab !== 'sponsors') bo-hidden @endif" data-tab-panel="sponsors">
     <div class="text-right mb-2">
-        <button type="button" class="btn btn-sm btn-primary mb-1" id="bo-sponsor-add-master-btn">스폰서 추가 (DB)</button>
+        <button type="button" class="btn btn-sm btn-primary mb-1" id="bo-sponsor-add-master-btn">스폰서 추가</button>
         <button type="button" class="btn btn-sm btn-secondary mb-1 ml-2" id="bo-sponsor-add-manual-btn">스폰서 직접 입력</button>
     </div>
     <div class="board-form-group mb-2">

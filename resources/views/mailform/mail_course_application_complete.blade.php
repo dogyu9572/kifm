@@ -15,6 +15,33 @@
 html,body {margin:0; padding:0;}
 </style>
 <body>
+@php
+	$paymentModel = $payment ?? null;
+	$training = $paymentModel?->training;
+	$courseTitle = $training?->title ?: '-';
+	$registeredAt = $paymentModel?->registered_at?->format('Y-m-d H:i') ?: '-';
+	$paymentStatusLabels = [
+		'completed' => '결제완료',
+		'pending_payment' => '결제대기',
+		'cancel_requested' => '취소요청',
+		'cancelled' => '취소완료',
+	];
+	$paymentMethodLabels = [
+		'card' => '신용카드',
+		'bank_transfer' => '무통장입금',
+		'bank' => '무통장입금',
+	];
+	$paymentStatusText = $paymentStatusLabels[$paymentModel?->payment_status ?? ''] ?? ($paymentModel?->payment_status ?: '-');
+	$paymentMethodText = $paymentMethodLabels[$paymentModel?->payment_method ?? ''] ?? ($paymentModel?->payment_method ?: '-');
+	$amountText = $paymentModel ? number_format((int) $paymentModel->total_amount).'원 ('.$paymentStatusText.')' : '-';
+	$trainingMethodLabels = [
+		'offline' => '오프라인',
+		'online' => '온라인',
+		'hybrid' => '온/오프라인',
+	];
+	$trainingMethodText = $trainingMethodLabels[$training?->training_method ?? ''] ?? ($training?->training_method ?: '-');
+	$creditText = '-';
+@endphp
 
 <!-- form -->
 <table style="table-layout:fixed; border-collapse:collapse; border-spacing:0; width:640px; margin:0 auto; font-family:'Pretendard';">
@@ -35,27 +62,27 @@ html,body {margin:0; padding:0;}
 						<tbody>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">강좌명</th>
-								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026년 대한기능의학회 춘계 연수강좌 1차, 2차</td>
+								<td style="font-size:14px; color:#0088B8; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $courseTitle }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">신청 일시</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">2026-03-05 14:20</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $registeredAt }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">결제 금액</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">100,000원 (결제완료)</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $amountText }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">결제 수단</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">신용카드 (현대 1234-****-****-5678)</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $paymentMethodText }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">교육 형태</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">오프라인 (아주대병원 대강당)</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $trainingMethodText }}</td>
 							</tr>
 							<tr>
 								<th style="font-size:14px; color:#222; font-weight:400; line-height:1.5; letter-spacing:-.02em; padding:4px 0; width:76px; text-align:left;">이수 평점</th>
-								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">6평점</td>
+								<td style="font-size:14px; color:#222; font-weight:700; line-height:1.5; letter-spacing:-.02em; padding:4px 0;">{{ $creditText }}</td>
 							</tr>
 						</tbody>
 					</table>

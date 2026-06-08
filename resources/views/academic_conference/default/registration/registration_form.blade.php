@@ -9,7 +9,11 @@
     $selectedMembershipPlanId = (int) old('membership_plan_id', $defaultMembershipPlanId);
     $selectedMembershipPlan = $membershipPlans->firstWhere('id', $selectedMembershipPlanId);
     $effectiveGrade = $selectedMembershipPlan?->grades?->pluck('grade')->first() ?: ($member?->member_level ?? '');
-    $eligiblePaymentPlans = $paymentPlans->filter(fn ($plan) => $plan->grades->pluck('grade')->contains($effectiveGrade))->values();
+    $eligiblePaymentPlans = $paymentPlans->filter(function ($plan) use ($effectiveGrade) {
+        $planGrades = $plan->grades->pluck('grade')->filter();
+
+        return $planGrades->isEmpty() || $planGrades->contains($effectiveGrade);
+    })->values();
     $selectedPlanIds = collect(old('payment_plan_ids', $eligiblePaymentPlans->pluck('id')->take(1)->all()))
         ->map(fn ($id) => (int) $id)
         ->take(1)
@@ -73,7 +77,7 @@
                             <label for="address">직장 주소<span class="required c_iden">*</span></label>
 							<div class="inbtn">
 								<input type="text" id="address_postcode" name="address_postcode" class="text" value="{{ $member?->address_postcode ?: $member?->workplace_zipcode }}" placeholder="우편번호를 입력해주세요" required title="우편번호 입력 필수" readonly>
-								<button type="button" class="btn btn_wkk">주소 확인</button>
+								<button type="button" class="btn btn_wkk" id="academic-registration-address-search">주소 검색</button>
 							</div>
 							<input type="text" id="address_base" name="address_base" class="text" value="{{ $member?->address_base ?: $member?->workplace_address }}" placeholder="주소를 입력해주세요" required title="주소 입력 필수" readonly>
 							<input type="text" id="address_detail" name="address_detail" class="text" value="{{ $member?->address_detail ?: $member?->workplace_address_detail }}" placeholder="상세주소를 입력해주세요" required title="상세주소 입력 필수">
@@ -94,7 +98,7 @@
                                     @endphp
                                     <li>
                                         <div class="radio">
-                                            <input type="radio" name="membership_plan_id" id="membership_plan_{{ $membershipPlan->id }}" value="{{ $membershipPlan->id }}" data-price="{{ $membershipPrice }}" data-label="{{ $membershipPlan->plan_name }}" data-grade="{{ $membershipGrade }}" @checked($selectedMembershipPlanId === (int) $membershipPlan->id) @if($loop->first) required @endif>
+                                            <input type="radio" name="membership_plan_id" id="membership_plan_{{ $membershipPlan->id }}" value="{{ $membershipPlan->id }}" data-price="{{ $membershipPrice }}" data-label="{{ $membershipPlan->plan_name }}" data-grade="{{ $membershipGrade }}" @checked($selectedMembershipPlanId === (int) $membershipPlan->id)>
                                             <label for="membership_plan_{{ $membershipPlan->id }}"><i aria-hidden="true"></i><span>{{ $membershipPlan->plan_name }} <strong>{{ number_format($membershipPrice) }}원</strong></span></label>
                                         </div>
                                     </li>
@@ -113,7 +117,7 @@
                             @forelse ($paymentPlans as $plan)
                                 @php
                                     $planGrades = $plan->grades->pluck('grade')->filter()->values();
-                                    $isPlanEnabled = $planGrades->contains($effectiveGrade);
+                                    $isPlanEnabled = $planGrades->isEmpty() || $planGrades->contains($effectiveGrade);
                                 @endphp
                                 <li @class(['end' => ! $isPlanEnabled])>
                                     <div class="radio">
@@ -201,6 +205,27 @@
                 </fieldset>
 
                 <fieldset class="type_bank_hide">
+                    <legend class="form_tit">환불정보</legend>
+                    <div class="inputs">
+                    	<ul class="long_label">
+                    	    <li>
+                    	        <label for="training-refund-bank">은행명/계좌번호</label>
+                    	        <div class="flex bank text">
+                    	            <select name="refund_bank" id="training-refund-bank" class="text">
+                    	                <option value="국민은행" @selected(old('refund_bank') === '국민은행')>국민은행</option>
+                    	            </select>
+	                    	            <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
+	                    	        </div>
+	                    	    </li>
+	                    	    <li>
+	                    	        <label for="training-refund-holder">예금주명</label>
+	                    	        <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="이메일을 입력해주세요">
+	                    	    </li>
+                    	</ul>
+                    </div>
+                </fieldset>
+
+                <fieldset class="type_bank_hide">
                     <legend class="form_tit">현금 영수증 발행</legend>
                     <div class="inputs">
                         <ul class="btns_flex">
@@ -262,7 +287,7 @@
                     @error('terms_agree')
                         <p class="c_red" role="alert">{{ $message }}</p>
                     @enderror
-                    <button type="submit" class="btn_submit btn_wbb"><span class="sound_only" id="academic-submit-amount">{{ number_format((int) $subtotal) }}원 </span>결제하기</button>
+                    <button type="submit" class="btn_submit btn_wbb" aria-disabled="true"><span class="sound_only" id="academic-submit-amount">{{ number_format((int) $subtotal) }}원 </span>결제하기</button>
                 </article>
             </form>
         </div>

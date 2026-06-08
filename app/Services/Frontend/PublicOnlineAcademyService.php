@@ -470,6 +470,9 @@ class PublicOnlineAcademyService
                 'paid_at' => $isCompletedPayment ? now() : null,
                 'bank_depositor' => $paymentMethod === 'bank_transfer' ? ($data['bank_depositor'] ?? null) : null,
                 'bank_deposit_date' => $paymentMethod === 'bank_transfer' ? ($data['bank_deposit_date'] ?? null) : null,
+                'refund_bank' => $paymentMethod === 'bank_transfer' ? ($data['refund_bank'] ?? null) : null,
+                'refund_account' => $paymentMethod === 'bank_transfer' ? ($data['refund_account'] ?? null) : null,
+                'refund_holder' => $paymentMethod === 'bank_transfer' ? ($data['refund_holder'] ?? null) : null,
                 'receipt_issue' => (string) ($data['receipt_issue'] ?? 'NO'),
                 'receipt_type' => ($data['receipt_issue'] ?? 'NO') === 'YES' ? ($data['receipt_type'] ?? null) : null,
                 'receipt_number' => ($data['receipt_issue'] ?? 'NO') === 'YES' ? ($data['receipt_number'] ?? null) : null,
@@ -616,6 +619,28 @@ class PublicOnlineAcademyService
         }
 
         return ((int) ($course->duration_days ?: 0)) . '일 수강';
+    }
+
+    public function compactPeriodText(EduCourse $course): string
+    {
+        if ($course->period_type === 'range' && $course->period_start && $course->period_end) {
+            $start = $course->period_start;
+            $end = $course->period_end;
+
+            if ($start->isSameDay($end)) {
+                return $start->format('y.m.d');
+            }
+            if ($start->isSameMonth($end)) {
+                return $start->format('y.m.d') . '~' . $end->format('d');
+            }
+            if ($start->isSameYear($end)) {
+                return $start->format('y.m.d') . '~' . $end->format('m.d');
+            }
+
+            return $start->format('y.m.d') . '~' . $end->format('y.m.d');
+        }
+
+        return $this->periodText($course);
     }
 
     public function isFreeCourse(EduCourse $course): bool

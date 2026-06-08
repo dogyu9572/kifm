@@ -57,24 +57,27 @@
 <section class="scon online_academy_list" aria-labelledby="online-academy-list-heading">
 	<div class="inner">
 		<h2 class="sub_title no_ico" id="online-academy-list-heading">NEW Releases</h2>
-		<ul class="tabs full_line mb48" data-online-academy-tabs>
-			@foreach ($courseTypeLabels as $typeCode => $typeLabel)
-				@php
-					$tabQuery = array_filter([
-						'course_type' => $typeCode,
-						'open_year' => $filters['open_year'] ?? null,
-						'search_field' => ($filters['search_field'] ?? 'all') !== 'all' ? $filters['search_field'] : null,
-						'search_keyword' => $filters['search_keyword'] ?? null,
-					]);
-					if (! empty($filters['keywords'])) {
-						$tabQuery['keywords'] = $filters['keywords'];
-					}
-				@endphp
-				<li class="{{ ($filters['course_type'] ?? '') === $typeCode ? 'on' : '' }}">
-					<a href="{{ route('online_academy.index', $tabQuery) }}" data-course-type="{{ $typeCode }}">{{ $typeLabel }}</a>
-				</li>
-			@endforeach
-		</ul>
+		<div class="mo_tabs_select">
+			<button type="button" class="btn btn_select_opcl mo_vw"></button>
+			<ul class="tabs full_line mb48" data-online-academy-tabs>
+				@foreach ($courseTypeLabels as $typeCode => $typeLabel)
+					@php
+						$tabQuery = array_filter([
+							'course_type' => $typeCode,
+							'open_year' => $filters['open_year'] ?? null,
+							'search_field' => ($filters['search_field'] ?? 'all') !== 'all' ? $filters['search_field'] : null,
+							'search_keyword' => $filters['search_keyword'] ?? null,
+						]);
+						if (! empty($filters['keywords'])) {
+							$tabQuery['keywords'] = $filters['keywords'];
+						}
+					@endphp
+					<li class="{{ ($filters['course_type'] ?? '') === $typeCode ? 'on' : '' }}">
+						<a href="{{ route('online_academy.index', $tabQuery) }}" data-course-type="{{ $typeCode }}">{{ $typeLabel }}</a>
+					</li>
+				@endforeach
+			</ul>
+		</div>
 
 		<form method="GET" action="{{ route('online_academy.index') }}" class="board_top board_top_academy" id="online-academy-filter-form">
 			<div class="left">
@@ -129,7 +132,7 @@
 					<a href="{{ $onlineAcademy->entryUrl($course, $currentMember) }}">
 						<span class="imgfit" aria-hidden="true"><img src="{{ $onlineAcademy->imageUrl($course->thumbnail_path, $onlineAcademy::FALLBACK_LIST_IMAGE) }}" alt=""></span>
 						<span class="txt">
-							<span class="type">{{ $courseTypeLabels[$course->course_type] ?? $course->course_type }}<span class="time">{{ $onlineAcademy->periodText($course) }}</span></span>
+							<span class="type">{{ $courseTypeLabels[$course->course_type] ?? $course->course_type }}<span class="time">{{ $onlineAcademy->compactPeriodText($course) }}</span></span>
 							<h3>{{ $course->title }}</h3>
 							@if ($onlineAcademy->professorText($course) !== '')
 								<p class="name">{{ $onlineAcademy->professorText($course) }}</p>

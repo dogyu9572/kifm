@@ -26,6 +26,7 @@
     let appliedDiscount = 0;
     let appliedCouponCode = '';
     let tossSdkPromise = null;
+    let daumPostcodePromise = null;
 
     function formatPhoneKoreaDisplay(raw) {
         const d = String(raw || '').replace(/\D/g, '').slice(0, 11);
@@ -64,6 +65,10 @@
 
     function selectedPlans() {
         return paymentInputs.filter((input) => input.checked);
+    }
+
+    function hasSelectedConferencePlan() {
+        return selectedPlans().length > 0;
     }
 
     function selectedMembershipPlan() {
@@ -137,7 +142,7 @@
             return;
         }
         if (ids.length === 0) {
-            window.alert('결제 항목을 선택해주세요.');
+            window.alert('결제항목을 선택해 주세요.');
             return;
         }
 
@@ -189,12 +194,24 @@
             }
         });
 
-        if (selectedPlans().length === 0) {
+        if (!hasSelectedConferencePlan()) {
             const firstEnabled = paymentInputs.find((input) => !input.disabled);
             if (firstEnabled) {
                 firstEnabled.checked = true;
             }
         }
+
+        updateSubmitButtonState();
+    }
+
+    function updateSubmitButtonState() {
+        if (!submitButton) {
+            return;
+        }
+
+        const isBlocked = !hasSelectedConferencePlan();
+        submitButton.classList.toggle('is-disabled', isBlocked);
+        submitButton.setAttribute('aria-disabled', isBlocked ? 'true' : 'false');
     }
 
     function togglePaymentMethod() {
@@ -229,7 +246,7 @@
             return false;
         }
         if (selectedPlans().length === 0) {
-            window.alert('결제 항목을 선택해주세요.');
+            window.alert('결제항목을 선택해 주세요.');
             paymentInputs[0]?.focus();
             return false;
         }
@@ -297,6 +314,20 @@
         if (depositDate && !depositDate.value.trim()) {
             window.alert('입금 예정일을 선택해주세요.');
             depositDate.focus();
+            return false;
+        }
+
+        const refundAccount = form.querySelector('input[name="refund_account"]');
+        if (refundAccount && !refundAccount.value.trim()) {
+            window.alert('환불 계좌번호를 입력해주세요.');
+            refundAccount.focus();
+            return false;
+        }
+
+        const refundHolder = form.querySelector('input[name="refund_holder"]');
+        if (refundHolder && !refundHolder.value.trim()) {
+            window.alert('예금주명을 입력해주세요.');
+            refundHolder.focus();
             return false;
         }
 
@@ -429,16 +460,47 @@
         });
     }
 
+    function loadDaumPostcode() {
+        if (window.daum && window.daum.Postcode) {
+            return Promise.resolve(window.daum.Postcode);
+        }
+        if (daumPostcodePromise) {
+            return daumPostcodePromise;
+        }
+
+        daumPostcodePromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+            script.async = true;
+            script.onload = function () {
+                if (window.daum && window.daum.Postcode) {
+                    resolve(window.daum.Postcode);
+                    return;
+                }
+                reject(new Error('Daum postcode is not available.'));
+            };
+            script.onerror = function () {
+                reject(new Error('Failed to load Daum postcode.'));
+            };
+            document.head.appendChild(script);
+        });
+
+        return daumPostcodePromise;
+    }
+
     function bindAddressSearch() {
         if (!addressSearchButton) {
             return;
         }
-        addressSearchButton.addEventListener('click', function () {
-            if (typeof daum === 'undefined' || !daum.Postcode) {
+        addressSearchButton.addEventListener('click', async function () {
+            let Postcode = null;
+            try {
+                Postcode = await loadDaumPostcode();
+            } catch (error) {
                 window.alert('주소 검색을 불러오지 못했습니다. 페이지를 새로고침 후 다시 시도해주세요.');
                 return;
             }
-            new daum.Postcode({
+            new Postcode({
                 oncomplete(data) {
                     const postcode = document.getElementById('address_postcode');
                     const base = document.getElementById('address_base');
@@ -554,6 +616,7 @@
                 resetCoupon();
             }
             updateSummary();
+            updateSubmitButtonState();
         });
     });
     membershipInputs.forEach((input) => {
@@ -563,6 +626,7 @@
             }
             updateConferencePlanAvailability();
             updateSummary();
+            updateSubmitButtonState();
         });
     });
     receiptRadios.forEach((input) => input.addEventListener('change', toggleReceiptArea));
@@ -572,6 +636,12 @@
     }
     form.addEventListener('submit', async function (event) {
         togglePaymentMethod();
+        if (!hasSelectedConferencePlan()) {
+            window.alert('결제항목을 선택해 주세요.');
+            paymentInputs.find((input) => !input.disabled)?.focus();
+            event.preventDefault();
+            return;
+        }
         if (!validateRequiredFields() || !validateRequiredSelections() || !validateBankTransferFields()) {
             event.preventDefault();
             return;
@@ -603,5 +673,6 @@
     updateConferencePlanAvailability();
     togglePaymentMethod();
     updateSummary();
+    updateSubmitButtonState();
     focusFirstInvalidField();
 })();

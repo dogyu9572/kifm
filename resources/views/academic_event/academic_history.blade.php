@@ -50,8 +50,8 @@
 							$attachmentUrl = $publicBoard->firstAttachmentUrl($history->attachments);
 						@endphp
 						<tr>
-							<td class="dates">{{ $publicBoard->academicConferenceHistoryPeriod($history) ?: '-' }}</td>
-							<td class="tac">{{ $history->title }}</td>
+							<td class="dates line2">{{ $publicBoard->academicConferenceHistoryPeriod($history) ?: '-' }}</td>
+							<td class="tac mo_w100p mo_tal">{{ $history->title }}</td>
 							<td class="down">
 								@if ($attachmentUrl)
 									<a href="{{ $attachmentUrl }}" class="btn btn_gwg btn_download" target="_blank" rel="noopener" download="{{ $publicBoard->firstAttachmentName($history->attachments) }}">자료집</a>

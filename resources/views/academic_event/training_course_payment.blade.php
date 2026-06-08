@@ -93,6 +93,10 @@
                             <button type="button" class="btn btn_wkk" id="training-coupon-apply-btn">쿠폰등록</button>
                         </div>
                         @error('coupon_code')<span class="c_red">{{ $message }}</span>@enderror
+						<dl class="coupon_sale" id="online-coupon-result">
+							<dt>쿠폰 할인 적용</dt>
+							<dd>적용된 쿠폰이 없습니다.</dd>
+						</dl>
                     </div>
                 </fieldset>
 
@@ -145,13 +149,13 @@
                                 <select name="refund_bank" id="training-refund-bank" class="text">
                                     <option value="국민은행" @selected(old('refund_bank') === '국민은행')>국민은행</option>
                                 </select>
-                                <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
-                            </div>
-                        </li>
-                        <li>
-                            <label for="training-refund-holder">예금주명</label>
-                            <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="이메일을 입력해주세요">
-                        </li>
+	                                <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
+	                            </div>
+	                        </li>
+	                        <li>
+	                            <label for="training-refund-holder">예금주명</label>
+	                            <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="예금주명을 입력해주세요">
+	                        </li>
                     </ul>
                 </fieldset>
 
@@ -188,22 +192,24 @@
 
                 <article class="abso_application">
 					<div class="mobile_opcl" aria-hidden="true"></div>
-                    <h2 class="tit">최종 결제 확인</h2>
-                    <p class="selected_item" id="training-summary-items">결제 항목을 선택해주세요.</p>
-                    <dl class="price_info">
-                        <div>
-                            <dt>결제금액</dt>
-                            <dd><strong id="training-summary-subtotal">0</strong>원</dd>
-                        </div>
-                        <div>
-                            <dt>쿠폰 할인</dt>
-                            <dd><strong class="c_iden" id="training-summary-discount">0</strong>원</dd>
-                        </div>
-                        <div class="total">
-                            <dt>최종 결제 금액</dt>
-                            <dd><strong id="training-summary-total">0</strong>원</dd>
-                        </div>
-                    </dl>
+                    <h2 class="tit btn_opcl">최종 결제 확인</h2>
+                    <div class="mo_opcl">
+                    	<p class="selected_item" id="training-summary-items">결제 항목을 선택해주세요.</p>
+                    	<dl class="price_info">
+                    	    <div>
+                    	        <dt>결제금액</dt>
+                    	        <dd><strong id="training-summary-subtotal">0</strong>원</dd>
+                    	    </div>
+                    	    <div>
+                    	        <dt>쿠폰 할인</dt>
+                    	        <dd><strong class="c_iden" id="training-summary-discount">0</strong>원</dd>
+                    	    </div>
+                    	    <div class="total">
+                    	        <dt>최종 결제 금액</dt>
+                    	        <dd><strong id="training-summary-total">0</strong>원</dd>
+                    	    </div>
+                    	</dl>
+                    </div>
 
                     <div class="check_area checkbox">
                         <input type="checkbox" name="terms_agree" id="training-terms-agree" required>

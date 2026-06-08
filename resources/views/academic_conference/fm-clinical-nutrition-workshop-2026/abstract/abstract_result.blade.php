@@ -92,7 +92,9 @@
 				@endif
 				<div class="btns_btm flex_center">
 					<a href="{{ $conferenceBaseUrl }}" class="btn btn_kwg">메인 페이지로</a>
-					<a href="{{ route('academic_conference.site.abstract.modify', [$event->folder_name, $abstractSubmission]) }}" class="btn btn_wbb">초록 수정</a>
+					@if ($canModifyAbstract ?? false)
+						<a href="{{ route('academic_conference.site.abstract.modify', [$event->folder_name, $abstractSubmission]) }}" class="btn btn_wbb">초록 수정</a>
+					@endif
 				</div>
 			@endunless
 		</div>

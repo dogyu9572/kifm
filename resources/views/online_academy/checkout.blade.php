@@ -115,8 +115,27 @@
 					</div>
 				</fieldset>
 
+                <fieldset class="type_bank_hide">
+                    <legend class="num_tit"><span>5</span>환불정보</legend>
+                    <ul class="glbox long_label">
+                        <li>
+                            <label for="training-refund-bank">은행명/계좌번호</label>
+                            <div class="flex bank text">
+                                <select name="refund_bank" id="training-refund-bank" class="text">
+                                    <option value="국민은행" @selected(old('refund_bank') === '국민은행')>국민은행</option>
+                                </select>
+	                                <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
+	                            </div>
+	                        </li>
+	                        <li>
+	                            <label for="training-refund-holder">예금주명</label>
+	                            <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="예금주명을 입력해주세요">
+	                        </li>
+                    </ul>
+                </fieldset>
+
 				<fieldset class="type_bank_hide">
-					<legend class="num_tit"><span>5</span>현금 영수증 발행</legend>
+					<legend class="num_tit"><span>6</span>현금 영수증 발행</legend>
 					<div class="glbox">
 						<ul class="btns_flex">
 							<li class="radio">
@@ -148,6 +167,7 @@
 				</fieldset>
 
 				<article class="abso_application">
+					<div class="mobile_opcl" aria-hidden="true"></div>
 					<h2 class="tit">결제정보</h2>
 					<p class="selected_item" id="online-summary-items">{{ $course->title }}</p>
 					<dl class="price_info">
@@ -166,12 +186,12 @@
 					</dl>
 					<div class="check_area checkbox">
 						<input type="checkbox" name="terms_agree" id="terms_agree" value="1" required @checked(old('terms_agree'))>
-						<label for="terms_agree "><i></i><span><strong class="c_iden">(필수)</strong> 결제 이용 약관, 개인정보 처리 동의</span></label>
+						<label for="terms_agree"><i></i><span><strong class="c_iden">(필수)</strong> 결제 이용 약관, 개인정보 처리 동의</span></label>
 					</div>
 					@error('terms_agree')
 						<p class="c_red" role="alert">{{ $message }}</p>
 					@enderror
-					<button type="submit" class="btn_submit btn_wbb"><span class="sound_only" id="online-submit-amount">{{ number_format($price) }}원 </span>결제하기</button>
+					<button type="submit" class="btn_submit btn_wgg"><span class="sound_only" id="online-submit-amount">{{ number_format($price) }}원 </span>결제 약관에 동의해주세요.</button>
 					<button type="button" class="btn_cancel btn_kwg" data-history-back>결제취소</button>
 				</article>
 			</form>

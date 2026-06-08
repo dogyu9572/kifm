@@ -29,6 +29,12 @@
 							</dd>
 						</div>
 						<div>
+							<dt>내용<span class="c_iden">*</span></dt>
+							<dd>
+								<textarea name="content" cols="30" rows="8" class="text w100p" placeholder="내용을 입력해 주세요.">{{ old('content') }}</textarea>
+							</dd>
+						</div>
+						<div>
 							<dt>자동등록방지<span class="c_iden">*</span></dt>
 							<dd>
 								<div class="captcha_area">

@@ -31,6 +31,17 @@ class AcademicEventSessionController extends Controller
         ]);
     }
 
+    /** @return array<string, string> */
+    protected function categoryLabels(): array
+    {
+        return [
+            'oral' => '구연 발표',
+            'poster' => '포스터 발표',
+            'special' => '특별 강연',
+            'symposium' => '심포지엄',
+        ];
+    }
+
     public function create(Request $request, AcademicEvent $academic_event)
     {
         return view('backoffice.academic-events.sessions.create', [
@@ -41,12 +52,7 @@ class AcademicEventSessionController extends Controller
                 'end_time' => '10:00',
                 'sort_order' => ((int) $academic_event->sessions()->max('sort_order')) + 1,
             ]),
-            'categoryLabels' => [
-                'oral' => '구연 발표',
-                'poster' => '포스터 발표',
-                'special' => '특별 강연',
-                'symposium' => '심포지엄',
-            ],
+            'categoryLabels' => $this->categoryLabels(),
             'cancelUrl' => $this->editEventSessionsTabUrl($academic_event),
         ]);
     }
@@ -68,12 +74,7 @@ class AcademicEventSessionController extends Controller
         return view('backoffice.academic-events.sessions.edit', [
             'event' => $academic_event,
             'session' => $academic_event_session,
-            'categoryLabels' => [
-                'oral' => '구연 발표',
-                'poster' => '포스터 발표',
-                'special' => '특별 강연',
-                'symposium' => '심포지엄',
-            ],
+            'categoryLabels' => $this->categoryLabels(),
             'cancelUrl' => $this->editEventSessionsTabUrl($academic_event),
         ]);
     }
@@ -122,6 +123,7 @@ class AcademicEventSessionController extends Controller
             'session' => $academic_event_session,
             'abstracts' => $abstracts,
             'statusLabels' => AcademicEventAbstractService::statusLabels(),
+            'categoryLabels' => $this->categoryLabels(),
             'cancelUrl' => $this->editEventSessionsTabUrl($academic_event),
         ]);
     }

@@ -6,6 +6,8 @@
 @section('content')
 @php
     $currentUserId = (int) auth()->id();
+    $postContent = trim(strip_tags((string) $post->content));
+    $showPostContent = $postContent !== '' && $postContent !== trim((string) $post->title);
 @endphp
 <main class="sub_area">
 
@@ -24,15 +26,17 @@
 			</div>
 
 			<div class="chat_area">
-				<div class="chat {{ (int) ($post->user_id ?? 0) === $currentUserId ? 'me' : 'you' }}">
-					<div class="name">
-						<strong>{{ (int) ($post->user_id ?? 0) === $currentUserId ? '(나) ' : '' }}{{ $post->author_name ?: '회원' }}</strong>
-						<div class="date">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d H:i') }}</div>
+				@if ($showPostContent)
+					<div class="chat {{ (int) ($post->user_id ?? 0) === $currentUserId ? 'me' : 'you' }}">
+						<div class="name">
+							<strong>{{ (int) ($post->user_id ?? 0) === $currentUserId ? '(나) ' : '' }}{{ $post->author_name ?: '회원' }}</strong>
+							<div class="date">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d H:i') }}</div>
+						</div>
+						<div class="txtbox">
+							{!! nl2br(e($postContent)) !!}
+						</div>
 					</div>
-					<div class="txtbox">
-						{!! nl2br(e(strip_tags((string) $post->content))) !!}
-					</div>
-				</div>
+				@endif
 
 				@foreach ($comments as $comment)
 					<div class="chat {{ (int) ($comment->user_id ?? 0) === $currentUserId ? 'me' : 'you' }}">

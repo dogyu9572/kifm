@@ -28,7 +28,7 @@
 						</ul>
 					</a>
 					<div class="btns">
-						<a href="{{ $trainingCourse->detailUrl($featuredTraining) }}" class="btn btn_wkk btn_outlink">홈페이지 바로가기</a>
+						<a href="{{ $trainingCourse->detailUrl($featuredTraining) }}" class="btn btn_wkk btn_outlink">자세히 보기</a>
 						<a href="{{ $trainingCourse->paymentUrl($featuredTraining) }}" class="btn btn_wrr btn_outlink">사전등록 바로가기</a>
 					</div>
 					<x-frontend.bookmark-button content-type="academic_event_training_course" :content-id="$featuredTraining->id" :title="$featuredTraining->title" :menu-label="$sName" :url="$trainingCourse->detailUrl($featuredTraining)" label="이 행사를 북마크에 추가" />

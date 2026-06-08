@@ -107,7 +107,14 @@ class PublicAcademicConferenceRegistrationService
             ->orderBy('price')
             ->orderBy('price_early')
             ->orderBy('id')
-            ->get();
+            ->get()
+            ->filter(function (PaymentPlan $plan) use ($user): bool {
+                $planGrade = $this->gradeForPlan($plan);
+
+                return $planGrade === ''
+                    || $this->gradeRank($planGrade) >= $this->gradeRank((string) $user->member_level);
+            })
+            ->values();
     }
 
     public function selectedMembershipPlanForUser(User $user, mixed $planId): ?PaymentPlan
@@ -290,7 +297,7 @@ class PublicAcademicConferenceRegistrationService
         return AcademicEventRegistration::query()
             ->where('academic_event_id', $event->id)
             ->where('member_id', $user->id)
-            ->whereNotIn('payment_status', ['cancel_requested', 'cancelled'])
+            ->whereNotIn('payment_status', ['cancel_requested', 'cancelled', 'pending_payment'])
             ->exists();
     }
 
@@ -303,8 +310,56 @@ class PublicAcademicConferenceRegistrationService
             ->whereNull('member_id')
             ->where('email', trim($email))
             ->where('phone', $phone)
-            ->whereNotIn('payment_status', ['cancel_requested', 'cancelled'])
+            ->whereNotIn('payment_status', ['cancel_requested', 'cancelled', 'pending_payment'])
             ->exists();
+    }
+
+    public function deletePendingCardMemberRegistrations(AcademicEvent $event, User $user): void
+    {
+        AcademicEventRegistration::query()
+            ->where('academic_event_id', $event->id)
+            ->where('member_id', $user->id)
+            ->where('payment_method', 'card')
+            ->where('payment_status', 'pending_payment')
+            ->get()
+            ->each(fn (AcademicEventRegistration $registration) => $this->deletePendingCardRegistration($registration));
+    }
+
+    public function deletePendingCardNonMemberRegistrations(AcademicEvent $event, string $email, string $phone): void
+    {
+        $phone = preg_replace('/\D+/', '', $phone);
+
+        AcademicEventRegistration::query()
+            ->where('academic_event_id', $event->id)
+            ->whereNull('member_id')
+            ->where('email', trim($email))
+            ->where('phone', $phone)
+            ->where('payment_method', 'card')
+            ->where('payment_status', 'pending_payment')
+            ->get()
+            ->each(fn (AcademicEventRegistration $registration) => $this->deletePendingCardRegistration($registration));
+    }
+
+    public function deletePendingCardRegistrationByOrderId(AcademicEvent $event, string $orderId): void
+    {
+        $orderId = trim($orderId);
+        if ($orderId === '') {
+            return;
+        }
+
+        $registration = AcademicEventRegistration::query()
+            ->where('academic_event_id', $event->id)
+            ->where(function ($query) use ($orderId) {
+                $query->where('source_row_json->toss_order_id', $orderId)
+                    ->orWhere('registration_no', $orderId);
+            })
+            ->where('payment_method', 'card')
+            ->where('payment_status', 'pending_payment')
+            ->first();
+
+        if ($registration) {
+            $this->deletePendingCardRegistration($registration);
+        }
     }
 
     public function cancelRegistration(AcademicEventRegistration $registration): string
@@ -471,6 +526,9 @@ class PublicAcademicConferenceRegistrationService
                 'bank_depositor' => $paymentMethod === 'bank_transfer' ? ($data['bank_depositor'] ?? null) : null,
                 'bank_deposit_date' => $paymentMethod === 'bank_transfer' ? ($data['bank_deposit_date'] ?? null) : null,
                 'bank_account_text' => $paymentMethod === 'bank_transfer' ? ($data['bank_account_text'] ?? null) : null,
+                'refund_bank' => $paymentMethod === 'bank_transfer' ? ($data['refund_bank'] ?? null) : null,
+                'refund_account' => $paymentMethod === 'bank_transfer' ? ($data['refund_account'] ?? null) : null,
+                'refund_holder' => $paymentMethod === 'bank_transfer' ? ($data['refund_holder'] ?? null) : null,
                 'receipt_issue' => (string) ($data['receipt_issue'] ?? 'NO'),
                 'receipt_type' => $data['receipt_type'] ?? null,
                 'receipt_number' => $data['receipt_number'] ?? null,
@@ -498,7 +556,7 @@ class PublicAcademicConferenceRegistrationService
 
             if ($paymentMethod === 'card') {
                 $source = $registration->source_row_json ?? [];
-                $source['toss_order_id'] = $registration->registration_no;
+                $source['toss_order_id'] = $this->nextTossOrderId($registration);
                 $registration->source_row_json = $source;
                 $registration->save();
             }
@@ -569,6 +627,9 @@ class PublicAcademicConferenceRegistrationService
                 'bank_depositor' => $paymentMethod === 'bank_transfer' ? ($data['bank_depositor'] ?? null) : null,
                 'bank_deposit_date' => $paymentMethod === 'bank_transfer' ? ($data['bank_deposit_date'] ?? null) : null,
                 'bank_account_text' => $paymentMethod === 'bank_transfer' ? ($data['bank_account_text'] ?? null) : null,
+                'refund_bank' => $paymentMethod === 'bank_transfer' ? ($data['refund_bank'] ?? null) : null,
+                'refund_account' => $paymentMethod === 'bank_transfer' ? ($data['refund_account'] ?? null) : null,
+                'refund_holder' => $paymentMethod === 'bank_transfer' ? ($data['refund_holder'] ?? null) : null,
                 'receipt_issue' => (string) ($data['receipt_issue'] ?? 'NO'),
                 'receipt_type' => $data['receipt_type'] ?? null,
                 'receipt_number' => $data['receipt_number'] ?? null,
@@ -592,7 +653,7 @@ class PublicAcademicConferenceRegistrationService
 
             if ($paymentMethod === 'card') {
                 $source = $registration->source_row_json ?? [];
-                $source['toss_order_id'] = $registration->registration_no;
+                $source['toss_order_id'] = $this->nextTossOrderId($registration);
                 $registration->source_row_json = $source;
                 $registration->save();
             }
@@ -614,12 +675,36 @@ class PublicAcademicConferenceRegistrationService
         });
     }
 
+    private function deletePendingCardRegistration(AcademicEventRegistration $registration): void
+    {
+        if ($registration->payment_method !== 'card' || $registration->payment_status !== 'pending_payment') {
+            return;
+        }
+
+        DB::transaction(function () use ($registration): void {
+            $source = $registration->source_row_json ?? [];
+            $membershipPaymentId = (int) ($source['membership_payment_id'] ?? 0);
+            if ($membershipPaymentId > 0) {
+                MembershipPayment::query()
+                    ->whereKey($membershipPaymentId)
+                    ->where('payment_status', 'pending')
+                    ->delete();
+            }
+
+            $registration->items()->delete();
+            $registration->delete();
+        });
+    }
+
     public function confirmTossPayment(AcademicEvent $event, string $orderId, string $paymentKey, int $amount): AcademicEventRegistration
     {
         $registration = AcademicEventRegistration::query()
             ->with(['items', 'member'])
             ->where('academic_event_id', $event->id)
-            ->where('registration_no', $orderId)
+            ->where(function ($query) use ($orderId) {
+                $query->where('source_row_json->toss_order_id', $orderId)
+                    ->orWhere('registration_no', $orderId);
+            })
             ->where('payment_method', 'card')
             ->first();
 
@@ -783,5 +868,18 @@ class PublicAcademicConferenceRegistrationService
         } while (MembershipPayment::query()->where('payment_no', $no)->exists());
 
         return $no;
+    }
+
+    private function nextTossOrderId(AcademicEventRegistration $registration): string
+    {
+        do {
+            $orderId = $registration->registration_no . '-TOSS-' . Str::upper(Str::random(8));
+        } while (
+            AcademicEventRegistration::query()
+                ->where('source_row_json->toss_order_id', $orderId)
+                ->exists()
+        );
+
+        return $orderId;
     }
 }

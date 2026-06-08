@@ -120,7 +120,7 @@
 								<div class="file_wrap">
 									<div class="flex">
 										<input type="text" class="text" data-abstract-file-name readonly>
-										<div class="file_input"><input type="file" id="file01" name="attachments[]" data-abstract-file-input><label for="file01" class="btn_file btn_wkk">파일첨부</label></div>
+										<div class="file_input"><input type="file" id="file01" name="attachments[]" data-abstract-file-input required><label for="file01" class="btn_file btn_wkk">파일첨부</label></div>
 									</div>
 								</div>
 								<div class="file_list none" data-abstract-file-list></div>
