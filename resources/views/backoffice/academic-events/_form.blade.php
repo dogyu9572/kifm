@@ -245,6 +245,11 @@
             <button type="button" class="btn btn-sm btn-outline-secondary" id="bo-add-venue-floor-btn">층 추가</button>
         </div>
         <table class="board-table" id="bo-venue-floors-table">
+            <colgroup>
+                <col>
+                <col>
+                <col class="bo-venue-floor-action-col">
+            </colgroup>
             <thead><tr><th>층명</th><th>파일</th><th></th></tr></thead>
             <tbody id="bo-venue-floors-body">
                 @foreach (old('venue_floors', $e->venueFloors?->map(fn ($f) => ['floor_name' => $f->floor_name, 'file_path' => $f->file_path, 'sort_order' => $f->sort_order])->toArray() ?? [['floor_name' => '', 'file_path' => null]]) as $fi => $row)
@@ -253,10 +258,24 @@
                         <td>
                             <input type="file" name="venue_floor_files[]" class="board-form-control" accept="image/*,.pdf">
                             @if (! empty($row['file_path']))
-                                <span class="board-form-help">등록됨</span>
+                                <input type="hidden" name="venue_floors[{{ $fi }}][file_path]" value="{{ $row['file_path'] }}">
+                                <input type="hidden" name="venue_floors[{{ $fi }}][delete_file]" value="0" data-venue-floor-delete-file>
+                                <div class="board-existing-files mt-2 mb-0 p-2">
+                                    <div class="board-attachment-list">
+                                        <div class="board-attachment-item existing-file">
+                                            <i class="fas fa-file-image"></i>
+                                            <a href="{{ asset('storage/' . $row['file_path']) }}" target="_blank" rel="noopener">
+                                                <span class="board-attachment-name">{{ \App\Support\BackofficeFile::displayName($row['file_path']) }}</span>
+                                            </a>
+                                            <button type="button" class="board-attachment-remove" data-remove-existing-venue-floor-file>
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             @endif
                         </td>
-                        <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
+                        <td class="text-center align-middle"><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
                     </tr>
                 @endforeach
             </tbody>
@@ -391,6 +410,7 @@
             <small class="board-form-text d-block mt-1">※ 기존 썸네일은 x 버튼 클릭 시 삭제됩니다.</small>
         @endif
     </div>
+    {{--
     <div class="board-form-group">
         <label class="board-form-label">Exhibition 이미지</label>
         <div class="board-file-upload">
@@ -424,6 +444,7 @@
             <small class="board-form-text d-block mt-1">※ 기존 Exhibition 이미지는 x 버튼 클릭 시 삭제됩니다.</small>
         @endif
     </div>
+    --}}
     <div class="bo-form-section mt-5">
         <h3 class="bo-section-title">오시는 길 설정</h3>
     </div>
@@ -825,7 +846,7 @@
         <tr id="bo-template-venue-floor" class="bo-template">
             <td><input type="text" name="venue_floors[__I__][floor_name]" class="board-form-control"></td>
             <td><input type="file" name="venue_floor_files[]" class="board-form-control" accept="image/*,.pdf"></td>
-            <td><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
+            <td class="text-center align-middle"><button type="button" class="btn btn-sm btn-secondary bo-remove-row-btn">삭제</button></td>
         </tr>
         <tr id="bo-template-abstract-field" class="bo-template">
             <td class="text-center sort-handle-cell">

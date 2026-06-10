@@ -59,27 +59,29 @@
 				</dl>
 			</div>
 
-			<div class="shadow_box">
-				<h2 class="tit">입금하실 계좌정보</h2>
-				<dl>
-					<div>
-						<dt>계좌번호</dt>
-						<dd>국민은행 287937-00-000083</dd>
+				@if ($registration->payment_method === 'bank_transfer')
+					<div class="shadow_box">
+						<h2 class="tit">입금하실 계좌정보</h2>
+						<dl>
+							<div>
+								<dt>계좌번호</dt>
+								<dd>국민은행 287937-00-000083</dd>
+							</div>
+							<div>
+								<dt>예금주</dt>
+								<dd>대한기능의학회</dd>
+							</div>
+							<div>
+								<dt>입금자명</dt>
+								<dd>{{ $registration->bank_depositor ?: '-' }}</dd>
+							</div>
+							<div>
+								<dt>입금 예정일</dt>
+								<dd>{{ optional($registration->bank_deposit_date)->format('Y.m.d') ?: '-' }}</dd>
+							</div>
+						</dl>
 					</div>
-					<div>
-						<dt>예금주</dt>
-						<dd>대한기능의학회</dd>
-					</div>
-					<div>
-						<dt>입금자명</dt>
-						<dd></dd>
-					</div>
-					<div>
-						<dt>입금 예정일</dt>
-						<dd></dd>
-					</div>
-				</dl>
-			</div>
+				@endif
 			
 			<div class="shadow_box">
 				<h2 class="tit">상세 정보</h2>

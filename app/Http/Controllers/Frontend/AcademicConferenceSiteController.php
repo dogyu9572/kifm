@@ -69,6 +69,9 @@ class AcademicConferenceSiteController extends Controller
         if (! $this->isFrontendMemberLoggedIn() && $normalizedPagePath === 'registration/form') {
             return redirect()->route('member.login', ['intended' => $conferenceBaseUrl . '/registration/form']);
         }
+        if ($this->isFrontendMemberLoggedIn() && $normalizedPagePath === 'registration/form_non_member') {
+            return redirect()->to($conferenceBaseUrl . '/registration/form');
+        }
         if ($this->isFrontendMemberLoggedIn() && $normalizedPagePath === 'abstract/submission') {
             return redirect()->to($conferenceBaseUrl . '/abstract/form_member');
         }
@@ -448,6 +451,9 @@ class AcademicConferenceSiteController extends Controller
         $event = $this->conferenceService->findPublicEventByFolder($folderName);
         $conferenceBaseUrl = $this->conferenceService->baseUrl($event);
 
+        if ($this->isFrontendMemberLoggedIn()) {
+            return $this->registrationFormError($request, 'registration', '회원은 회원 참가신청 페이지에서 신청해주세요.');
+        }
         if (! $this->registrationService->canPreRegister($event)) {
             return $this->registrationFormError($request, 'registration', '사전등록 기간이 종료되었습니다.');
         }

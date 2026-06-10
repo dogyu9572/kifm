@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FrontendSubcommitteeDiscussionCommentRequest;
 use App\Http\Requests\FrontendSubcommitteeDiscussionStoreRequest;
+use App\Models\BoardComment;
 use App\Models\CommunityCommittee;
 use App\Models\CommunityCommitteeApplication;
 use App\Models\Popup;
@@ -238,13 +239,58 @@ class SubcommitteeController extends Controller
         }
 
         $user = Auth::user();
+        $attachments = $this->publicBoardService->storeDiscussionCommentAttachments([
+            'attach_file' => $request->file('attach_file'),
+            'attach_image' => $request->file('attach_image'),
+        ]);
+
         $this->publicBoardService->createComment(
             'community_committee_discussions',
             $id,
             $request->validated('content'),
             (int) $user->id,
-            ($user->name ?: $user->login_id) ?: '회원'
+            ($user->name ?: $user->login_id) ?: '회원',
+            $attachments
         );
+
+        return redirect()->route('subcommittee.discussion_show', [$committee, $id]);
+    }
+
+    public function discussionCommentUpdate(
+        FrontendSubcommitteeDiscussionCommentRequest $request,
+        CommunityCommittee $committee,
+        int $id,
+        int $comment
+    ): RedirectResponse {
+        $this->assertMayAccessCommittee($committee);
+
+        $this->assertDiscussionExists($committee, $id);
+        $commentModel = $this->publicBoardService->findComment('community_committee_discussions', $id, $comment);
+        if (! $commentModel instanceof BoardComment) {
+            throw new NotFoundHttpException();
+        }
+
+        $this->assertMayManageComment($commentModel);
+        $this->publicBoardService->updateComment($commentModel, $request->validated('content'));
+
+        return redirect()->route('subcommittee.discussion_show', [$committee, $id]);
+    }
+
+    public function discussionCommentDestroy(
+        CommunityCommittee $committee,
+        int $id,
+        int $comment
+    ): RedirectResponse {
+        $this->assertMayAccessCommittee($committee);
+
+        $this->assertDiscussionExists($committee, $id);
+        $commentModel = $this->publicBoardService->findComment('community_committee_discussions', $id, $comment);
+        if (! $commentModel instanceof BoardComment) {
+            throw new NotFoundHttpException();
+        }
+
+        $this->assertMayManageComment($commentModel);
+        $this->publicBoardService->deleteComment($commentModel);
 
         return redirect()->route('subcommittee.discussion_show', [$committee, $id]);
     }
@@ -321,6 +367,27 @@ class SubcommitteeController extends Controller
             return;
         }
         if (! $user->canAccessCommunityCommitteeId((string) $committee->id)) {
+            abort(403);
+        }
+    }
+
+    private function assertDiscussionExists(CommunityCommittee $committee, int $id): void
+    {
+        if (! $this->publicBoardService->exists('community_committee_discussions', $id, $committee->name)) {
+            throw new NotFoundHttpException();
+        }
+    }
+
+    private function assertMayManageComment(BoardComment $comment): void
+    {
+        $user = Auth::user();
+        if ($user === null) {
+            abort(403);
+        }
+        if ($user->isAdmin()) {
+            return;
+        }
+        if ((int) $comment->user_id !== (int) $user->id) {
             abort(403);
         }
     }

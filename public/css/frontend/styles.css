@@ -943,7 +943,9 @@
 	.chat_area .chat .name .option_area {position:relative; top:0;}
 	.chat_area .chat .name .option_area .btn_option {font-size:0; width:26px; height:26px; background:#f8f8f8 url('/images/icon_option.svg') no-repeat 50% 50%; border-radius:50%; padding:0;}
 	.chat_area .chat .name .option_area ul {position:absolute; top:38px; width:120px; padding:12px 0; border:#ddd 1px solid; border-radius:8px; background:#fff; box-shadow:rgba(0,0,0,.08) 0 4px 10px; display:none;}
-	.chat_area .chat .name .option_area button {display:block; font-size:16px; padding:12px 24px;}
+	.chat_area .chat .name .option_area ul.is-open {display:block;}
+	.chat_area .chat .name .option_area form {margin:0;}
+	.chat_area .chat .name .option_area button {display:block; width:100%; box-sizing:border-box; font-size:16px; text-align:left; padding:12px 24px;}
 	.chat_area .chat.you {padding:0 360px 0 0; align-items:flex-start;}
 	.chat_area .chat.me {padding:0 0 0 360px; align-items:flex-end;}
 	.chat_area .chat.you .imgfit {left:0;}
@@ -956,6 +958,13 @@
 	.chat_area .txtbox {padding:24px;}
 	.chat_area .chat.you .txtbox {background:#ECF5F8; border-radius:0 16px 16px 16px;}
 	.chat_area .chat.me .txtbox {color:#fff; background:#0088B8; border-radius:16px 0 16px 16px;}
+	.chat_attachments {display:flex; flex-direction:column; gap:8px; margin-top:12px;}
+	.chat_attachment_image {display:block;}
+	.chat_attachment_image img {display:block; max-width:220px; max-height:220px; border-radius:8px;}
+	.chat_attachment_file {display:block; text-decoration:underline; word-break:break-all;}
+	.chat_area .chat.me .chat_attachment_file {color:#fff;}
+	.chat_edit_form {width:100%;}
+	.chat_edit_form .chat_input {margin-top:8px;}
 	.chat_input_area {border-top:#ddd 1px solid; padding:16px;}
 	.attach_area {display:flex; flex-wrap:wrap; gap:5px 24px; padding-bottom:10px;}
 	.attach_area .input_attach {position:relative; z-index:1; display:flex; align-items:center;}
@@ -1558,11 +1567,15 @@
 	.terms_area h2 ~ h2 ~ h2 ~ h2 ~ h2 ~ h2:before {content:"6";}
 	.terms_area h2 ~ h2 ~ h2 ~ h2 ~ h2 ~ h2 ~ h2:before {content:"7";}
 	.terms_area h2 ~ h2 ~ h2 ~ h2 ~ h2 ~ h2 ~ h2 ~ h2:before {content:"8";}
-	.terms_area h3 {margin-top:40px;}
-	.terms_area p {font-size:16px; color:#666; line-height:1.6;}
-	.terms_area .terms_note {font-size:16px; color:#666; line-height:1.6; margin-top:5px;}
-/* 개인정보처리방침 */
-	.privacy_policy_head {padding:40px;}
+		.terms_area h3 {margin-top:40px;}
+		.terms_area p {font-size:16px; color:#666; line-height:1.6;}
+		.terms_area .terms_note {font-size:16px; color:#666; line-height:1.6; margin-top:5px;}
+		.terms_area .terms_content h1 {font-size:24px; line-height:1.4; margin-bottom:24px; border-bottom:0;}
+		.terms_area .terms_content h2 {padding-left:0;}
+		.terms_area .terms_content h2:before {display:none;}
+		.terms_area .terms_content p {margin-top:10px; word-break:keep-all;}
+	/* 개인정보처리방침 */
+		.privacy_policy_head {padding:40px;}
 /* 이메일 무단 수집 거부 */
 	.email_collection_refusal_area {padding:80px 20px; gap:16px;}
 	.email_collection_refusal_area:before {content:""; display:block; width:60px; height:60px; background:#0088B8 url('/images/icon_email_line.svg') no-repeat 50% 50%; border-radius:50%;}

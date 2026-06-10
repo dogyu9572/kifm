@@ -33,6 +33,7 @@
 			@if (! empty($attachments))
 			<div class="file_area">
 				@foreach ($attachments as $attachment)
+				@if ($attachment['path'] !== '')
 				<a href="{{ asset('storage/'.$attachment['path']) }}" download="{{ $attachment['name'] }}">
 					<strong>{{ $attachment['name'] }}</strong>
 					@if (isset($attachment['size']))
@@ -40,6 +41,14 @@
 					@endif
 					<i class="btn_download flex_center">다운로드</i>
 				</a>
+				@else
+				<a href="javascript:void(0);">
+					<strong>{{ $attachment['name'] }}</strong>
+					@if (isset($attachment['size']))
+					<span>({{ number_format((int) $attachment['size'] / 1024, 1) }}KB)</span>
+					@endif
+				</a>
+				@endif
 				@endforeach
 			</div>
 			@endif
@@ -70,12 +79,21 @@
 				@if (! empty($answer_attachments))
 				<div class="file_area">
 					@foreach ($answer_attachments as $attachment)
+					@if ($attachment['path'] !== '')
 					<a href="{{ asset('storage/'.$attachment['path']) }}" download="{{ $attachment['name'] }}">
 						<strong>{{ $attachment['name'] }}</strong>
 						@if (isset($attachment['size']))
 						<span>({{ number_format((int) $attachment['size'] / 1024, 1) }}KB)</span>
 						@endif
 					</a>
+					@else
+					<a href="javascript:void(0);">
+						<strong>{{ $attachment['name'] }}</strong>
+						@if (isset($attachment['size']))
+						<span>({{ number_format((int) $attachment['size'] / 1024, 1) }}KB)</span>
+						@endif
+					</a>
+					@endif
 					@endforeach
 				</div>
 				@endif

@@ -449,6 +449,20 @@ document.addEventListener('DOMContentLoaded', () => {
         tbody.appendChild(tr);
     });
 
+    document.getElementById('bo-venue-floors-body')?.addEventListener('click', (event) => {
+        const removeBtn = event.target.closest('[data-remove-existing-venue-floor-file]');
+        if (!removeBtn) {
+            return;
+        }
+
+        const row = removeBtn.closest('tr');
+        const deleteInput = row?.querySelector('[data-venue-floor-delete-file]');
+        if (deleteInput) {
+            deleteInput.value = '1';
+        }
+        removeBtn.closest('.board-existing-files')?.classList.add('bo-hidden');
+    });
+
     document.getElementById('bo-add-abstract-field-btn')?.addEventListener('click', () => {
         const tbody = document.getElementById('bo-abstract-fields-body');
         const tpl = document.getElementById('bo-template-abstract-field');
@@ -1178,13 +1192,14 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteCheckboxId: 'delete_greeting_image',
             existingItemId: 'bo-academic-greeting-existing-item',
         });
-        window.initBoardImageFilePreview({
-            inputId: 'academic_exhibition_image_file',
-            previewId: 'academicExhibitionImageFilePreview',
-            removeExistingSelector: '[data-remove-existing-target="exhibition_image"]',
-            deleteCheckboxId: 'delete_exhibition_image',
-            existingItemId: 'bo-academic-exhibition-existing-item',
-        });
+        // 단일 Exhibition 이미지는 사용하지 않고 행사장 층별 안내 파일을 Exhibition 탭에 사용한다.
+        // window.initBoardImageFilePreview({
+        //     inputId: 'academic_exhibition_image_file',
+        //     previewId: 'academicExhibitionImageFilePreview',
+        //     removeExistingSelector: '[data-remove-existing-target="exhibition_image"]',
+        //     deleteCheckboxId: 'delete_exhibition_image',
+        //     existingItemId: 'bo-academic-exhibition-existing-item',
+        // });
     }
 
     const initAcademicSingleFilePreview = ({ inputId, previewId, deleteCheckboxId, existingItemId }) => {

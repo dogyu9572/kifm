@@ -15,6 +15,14 @@
             return;
         }
 
+        document.querySelectorAll('[data-bookmark-content-type-filter]').forEach(function (select) {
+            select.addEventListener('change', function () {
+                if (select.form) {
+                    select.form.submit();
+                }
+            });
+        });
+
         var destroyUrl = wrap.getAttribute('data-destroy-url');
         if (!destroyUrl) {
             return;

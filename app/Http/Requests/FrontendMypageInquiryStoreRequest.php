@@ -16,6 +16,10 @@ class FrontendMypageInquiryStoreRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:255'],
             'content' => ['required', 'string'],
+            'attachments' => ['nullable', 'array', 'max:5'],
+            'attachments.*' => ['file', 'max:10240'],
+            'delete_attachments' => ['nullable', 'array'],
+            'delete_attachments.*' => ['integer', 'min:0'],
         ];
     }
 }

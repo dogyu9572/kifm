@@ -76,6 +76,7 @@ class AcademicEventRequest extends FormRequest
             'venue_floors' => ['nullable', 'array'],
             'venue_floors.*.floor_name' => ['nullable', 'string', 'max:100'],
             'venue_floors.*.file_path' => ['nullable', 'string', 'max:500'],
+            'venue_floors.*.delete_file' => ['nullable', 'boolean'],
             'venue_floors.*.sort_order' => ['nullable', 'integer'],
             'abstract_fields' => ['nullable', 'array'],
             'abstract_fields.*.name' => ['nullable', 'string', 'max:150'],

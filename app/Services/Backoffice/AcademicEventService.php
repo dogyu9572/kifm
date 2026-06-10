@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 use Throwable;
 
@@ -339,9 +340,14 @@ class AcademicEventService
             if ($name === '') {
                 continue;
             }
+            $filePath = $row['file_path'] ?? null;
+            if (! empty($row['delete_file']) && $filePath) {
+                Storage::disk('public')->delete($filePath);
+                $filePath = null;
+            }
             $event->venueFloors()->create([
                 'floor_name' => $name,
-                'file_path' => $row['file_path'] ?? null,
+                'file_path' => $filePath,
                 'sort_order' => (int) ($row['sort_order'] ?? $i),
             ]);
         }

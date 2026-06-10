@@ -83,6 +83,10 @@ class MypagePrintService
         return MemberExecutive::query()
             ->where('member_id', $user->id)
             ->whereKey($executiveId)
+            ->where(function ($query) {
+                $query->whereNull('term_start_date')
+                    ->orWhereDate('term_start_date', '<=', now()->toDateString());
+            })
             ->first();
     }
 

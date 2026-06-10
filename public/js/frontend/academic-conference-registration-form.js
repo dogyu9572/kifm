@@ -317,6 +317,13 @@
             return false;
         }
 
+        const refundBank = form.querySelector('select[name="refund_bank"]');
+        if (refundBank && !refundBank.value.trim()) {
+            window.alert('환불 은행을 선택해주세요.');
+            refundBank.focus();
+            return false;
+        }
+
         const refundAccount = form.querySelector('input[name="refund_account"]');
         if (refundAccount && !refundAccount.value.trim()) {
             window.alert('환불 계좌번호를 입력해주세요.');

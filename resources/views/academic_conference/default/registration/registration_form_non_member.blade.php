@@ -11,6 +11,8 @@
     $subtotal = $paymentPlans
         ->whereIn('id', $selectedPlanIds)
         ->sum(fn ($plan) => (int) $plan->price_early);
+    $refundBankOptions = ['국민은행', '신한은행', '우리은행', '하나은행', '농협은행', '기업은행', '카카오뱅크', '토스뱅크', '케이뱅크', 'SC제일은행', '씨티은행', '새마을금고', '신협', '우체국'];
+    $selectedPaymentMethod = old('payment_method', 'card');
 @endphp
 <main class="sub_area">
 
@@ -137,22 +139,25 @@
 
                 <fieldset>
                     <legend class="form_tit">결제 수단 선택</legend>
-                    <div class="inputs">
-                        <ul class="btns_flex">
-                            <li class="radio">
-                                <input type="radio" name="payment_method_display" id="payment_type_card" value="card" checked>
-                                <label for="payment_type_card"><span>신용카드</span></label>
-                            </li>
-                            <li class="radio">
-                                <input type="radio" name="payment_method_display" id="payment_type_bank" value="bank">
-                                <label for="payment_type_bank"><span>무통장입금</span></label>
-                            </li>
-                        </ul>
-                        <input type="hidden" name="payment_method" id="academic-payment-method" value="card">
-						<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
-                        @error('payment')
-                            <p class="c_red" role="alert">{{ $message }}</p>
-                        @enderror
+	                    <div class="inputs">
+	                        <ul class="btns_flex">
+	                            <li class="radio">
+	                                <input type="radio" name="payment_method_display" id="payment_type_card" value="card" @checked($selectedPaymentMethod !== 'bank_transfer')>
+	                                <label for="payment_type_card"><span>신용카드</span></label>
+	                            </li>
+	                            <li class="radio">
+	                                <input type="radio" name="payment_method_display" id="payment_type_bank" value="bank" @checked($selectedPaymentMethod === 'bank_transfer')>
+	                                <label for="payment_type_bank"><span>무통장입금</span></label>
+	                            </li>
+	                        </ul>
+	                        <input type="hidden" name="payment_method" id="academic-payment-method" value="{{ $selectedPaymentMethod === 'bank_transfer' ? 'bank_transfer' : 'card' }}">
+							<p class="c_red type_card" role="alert">* 카드전표는 등록하신 이메일로 자동발송됩니다.</p>
+	                        @error('payment_method')
+	                            <p class="c_red" role="alert">{{ $message }}</p>
+	                        @enderror
+	                        @error('payment')
+	                            <p class="c_red" role="alert">{{ $message }}</p>
+	                        @enderror
 
 						<div class="type_bank_hide bank_info_area">
                             <ul>
@@ -184,26 +189,38 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="type_bank_hide">
-                    <legend class="form_tit">환불정보</legend>
-                    <div class="inputs">
-                    	<ul class="long_label">
-                    	    <li>
-                    	        <label for="training-refund-bank">은행명/계좌번호</label>
-                    	        <div class="flex bank text">
-                    	            <select name="refund_bank" id="training-refund-bank" class="text">
-                    	                <option value="국민은행" @selected(old('refund_bank') === '국민은행')>국민은행</option>
-                    	            </select>
-	                    	            <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
-	                    	        </div>
-	                    	    </li>
-	                    	    <li>
-	                    	        <label for="training-refund-holder">예금주명</label>
-	                    	        <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="이메일을 입력해주세요">
-	                    	    </li>
-                    	</ul>
-                    </div>
-                </fieldset>
+	                <fieldset class="type_bank_hide">
+	                    <legend class="form_tit">환불정보</legend>
+	                    <div class="inputs">
+		<ul class="long_label">
+		    <li>
+		        <label for="training-refund-bank">은행명/계좌번호<span class="required c_iden">*</span></label>
+		        <div class="flex bank text">
+		            <select name="refund_bank" id="training-refund-bank" class="text">
+			                        <option value="">-- 은행 선택 --</option>
+		                @foreach ($refundBankOptions as $bankName)
+		                    <option value="{{ $bankName }}" @selected(old('refund_bank') === $bankName)>{{ $bankName }}</option>
+		                @endforeach
+		            </select>
+			            <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
+			        </div>
+			        @error('refund_bank')
+			            <p class="c_red" role="alert">{{ $message }}</p>
+			        @enderror
+			        @error('refund_account')
+			            <p class="c_red" role="alert">{{ $message }}</p>
+			        @enderror
+			    </li>
+			    <li>
+			        <label for="training-refund-holder">예금주명<span class="required c_iden">*</span></label>
+			        <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder', old('name')) }}" placeholder="예금주명을 입력해주세요">
+			        @error('refund_holder')
+			            <p class="c_red" role="alert">{{ $message }}</p>
+			        @enderror
+			    </li>
+		</ul>
+	                    </div>
+	                </fieldset>
 
                 <fieldset class="type_bank_hide">
                     <legend class="form_tit">현금 영수증 발행</legend>
@@ -226,6 +243,9 @@
 									<option value="PERSONAL" @selected(old('receipt_type') === 'PERSONAL')>개인소득공제용</option>
 									<option value="CARD" @selected(old('receipt_type') === 'CARD')>사업자증빙용</option>
 								</select>
+	                                @error('receipt_type')
+	                                    <p class="c_red" role="alert">{{ $message }}</p>
+	                                @enderror
 							</li>
 							<li>
 								<label for="receipt_number">현금영수증 번호<span class="required c_iden">*</span></label>

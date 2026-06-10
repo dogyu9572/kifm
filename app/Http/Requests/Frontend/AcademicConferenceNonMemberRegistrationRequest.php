@@ -9,7 +9,7 @@ class AcademicConferenceNonMemberRegistrationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return ! auth()->check() || auth()->user()?->role !== 'user';
+        return true;
     }
 
     protected function prepareForValidation(): void

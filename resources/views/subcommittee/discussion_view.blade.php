@@ -5,7 +5,9 @@
 @section('dName', $dName)
 @section('content')
 @php
+    $currentUser = auth()->user();
     $currentUserId = (int) auth()->id();
+    $currentUserCanManageAll = $currentUser && $currentUser->isAdmin();
     $postContent = trim(strip_tags((string) $post->content));
     $showPostContent = $postContent !== '' && $postContent !== trim((string) $post->title);
 @endphp
@@ -39,50 +41,96 @@
 				@endif
 
 				@foreach ($comments as $comment)
+					@php
+						$canManageComment = $currentUserCanManageAll || (int) ($comment->user_id ?? 0) === $currentUserId;
+					@endphp
 					<div class="chat {{ (int) ($comment->user_id ?? 0) === $currentUserId ? 'me' : 'you' }}">
 						<div class="name">
 							<strong>{{ (int) ($comment->user_id ?? 0) === $currentUserId ? '(나) ' : '' }}{{ $comment->author_name ?: '회원' }}</strong>
 							<div class="date">{{ $comment->created_at->format('Y.m.d H:i') }}</div>
+							@if ($canManageComment)
 							<div class="option_area">
 								<button type="button" class="btn_option">수정/삭제 펼침</button>
 								<ul>
-									<li><button type="button">수정</button></li>
-									<li><button type="button">삭제</button></li>
+									<li><button type="button" data-comment-edit-toggle data-comment-id="{{ $comment->id }}">수정</button></li>
+									<li>
+										<form method="POST" action="{{ route('subcommittee.discussion_comment_destroy', [$committee, $post->id, $comment->id]) }}" data-comment-delete-form>
+											@csrf
+											@method('DELETE')
+											<button type="submit">삭제</button>
+										</form>
+									</li>
 								</ul>
 							</div>
+							@endif
 						</div>
-						<div class="txtbox">
+						<div class="txtbox" data-comment-body="{{ $comment->id }}">
 							{!! nl2br(e($comment->content)) !!}
+							@include('subcommittee.partials.discussion_comment_attachments', ['attachments' => $comment->display_attachments ?? []])
 						</div>
+						@if ($canManageComment)
+							<form method="POST" action="{{ route('subcommittee.discussion_comment_update', [$committee, $post->id, $comment->id]) }}" class="chat_edit_form" data-comment-edit-form data-comment-id="{{ $comment->id }}" hidden>
+								@csrf
+								@method('PUT')
+								<div class="chat_input">
+									<input type="text" name="content" class="text" value="{{ $comment->content }}" required>
+									<button type="submit" class="btn btn_wkk">수정</button>
+									<button type="button" class="btn btn_kwg" data-comment-edit-cancel data-comment-id="{{ $comment->id }}">취소</button>
+								</div>
+							</form>
+						@endif
 					</div>
 
 					@foreach ($comment->replies as $reply)
+						@php
+							$canManageReply = $currentUserCanManageAll || (int) ($reply->user_id ?? 0) === $currentUserId;
+						@endphp
 						<div class="chat {{ (int) ($reply->user_id ?? 0) === $currentUserId ? 'me' : 'you' }}">
 							<div class="name">
 								<strong>{{ (int) ($reply->user_id ?? 0) === $currentUserId ? '(나) ' : '' }}{{ $reply->author_name ?: '회원' }}</strong>
 								<div class="date">{{ $reply->created_at->format('Y.m.d H:i') }}</div>
+								@if ($canManageReply)
 								<div class="option_area">
 									<button type="button" class="btn_option">수정/삭제 펼침</button>
 									<ul>
-										<li><button type="button">수정</button></li>
-										<li><button type="button">삭제</button></li>
+										<li><button type="button" data-comment-edit-toggle data-comment-id="{{ $reply->id }}">수정</button></li>
+										<li>
+											<form method="POST" action="{{ route('subcommittee.discussion_comment_destroy', [$committee, $post->id, $reply->id]) }}" data-comment-delete-form>
+												@csrf
+												@method('DELETE')
+												<button type="submit">삭제</button>
+											</form>
+										</li>
 									</ul>
 								</div>
+								@endif
 							</div>
-							<div class="txtbox">
+							<div class="txtbox" data-comment-body="{{ $reply->id }}">
 								{!! nl2br(e($reply->content)) !!}
+								@include('subcommittee.partials.discussion_comment_attachments', ['attachments' => $reply->display_attachments ?? []])
 							</div>
+							@if ($canManageReply)
+								<form method="POST" action="{{ route('subcommittee.discussion_comment_update', [$committee, $post->id, $reply->id]) }}" class="chat_edit_form" data-comment-edit-form data-comment-id="{{ $reply->id }}" hidden>
+									@csrf
+									@method('PUT')
+									<div class="chat_input">
+										<input type="text" name="content" class="text" value="{{ $reply->content }}" required>
+										<button type="submit" class="btn btn_wkk">수정</button>
+										<button type="button" class="btn btn_kwg" data-comment-edit-cancel data-comment-id="{{ $reply->id }}">취소</button>
+									</div>
+								</form>
+							@endif
 						</div>
 					@endforeach
 				@endforeach
 			</div>
 			<div class="chat_input_area">
-				<div class="attach_area">
-					<div class="input_attach attach_file_box"><input type="file" id="attach_file"><label for="attach_file"><strong>첨부파일</strong></label><p></p></div>
-					<div class="input_attach attach_image_box"><input type="file" id="attach_image"><label for="attach_image"><strong>이미지</strong></label><p>권장 사이즈: 200x200</p></div>
-				</div>
-				<form method="POST" action="{{ route('subcommittee.discussion_comment_store', [$committee, $post->id]) }}" class="chat_input_area" data-subcommittee-discussion-comment-form data-validation-message="{{ $errors->first('content') }}">
+					<form method="POST" action="{{ route('subcommittee.discussion_comment_store', [$committee, $post->id]) }}" enctype="multipart/form-data" data-subcommittee-discussion-comment-form data-validation-message="{{ isset($errors) ? $errors->first('content') : '' }}">
 					@csrf
+					<div class="attach_area">
+						<div class="input_attach attach_file_box"><input type="file" id="attach_file" name="attach_file"><label for="attach_file"><strong>첨부파일</strong></label><p></p></div>
+						<div class="input_attach attach_image_box"><input type="file" id="attach_image" name="attach_image" accept="image/*"><label for="attach_image"><strong>이미지</strong></label><p>권장 사이즈: 200x200</p></div>
+					</div>
 					<div class="chat_input">
 						<input type="text" name="content" class="text" value="{{ old('content') }}" placeholder="답글 내용을 작성해주세요.">
 						<button type="submit" class="btn btn_wkk">보내기</button>
@@ -105,68 +153,4 @@
 @push('scripts')
 <script src="{{ asset('js/frontend/script_bookmark.js') }}"></script>
 <script src="{{ asset('js/frontend/subcommittee-discussion.js') }}"></script>
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-    const chatArea = document.querySelector('.chat_area');
-    if (chatArea) chatArea.scrollTop = chatArea.scrollHeight;
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const fileInputs = document.querySelectorAll('.input_attach input[type="file"]');
-
-    fileInputs.forEach(input => {
-        const container = input.closest('.input_attach');
-        const pTag = container.querySelector('p');
-        const defaultText = pTag.innerHTML;
-
-        input.addEventListener('change', function (e) {
-            const file = e.target.files[0];
-
-            pTag.innerHTML = '';
-
-            if (file) {
-                container.classList.add('in');
-
-                const nameSpan = document.createElement('span');
-                nameSpan.textContent = file.name + ' ';
-                nameSpan.style.marginRight = '10px';
-
-                const delBtn = document.createElement('button');
-                delBtn.type = 'button';
-                delBtn.textContent = '삭제';
-                delBtn.style.cursor = 'pointer';
-
-                delBtn.addEventListener('click', function () {
-                    input.value = '';
-                    pTag.innerHTML = defaultText;
-                    container.classList.remove('in');
-                });
-
-                pTag.appendChild(nameSpan);
-                pTag.appendChild(delBtn);
-            } else {
-                pTag.innerHTML = defaultText;
-                container.classList.remove('in');
-            }
-        });
-    });
-	initOptionAreaToggle();
-});
-function initOptionAreaToggle() {
-    const optionButtons = document.querySelectorAll('.option_area .btn_option');
-    
-    optionButtons.forEach(button => {
-        const targetUl = button.nextElementSibling;
-        
-        if (targetUl && targetUl.tagName.toLowerCase() === 'ul') {
-            button.addEventListener('click', function() {
-                if (targetUl.style.display === 'block') {
-                    targetUl.style.display = 'none';
-                } else {
-                    targetUl.style.display = 'block';
-                }
-            });
-        }
-    });
-}
-</script>
 @endpush

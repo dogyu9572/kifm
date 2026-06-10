@@ -10,7 +10,7 @@
 		<div class="sub_title">{{ $sName }}</div>
 
 		<div class="glbox board_write inquiry_write_area">
-			<form action="{{ isset($post) ? route('mypage.inquiry.update', $post->id) : route('mypage.inquiry.store') }}" method="POST">
+			<form action="{{ isset($post) ? route('mypage.inquiry.update', $post->id) : route('mypage.inquiry.store') }}" method="POST" enctype="multipart/form-data" data-mypage-inquiry-form>
 				@csrf
 				@if (isset($post))
 				@method('PUT')
@@ -39,13 +39,30 @@
 							<th scope="row">첨부파일</th>
 							<td>
 								<div class="file_wrap">
-									<div class="flex">
+									<div class="flex" data-inquiry-file-row>
 										<input type="text" class="text" data-abstract-file-name readonly>
-										<div class="file_input"><input type="file" id="file01" name="attachments[]" data-abstract-file-input><label for="file01" class="btn_file btn_wkk">파일첨부</label></div>
+										<div class="file_input">
+											<input type="file" id="file01" name="attachments[]" data-abstract-file-input>
+											<label for="file01" class="btn_file btn_wkk">파일첨부</label>
+										</div>
 										<button type="button" class="btn btn_plma btn_plus">추가</button>
 									</div>
 								</div>
-								<div class="file_list none" data-abstract-file-list></div>
+								<div class="file_list @if(empty($attachments ?? [])) none @endif" data-abstract-file-list>
+									@foreach (($attachments ?? []) as $attachmentIndex => $attachment)
+									@if ($attachment['path'] !== '')
+									<a href="{{ asset('storage/'.$attachment['path']) }}" download="{{ $attachment['name'] }}" data-existing-attachment-index="{{ $attachmentIndex }}">{{ $attachment['name'] }}</a>
+									@else
+									<a href="javascript:void(0);" data-existing-attachment-index="{{ $attachmentIndex }}">{{ $attachment['name'] }}</a>
+									@endif
+									@endforeach
+								</div>
+								@error('attachments')
+								<p class="c_red" role="alert">{{ $message }}</p>
+								@enderror
+								@error('attachments.*')
+								<p class="c_red" role="alert">{{ $message }}</p>
+								@enderror
 							</td>
 						</tr>
 						<tr>
@@ -78,94 +95,5 @@
 
 
 @push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.body.addEventListener('change', function(e) {
-        if (e.target && e.target.hasAttribute('data-abstract-file-input')) {
-            const fileInput = e.target;
-            const fileWrap = fileInput.closest('.file_wrap');
-            const textInput = fileWrap.querySelector('[data-abstract-file-name]');
-            const fileList = fileWrap.closest('td').querySelector('[data-abstract-file-list]');
-            const files = fileInput.files;
-            
-            if (files.length > 0) {
-                textInput.value = files[0].name;
-                fileList.classList.remove('none');
-
-                Array.from(files).forEach(file => {
-                    const link = document.createElement('a');
-                    link.href = 'javascript:void(0);';
-                    link.textContent = file.name;
-                    
-                    link._relatedInput = fileInput;
-                    link._relatedTextInput = textInput;
-                    
-                    fileList.appendChild(link);
-                });
-            }
-        }
-    });
-
-    document.body.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('btn_plus')) {
-            const currentFlex = e.target.closest('.flex');
-            const fileWrap = currentFlex.closest('.file_wrap');
-            const cloneFlex = currentFlex.cloneNode(true);
-            const textInput = cloneFlex.querySelector('[data-abstract-file-name]');
-            const fileInput = cloneFlex.querySelector('[data-abstract-file-input]');
-            
-            if(textInput) textInput.value = '';
-            if(fileInput) fileInput.value = '';
-
-            const uniqueId = 'file_' + new Date().getTime() + '_' + Math.floor(Math.random() * 1000);
-            const label = cloneFlex.querySelector('label');
-            if(fileInput && label) {
-                fileInput.id = uniqueId;
-                label.setAttribute('for', uniqueId);
-            }
-
-            const plusBtn = cloneFlex.querySelector('.btn_plus');
-            plusBtn.textContent = '삭제';
-            plusBtn.classList.remove('btn_plus');
-            plusBtn.classList.add('btn_minus');
-
-            fileWrap.appendChild(cloneFlex);
-        }
-
-        if (e.target && e.target.classList.contains('btn_minus')) {
-            const currentFlex = e.target.closest('.flex');
-            const fileInput = currentFlex.querySelector('[data-abstract-file-input]');
-            const fileList = currentFlex.closest('td').querySelector('[data-abstract-file-list]');
-            
-            if (fileInput && fileList) {
-                const links = fileList.querySelectorAll('a');
-                links.forEach(link => {
-                    if (link._relatedInput === fileInput) {
-                        link.remove();
-                    }
-                });
-                if (fileList.children.length === 0) {
-                    fileList.classList.add('none');
-                }
-            }
-            
-            currentFlex.remove();
-        }
-
-        if (e.target && e.target.closest('[data-abstract-file-list] a')) {
-            const targetLink = e.target;
-            const fileList = targetLink.closest('[data-abstract-file-list]');
-            
-            if (targetLink._relatedInput) targetLink._relatedInput.value = '';
-            if (targetLink._relatedTextInput) targetLink._relatedTextInput.value = '';
-
-            targetLink.remove();
-            
-            if (fileList.children.length === 0) {
-                fileList.classList.add('none');
-            }
-        }
-    });
-});
-</script>
+<script src="{{ asset('js/frontend/mypage-inquiry-write.js') }}?v=2026061004"></script>
 @endpush

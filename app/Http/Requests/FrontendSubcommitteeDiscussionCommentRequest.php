@@ -22,6 +22,8 @@ class FrontendSubcommitteeDiscussionCommentRequest extends FormRequest
     {
         return [
             'content' => ['required', 'string', 'max:65535'],
+            'attach_file' => ['nullable', 'file', 'max:10240'],
+            'attach_image' => ['nullable', 'image', 'max:10240'],
         ];
     }
 

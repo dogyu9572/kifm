@@ -4,11 +4,18 @@ namespace App\Services\Frontend;
 
 use App\Models\OneOnOneInquiry;
 use App\Models\User;
+use App\Support\BackofficeFile;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use stdClass;
+use Throwable;
 
 /**
  * 마이페이지 1:1 문의 — 백오피스 「1:1 문의 관리」와 동일 저장소.
@@ -18,6 +25,9 @@ use stdClass;
  */
 class MypageInquiryService
 {
+    private const ATTACHMENT_DISK = 'public';
+    private const ATTACHMENT_DIR = 'mypage/one-on-one-inquiries/attachments';
+
     public function paginateForMember(User $user, ?Request $request = null, int $perPage = 20): LengthAwarePaginator
     {
         $filters = $this->filters($request);
@@ -127,18 +137,32 @@ class MypageInquiryService
         return ! $this->isAnswered($inquiry);
     }
 
-    public function update(User $user, int $id, string $title, string $content): void
+    /**
+     * @param  array<int, UploadedFile>|UploadedFile|null  $uploadedFiles
+     * @param  array<int, int>  $deleteAttachmentIndexes
+     */
+    public function update(
+        User $user,
+        int $id,
+        string $title,
+        string $content,
+        array|UploadedFile|null $uploadedFiles = null,
+        array $deleteAttachmentIndexes = [],
+    ): void
     {
         $inquiry = $this->findModelForMember($user, $id);
         if ($inquiry === null || $this->isAnswered($inquiry)) {
             abort(403);
         }
 
-        $inquiry->update([
-            'title' => $title,
-            'content' => $content,
-            'content_format' => 'text',
-        ]);
+        DB::transaction(function () use ($inquiry, $title, $content, $uploadedFiles, $deleteAttachmentIndexes): void {
+            $inquiry->title = $title;
+            $inquiry->content = $content;
+            $inquiry->content_format = 'text';
+            $this->removeAttachmentsByIndex($inquiry, $deleteAttachmentIndexes);
+            $this->appendAttachments($inquiry, $uploadedFiles);
+            $inquiry->save();
+        });
     }
 
     public function delete(User $user, int $id): void
@@ -148,23 +172,220 @@ class MypageInquiryService
             abort(403);
         }
 
-        $inquiry->delete();
+        DB::transaction(function () use ($inquiry): void {
+            $this->cleanupAttachments($inquiry);
+            $inquiry->delete();
+        });
     }
 
-    public function create(User $user, string $title, string $content): int
+    /**
+     * @param  array<int, UploadedFile>|UploadedFile|null  $uploadedFiles
+     */
+    public function create(User $user, string $title, string $content, array|UploadedFile|null $uploadedFiles = null): int
     {
-        $inquiry = OneOnOneInquiry::query()->create([
-            'user_id' => $user->id,
-            'member_name' => $user->name,
-            'member_email' => $user->email,
-            'title' => $title,
-            'content' => $content,
-            'content_format' => 'text',
-            'answer_status' => 'PENDING',
-            'client_ip' => request()->ip(),
-        ]);
+        $inquiry = DB::transaction(function () use ($user, $title, $content, $uploadedFiles): OneOnOneInquiry {
+            $inquiry = OneOnOneInquiry::query()->create([
+                'user_id' => $user->id,
+                'member_name' => $user->name,
+                'member_email' => $user->email,
+                'title' => $title,
+                'content' => $content,
+                'content_format' => 'text',
+                'answer_status' => 'PENDING',
+                'client_ip' => request()->ip(),
+            ]);
+
+            $this->appendAttachments($inquiry, $uploadedFiles);
+            $inquiry->save();
+
+            return $inquiry;
+        });
 
         return (int) $inquiry->id;
+    }
+
+    /**
+     * @param  array<int, UploadedFile>|UploadedFile|null  $uploadedFiles
+     */
+    private function appendAttachments(OneOnOneInquiry $inquiry, array|UploadedFile|null $uploadedFiles): void
+    {
+        $files = $this->normalizeUploadedFiles($uploadedFiles);
+        if ($files === []) {
+            return;
+        }
+
+        $existing = is_array($inquiry->attachments) ? $inquiry->attachments : [];
+
+        foreach ($files as $file) {
+            $storedPath = $this->storeInquiryAttachment($inquiry, $file);
+            if ($storedPath === null) {
+                continue;
+            }
+
+            $existing[] = [
+                'path' => $storedPath,
+                'original_name' => $file->getClientOriginalName(),
+                'size' => $file->getSize(),
+                'mime' => $file->getMimeType(),
+            ];
+        }
+
+        if (count($existing) > 5) {
+            $removed = array_slice($existing, 0, count($existing) - 5);
+            foreach ($removed as $attachment) {
+                $path = is_array($attachment) ? ($attachment['path'] ?? null) : null;
+                if (is_string($path) && $path !== '' && Storage::disk(self::ATTACHMENT_DISK)->exists($path)) {
+                    Storage::disk(self::ATTACHMENT_DISK)->delete($path);
+                }
+            }
+            $existing = array_slice($existing, -5);
+        }
+
+        $inquiry->attachments = $existing === [] ? null : array_values($existing);
+    }
+
+    private function storeInquiryAttachment(OneOnOneInquiry $inquiry, UploadedFile $file): ?string
+    {
+        try {
+            $storedPath = BackofficeFile::storeWithOriginalName($file, self::ATTACHMENT_DIR, self::ATTACHMENT_DISK);
+            if (is_string($storedPath) && $storedPath !== '') {
+                return $storedPath;
+            }
+
+            Log::warning('mypage inquiry attachment store returned empty path', [
+                'inquiry_id' => $inquiry->id,
+                'original_name' => $file->getClientOriginalName(),
+                'is_valid' => $file->isValid(),
+                'error' => $file->getError(),
+                'size' => $file->getSize(),
+                'real_path' => $file->getRealPath(),
+                'is_readable' => is_string($file->getRealPath()) && is_readable($file->getRealPath()),
+            ]);
+        } catch (Throwable $exception) {
+            Log::error('mypage inquiry attachment store failed', [
+                'inquiry_id' => $inquiry->id,
+                'original_name' => $file->getClientOriginalName(),
+                'message' => $exception->getMessage(),
+            ]);
+        }
+
+        $fallbackPath = trim(self::ATTACHMENT_DIR, '/') . '/'
+            . Str::random(24) . '__' . $this->sanitizeAttachmentName($file->getClientOriginalName());
+
+        try {
+            $realPath = $file->getRealPath();
+            if (is_string($realPath) && is_readable($realPath)) {
+                $stream = fopen($realPath, 'r');
+                try {
+                    if ($stream !== false && Storage::disk(self::ATTACHMENT_DISK)->put($fallbackPath, $stream)) {
+                        return $fallbackPath;
+                    }
+                } finally {
+                    if (is_resource($stream)) {
+                        fclose($stream);
+                    }
+                }
+            }
+
+            $storedPath = Storage::disk(self::ATTACHMENT_DISK)
+                ->putFileAs(trim(self::ATTACHMENT_DIR, '/'), $file, basename($fallbackPath));
+
+            return is_string($storedPath) && $storedPath !== '' ? $storedPath : null;
+        } catch (Throwable $exception) {
+            Log::error('mypage inquiry attachment fallback store failed', [
+                'inquiry_id' => $inquiry->id,
+                'original_name' => $file->getClientOriginalName(),
+                'message' => $exception->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    private function sanitizeAttachmentName(string $name): string
+    {
+        $name = basename($name);
+        $name = preg_replace('/[\\\\\\/\\x00-\\x1F\\x7F]+/u', '_', $name) ?: 'file';
+        $name = trim($name);
+
+        return $name !== '' ? $name : 'file';
+    }
+
+    /**
+     * @return array<int, UploadedFile>
+     */
+    private function normalizeUploadedFiles(array|UploadedFile|null $uploadedFiles): array
+    {
+        if ($uploadedFiles instanceof UploadedFile) {
+            return $uploadedFiles->isValid() ? [$uploadedFiles] : [];
+        }
+
+        if (! is_array($uploadedFiles)) {
+            return [];
+        }
+
+        $files = [];
+        array_walk_recursive($uploadedFiles, function (mixed $file) use (&$files): void {
+            if ($file instanceof UploadedFile && $file->isValid()) {
+                $files[] = $file;
+            }
+        });
+
+        return $files;
+    }
+
+    /**
+     * @param  array<int, int>  $deleteAttachmentIndexes
+     */
+    private function removeAttachmentsByIndex(OneOnOneInquiry $inquiry, array $deleteAttachmentIndexes): void
+    {
+        $indexes = array_values(array_unique(array_filter(
+            array_map('intval', $deleteAttachmentIndexes),
+            fn (int $index): bool => $index >= 0,
+        )));
+
+        if ($indexes === []) {
+            return;
+        }
+
+        $existing = is_array($inquiry->attachments) ? array_values($inquiry->attachments) : [];
+        if ($existing === []) {
+            return;
+        }
+
+        foreach ($indexes as $index) {
+            if (! array_key_exists($index, $existing)) {
+                continue;
+            }
+
+            $attachment = $existing[$index];
+            $path = is_array($attachment) ? ($attachment['path'] ?? null) : null;
+            if (is_string($path) && $path !== '' && Storage::disk(self::ATTACHMENT_DISK)->exists($path)) {
+                Storage::disk(self::ATTACHMENT_DISK)->delete($path);
+            }
+
+            unset($existing[$index]);
+        }
+
+        $existing = array_values($existing);
+        $inquiry->attachments = $existing === [] ? null : $existing;
+    }
+
+    private function cleanupAttachments(OneOnOneInquiry $inquiry): void
+    {
+        foreach (['attachments', 'answer_attachments'] as $column) {
+            $items = $inquiry->{$column};
+            if (! is_array($items)) {
+                continue;
+            }
+
+            foreach ($items as $item) {
+                $path = is_array($item) ? ($item['path'] ?? null) : null;
+                if (is_string($path) && $path !== '' && Storage::disk(self::ATTACHMENT_DISK)->exists($path)) {
+                    Storage::disk(self::ATTACHMENT_DISK)->delete($path);
+                }
+            }
+        }
     }
 
     private function findModelForMember(User $user, int $id): ?OneOnOneInquiry
@@ -215,17 +436,18 @@ class MypageInquiryService
 
         $items = [];
         foreach ($decoded as $attachment) {
-            if (! is_array($attachment) || empty($attachment['path'])) {
+            if (! is_array($attachment)) {
                 continue;
             }
 
-            $name = $attachment['name'] ?? $attachment['original_name'] ?? null;
+            $path = (string) ($attachment['path'] ?? '');
+            $name = $attachment['name'] ?? $attachment['original_name'] ?? BackofficeFile::displayName($path);
             if ($name === null || $name === '') {
                 continue;
             }
 
             $items[] = [
-                'path' => $attachment['path'],
+                'path' => $path,
                 'name' => $name,
                 'size' => $attachment['size'] ?? null,
             ];
@@ -242,6 +464,7 @@ class MypageInquiryService
         $row->content = $inquiry->content;
         $row->created_at = $inquiry->created_at;
         $row->attachments = $inquiry->attachments;
+        $row->display_attachments = $this->parseAttachments($inquiry->attachments);
 
         $isAnswered = $this->isAnswered($inquiry);
         $row->reply_status = $isAnswered ? 'answered' : 'waiting';

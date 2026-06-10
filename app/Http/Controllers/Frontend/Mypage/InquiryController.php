@@ -51,6 +51,7 @@ class InquiryController extends Controller
 
         return $this->renderMypage('inquiry_write', '04', '1:1 문의', 'inquiry_write', [
             'post' => $post,
+            'attachments' => $post->display_attachments ?? [],
         ]);
     }
 
@@ -61,6 +62,7 @@ class InquiryController extends Controller
             $this->currentMember(),
             $validated['title'],
             $validated['content'],
+            $request->file('attachments'),
         );
 
         return redirect()
@@ -76,6 +78,8 @@ class InquiryController extends Controller
             $id,
             $validated['title'],
             $validated['content'],
+            $request->file('attachments'),
+            $validated['delete_attachments'] ?? [],
         );
 
         return redirect()->route('mypage.inquiry_view', ['id' => $id]);

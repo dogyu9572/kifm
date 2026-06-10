@@ -9,8 +9,10 @@
 
 	<div class="inner">
 		@if(! empty($privacyPolicyPost?->content))
-{!! $privacyPolicyPost->content !!}
-@else
+			<div class="terms_content">
+				{!! $privacyPolicyPost->content !!}
+			</div>
+		@else
 		
 		<div class="blue_box privacy_policy_head">
 

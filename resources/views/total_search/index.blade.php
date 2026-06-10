@@ -29,10 +29,13 @@
         <article class="search_group type1" id="{{ $group['anchor_id'] }}" data-total-search-group>
             <div class="tit_area">
 				<h2 class="group_title">{{ $group['label'] }} <span class="count">(총 <span class="c_red">{{ $group['total'] }}</span>건)</span></h2>
+                @if($group['total'] > 0)
 				<a href="{{ $group['list_url'] }}" class="more" aria-label="더보기">더보기</a>
+                @endif
 			</div>
+            @if(count($group['items']) > 0)
             <ul class="list">
-                @forelse($group['items'] as $item)
+                @foreach($group['items'] as $item)
                 <li>
                     <a href="{{ $item['url'] }}">
                         <span class="state {{ $item['status_class'] }}"><span class="sound_only">현재 상태:</span>{{ $item['status_label'] }}</span>
@@ -43,15 +46,9 @@
                         </div>
                     </a>
                 </li>
-                @empty
-                <li class="no_search">
-                    <a href="#this">
-                        <span class="state end"><span class="sound_only">현재 상태:</span>검색결과 없음</span>
-                        <h3>검색 결과가 없습니다.</h3>
-                    </a>
-                </li>
-                @endforelse
+                @endforeach
             </ul>
+            @endif
         </article>
         @endforeach
 
@@ -59,25 +56,22 @@
         <article class="search_group type2" id="{{ $group['anchor_id'] }}" data-total-search-group>
             <div class="tit_area">
 				<h2 class="group_title">{{ $group['label'] }} <span class="count">(총 <span class="c_red">{{ $group['total'] }}</span>건)</span></h2>
+                @if($group['total'] > 0)
 				<a href="{{ $group['list_url'] }}" class="more" aria-label="더보기">더보기</a>
+                @endif
 			</div>
+            @if(count($group['items']) > 0)
             <ul class="list">
-                @forelse($group['items'] as $item)
+                @foreach($group['items'] as $item)
                 <li class="no_search">
                     <a href="{{ $item['url'] }}">
                         <h3>{{ $item['title'] }}</h3>
                         <p>{{ $item['summary'] !== '' ? $item['summary'] : '내용이 없습니다.' }}</p>
                     </a>
                 </li>
-                @empty
-                <li class="no_search">
-                    <a href="#this">
-                        <h3>검색 결과가 없습니다.</h3>
-                        <p>다른 검색어로 다시 검색해 주세요.</p>
-                    </a>
-                </li>
-                @endforelse
+                @endforeach
             </ul>
+            @endif
         </article>
         @endforeach
 

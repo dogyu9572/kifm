@@ -72,6 +72,7 @@ class ArchivesController extends Controller
             null,
             (string) Auth::user()->member_level
         );
+        $this->publicBoardService->decorateMemberArchiveTypeLabels($posts);
 
         return view('archives.members', array_merge(
             $this->archivesViewData('03', '회원 자료실', 'archives_members'),

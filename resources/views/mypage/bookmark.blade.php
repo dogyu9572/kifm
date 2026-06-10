@@ -14,7 +14,7 @@
 		<div class="board_top">
 			<div class="left">
 				<form method="GET" action="{{ route('mypage.bookmark') }}">
-					<select name="content_type" class="text">
+					<select name="content_type" class="text" data-bookmark-content-type-filter>
 						<option value="all" @selected(($filterContentType ?? 'all') === 'all')>전체보기</option>
 						@foreach ($contentTypeOptions as $contentType)
 						<option value="{{ $contentType['value'] }}" @selected(($filterContentType ?? 'all') === $contentType['value'])>{{ $contentType['label'] }}</option>
@@ -23,7 +23,6 @@
 					@if (! empty($filterKeyword))
 					<input type="hidden" name="keyword" value="{{ $filterKeyword }}">
 					@endif
-					<button type="submit" class="btn_search_solo">검색</button>
 				</form>
 			</div>
 			<div class="right flex">

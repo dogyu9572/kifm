@@ -150,6 +150,14 @@ class PublicAcademicConferenceService
         return $this->optionalImageUrl($path);
     }
 
+    public function isImageFile(?string $path): bool
+    {
+        $path = (string) parse_url((string) $path, PHP_URL_PATH);
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        return in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'], true);
+    }
+
     public function sessionDateText(AcademicEventSession $session): string
     {
         return $session->session_date ? $session->session_date->format('Y.m.d') . ' (' . $this->weekday($session->session_date) . ')' : '';

@@ -52,13 +52,13 @@
 							@else
 								<td class="num">{{ $posts->total() - (($posts->currentPage() - 1) * $posts->perPage()) - $loop->index }}</td>
 							@endif
-							<td class="type">학회 자료</td>
+							<td class="type">{{ $post->display_archive_type ?? '-' }}</td>
 							<td class="tal"><a href="{{ route('archives.members_show', $post->id) }}">{{ $post->title }}</a></td>
 							<td class="date">{{ \Carbon\Carbon::parse($post->created_at)->format('Y.m.d') }}</td>
 						</tr>
 					@empty
 						<tr>
-							<td colspan="3" class="tac">등록된 게시글이 없습니다.</td>
+							<td colspan="4" class="tac">등록된 게시글이 없습니다.</td>
 						</tr>
 					@endforelse
 				</tbody>

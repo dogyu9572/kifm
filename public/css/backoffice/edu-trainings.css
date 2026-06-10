@@ -169,6 +169,14 @@
     border-top: 0 none !important;
 }
 
+#bo-venue-floors-table .bo-venue-floor-action-col {
+    width: 90px;
+}
+
+#bo-venue-floors-table .board-existing-files {
+    margin-bottom: 0;
+}
+
 /* 학술행사 세션 목록: 하늘색 헤더 라인 + 회색 이중선 제거 */
 .bo-academic-sessions-table.board-table thead th {
     border-bottom: 2px solid #59aee8;

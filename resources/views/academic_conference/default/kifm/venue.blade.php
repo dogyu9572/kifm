@@ -58,22 +58,9 @@
 					@endif
 				</dl>
 			</div>
-		</div>
-		@if ($event->venueFloors->isNotEmpty())
-			<div class="venue_floor_area">
-				@foreach ($event->venueFloors as $floor)
-					@php $floorFileUrl = $conference->floorFileUrl($floor->file_path); @endphp
-					@if ($floorFileUrl)
-						<figure>
-							<figcaption>{{ $floor->floor_name }}</figcaption>
-							<a href="{{ $floorFileUrl }}" target="_blank" rel="noopener">{{ $floor->floor_name }} 안내 보기</a>
-						</figure>
-					@endif
-				@endforeach
 			</div>
-		@endif
-	</div>
-</section>
+		</div>
+	</section>
 
 </main>
 @endsection

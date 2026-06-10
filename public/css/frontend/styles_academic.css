@@ -36,6 +36,9 @@
 	.tabs .on button {color:#E60012; font-weight:700;}
 	.tabs .on a:after,
 	.tabs .on button:after{width:100%;}
+	.exhibition_floor_area {display:flex; justify-content:center;}
+	.exhibition_floor_panel {width:100%; text-align:center;}
+	.exhibition_floor_panel img {display:block; max-width:100%; margin:0 auto;}
 /* 팝업 */
 	.popup,
 	.popup .dm {position:fixed; top:0; left:0; width:100%; height:100%;}

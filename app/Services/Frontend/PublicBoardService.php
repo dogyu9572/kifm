@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 
 class PublicBoardService
 {
@@ -114,6 +115,20 @@ class PublicBoardService
         return $post;
     }
 
+    public function exists(string $slug, int $id, ?string $committeeCategory = null, ?string $memberLevel = null): bool
+    {
+        $query = DB::table($this->table($slug))
+            ->whereNull('deleted_at')
+            ->where('is_active', true)
+            ->where('is_secret', false)
+            ->where('id', $id);
+
+        $this->applyCommitteeCategoryFilter($query, $slug, $committeeCategory);
+        $this->applyMemberArchiveAccessFilter($query, $slug, $memberLevel);
+
+        return $query->exists();
+    }
+
     /**
      * 이전/다음 글 (목록 정렬과 동일한 기준: 공지 우선, 최신순).
      * 화면에서는 등록일이 더 오래된 글을 "이전 글", 더 최신 글을 "다음 글"로 노출한다.
@@ -185,10 +200,23 @@ class PublicBoardService
                 $query->orderBy('id');
             }])
             ->orderBy('id')
-            ->get();
+            ->get()
+            ->map(function (BoardComment $comment): BoardComment {
+                $this->decorateCommentAttachments($comment);
+                $comment->replies->each(fn (BoardComment $reply) => $this->decorateCommentAttachments($reply));
+
+                return $comment;
+            });
     }
 
-    public function createComment(string $slug, int $postId, string $content, int $userId, string $authorName): BoardComment
+    public function createComment(
+        string $slug,
+        int $postId,
+        string $content,
+        int $userId,
+        string $authorName,
+        array $attachments = []
+    ): BoardComment
     {
         return BoardComment::query()->create([
             'board_slug' => $slug,
@@ -198,10 +226,63 @@ class PublicBoardService
             'author_name' => $authorName,
             'password' => null,
             'content' => $content,
-            'attachments' => null,
+            'attachments' => $attachments !== [] ? $attachments : null,
             'depth' => 0,
             'is_secret' => false,
         ]);
+    }
+
+    /**
+     * @param array<string, UploadedFile|null> $files
+     * @return list<array{name: string, path: string, mime: string|null, size: int, type: string}>
+     */
+    public function storeDiscussionCommentAttachments(array $files): array
+    {
+        $attachments = [];
+
+        foreach (['attach_file' => 'file', 'attach_image' => 'image'] as $input => $type) {
+            $file = $files[$input] ?? null;
+            if (! $file instanceof UploadedFile) {
+                continue;
+            }
+
+            $attachments[] = [
+                'name' => $file->getClientOriginalName(),
+                'path' => $file->store('subcommittee/discussion-comments', 'public'),
+                'mime' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'type' => $type,
+            ];
+        }
+
+        return $attachments;
+    }
+
+    public function findComment(string $slug, int $postId, int $commentId): ?BoardComment
+    {
+        $comment = BoardComment::query()
+            ->forPost($slug, $postId)
+            ->whereKey($commentId)
+            ->first();
+
+        if ($comment instanceof BoardComment) {
+            $this->decorateCommentAttachments($comment);
+        }
+
+        return $comment;
+    }
+
+    public function updateComment(BoardComment $comment, string $content): void
+    {
+        unset($comment->display_attachments);
+        $comment->content = $content;
+        $comment->save();
+    }
+
+    public function deleteComment(BoardComment $comment): void
+    {
+        $this->deleteStoredCommentAttachments($comment);
+        $comment->delete();
     }
 
     public function listAcademicConferenceHistory(Request $request, int $perPage = 10): LengthAwarePaginator
@@ -242,6 +323,26 @@ class PublicBoardService
         }
 
         return $startDate !== '' ? $startDate : $endDate;
+    }
+
+    public function decorateMemberArchiveTypeLabels(LengthAwarePaginator $posts): LengthAwarePaginator
+    {
+        $labels = [
+            'ebook' => 'E-book (초록집)',
+            'video' => '강의 영상',
+            'paper' => '논문/학술지',
+            'guide' => '가이드라인',
+        ];
+
+        $posts->getCollection()->transform(function (object $post) use ($labels): object {
+            $customFields = $this->decodeJsonObject($post->custom_fields ?? null);
+            $archiveType = trim((string) ($customFields['archive_type'] ?? ''));
+            $post->display_archive_type = $labels[$archiveType] ?? ($archiveType !== '' ? $archiveType : '-');
+
+            return $post;
+        });
+
+        return $posts;
     }
 
     public function firstAttachmentUrl(?string $attachments): ?string
@@ -288,6 +389,42 @@ class PublicBoardService
         $first = $decoded[0] ?? [];
 
         return is_array($first) ? $first : [];
+    }
+
+    private function decorateCommentAttachments(BoardComment $comment): void
+    {
+        $items = is_array($comment->attachments) ? $comment->attachments : [];
+
+        $comment->display_attachments = collect($items)
+            ->filter(static fn ($item): bool => is_array($item) && ! empty($item['path']))
+            ->map(function (array $item): array {
+                $path = (string) $item['path'];
+                $mime = (string) ($item['mime'] ?? '');
+
+                return [
+                    'name' => (string) ($item['name'] ?? basename($path)),
+                    'url' => str_starts_with($path, 'http') ? $path : Storage::disk('public')->url($path),
+                    'is_image' => (($item['type'] ?? '') === 'image') || str_starts_with($mime, 'image/'),
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function deleteStoredCommentAttachments(BoardComment $comment): void
+    {
+        $items = is_array($comment->attachments) ? $comment->attachments : [];
+
+        foreach ($items as $item) {
+            if (! is_array($item) || empty($item['path'])) {
+                continue;
+            }
+
+            $path = (string) $item['path'];
+            if (! str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
     }
 
     /**
