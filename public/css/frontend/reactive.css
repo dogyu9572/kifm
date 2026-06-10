@@ -767,7 +767,6 @@
 	.my_head_half .right .participation_area .info {font-size:20px;}
 /* 신청 취소 */
 /* 회원탈퇴 */
-/* 참가내역 관리 */
 /* 상세 */
 	.participation_history_view_top h2 {font-size:24px;}
 	.participation_history_view_top p {margin:12px 0;}
@@ -794,23 +793,29 @@
 	.tbl_break_list .part_his4:before {content:"결제 방법 :";}
 	.tbl_break_list .part_his5:before {content:"신청일 :";}
 	.tbl_break_list .part_his6:before {content:"신청 상태 :";}
+	.participation_history_wrap td {padding:0;}
 /* 온라인 교육 수강내역 */
 	.tbl_break_list .online1 {width:100%; font-weight:600;}
 	.tbl_break_list .online2 {width:80px;}
 	.tbl_break_list .online3 {width:calc(100% - 430px);}
 	.tbl_break_list .online4 {width:180px;}
-	.tbl_break_list .online5 {width:140px;}
+	.tbl_break_list .online5,
 	.tbl_break_list .online6,
 	.tbl_break_list .online7,
-	.tbl_break_list .online8 {width:calc((100% - 20px)/3); text-align:center;}
+	.tbl_break_list .online8 {width:calc((100% - 30px)/4); text-align:center;}
 	.tbl_break_list td[class*="online"] a {width:100%;}
 	.tbl_break_list td[class*="online"]:before {padding-right:5px;}
 	.tbl_break_list .online4 br {display:none;}
 	.tbl_break_list .online2:before {content:"평점 :";}
 	.tbl_break_list .online3:before {content:"수강 기간 :";}
 	.tbl_break_list .online4:before {content:"상태 :";}
-	.tbl_break_list .online5:before {content:"수료증 :";}
-/* 1:1 문의 *//* 즐겨찾는 메뉴 */
+/* 1:1 문의 */
+/* 쓰기 */
+	.inquiry_write_area td .text {height:50px;}
+	.file_wrap .flex .text {flex-basis:calc(100% - 190px);}
+	.file_wrap .flex .file_input label {height:50px; line-height:50px;}
+	.file_wrap .flex .btn_plma {width:50px; height:50px;}
+/* 즐겨찾는 메뉴 */
 	.favorite_wrap .glbox {margin-top:20px;}
 	.favorite_wrap .glbox .box {flex-wrap:wrap; gap:40px 0;}
 	.favorite_wrap .glbox fieldset {width:calc(100% / 4); padding:0 16px; overflow:visible;}
@@ -1732,10 +1737,14 @@
 	.tbl_break_list .part_his8,
 	.tbl_break_list .part_his9 {order:7;}
 /* 온라인 교육 수강내역 */
-	.tbl_break_list .online2 {width:calc(50% - 5px);}
-	.tbl_break_list .online3 {width:calc(50% - 5px);}
-	.tbl_break_list .online4 {width:calc(50% - 5px);}
-	.tbl_break_list .online5 {width:calc(50% - 5px);}
+	.tbl_break_list .online1 {order:1;}
+	.tbl_break_list .online2 {order:3; width:calc(50% - 5px);}
+	.tbl_break_list .online3 {order:2; width:100%;}
+	.tbl_break_list .online4 {order:4; width:calc(50% - 5px);}
+	.tbl_break_list .online5,
+	.tbl_break_list .online6,
+	.tbl_break_list .online7,
+	.tbl_break_list .online8 {order:5; width:calc(50% - 5px);}
 /* 1:1 문의 */
 	.contact_info {padding:16px;}
 	.contact_info:before {width:50px; height:50px; margin-bottom:8px;}
@@ -1763,7 +1772,7 @@
 	.inquiry_write_area td textarea.text {height:120px; padding:12px;}
 	.file_wrap .flex {gap:4px;}
 	.file_wrap .flex + .flex {margin-top:4px;}
-	.file_wrap .flex .text {flex-basis:calc(100% - 128px);}
+	.file_wrap .flex .text {flex-basis:calc(100% - 128px); width:calc(100% - 128px);}
 	.file_wrap .flex .file_input {width:80px;}
 	.file_wrap .flex .file_input label {height:40px; line-height:40px;}
 	.file_wrap .flex .btn_plma {width:40px; height:40px;}
@@ -1799,7 +1808,7 @@
 	.hospital_information_area .text {padding:12px;}
 	.hospital_information_area .about_hospital textarea.edit_area {height:160px;}
 /* 회원 활동(임원) */
-	.mo_break_list.slide4 tr td,
+	.mo_break_list.slide4 tr td {width:auto; flex:1 1 auto;}
 	.mo_break_list.slide5 tr td {width:calc(50% - 5px);}
 	.mo_break_list.slide4 tr td:last-child,
 	.mo_break_list.slide5 tr td:last-child {width:100%;}
@@ -1855,8 +1864,8 @@
 	.mo_tabs_select .btn_select_opcl {position:relative; font-size:14px; font-weight:500; border:#ddd 1px solid; border-radius:4px; display:block; width:100%; text-align:left; padding:0 12px;}
 	.mo_tabs_select .btn_select_opcl:after {content:""; position:absolute; top:0; right:12px; width:18px; height:100%; background:url('/images/arrow_select.svg') no-repeat 50% 50% / contain; transition:.2s linear;}
 	.mo_tabs_select .tabs {position:absolute; top:calc(100% - 1px); left:0; width:100%; overflow:hidden; max-height:0; margin:0; background:#fff;}
-	.mo_tabs_select .tabs li {width: 100%; flex-basis:100%;}
-	.mo_tabs_select .tabs li a {text-align: left; justify-content: flex-start; padding:4px 12px;}
+	.mo_tabs_select .tabs li {width:100%; flex-basis:100%;}
+	.mo_tabs_select .tabs li a {text-align:left; justify-content:flex-start; padding:4px 12px;}
 	.mo_tabs_select.on .btn_select_opcl:after {transform:rotate(180deg);}
 	.mo_tabs_select.on .tabs {padding:10px 0; border:#ddd 1px solid;}
 /* 상세 */

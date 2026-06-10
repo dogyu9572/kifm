@@ -49,7 +49,7 @@
 							</td>
 						</tr>
 						<tr>
-							<th scope="row">자동등록방지*<span class="c_iden">*</span></th>
+							<th scope="row">자동등록방지<span class="c_iden">*</span></th>
 							<td>
 								<div class="captcha_area">
 									<div class="obj imgfit"><img src="{{ route('subcommittee.captcha.discussion') }}" data-src="{{ route('subcommittee.captcha.discussion') }}" data-captcha-image alt="자동등록방지 코드"></div>

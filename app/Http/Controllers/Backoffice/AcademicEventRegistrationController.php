@@ -11,6 +11,7 @@ use App\Models\PaymentPlan;
 use App\Models\User;
 use App\Services\Backoffice\AcademicEventRegistrationService;
 use App\Services\Backoffice\PaymentPlanService;
+use App\Services\Certified\CertifiedQualificationSyncService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +25,8 @@ use Illuminate\Validation\ValidationException;
 class AcademicEventRegistrationController extends Controller
 {
     public function __construct(
-        protected AcademicEventRegistrationService $registrationService
+        protected AcademicEventRegistrationService $registrationService,
+        private readonly CertifiedQualificationSyncService $certifiedQualificationSyncService,
     ) {}
 
     public function index(Request $request): View
@@ -72,7 +74,7 @@ class AcademicEventRegistrationController extends Controller
 
         $event = AcademicEvent::query()->findOrFail((int) $request->input('academic_event_id'));
 
-        DB::transaction(function () use ($request, $items, $event) {
+        $registration = DB::transaction(function () use ($request, $items, $event) {
             $registration = AcademicEventRegistration::query()->create([
                 'registration_no' => $this->registrationService->nextRegistrationNo($event),
                 'academic_event_id' => $event->id,
@@ -101,7 +103,12 @@ class AcademicEventRegistrationController extends Controller
                 'total_amount' => $this->registrationService->sumItems($items),
             ]);
             $this->registrationService->syncItems($registration, $items);
+
+            return $registration->refresh()->loadMissing('member');
         });
+        if ($registration->payment_status === 'completed') {
+            $this->certifiedQualificationSyncService->syncForMember($registration->member);
+        }
 
         return redirect()->route('backoffice.academic-event-registrations.index')
             ->with('success', '참가 및 결제 정보가 등록되었습니다.');
@@ -139,7 +146,7 @@ class AcademicEventRegistrationController extends Controller
             throw ValidationException::withMessages(['payment_items_payload' => '결제 항목을 1개 이상 선택해주세요.']);
         }
 
-        DB::transaction(function () use ($request, $academic_event_registration, $items) {
+        $registration = DB::transaction(function () use ($request, $academic_event_registration, $items) {
             $academic_event_registration->update([
                 'academic_event_id' => (int) $request->input('academic_event_id'),
                 'member_id' => $request->filled('member_id') ? (int) $request->input('member_id') : null,
@@ -168,8 +175,14 @@ class AcademicEventRegistrationController extends Controller
                 'total_amount' => $this->registrationService->sumItems($items),
             ]);
             $this->registrationService->syncItems($academic_event_registration, $items);
-            $this->syncLinkedMembershipPayment($academic_event_registration->refresh());
+            $registration = $academic_event_registration->refresh()->loadMissing('member');
+            $this->syncLinkedMembershipPayment($registration);
+
+            return $registration;
         });
+        if ($registration->payment_status === 'completed') {
+            $this->certifiedQualificationSyncService->syncForMember($registration->member);
+        }
 
         return redirect()->route('backoffice.academic-event-registrations.index')
             ->with('success', '참가 및 결제 정보가 수정되었습니다.');

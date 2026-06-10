@@ -517,3 +517,163 @@ form#memberForm.bo-member-form .bo-readonly-box {
 .bo-member-history-section .d-none {
     display: none !important;
 }
+
+/* 인정의 등록/수정: 프로토타입 밀도 보정 */
+.bo-certified-member-form .bo-form-row {
+    align-items: center;
+}
+
+.bo-certified-member-form .bo-form-field .board-form-control {
+    max-width: 400px;
+}
+
+.bo-certified-member-form .bo-readonly-box {
+    display: block;
+    min-height: 0;
+    height: 42px;
+    padding: 8px 12px;
+    line-height: 24px;
+}
+
+.bo-certified-member-summary {
+    width: 100%;
+    max-width: 1120px;
+    border-top: 1px solid #e9ecef;
+}
+
+.bo-certified-member-summary-row {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr) 180px minmax(0, 1fr);
+    border-bottom: 1px solid #e9ecef;
+}
+
+.bo-certified-member-summary-label,
+.bo-certified-member-summary-value {
+    min-height: 42px;
+    padding: 11px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.bo-certified-member-summary-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #343a40;
+    font-weight: 600;
+    background: #f8f9fa;
+}
+
+.bo-certified-member-summary-value {
+    display: flex;
+    align-items: center;
+    color: #212529;
+    background: #fff;
+}
+
+.bo-certified-member-summary-value--wide {
+    grid-column: span 3;
+}
+
+.bo-certified-subtitle {
+    margin: 0 0 14px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.bo-certified-condition-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.bo-certified-condition-card {
+    min-height: 120px;
+    padding: 14px 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: #fbfcfd;
+}
+
+.bo-certified-condition-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.bo-certified-condition-head strong {
+    color: #343a40;
+    font-size: 14px;
+}
+
+.bo-certified-condition-count {
+    margin-bottom: 8px;
+    color: #111;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.bo-certified-condition-note {
+    margin: 0;
+    color: #6c757d;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.bo-certified-condition-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.bo-certified-status,
+.bo-certified-mini-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.bo-certified-status {
+    min-width: 54px;
+    padding: 6px 9px;
+    font-size: 12px;
+}
+
+.bo-certified-mini-status {
+    padding: 5px 8px;
+    font-size: 11px;
+}
+
+.bo-certified-status.is-complete,
+.bo-certified-mini-status.is-complete {
+    color: #0f7d38;
+    background: #e8f7ee;
+}
+
+.bo-certified-status.is-incomplete,
+.bo-certified-mini-status.is-incomplete {
+    color: #c92a2a;
+    background: #fff0f0;
+}
+
+@media (max-width: 900px) {
+    .bo-certified-member-summary-row {
+        grid-template-columns: 140px minmax(0, 1fr);
+    }
+
+    .bo-certified-member-summary-value--wide {
+        grid-column: auto;
+    }
+
+    .bo-certified-condition-grid {
+        grid-template-columns: 1fr;
+    }
+}

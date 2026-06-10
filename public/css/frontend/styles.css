@@ -464,6 +464,8 @@
 	.board_list span.state {display:block; width:80px; height:30px; line-height:30px; text-align:center; border-radius:4px; font-size:16px; margin:0 auto;}
 	.board_list span.state.ing {background:#2222220D;}
 	.board_list span.state.end {color:#0088B8; background:#0088B814;}
+	.board_list span.state.ing2 {color:#0088B8; background:#0088B814;}
+	.board_list span.state.end2 {background:#2222220D;}
 	.board_list.slide4 th,
 	.board_list.slide4 td {width:25%;}
 	.board_list.slide5 th,
@@ -967,6 +969,7 @@
 	.attach_area .attach_image_box {gap:8px;}
 	.attach_area .attach_file_box label:before {background-image:url('/images/icon_attach_file.svg');}
 	.attach_area .attach_image_box label:before {background-image:url('/images/icon_attach_image.svg');}
+	.attach_area .attach_file_box button,
 	.attach_area .attach_image_box button {width:16px; height:16px; background:url('/images/icon_del.svg') no-repeat 50% 50% / contain; font-size:0;}
 	.chat_input {display:flex; align-items:center; gap:10px;}
 	.chat_input .text {width:calc(100% - 170px); background:#F8F8F8; border-color:#F8F8F8;}
@@ -1164,7 +1167,7 @@
 	.select_committee .select_check span {display:block; width:100%; height:60px; line-height:58px; text-align:center; font-weight:600; border:#ddd 1px solid; border-radius:6px; background:#fff; transition:.2s linear;}
 	.select_committee .select_check input:checked + label span {color:#0088B8; border-color:#0088B8; box-shadow:0 4px 10px 0 rgba(0, 136, 184, 0.10);}
 	.txt_scroll_area {padding:16px; margin-bottom:16px;}
-	.txt_scroll_area .txt_scroll {height:120px; overflow:hidden auto; padding-right:16px; -webkit-overflow-scrolling: touch;}
+	.txt_scroll_area .txt_scroll {height:120px; overflow:hidden auto; padding-right:16px; -webkit-overflow-scrolling:touch;}
 
 /** 마이페이지 **/
 	.g99 .sub_menu_area .menu {display:none;}

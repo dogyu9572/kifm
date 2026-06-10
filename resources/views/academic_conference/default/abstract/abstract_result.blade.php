@@ -80,16 +80,6 @@
 						</dl>
 					</div>
 				</div>
-				@if ($memberAbstracts->count() > 1)
-					<div class="gbox mt">
-						<h3 class="normal_tit">나의 초록 접수 내역</h3>
-						<ul class="dots_list">
-							@foreach ($memberAbstracts as $row)
-								<li>{{ $row->abstract_no ?: ('ABS-' . $row->id) }} / {{ $row->title }} / {{ optional($row->submitted_at)->format('Y-m-d H:i') }}</li>
-							@endforeach
-						</ul>
-					</div>
-				@endif
 				<div class="btns_btm flex_center">
 					<a href="{{ $conferenceBaseUrl }}" class="btn btn_kwg">메인 페이지로</a>
 					@if ($canModifyAbstract ?? false)

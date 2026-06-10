@@ -28,7 +28,7 @@
     </div>
     <div class="board-card">
         <div class="board-card-body">
-            <form action="{{ route('backoffice.certified-members.store') }}" method="POST" class="bo-member-form">
+            <form action="{{ route('backoffice.certified-members.store') }}" method="POST" class="bo-member-form bo-certified-member-form">
                 @csrf
                 <input type="hidden" name="return_url" value="{{ $returnUrl }}">
                 @include('backoffice.certified_members._form')

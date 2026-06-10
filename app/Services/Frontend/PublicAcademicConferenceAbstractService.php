@@ -8,6 +8,7 @@ use App\Models\AcademicEventAbstractFile;
 use App\Models\User;
 use App\Support\CategoryOptions;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -92,6 +93,29 @@ class PublicAcademicConferenceAbstractService
             ->where('academic_event_id', $event->id)
             ->whereKey($lookupId)
             ->first();
+    }
+
+    public function findMemberAbstractById(AcademicEvent $event, User $user, int $abstractId): ?AcademicEventAbstract
+    {
+        return AcademicEventAbstract::query()
+            ->with(['files', 'field', 'member'])
+            ->where('academic_event_id', $event->id)
+            ->where('member_id', $user->id)
+            ->whereKey($abstractId)
+            ->first();
+    }
+
+    /** @return LengthAwarePaginator<int, AcademicEventAbstract> */
+    public function memberAbstractsForList(AcademicEvent $event, User $user, int $perPage = 20): LengthAwarePaginator
+    {
+        return AcademicEventAbstract::query()
+            ->with(['field'])
+            ->where('academic_event_id', $event->id)
+            ->where('member_id', $user->id)
+            ->orderByDesc('submitted_at')
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     public function findNonMemberAbstract(AcademicEvent $event, string $name, string $email, string $phone, string $password): ?AcademicEventAbstract

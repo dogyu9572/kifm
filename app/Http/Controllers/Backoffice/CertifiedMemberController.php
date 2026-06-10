@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CertifiedMemberRequest;
 use App\Models\CertifiedMember;
 use App\Models\User;
+use App\Services\Certified\CertifiedQualificationEvaluator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -14,6 +15,10 @@ use Illuminate\Support\Carbon;
 
 class CertifiedMemberController extends Controller
 {
+    public function __construct(
+        private readonly CertifiedQualificationEvaluator $qualificationEvaluator,
+    ) {}
+
     public function index(Request $request): View
     {
         $filters = [
@@ -83,7 +88,7 @@ class CertifiedMemberController extends Controller
         }
 
         return view('backoffice.certified_members.create', array_merge(
-            $this->buildPayload($request),
+            $this->buildPayload($request, $member),
             ['certifiedMember' => $certifiedMember]
         ));
     }
@@ -113,9 +118,11 @@ class CertifiedMemberController extends Controller
 
     public function edit(Request $request, CertifiedMember $certifiedMember): View
     {
+        $certifiedMember->load(['member', 'renewals']);
+
         return view('backoffice.certified_members.edit', array_merge(
-            $this->buildPayload($request),
-            ['certifiedMember' => $certifiedMember->load(['member', 'renewals'])]
+            $this->buildPayload($request, $certifiedMember->member),
+            ['certifiedMember' => $certifiedMember]
         ));
     }
 
@@ -130,8 +137,6 @@ class CertifiedMemberController extends Controller
             'acquired_date' => $validated['acquired_date'],
             'acquired_validity_start' => $validated['acquired_validity_start'],
             'acquired_validity_end' => $validated['acquired_validity_end'],
-            'winter_course_completed' => (bool) ($validated['winter_course_completed'] ?? false),
-            'exam_passed' => (bool) ($validated['exam_passed'] ?? false),
         ]);
 
         User::query()->whereKey($certifiedMember->member_id)->update(['certified_instructor' => true]);
@@ -211,10 +216,11 @@ class CertifiedMemberController extends Controller
         ]);
     }
 
-    private function buildPayload(Request $request): array
+    private function buildPayload(Request $request, ?User $member = null): array
     {
         return [
             'returnUrl' => $this->safeBackofficeReturnUrl($request, route('backoffice.certified-members.index')),
+            'qualificationSummary' => $member ? $this->qualificationEvaluator->evaluate($member) : null,
         ];
     }
 

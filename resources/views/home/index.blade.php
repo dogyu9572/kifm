@@ -6,14 +6,38 @@
 	$calendarPayload = e(json_encode($calendarSchedules ?? [], JSON_UNESCAPED_UNICODE));
 	$memberCard = $memberCard ?? ['is_logged_in' => false];
 	$certification = $memberCard['certification'] ?? [
-		'conference_count' => 0,
-		'conference_required' => 3,
-		'conference_short' => 3,
+		'has_certified_member' => false,
+		'acquisition' => [],
+		'renewal' => [],
 		'progress_percent' => 0,
 	];
-	$conferenceCount = (int) ($certification['conference_count'] ?? 0);
-	$conferenceRequired = max(1, (int) ($certification['conference_required'] ?? 3));
-	$conferenceShort = max(0, (int) ($certification['conference_short'] ?? 0));
+	$hasCertifiedMember = ! empty($certification['has_certified_member']);
+	$acquisition = $certification['acquisition'] ?? [];
+	$renewal = $certification['renewal'] ?? [];
+	$certificationLabel = '취득 요건';
+	$certificationCount = 0;
+	$certificationRequired = 3;
+	$certificationShortUnit = '개 조건';
+	$certificationPeriod = null;
+
+	if ($hasCertifiedMember) {
+		$generalCount = min((int) ($renewal['general_count'] ?? 0), (int) ($renewal['general_required'] ?? 4));
+		$winterCount = min((int) ($renewal['winter_count'] ?? 0), (int) ($renewal['winter_required'] ?? 1));
+		$certificationLabel = '갱신 요건';
+		$certificationCount = $generalCount + $winterCount;
+		$certificationRequired = max(1, (int) ($renewal['general_required'] ?? 4) + (int) ($renewal['winter_required'] ?? 1));
+		$certificationShortUnit = '회';
+		$certificationPeriod = $renewal['validity_period'] ?? ($memberCard['certification_period'] ?? null);
+	} else {
+		$certificationCount = (int) ! empty($acquisition['regular_even_completed'])
+			+ (int) ! empty($acquisition['regular_odd_completed'])
+			+ (int) ! empty($acquisition['winter_completed']);
+		$certificationPeriod = ! empty($acquisition['completed_at'])
+			? '취득 조건 충족'
+			: null;
+	}
+
+	$certificationShort = max(0, $certificationRequired - $certificationCount);
 @endphp
 
 @section('content')
@@ -97,18 +121,22 @@
 					<div class="member_info">
 						<div class="tit">
 							<strong>인정의 자격 정보</strong>
-							@if (! empty($memberCard['certification_period']))
-								<div class="date">{{ $memberCard['certification_period'] }}</div>
+							@if (! empty($certificationPeriod))
+								<div class="date">{{ $certificationPeriod }}</div>
 							@endif
 						</div>
 						<dl class="flex flex_between">
-							<dt>참석 현황</dt>
-							<dd><strong class="c_iden">{{ $conferenceCount }}</strong>/{{ $conferenceRequired }}회</dd>
+							<dt>{{ $certificationLabel }}</dt>
+							<dd><strong class="c_iden">{{ $certificationCount }}</strong>/{{ $certificationRequired }}{{ $hasCertifiedMember ? '회' : '개' }}</dd>
 						</dl>
 						<div class="state_line"><div class="bar"></div></div>
-						@if ($conferenceShort > 0)
+						@if ($certificationShort > 0)
 							<div class="info flex_end">
-								<div class="r"><p class="excl">{{ $conferenceShort }}회 부족</p></div>
+								<div class="r"><p class="excl">{{ $certificationShort }}{{ $certificationShortUnit }} 부족</p></div>
+							</div>
+						@else
+							<div class="info flex_end">
+								<div class="r"><p class="excl">조건 충족</p></div>
 							</div>
 						@endif
 					</div>

@@ -107,6 +107,7 @@
 
 			<div class="btns_btm">
 				<a href="/home" class="btn btn_kwk">메인으로</a>
+				<a href="{{ route('academic_event.training_course') }}" class="btn btn_kwk">목록</a>
 				<a href="{{ route('mypage.participation_history') }}" class="btn btn_wkk">참가내역 관리로</a>
 			</div>
 		</div>

@@ -18,7 +18,7 @@
 			<p class="tb tac">회원으로 신청하신 경우, 로그인 후 확인하실 수 있습니다.</p>
 			<form action="{{ route('member.login.store') }}" method="POST" class="inputs gbox">
 				@csrf
-				<input type="hidden" name="intended" value="{{ $conferenceBaseUrl }}/abstract/result">
+				<input type="hidden" name="intended" value="{{ $conferenceBaseUrl }}/abstract/list">
 				<h2 class="sound_only">로그인 정보 입력</h2>
 				<div class="input_row">
                     <label for="user-id">아이디</label>
@@ -39,7 +39,7 @@
 					</ul>
 				</div>
 				@if (auth()->check() && auth()->user()?->role === 'user')
-					<a href="{{ $conferenceBaseUrl }}/abstract/result" class="btn btn_wkk">초록 접수 확인</a>
+					<a href="{{ $conferenceBaseUrl }}/abstract/list" class="btn btn_wkk">초록 접수 확인</a>
 				@else
 					<button type="submit" class="btn btn_wkk">로그인</button>
 				@endif

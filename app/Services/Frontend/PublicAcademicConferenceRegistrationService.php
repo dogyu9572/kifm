@@ -10,6 +10,7 @@ use App\Models\MembershipPayment;
 use App\Models\PaymentPlan;
 use App\Models\User;
 use App\Services\Backoffice\AcademicEventRegistrationService;
+use App\Services\Certified\CertifiedQualificationSyncService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,7 @@ class PublicAcademicConferenceRegistrationService
 {
     public function __construct(
         private readonly AcademicEventRegistrationService $registrationService,
+        private readonly CertifiedQualificationSyncService $certifiedQualificationSyncService,
     ) {}
 
     /** @return Collection<int, PaymentPlan> */
@@ -753,6 +755,7 @@ class PublicAcademicConferenceRegistrationService
 
         if ($isCompleted) {
             $this->completeLinkedMembershipPayment($registration->refresh());
+            $this->certifiedQualificationSyncService->syncForMember($registration->member);
         }
 
         return $registration->refresh()->loadMissing(['items', 'member']);

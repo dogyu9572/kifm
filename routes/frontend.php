@@ -286,6 +286,7 @@ Route::prefix('academic_conference')->name('academic_conference.')->group(functi
     Route::get('/abstract/complete', [AcademicConferenceAbstractController::class, 'complete'])->name('abstract_complete');
     Route::get('/abstract/check', [AcademicConferenceAbstractController::class, 'check'])->name('abstract_check');
     Route::get('/abstract/modify', [AcademicConferenceAbstractController::class, 'modify'])->name('abstract_modify');
+	Route::get('/abstract/list', [AcademicConferenceAbstractController::class, 'list'])->name('abstract_list');
 
     // Notice (공지)
     Route::get('/notice', [AcademicConferenceNoticeController::class, 'index'])->name('notice');

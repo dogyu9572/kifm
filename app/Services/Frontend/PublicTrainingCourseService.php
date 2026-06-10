@@ -9,6 +9,7 @@ use App\Models\EduTrainingRound;
 use App\Models\User;
 use App\Services\Backoffice\EduTrainingService;
 use App\Services\Backoffice\MemberService;
+use App\Services\Certified\CertifiedQualificationSyncService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,6 +28,7 @@ class PublicTrainingCourseService
 
     public function __construct(
         private readonly MailformNotificationService $mailNotifier,
+        private readonly CertifiedQualificationSyncService $certifiedQualificationSyncService,
     ) {}
 
     /** @return array<string, string> */
@@ -482,6 +484,9 @@ class PublicTrainingCourseService
         if ($method === 'bank_transfer' || $paymentStatus === 'completed') {
             $this->mailNotifier->sendTrainingCourseApplicationComplete($payment);
         }
+        if ($paymentStatus === 'completed') {
+            $this->certifiedQualificationSyncService->syncForMember($payment->member);
+        }
 
         return $payment;
     }
@@ -521,6 +526,7 @@ class PublicTrainingCourseService
         $payment = $payment->refresh()->loadMissing(['training', 'items']);
         if ($isCompleted) {
             $this->mailNotifier->sendTrainingCourseApplicationComplete($payment);
+            $this->certifiedQualificationSyncService->syncForMember($payment->member);
         }
 
         return $payment;

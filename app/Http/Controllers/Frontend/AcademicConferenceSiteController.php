@@ -73,7 +73,7 @@ class AcademicConferenceSiteController extends Controller
             return redirect()->to($conferenceBaseUrl . '/abstract/form_member');
         }
         if ($this->isFrontendMemberLoggedIn() && $normalizedPagePath === 'abstract/check_member') {
-            return redirect()->to($conferenceBaseUrl . '/abstract/result');
+            return redirect()->to($conferenceBaseUrl . '/abstract/list');
         }
         if ($normalizedPagePath === 'abstract/check') {
             return redirect()->to($conferenceBaseUrl . '/abstract/check_member');
@@ -152,6 +152,7 @@ class AcademicConferenceSiteController extends Controller
         $abstractBookUrl = $event->abstract_book_path ? $this->conferenceService->optionalImageUrl($event->abstract_book_path) : null;
         $abstractSubmission = null;
         $abstractSummary = null;
+        $abstracts = null;
         $memberAbstracts = collect();
         $hasMemberAbstractSubmission = false;
         $canModifyAbstract = false;
@@ -171,11 +172,16 @@ class AcademicConferenceSiteController extends Controller
         if ($normalizedPagePath === 'sponsors') {
             $sponsorGroups = $this->conferenceService->sponsorGroups($event);
         }
+        if ($normalizedPagePath === 'abstract/list' && ($currentMember?->role ?? null) === 'user') {
+            $abstracts = $this->abstractService->memberAbstractsForList($event, $currentMember);
+        }
         if (in_array($normalizedPagePath, ['abstract/complete', 'abstract/result'], true)) {
             $lookupAbstractId = $currentMember
-                ? null
+                ? $request->integer('abstract_id')
                 : (int) session('academic_conference_abstract_lookup_id');
-            $abstractSubmission = $this->abstractService->findForLookup($event, $currentMember, $lookupAbstractId);
+            $abstractSubmission = $currentMember && $lookupAbstractId > 0
+                ? $this->abstractService->findMemberAbstractById($event, $currentMember, $lookupAbstractId)
+                : $this->abstractService->findForLookup($event, $currentMember, $lookupAbstractId);
             $abstractSummary = $this->abstractService->abstractSummary($abstractSubmission);
             $memberAbstracts = $currentMember
                 ? $this->abstractService->memberAbstracts($event, $currentMember)
@@ -204,6 +210,7 @@ class AcademicConferenceSiteController extends Controller
             'abstractBookUrl',
             'abstractSubmission',
             'abstractSummary',
+            'abstracts',
             'memberAbstracts',
             'hasMemberAbstractSubmission',
             'canModifyAbstract',

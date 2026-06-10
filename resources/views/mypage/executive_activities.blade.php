@@ -44,12 +44,16 @@
 						} else {
 							$termEnd = '-';
 						}
-						$statusLabel = $executive->termStatusLabel() === '임기중' ? '재직중' : $executive->termStatusLabel();
+						
+						$originalStatus = $executive->termStatusLabel();
+						$statusLabel = $originalStatus === '임기중' ? '재직중' : $originalStatus;
+
+						$statusClass = ($statusLabel === '재직중' || $statusLabel === '임기중') ? 'ing2' : ($statusLabel === '임기만료' ? 'end2' : '');
 					@endphp
 					<tr>
 						<td>{{ $roleLabels[$executive->executive_role] ?? $executive->executive_role }}</td>
 						<td>{{ $term }} ~ {{ $termEnd }}</td>
-						<td>{{ $statusLabel }}</td>
+						<td><span class="state {{ $statusClass }}">{{ $statusLabel }}</span></td>
 						<td><a href="{{ route('mypage.print_letter_appointment', ['executive_id' => $executive->id]) }}" class="btn btn_kwk" target="_blank">임명장 출력</a></td>
 					</tr>
 					@empty

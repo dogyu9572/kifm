@@ -42,13 +42,40 @@ class AbstractController extends Controller
         return $this->render('abstract_modify', '03', '학술대회 초록등록 확인', 'academic_conference_abstract_modify');
     }
 
+    public function list(): View
+    {
+        return $this->render('abstract_list', '03', '초록 접수 리스트', 'academic_conference_abstract_list');
+    }
+
     private function render(string $view, string $sNum, string $sName, string $slug): View
     {
         $page_type = 'academic_conference';
         $gNum = '04';
         $gName = 'Abstract';
         $gSlug = $slug;
+        $event = null;
+        $currentMember = auth()->user();
+        $abstracts = null;
+        $abstractPresentationTypes = [];
+        $conferenceBaseUrl = url('/academic_conference');
 
-        return view('academic_conference.abstract.' . $view, compact('page_type', 'gNum', 'sNum', 'gName', 'sName', 'gSlug'));
+        $viewName = 'academic_conference.abstract.' . $view;
+        if ($view === 'abstract_list') {
+            $viewName = 'academic_conference.default.abstract.' . $view;
+        }
+
+        return view($viewName, compact(
+            'event',
+            'currentMember',
+            'abstracts',
+            'abstractPresentationTypes',
+            'conferenceBaseUrl',
+            'page_type',
+            'gNum',
+            'sNum',
+            'gName',
+            'sName',
+            'gSlug',
+        ));
     }
 }

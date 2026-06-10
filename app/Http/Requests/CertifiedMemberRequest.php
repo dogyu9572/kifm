@@ -20,8 +20,6 @@ class CertifiedMemberRequest extends FormRequest
             'acquired_date' => ['required', 'date'],
             'acquired_validity_start' => ['required', 'date'],
             'acquired_validity_end' => ['required', 'date', 'after_or_equal:acquired_validity_start'],
-            'winter_course_completed' => ['nullable', 'boolean'],
-            'exam_passed' => ['nullable', 'boolean'],
         ];
     }
 
@@ -46,8 +44,6 @@ class CertifiedMemberRequest extends FormRequest
             'acquired_date' => '취득일',
             'acquired_validity_start' => '취득 인정의 시작일',
             'acquired_validity_end' => '취득 인정의 종료일',
-            'winter_course_completed' => '동계 강좌 이수 여부',
-            'exam_passed' => '시험 합격 여부',
         ];
     }
 }

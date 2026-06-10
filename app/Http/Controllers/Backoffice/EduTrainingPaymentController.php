@@ -9,6 +9,7 @@ use App\Models\EduTrainingPayment;
 use App\Models\PaymentPlan;
 use App\Models\User;
 use App\Services\Backoffice\PaymentPlanService;
+use App\Services\Certified\CertifiedQualificationSyncService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +22,10 @@ use Illuminate\Validation\ValidationException;
 
 class EduTrainingPaymentController extends Controller
 {
+    public function __construct(
+        private readonly CertifiedQualificationSyncService $certifiedQualificationSyncService,
+    ) {}
+
     public function index(Request $request): View
     {
         $perPage = (int) $request->get('per_page', 10);
@@ -118,6 +123,9 @@ class EduTrainingPaymentController extends Controller
 
             return $payment;
         });
+        if ($payment->payment_status === 'completed') {
+            $this->certifiedQualificationSyncService->syncForMember($payment->member);
+        }
 
         return redirect()->route('backoffice.edu-training-payments.index')
             ->with('success', '참가 및 결제 정보가 등록되었습니다.');
@@ -155,7 +163,7 @@ class EduTrainingPaymentController extends Controller
             throw ValidationException::withMessages(['payment_items_payload' => '결제 항목을 1개 이상 선택해주세요.']);
         }
 
-        DB::transaction(function () use ($request, $eduTrainingPayment, $items) {
+        $payment = DB::transaction(function () use ($request, $eduTrainingPayment, $items) {
             $eduTrainingPayment->update([
                 'edu_training_id' => (int) $request->input('edu_training_id'),
                 'member_id' => $request->filled('member_id') ? (int) $request->input('member_id') : null,
@@ -184,7 +192,12 @@ class EduTrainingPaymentController extends Controller
             ]);
 
             $this->syncItems($eduTrainingPayment, $items);
+
+            return $eduTrainingPayment->refresh()->loadMissing('member');
         });
+        if ($payment->payment_status === 'completed') {
+            $this->certifiedQualificationSyncService->syncForMember($payment->member);
+        }
 
         return redirect()->route('backoffice.edu-training-payments.index')
             ->with('success', '참가 및 결제 정보가 수정되었습니다.');
@@ -204,6 +217,7 @@ class EduTrainingPaymentController extends Controller
             'payment_status' => 'completed',
             'paid_at' => now(),
         ]);
+        $this->certifiedQualificationSyncService->syncForMember($eduTrainingPayment->refresh()->member);
 
         return response()->json(['success' => true]);
     }
@@ -481,4 +495,3 @@ class EduTrainingPaymentController extends Controller
         ];
     }
 }
-

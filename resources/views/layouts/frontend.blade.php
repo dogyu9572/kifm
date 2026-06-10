@@ -444,7 +444,7 @@
 				@if(isset($gNum) && $gNum == '04')
 					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/abstract" @if(($sNum ?? '') == '01') aria-current="page" @endif>Information</a></li>
 					<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/abstract/submission" @if(($sNum ?? '') == '02') aria-current="page" @endif>Abstract Submission</a></li>
-					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/abstract/check" @if(($sNum ?? '') == '03') aria-current="page" @endif>Abstract Check</a></li>
+					<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/abstract/list" @if(($sNum ?? '') == '03') aria-current="page" @endif>Abstract Check</a></li>
 				@endif
 				@if(isset($gNum) && $gNum == '05')
 					<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="{{ $academicConferenceBaseUrl }}/notice" @if(($sNum ?? '') == '01') aria-current="page" @endif>Notice</a></li>
