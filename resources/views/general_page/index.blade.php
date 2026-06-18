@@ -111,21 +111,21 @@
 	<h2 class="sound_only" id="notice-title">학회 공지 및 배너 링크</h2>
 	<div class="inner">
 		<div class="long notice">
-			<div class="mtit"><h3>학회 공지</h3><a href="{{ route('member_plaza.society_notices') }}" class="more" aria-label="대한기능의학회 공지사항으로 이동"></a></div>
+			<div class="mtit"><h3>학회 공지</h3><a href="{{ route('general.news.notices') }}" class="more" aria-label="대한기능의학회 공지사항으로 이동"></a></div>
 			<ul class="list">
-				<li><a href="{{ route('member_plaza.society_notices') }}">등록된 공지사항이 없습니다.<span class="date">-</span></a></li>
+				<li><a href="{{ route('general.news.notices') }}">등록된 공지사항이 없습니다.<span class="date">-</span></a></li>
 			</ul>
 		</div>
 		<div class="short academy">
-			<div class="mtit"><h3>온라인 아카데미</h3></div>
+			<div class="mtit"><h3>영상 콘텐츠 (비온 뒤)</h3></div>
 			<div class="main_gall">
-				<a href="{{ route('online_academy.index') }}"><span class="imgfit"><img src="/images/img_sample_mc02_01.jpg" alt=""></span><span class="txt"><p>등록된 온라인 아카데미가 없습니다.</p></span></a>
+				<a href="{{ route('general.content.video_afterrain') }}"><span class="imgfit"><img src="/images/img_sample_mc02_01.jpg" alt=""></span><span class="txt"><p>등록된 영상이 없습니다.</p></span></a>
 			</div>
 		</div>
 		<div class="short archives">
-			<div class="mtit"><h3>회원자료실</h3></div>
+			<div class="mtit"><h3>미디어&행사</h3></div>
 			<div class="main_gall">
-				<a href="{{ route('archives.members') }}"><span class="imgfit"><img src="/images/img_sample_mc02_02.jpg" alt=""></span><span class="txt"><p>등록된 회원자료실 게시글이 없습니다.</p></span></a>
+				<a href="{{ route('general.news.media_events') }}"><span class="imgfit"><img src="/images/img_sample_mc02_02.jpg" alt=""></span><span class="txt"><p>등록된 미디어&행사게시글이 없습니다.</p></span></a>
 			</div>
 		</div>
 	</div>

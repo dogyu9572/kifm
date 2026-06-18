@@ -1,17 +1,17 @@
 @extends('layouts.frontend')
-@section('title', $gName . ' | ' . $sName)
+@section('title', $egName)
 @section('gName', $gName)
-@section('sName', $sName)
+@section('sName', $geName)
 @section('content')
 <main class="sub_area">
 
 <section class="scon core_values_wrap" aria-labelledby="core-values-heading">
 	<div class="inner">
-		<h1 class="sub_title" id="core-values-heading">{{ $sName }}</h1>
+		<h1 class="sub_title" id="core-values-heading">{{ $geName }}</h1>
 
 		<div class="history_top">
-			<div class="history_title">증상을 넘어 <strong class="c_iden">원인</strong>으로, <br class="mo_vw">질병을 넘어 <strong class="c_iden">사람</strong>으로</div>
-			<p>대한기능의학회가 현대 의학의 한계를 넘는 <br class="mo_vw">새로운 의료의 패러다임을 제시합니다.</p>
+			<div class="history_title">Beyond Symptoms to <strong class="c_iden">Causes</strong>, <br class="mo_vw">Beyond Disease to <strong class="c_iden">People</strong></div>
+			<p>The Korean Society for Functional Medicine presents a new paradigm <br class="mo_vw">of medicine that transcends the limits of modern healthcare.</p>
 		</div>
 	</div>
 	<div class="history_img" aria-hidden="true"></div>
@@ -19,7 +19,7 @@
 		<div class="history_body">
 			<h2 class="sound_only">학회 연혁 목록</h2>
 			<ul class="history_tabs">
-				<li><a href="#history1">2023 ~ 현재</a></li>
+				<li><a href="#history1">2023 ~ Now</a></li>
 				<li><a href="#history2">2019 ~ 2022</a></li>
 				<li><a href="#history3">2015 ~ 2018</a></li>
 				<li><a href="#history4">2013 ~ 2014</a></li>
@@ -27,7 +27,7 @@
 
 			@php
 				$historyArticles = [
-					['id' => 'history1', 'label' => '2023 ~ 현재', 'key' => 'history1'],
+					['id' => 'history1', 'label' => '2023 ~ Now', 'key' => 'history1'],
 					['id' => 'history2', 'label' => '2019 ~ 2022', 'key' => 'history2'],
 					['id' => 'history3', 'label' => '2015 ~ 2018', 'key' => 'history3'],
 					['id' => 'history4', 'label' => '2013 ~ 2014', 'key' => 'history4'],

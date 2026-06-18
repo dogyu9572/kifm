@@ -128,7 +128,7 @@
 			<div class="inner">
 				<ul class="type" role="tablist" aria-label="회원 유형 선택">
 					@php $page_type = $page_type ?? ''; @endphp
-					<li role="presentation" class="c1 {{ $page_type == 'general' ? 'on' : '' }}">
+					<li role="presentation" class="c1 {{ $page_type == 'general_page' ? 'on' : '' }}">
 						<a href="javascript:alert('준비중입니다.')" role="tab" aria-selected="{{ $page_type == 'general' ? 'true' : 'false' }}" {!! $page_type == 'general' ? 'aria-current="page"' : '' !!}>일반인</a>
 					</li>
 					<li role="presentation" class="c2 {{ $page_type == 'professional' ? 'on' : '' }}">
@@ -335,14 +335,14 @@
 						<ul class="snb" aria-labelledby="main-menu-02">
 							<li><a href="/general_page/content/examination" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 검사 이해</a></li>
 							<li><a href="/general_page/content/video_afterrain" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>영상 콘텐츠(비온뒤)</a></li>
-							<li><a href="/general_page/content/faq" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
+							<li><a href="/general_page/content/faq" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
 						</ul>
 					</li>
 					<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}">
 						<a href="/general_page/our_neighborhood_doctor" id="main-menu-03" @if(($gNum ?? '') == '03') aria-current="page" @endif>진료 고민된다면</a>
 						<ul class="snb" aria-labelledby="main-menu-03">
-							<li><a href="/general_page/our_neighborhood_doctor" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
-							<li><a href="/general_page/our_neighborhood_doctor/patient_story" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>환자 이야기</a></li>
+							<li><a href="/general_page/our_neighborhood_doctor" @if(($gNum ?? '') == '03' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
+							<li><a href="/general_page/our_neighborhood_doctor/patient_story" @if(($gNum ?? '') == '03' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>환자 이야기</a></li>
 						</ul>
 					</li>
 					<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}">
@@ -383,14 +383,14 @@
 						<ul class="snb" aria-labelledby="main-menu-02">
 							<li><a href="/general_page/content/examination" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 검사 이해</a></li>
 							<li><a href="/general_page/content/video_afterrain" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>영상 콘텐츠(비온뒤)</a></li>
-							<li><a href="/general_page/content/faq" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
+							<li><a href="/general_page/content/faq" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
 						</ul>
 					</li>
 					<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}">
 						<a href="/general_page/our_neighborhood_doctor" id="main-menu-03" @if(($gNum ?? '') == '03') aria-current="page" @endif>진료 고민된다면</a>
 						<ul class="snb" aria-labelledby="main-menu-03">
-							<li><a href="/general_page/our_neighborhood_doctor" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
-							<li><a href="/general_page/our_neighborhood_doctor/patient_story" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>환자 이야기</a></li>
+							<li><a href="/general_page/our_neighborhood_doctor" @if(($gNum ?? '') == '03' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
+							<li><a href="/general_page/our_neighborhood_doctor/patient_story" @if(($gNum ?? '') == '03' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>환자 이야기</a></li>
 						</ul>
 					</li>
 					<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}">
@@ -413,6 +413,7 @@
 	@if(isset($gNum) && $page_type == 'eng')
 	<!-- 영문 -->
     <header class="header {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }} {{ (isset($gNum) && $gNum == '03' && ($page ?? '') == 'view' || $gNum == '01' || $gNum == '02') ? 'white_mode' : '' }}">
+<!--
 		<div class="top">
 			<div class="inner">
 				<ul class="type" role="tablist" aria-label="회원 유형 선택">
@@ -425,6 +426,20 @@
 					</li>
 					<li role="presentation" class="c3 {{ $page_type == 'online_academy' ? 'on' : '' }}">
 						<a href="/online_academy/" role="tab" aria-selected="{{ $page_type == 'online_academy' ? 'true' : 'false' }}" {!! $page_type == 'online_academy' ? 'aria-current="page"' : '' !!}>온라인 아카데미</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+-->
+		<div class="top">
+			<div class="inner">
+				<ul class="type" role="tablist" aria-label="언어 선택">
+					@php $page_type = $page_type ?? ''; @endphp
+					<li role="presentation" class="c1 {{ $page_type != 'eng' ? 'on' : '' }}">
+						<a href="{{ route('general.index') }}" role="tab" aria-selected="{{ $page_type != 'eng' ? 'true' : 'false' }}" {!! $page_type != 'eng' ? 'aria-current="page"' : '' !!}>KOR</a>
+					</li>
+					<li role="presentation" class="c2 {{ $page_type == 'eng' ? 'on' : '' }}">
+						<a href="/eng/" role="tab" aria-selected="{{ $page_type == 'eng' ? 'true' : 'false' }}" {!! $page_type == 'eng' ? 'aria-current="page"' : '' !!}>ENG</a>
 					</li>
 				</ul>
 			</div>
@@ -639,7 +654,7 @@
 					@if(($gNum ?? '') == '02')
 						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/general_page/content/examination" @if(($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 검사 이해</a></li>
 						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/general_page/content/video_afterrain" @if(($sNum ?? '') == '02') class="on" aria-current="page" @endif>영상 콘텐츠(비온뒤)</a></li>
-						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/general_page/content/faq" @if(($sNum ?? '') == '04') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/general_page/content/faq" @if(($sNum ?? '') == '03') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
 					@endif
 					@if(($gNum ?? '') == '03')
 						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/general_page/our_neighborhood_doctor" @if(($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
@@ -778,11 +793,11 @@
 					@endif
 					@if(isset($gNum) && $page_type == 'eng')
 					<address>
-						<ul class="office_info" aria-label="회사 정보">
-							<li class="w100p"><strong class="sound_only">주소</strong> <span>경기도 수원시 영통구 월드컵로 164 (원천동, 아주대학병원) 1031호</span></li>
-							<li><strong>대표자</strong> <span>김범택</span></li>
-							<li><strong>사업자번호</strong> <span>26-82-00017</span></li>
-							<li><strong>전화번호</strong> <span><a href="tel:01084414884">010-8441-4884</a></span></li>
+						<ul class="office_info" aria-label="Company Information">
+							<li class="w100p"><strong class="sound_only">Address</strong> <span>Room 1031, Ajou University Hospital, 164 World Cup-ro, Yeongtong-gu, Suwon-si, Gyeonggi-do</span></li>
+							<li><strong>Representative</strong> <span>Kim Beom-taek</span></li>
+							<li><strong>Business Registration No.</strong> <span>26-82-00017</span></li>
+							<li><strong>Phone</strong> <span><a href="tel:01084414884">010-8441-4884</a></span></li>
 						</ul>
 					</address>
 					@endif
@@ -798,8 +813,10 @@
 							<li><a href="/terms/email_collection_refusal">이메일무단수집거부</a></li>
 						@endif
 						@if(isset($gNum) && $page_type == 'eng')
+						<!-- 영문은 생략
 							<li><a href="/eng/privacy_policy">개인정보처리방침</a></li>
 							<li><a href="/eng/email_collection_refusal">이메일무단수집거부</a></li>
+						-->
 						@endif
 						</ul>
 					</nav>

@@ -12,3 +12,6 @@
 /* sub */
 	.officers_body.set3 {gap:30px;}
 	.officers_body.set3 li {width:calc((100% - 60px)/3);}
+	.academic_event_head .info_list li {padding-left:180px;}
+	.academic_event_body .list .details li {padding:2px 0 2px 105px;}
+	.academic_event_body .list .details strong {width:100px;}

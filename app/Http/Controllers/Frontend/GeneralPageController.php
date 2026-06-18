@@ -135,7 +135,7 @@ class GeneralPageController extends Controller
     {
         $page_type = 'general';
         $gNum = '02';
-        $sNum = '04';
+        $sNum = '03';
         $gName = '건강 알아가기';
         $sName = '자주 묻는 질문';
         $geName = 'content';
@@ -168,7 +168,7 @@ class GeneralPageController extends Controller
     {
         $page_type = 'general';
         $gNum = '03';
-        $sNum = '01';
+        $sNum = '02';
         $gName = '진료 고민된다면';
         $sName = '환자 이야기';
         $geName = 'patient_story';
@@ -179,7 +179,7 @@ class GeneralPageController extends Controller
     {
         $page_type = 'general';
         $gNum = '03';
-        $sNum = '01';
+        $sNum = '02';
         $gName = '진료 고민된다면';
         $sName = '환자 이야기';
         $geName = 'patient_story';
@@ -193,7 +193,7 @@ class GeneralPageController extends Controller
     public function notices(): View
     {
         $page_type = 'general';
-        $gNum = '05';
+        $gNum = '04';
         $sNum = '01';
         $gName = '학회 뉴스';
         $sName = '학회 소식';
@@ -205,7 +205,7 @@ class GeneralPageController extends Controller
     public function noticesView(): View
     {
         $page_type = 'general';
-        $gNum = '05';
+        $gNum = '04';
         $sNum = '01';
         $gName = '학회 뉴스';
         $sName = '학회 소식';
@@ -217,7 +217,7 @@ class GeneralPageController extends Controller
     public function pressColumns(): View
     {
         $page_type = 'general';
-        $gNum = '05';
+        $gNum = '04';
         $sNum = '02';
         $gName = '학회 뉴스';
         $sName = '보도자료&칼럼';
@@ -229,7 +229,7 @@ class GeneralPageController extends Controller
     public function pressColumnsView(): View
     {
         $page_type = 'general';
-        $gNum = '05';
+        $gNum = '04';
         $sNum = '02';
         $gName = '학회 뉴스';
         $sName = '보도자료&칼럼';
@@ -241,7 +241,7 @@ class GeneralPageController extends Controller
     public function mediaEvents(): View
     {
         $page_type = 'general';
-        $gNum = '05';
+        $gNum = '04';
         $sNum = '03';
         $gName = '학회 뉴스';
         $sName = '미디어&행사';
@@ -253,7 +253,7 @@ class GeneralPageController extends Controller
     public function mediaEventsView(): View
     {
         $page_type = 'general';
-        $gNum = '05';
+        $gNum = '04';
         $sNum = '03';
         $gName = '학회 뉴스';
         $sName = '미디어&행사';

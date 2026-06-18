@@ -23,4 +23,7 @@
 /* sub */
 	.officers_body.set3 {gap:10px;}
 	.officers_body.set3 li {width:100%;}
+	.academic_event_head .info_list li {padding-left:110px;}
+	.academic_event_body .list .details strong {width:80px;}
+	.academic_event_body .list .details li {padding:2px 0 2px 90px;}
 }

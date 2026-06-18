@@ -1,13 +1,13 @@
 @extends('layouts.frontend')
-@section('title', $gName . ' | ' . $sName)
+@section('title', $geName)
 @section('gName', $gName)
-@section('sName', $sName)
+@section('sName', $geName)
 @section('content')
 <main class="sub_area">
 
 <section class="scon" aria-labelledby="society-notices-heading">
 	<div class="inner">
-		<h1 class="sub_title" id="society-notices-heading">{{ $sName }}</h1>
+		<h1 class="sub_title" id="society-notices-heading">{{ $geName }}</h1>
 
 		<div class="board_top">
 			<div class="left">
@@ -15,21 +15,21 @@
 			</div>
 			<div class="right flex">
 				<select name="" id="" class="text">
-					<option value="">전체</option>
-					<option value="">제목</option>
-					<option value="">내용</option>
+					<option value="">All</option>
+					<option value="">Title</option>
+					<option value="">Content</option>
 				</select>
 				<form class="search_area">
-					<label for="event-search" class="sound_only">대회명 검색</label>
-					<input type="text" id="event-search" class="text" placeholder="대회명을 입력해주세요">
-					<button type="submit" class="btn_search">검색</button>
+					<label for="event-search" class="sound_only">Search by title</label>
+					<input type="text" id="event-search" class="text" placeholder="Enter title">
+					<button type="submit" class="btn_search">Search</button>
 				</form>
 			</div>
 		</div>
 		
 		<div class="board_list">
 			<table>
-				<caption>임상 영양 및 대사 의학 연구회 공지사항 입니다.</caption>
+				<caption>Notice board for Korean Society for Functional Medicine.</caption>
 				<colgroup>
 					<col class="num">
 					<col>
@@ -38,76 +38,76 @@
 				<thead>
 					<tr>
 						<th scope="col">NO.</th>
-						<th scope="col">제목</th>
-						<th scope="col">등록일</th>
+						<th scope="col">Title</th>
+						<th scope="col">Date</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr class="notice">
-						<td class="num" aria-label="공지사항"></td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다. 제목이 위치할 공간입니다.</a></td>
+						<td class="num" aria-label="Notice"></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr class="notice">
-						<td class="num" aria-label="공지사항"></td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="num" aria-label="Notice"></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">8</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">7</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">6</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">5</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">4</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">3</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">2</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 					<tr>
 						<td class="num">1</td>
-						<td class="tal"><a href="/eng/news_view">제목이 위치할 공간입니다. 제목이 위치할 공간입니다.제목이 위치할 공간입니다.</a></td>
+						<td class="tal"><a href="/eng/news_view">This is where the title will be placed. This is where the title will be placed.</a></td>
 						<td class="date">2025.01.01</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 
-		<nav class="board-pagination" aria-label="게시판 페이지 이동">
+		<nav class="board-pagination" aria-label="Board page navigation">
 			<ul class="pagination">
-				<li class="page-item arw_item"><a class="page-link" href="#" title="첫 페이지" aria-label="첫 페이지로 이동"><i class="arrow two first" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="이전 페이지" aria-label="이전 페이지로 이동"><i class="arrow one prev" aria-hidden="true"></i></a></li>
-				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="현재 페이지 1">1</span></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="2페이지로 이동">2</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="3페이지로 이동">3</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="4페이지로 이동">4</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="5페이지로 이동">5</a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="다음 페이지" aria-label="다음 페이지로 이동"><i class="arrow one next" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="마지막 페이지" aria-label="마지막 페이지로 이동"><i class="arrow two last" aria-hidden="true"></i></a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="First page" aria-label="Go to first page"><i class="arrow two first" aria-hidden="true"></i></a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="Previous page" aria-label="Go to previous page"><i class="arrow one prev" aria-hidden="true"></i></a></li>
+				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="Current page 1">1</span></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 2">2</a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 3">3</a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 4">4</a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 5">5</a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="Next page" aria-label="Go to next page"><i class="arrow one next" aria-hidden="true"></i></a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="Last page" aria-label="Go to last page"><i class="arrow two last" aria-hidden="true"></i></a></li>
 			</ul>
 		</nav>
 		

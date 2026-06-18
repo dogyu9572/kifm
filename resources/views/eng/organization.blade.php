@@ -1,13 +1,13 @@
 @extends('layouts.frontend')
-@section('title', $gName . ' | ' . $sName)
+@section('title', $geName)
 @section('gName', $gName)
-@section('sName', $sName)
+@section('sName', $geName)
 @section('content')
 <main class="sub_area">
 
 <section class="scon officers_wrap" aria-labelledby="officers-heading">
 	<div class="inner">
-		<h1 class="sub_title" id="officers-heading">{{ $sName }}</h1>
+		<h1 class="sub_title" id="officers-heading">{{ $geName }}</h1>
 
 		<ul class="officers_head">
 			<li>

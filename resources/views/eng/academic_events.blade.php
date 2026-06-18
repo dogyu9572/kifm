@@ -1,158 +1,157 @@
 @extends('layouts.frontend')
-@section('title', $gName . ' | ' . $sName)
+@section('title', $geName)
 @section('gName', $gName)
-@section('sName', $sName)
+@section('sName', $geName)
 @section('content')
 <main class="sub_area">
 
 <section class="scon academic_event_wrap" aria-labelledby="conference-heading">
 	<div class="inner">
-		<h1 class="sub_title" id="conference-heading">{{ $sName }}</h1>
+		<h1 class="sub_title" id="conference-heading">{{ $geName }}</h1>
 		
 		<div class="academic_event_head">
 			<div class="imgfit" aria-hidden="true"><img src="/images/img_sample_conference_top.jpg" alt=""></div>
 			<div class="txt">
 				<a href="/academic_event/conference/view">
-					<p class="eng_title c_iden">Geroscience and functional medicine. 노화치료의 시대에 기능의학의 역할</p>
-					<h2>2025년 대한기능의학회 추계학술대회</h2>
+					<p class="eng_title c_iden">Geroscience and functional medicine. The Role of Functional Medicine in the Era of Anti-Aging Treatment</p>
+					<h2>2025 Korean Society for Functional Medicine Autumn Academic Conference</h2>
 					<ul class="info_list">
-						<li class="i1"><strong>일시</strong>2026년 11월 16일 (일)</li>
-						<li class="i2"><strong>사전등록</strong>2026년 11월 1일 (월) ~ 2026년 11월 9일 (일)</li>
-						<li class="i3"><strong>장소</strong>고려대학교 의과대학 본관 2층 유광사홀</li>
+						<li class="i1"><strong>Date</strong>November 16, 2026 (Sun)</li>
+						<li class="i2"><strong>Registration</strong>November 1, 2026 (Mon) ~ November 9, 2026 (Sun)</li>
+						<li class="i3"><strong>Venue</strong>Yukwangsa Hall, 2F Main Building, Korea University College of Medicine</li>
 					</ul>
 				</a>
 				<div class="btns">
-					<a href="#this" target="_blank" title="새창 열림" class="btn btn_wkk btn_outlink">홈페이지 바로가기</a>
-					<a href="#this" target="_blank" title="새창 열림" class="btn btn_wrr btn_outlink">사전등록 바로가기</a>
+					<a href="#this" target="_blank" title="Opens in new window" class="btn btn_wkk btn_outlink">Visit Website</a>
+					<a href="#this" target="_blank" title="Opens in new window" class="btn btn_wrr btn_outlink">Registration</a>
 				</div>
-				<button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+				<button type="button" class="bookmark" aria-label="Add this event to bookmarks" aria-pressed="false"></button>
 			</div>
 		</div>
 		
 		<div class="academic_event_body">
 			<div class="bdbtit">
-				<h3>최신 {{ $sName }} 목록</h3>
+				<h3>Latest {{ $geName }} List</h3>
 				<ul class="tabs" role="tablist">
-                    <li class="on"><a href="#this" role="tab" aria-selected="true">전체보기</a></li>
-                    <li><a href="#this" role="tab" aria-selected="false">모집 예정</a></li>
-                    <li><a href="#this" role="tab" aria-selected="false">모집 중</a></li>
-                    <li><a href="#this" role="tab" aria-selected="false">신청마감</a></li>
+                    <li class="on"><a href="#this" role="tab" aria-selected="true">View All</a></li>
+                    <li><a href="#this" role="tab" aria-selected="false">Upcoming</a></li>
+                    <li><a href="#this" role="tab" aria-selected="false">Open</a></li>
+                    <li><a href="#this" role="tab" aria-selected="false">Closed</a></li>
                 </ul>
 			</div>
 			<div class="board_top">
 				<div class="left">
-					<label for="event-year" class="sound_only">행사년도 선택</label>
+					<label for="event-year" class="sound_only">Select Event Year</label>
 					<select name="event-year" id="event-year-before" class="years">
-						<option value="">행사년도</option>
+						<option value="">Event Year</option>
 					</select>
 				</div>
 				<div class="right">
 					<form class="search_area">
-                        <label for="event-search" class="sound_only">대회명 검색</label>
-                        <input type="text" id="event-search" class="text" placeholder="대회명을 입력해주세요">
-                        <button type="submit" class="btn_search">검색</button>
+                        <label for="event-search" class="sound_only">Search by Event Name</label>
+                        <input type="text" id="event-search" class="text" placeholder="Enter event name">
+                        <button type="submit" class="btn_search">Search</button>
                     </form>
 				</div>
 			</div>
 			<ul class="list">
 				<li>
                     <a href="/academic_event/conference/view">
-                        <span class="state end"><span class="sound_only">상태:</span>신청마감</span>
-                        <h4>2025년 대한기능의학회 추계학술대회</h4>
-                        <p class="summary">Geroscience and functional medicine. 노화치료의 시대에 기능의학의 역할</p>
+                        <span class="state end"><span class="sound_only">Status:</span>Closed</span>
+                        <h4>2025 Korean Society for Functional Medicine Autumn Academic Conference</h4>
+                        <p class="summary">Geroscience and functional medicine. The Role of Functional Medicine in the Era of Anti-Aging Treatment</p>
                         <ul class="details">
-                            <li><strong>일시</strong> 2026년 11월 16일 (일)</li>
-                            <li><strong>사전등록</strong> 2026년 11월 1일 (월) ~ 2026년 11월 9일 (일)</li>
-                            <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
+                            <li><strong>Date</strong> November 16, 2026 (Sun)</li>
+                            <li><strong>Registration</strong> November 1, 2026 (Mon) ~ November 9, 2026 (Sun)</li>
+                            <li><strong>Venue</strong> Yukwangsa Hall, 2F Main Building, Korea University College of Medicine</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <button type="button" class="bookmark" aria-label="Add this event to bookmarks" aria-pressed="false"></button>
                 </li>
 				<li>
                     <a href="/academic_event/conference/view">
-                        <span class="state expected"><span class="sound_only">상태:</span>모집예정</span>
-                        <h4>2025년 대한기능의학회 추계학술대회</h4>
-                        <p class="summary">Geroscience and functional medicine. 노화치료의 시대에 기능의학의 역할</p>
+                        <span class="state expected"><span class="sound_only">Status:</span>Upcoming</span>
+                        <h4>2025 Korean Society for Functional Medicine Autumn Academic Conference</h4>
+                        <p class="summary">Geroscience and functional medicine. The Role of Functional Medicine in the Era of Anti-Aging Treatment</p>
                         <ul class="details">
-                            <li><strong>일시</strong> 2026년 11월 16일 (일)</li>
-                            <li><strong>사전등록</strong> 2026년 11월 1일 (월) ~ 2026년 11월 9일 (일)</li>
-                            <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
+                            <li><strong>Date</strong> November 16, 2026 (Sun)</li>
+                            <li><strong>Registration</strong> November 1, 2026 (Mon) ~ November 9, 2026 (Sun)</li>
+                            <li><strong>Venue</strong> Yukwangsa Hall, 2F Main Building, Korea University College of Medicine</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <button type="button" class="bookmark" aria-label="Add this event to bookmarks" aria-pressed="false"></button>
                 </li>
 				<li>
                     <a href="/academic_event/conference/view">
-                        <span class="state ing"><span class="sound_only">상태:</span>모집 중</span>
-                        <h4>2025년 대한기능의학회 추계학술대회</h4>
-                        <p class="summary">Geroscience and functional medicine. 노화치료의 시대에 기능의학의 역할</p>
+                        <span class="state ing"><span class="sound_only">Status:</span>Open</span>
+                        <h4>2025 Korean Society for Functional Medicine Autumn Academic Conference</h4>
+                        <p class="summary">Geroscience and functional medicine. The Role of Functional Medicine in the Era of Anti-Aging Treatment</p>
                         <ul class="details">
-                            <li><strong>일시</strong> 2026년 11월 16일 (일)</li>
-                            <li><strong>사전등록</strong> 2026년 11월 1일 (월) ~ 2026년 11월 9일 (일)</li>
-                            <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
+                            <li><strong>Date</strong> November 16, 2026 (Sun)</li>
+                            <li><strong>Registration</strong> November 1, 2026 (Mon) ~ November 9, 2026 (Sun)</li>
+                            <li><strong>Venue</strong> Yukwangsa Hall, 2F Main Building, Korea University College of Medicine</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <button type="button" class="bookmark" aria-label="Add this event to bookmarks" aria-pressed="false"></button>
                 </li>
 				<li>
                     <a href="/academic_event/conference/view">
-                        <span class="state end"><span class="sound_only">상태:</span>신청마감</span>
-                        <h4>2025년 대한기능의학회 추계학술대회</h4>
-                        <p class="summary">Geroscience and functional medicine. 노화치료의 시대에 기능의학의 역할</p>
+                        <span class="state end"><span class="sound_only">Status:</span>Closed</span>
+                        <h4>2025 Korean Society for Functional Medicine Autumn Academic Conference</h4>
+                        <p class="summary">Geroscience and functional medicine. The Role of Functional Medicine in the Era of Anti-Aging Treatment</p>
                         <ul class="details">
-                            <li><strong>일시</strong> 2026년 11월 16일 (일)</li>
-                            <li><strong>사전등록</strong> 2026년 11월 1일 (월) ~ 2026년 11월 9일 (일)</li>
-                            <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
+                            <li><strong>Date</strong> November 16, 2026 (Sun)</li>
+                            <li><strong>Registration</strong> November 1, 2026 (Mon) ~ November 9, 2026 (Sun)</li>
+                            <li><strong>Venue</strong> Yukwangsa Hall, 2F Main Building, Korea University College of Medicine</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <button type="button" class="bookmark" aria-label="Add this event to bookmarks" aria-pressed="false"></button>
                 </li>
 				<li>
                     <a href="/academic_event/conference/view">
-                        <span class="state expected"><span class="sound_only">상태:</span>모집예정</span>
-                        <h4>2025년 대한기능의학회 추계학술대회</h4>
-                        <p class="summary">Geroscience and functional medicine. 노화치료의 시대에 기능의학의 역할</p>
+                        <span class="state expected"><span class="sound_only">Status:</span>Upcoming</span>
+                        <h4>2025 Korean Society for Functional Medicine Autumn Academic Conference</h4>
+                        <p class="summary">Geroscience and functional medicine. The Role of Functional Medicine in the Era of Anti-Aging Treatment</p>
                         <ul class="details">
-                            <li><strong>일시</strong> 2026년 11월 16일 (일)</li>
-                            <li><strong>사전등록</strong> 2026년 11월 1일 (월) ~ 2026년 11월 9일 (일)</li>
-                            <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
+                            <li><strong>Date</strong> November 16, 2026 (Sun)</li>
+                            <li><strong>Registration</strong> November 1, 2026 (Mon) ~ November 9, 2026 (Sun)</li>
+                            <li><strong>Venue</strong> Yukwangsa Hall, 2F Main Building, Korea University College of Medicine</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <button type="button" class="bookmark" aria-label="Add this event to bookmarks" aria-pressed="false"></button>
                 </li>
 				<li>
                     <a href="/academic_event/conference/view">
-                        <span class="state ing"><span class="sound_only">상태:</span>모집 중</span>
-                        <h4>2025년 대한기능의학회 추계학술대회</h4>
-                        <p class="summary">Geroscience and functional medicine. 노화치료의 시대에 기능의학의 역할</p>
+                        <span class="state ing"><span class="sound_only">Status:</span>Open</span>
+                        <h4>2025 Korean Society for Functional Medicine Autumn Academic Conference</h4>
+                        <p class="summary">Geroscience and functional medicine. The Role of Functional Medicine in the Era of Anti-Aging Treatment</p>
                         <ul class="details">
-                            <li><strong>일시</strong> 2026년 11월 16일 (일)</li>
-                            <li><strong>사전등록</strong> 2026년 11월 1일 (월) ~ 2026년 11월 9일 (일)</li>
-                            <li><strong>장소</strong> 고려대학교 의과대학 본관 2층 유광사홀</li>
+                            <li><strong>Date</strong> November 16, 2026 (Sun)</li>
+                            <li><strong>Registration</strong> November 1, 2026 (Mon) ~ November 9, 2026 (Sun)</li>
+                            <li><strong>Venue</strong> Yukwangsa Hall, 2F Main Building, Korea University College of Medicine</li>
                         </ul>
                     </a>
-                    <button type="button" class="bookmark" aria-label="이 행사를 북마크에 추가" aria-pressed="false"></button>
+                    <button type="button" class="bookmark" aria-label="Add this event to bookmarks" aria-pressed="false"></button>
                 </li>
 			</ul>
 		</div>
 
-		<nav class="board-pagination" aria-label="게시판 페이지 이동">
+		<nav class="board-pagination" aria-label="Board page navigation">
 			<ul class="pagination">
-				<li class="page-item arw_item"><a class="page-link" href="#" title="첫 페이지" aria-label="첫 페이지로 이동"><i class="arrow two first" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="이전 페이지" aria-label="이전 페이지로 이동"><i class="arrow one prev" aria-hidden="true"></i></a></li>
-				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="현재 페이지 1">1</span></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="2페이지로 이동">2</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="3페이지로 이동">3</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="4페이지로 이동">4</a></li>
-				<li class="page-item"><a class="page-link" href="#" aria-label="5페이지로 이동">5</a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="다음 페이지" aria-label="다음 페이지로 이동"><i class="arrow one next" aria-hidden="true"></i></a></li>
-				<li class="page-item arw_item"><a class="page-link" href="#" title="마지막 페이지" aria-label="마지막 페이지로 이동"><i class="arrow two last" aria-hidden="true"></i></a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="First page" aria-label="Go to first page"><i class="arrow two first" aria-hidden="true"></i></a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="Previous page" aria-label="Go to previous page"><i class="arrow one prev" aria-hidden="true"></i></a></li>
+				<li class="page-item active"><span class="page-link" aria-current="page" aria-label="Current page 1">1</span></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 2">2</a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 3">3</a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 4">4</a></li>
+				<li class="page-item"><a class="page-link" href="#" aria-label="Go to page 5">5</a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="Next page" aria-label="Go to next page"><i class="arrow one next" aria-hidden="true"></i></a></li>
+				<li class="page-item arw_item"><a class="page-link" href="#" title="Last page" aria-label="Go to last page"><i class="arrow two last" aria-hidden="true"></i></a></li>
 			</ul>
 		</nav>
 		
 	</div>
 </section>
-	
 </main>
 
 @endsection

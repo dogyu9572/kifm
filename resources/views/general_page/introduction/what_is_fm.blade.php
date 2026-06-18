@@ -49,7 +49,8 @@
 					</ul>
 				</li>
 			</ul>
-			<div class="btm">기능의학은 기존 의학을 대체하는 것이 아닙니다.<br>기존 의학적 진단과 치료를 기반으로 하면서, <strong class="c_iden">더 근본적인 원인을 찾아 함께 해결</strong>하는 통합적인 접근법입니다.</div>
+			<div class="btm">기능의학은 기존 의학을 대체하는 것이 아닙니다.<br>기존 의학적 진단과 치료를 기반으로 하면서, <br class="mo_vw"><strong class="c_iden">더 근본적인 원인을 찾아 함께 해결</strong>하는
+			<br class="mo_vw">통합적인 접근법입니다.</div>
 		</div>
 	</div>
 		

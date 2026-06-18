@@ -278,6 +278,7 @@
 	.mc01 .inner {display:flex; align-items:flex-start; gap:60px;}
 	.mc01 .left {width:1010px;}
 	.mc01 .schedule {overflow:hidden; width:calc(100% + 20px); margin:0 -10px; padding:0 10px;}
+	.mc01 .schedule p.schedule_empty {position: relative; font-size: 18px; font-weight: 500; line-height: 1.6; letter-spacing: -.36px; padding: 0 80px 0 16px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
 	.mc01 .schedule .month {display:flex; padding:8px; background:#0088B81A; border-radius:8px; margin-bottom:24px;}
 	.mc01 .schedule .month li {width:calc(100%/12);}
 	.mc01 .schedule .month button {display:block; font-size:18px; line-height:38px; text-align:center; font-family:'Play'; width:100%; border-radius:8px;}

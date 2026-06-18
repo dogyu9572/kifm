@@ -1,7 +1,7 @@
 @extends('layouts.frontend')
 @section('title', $gName . ' | ' . $sName)
 @section('gName', $gName)
-@section('sName', $sName)
+@section('sName', $geName)
 @section('content')
 @php
     $thumbnailSrc = ! empty($post?->thumbnail)
@@ -12,7 +12,7 @@
 
 <section class="scon" aria-labelledby="greeting-heading">
     <div class="inner">
-        <h1 class="sub_title" id="greeting-heading">{{ $sName }}</h1>
+        <h1 class="sub_title" id="greeting-heading">{{ $geName }}</h1>
 
         <div class="greeting_area">
             <div class="imgfit">

@@ -32,10 +32,10 @@
 	</div>
 	<div class="inner">
 		<div class="book_area">
-			<h3 class="book_label">학술지</h3>
+			<h3 class="book_label">Journal</h3>
 			<div class="book_slide swiper">
 				<div class="swiper-wrapper">
-					<div class="swiper-slide"><a href="">등록된 학술지가 없습니다.</a></div>
+					<div class="swiper-slide"><a href="">No journals have been registered.</a></div>
 				</div>
 			</div>
 			<div class="book_control">
@@ -52,7 +52,7 @@
 	<div class="inner">
 		<div class="left">
 			<div class="mtit">
-				<h3>학술대회 일정</h3>
+				<h3>Conference Schedule</h3>
 				<div class="arrows flex">
 					<button type="button" class="arrow prev" aria-label="학술대회 일정 이전 슬라이드"></button>
 					<button type="button" class="arrow next" aria-label="학술대회 일정 다음 슬라이드"></button>
@@ -67,7 +67,7 @@
 				<div class="schedule_slide">
 					<div class="swiper-wrapper">
 						<div class="swiper-slide empty">
-							<p class="schedule_empty">등록된 학술행사가 없습니다.</p>
+							<p class="schedule_empty">No academic events have been registered.</p>
 						</div>
 					</div>
 				</div>
@@ -75,7 +75,7 @@
 		</div>
 		<div class="right">
 			<div class="mtit">
-				<h3>학회 일정</h3>
+				<h3>Society Schedule</h3>
 			</div>
 			<div class="month_area">
 				<div class="select_month">
@@ -85,16 +85,16 @@
 				</div>
 				<div class="month">
 					<table>
-						<caption>학회 일정 달력</caption>
+						<caption>Society Schedule Calendar</caption>
 						<thead>
 							<tr>
-								<th>일</th>
-								<th>월</th>
-								<th>화</th>
-								<th>수</th>
-								<th>목</th>
-								<th>금</th>
-								<th>토</th>
+								<th>Sun</th>
+								<th>Mon</th>
+								<th>Tue</th>
+								<th>Web</th>
+								<th>Thu</th>
+								<th>Fri</th>
+								<th>Sat</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -111,9 +111,9 @@
 	<h2 class="sound_only" id="notice-title">학회 공지 및 배너 링크</h2>
 	<div class="inner">
 		<div class="long notice w100p">
-			<div class="mtit"><h3>공지사항</h3><a href="/eng/news" class="more" aria-label="대한기능의학회 공지사항으로 이동"></a></div>
+			<div class="mtit"><h3>News</h3><a href="/eng/news" class="more" aria-label="대한기능의학회 공지사항으로 이동"></a></div>
 			<ul class="list">
-				<li><a href="/eng/news_view">등록된 공지사항이 없습니다.<span class="date">-</span></a></li>
+				<li><a href="/eng/news_view">No announcements have been registered.<span class="date">-</span></a></li>
 			</ul>
 		</div>
 	</div>

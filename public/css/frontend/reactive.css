@@ -304,7 +304,7 @@
 	.header.on .btm .right .btn_menu {background:none;}
 	.header .sitemap .inner {position:relative; padding:0 calc(100% - 200px) 0 0; flex-direction:column; height:100%;}
 	.header .sitemap .inner:before {content:""; position:absolute; top:0; left:200px; width:1px; height:100%; background:#ddd;}
-	.header .sitemap .menu {width:100%; padding:0; flex-basis:100%;}
+	.header .sitemap .menu {width:100%; padding:0; flex-basis:100%; flex:0 0 auto;}
 	.header .sitemap .menu > a {font-size:16px;  padding:15px 20px;}
 	.header .sitemap .menu > a:after {display:none;}
 	.header .sitemap .menu.open > a,
@@ -955,11 +955,13 @@
 	.header .btm .search_area .btn {right:4px; width:30px; height:30px;}
 	.header .btm .right .btn_search_mobile,
 	.header .btm .right .btn_chatbot,
+	.header .btm .right .favorites_menu .btn,
 	.header .btm .right .btn_menu {width:32px; height:32px;}
 	.header .btm .right .btn_search_mobile {background:#ddd url('/images/btn_search_mobile.svg') no-repeat 50% 50% / 60%; font-size:0; margin-right:8px; border-radius:4px; transition:none;}
 	.header .btm .right .btn_menu {margin-left:8px;}
 	.header.on .top .member {display:flex;}
 	.header.on .btm .center {position:absolute;}
+	.header.on .btm .right .favorites_menu,
 	.header.on .btm .right .btn_search_mobile {opacity:0; pointer-events:none;}
 	.header .sitemap,
 	.header .sitemap .bg {top:37px; height:calc(100vh - 37px);}
@@ -968,7 +970,7 @@
 	.header .sitemap .inner:before {left:155px;}
 	.header .sitemap .menu > a {font-size:18px;}
 	.header .sitemap .snb {left:155px; width:calc(100% - 155px);}
-	.header .sitemap .snb > li > a {font-size:16px;}
+	.header .sitemap .snb > li > a {font-size:16px; text-align:left;}
 	.header .sitemap .depth a {font-size:16px;}
 /* footer */
 	.fbanner {margin-top:60px; padding:10px 0;}
