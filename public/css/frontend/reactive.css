@@ -304,7 +304,7 @@
 	.header.on .btm .right .btn_menu {background:none;}
 	.header .sitemap .inner {position:relative; padding:0 calc(100% - 200px) 0 0; flex-direction:column; height:100%;}
 	.header .sitemap .inner:before {content:""; position:absolute; top:0; left:200px; width:1px; height:100%; background:#ddd;}
-	.header .sitemap .menu {width:100%; padding:0;}
+	.header .sitemap .menu {width:100%; padding:0; flex-basis:100%;}
 	.header .sitemap .menu > a {font-size:16px;  padding:15px 20px;}
 	.header .sitemap .menu > a:after {display:none;}
 	.header .sitemap .menu.open > a,
@@ -366,8 +366,9 @@
 	.main_visual_wrap .page_links li {padding:10px 0;}
 	.main_visual_wrap .page_links a {gap:6px; font-size:14px;}
 	.main_visual_wrap .page_links a:before {width:36px; height:36px; background-size:50% 50%;}
-	.book_area {margin-top:40px; padding:20px 26px 20px 180px; line-height:40px;}
-	.book_area .book_label {left:26px; font-size:22px; padding-left:52px; background-size:contain;}
+	.book_area {margin-top:40px; padding:20px 26px 20px 180px; line-height:40px; display:flex; align-items:center;}
+	.book_area .book_label {left:26px; font-size:22px; padding-left:0; background-size:contain;}
+	.book_area .book_label img {max-width:80px;}
 	.book_area .book_slide {height:40px; padding-right:120px;}
 	.book_area .book_slide a {font-size:18px;}
 	.book_area .book_control {right:26px;}
@@ -619,9 +620,9 @@
 	.check_box_line li .radio strong {right:20px; font-size:18px;}
 	.training_course_view_wrap .glbox label {width:100px;}
 	.training_course_view_wrap .glbox .text {flex:1 1 calc(100% - 100px);}
-	.training_course_view_wrap .coupon_sale {margin-top:10px;}
-	.training_course_view_wrap .coupon_sale dt {width:100px;}
-	.training_course_view_wrap .coupon_sale dd {width:calc(100% - 100px); height:50px; line-height:48px;}
+	.training_course_view_wrap .coupon_sale {margin-top:10px; gap:6px;}
+	.training_course_view_wrap .coupon_sale dt {padding:0 6px;}
+	.training_course_view_wrap .coupon_sale dd {width:calc(100% - 100px); font-size:13px;}
 	.training_course_view_wrap .long_label label {width:140px;}
 	.training_course_view_wrap .long_label .text {flex:1 1 calc(100% - 140px);}
 	.inbtn .text {flex-basis:calc(100% - 110px);}
@@ -742,6 +743,7 @@
 	.pop_doctor .doctor_top .btm p:before {width:14px; height:24px;}
 	.pop_doctor .doctor_con .tit {margin-top:20px;}
 	.pop_doctor .doctor_con .pop_map {margin-top:6px;}
+	.pop_doctor .check_box {grid-template-columns:repeat(1, 1fr); gap:6px;}
 
 /* 회원서비스 */
 	.member_inbox .btn {height:50px; line-height:48px;}
@@ -946,6 +948,7 @@
 	.header .top .member .i1 button.member-nav-link {background-image:url('/images/icon_log.svg');}
 	.header .top .member .i2 a {background-image:url('/images/icon_member.svg');}
 	.header .logo {width:154px;}
+	.header .btm {height:64px;}
 	.header .btm .center {position:absolute; top:100%; left:0; width:100%; max-width:100%; background:#fff; padding:16px 20px; border-top:#ddd 1px solid; display:none;}
 	.header .btm .search_area {height:40px; padding:4px 40px 4px 4px;}
 	.header .btm .search_area .text {padding:0 12px; font-size:14px;}
@@ -1043,8 +1046,8 @@
 	.main_visual_wrap .page_links li:nth-child(2n):after {height:calc(100% - 32px);}
 	.main_visual_wrap .page_links a {gap:4px; font-size:14px;}
 	.main_visual_wrap .page_links a:before {width:48px; height:48px;}
-	.book_area {margin-top:16px; padding:12px 16px; line-height:24px;}
-	.book_area .book_label {position:relative; top:0; left:0; font-size:16px; padding-left:28px;}
+	.book_area {margin-top:16px; padding:12px 16px; line-height:16px; gap:5%;}
+	.book_area .book_label {position:relative; top:0; left:0; font-size:16px; padding-left:0;}
 	.book_area .book_slide {height:24px; padding-right:20px; margin-top:8px;}
 	.book_area .book_slide a {font-size:16px; padding-right:0;}
 	.book_area .book_slide a:after {display:none;}
@@ -1600,6 +1603,9 @@
 	.pop_doctor .doctor_top .btm p:before {width:12px; height:20px;}
 	.pop_doctor .doctor_con .tit {margin-top:16px;}
 	.pop_doctor .doctor_con .pop_map {margin-top:4px;}
+	.pop_doctor .check_box li {font-size:14px; padding-left:20px; background-size:14px; background-position:0 4px;}
+	.pop_doctor .dots_list li span {width:70px;}
+	.pop_doctor .dots_list li strong {width:calc(100% - 70px);}
 
 /* 회원서비스 */
 	.member_inbox .btn {height:40px; line-height:38px;}
@@ -1923,7 +1929,7 @@
 	.search_group .list a {padding:16px;}
 	.search_group .list h3 {font-size:16px;}
 	.search_group .list p {font-size:13px;}
-	.search_group.type1 .list {gap:16px;}
+	.search_group.type1 .list {gap:12px; flex-direction:column;}
 	.search_group.type1 .list li {width:100%;}
 	.search_group.type1 .state {font-size:12px; line-height:24px; height:24px; padding:0 6px;}
 	.search_group.type1 h3 {margin:6px 0 12px;}

@@ -13,7 +13,7 @@
     @if (empty($cert['has_certified_member']))
         <div class="glbox participation_area participation_course" data-progress-percent="{{ $cert['progress_percent'] }}">
             <div class="info">
-                <div class="l" id="certification-acquisition-label">인증의 취득 요건 현황 <p>인증의 취득을 위해 아래 조건을 충족해주세요</p></div>
+                <div class="l" id="certification-acquisition-label">인정의 취득 요건 현황 <p>인정의 취득을 위해 아래 조건을 충족해주세요</p></div>
             </div>
             <div class="slice_half">
                 <div class="box flex_center">
@@ -38,7 +38,7 @@
     @else
         <div class="glbox participation_area" data-progress-percent="{{ $cert['progress_percent'] }}">
             <div class="info">
-                <div class="l gap0" id="certification-renewal-label">자격 유효기간 <span class="day">({{ $renewal['validity_period'] ?? '-' }})</span><p>인증의 갱신을 위해 아래 조건을 충족해주세요</p></div>
+                <div class="l gap0" id="certification-renewal-label">자격 유효기간 <span class="day">({{ $renewal['validity_period'] ?? '-' }})</span><p>인정의 갱신을 위해 아래 조건을 충족해주세요</p></div>
                 <div class="r d_day btn_wbb">{{ $renewal['d_day_label'] ?? '-' }}</div>
             </div>
             <div class="slice_half ptb6">

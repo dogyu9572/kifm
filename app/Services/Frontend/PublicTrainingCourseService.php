@@ -25,6 +25,7 @@ class PublicTrainingCourseService
 {
     public const FALLBACK_HEAD_IMAGE = 'images/img_sample_training_course_top.jpg';
     public const ROUND_ITEM_CATEGORY_PREFIX = 'training_round:';
+    public const ROUND_BUNDLE_VALUE = 'all';
 
     public function __construct(
         private readonly MailformNotificationService $mailNotifier,
@@ -260,6 +261,38 @@ class PublicTrainingCourseService
         ];
     }
 
+    /**
+     * @return array{eligible: bool, price: int, message: string, grade_code: string, grade_label: string}
+     */
+    public function bundlePriceForTraining(EduTraining $training, ?User $user): array
+    {
+        $grade = $this->memberGrade($user);
+        $firstRound = $this->publicRounds($training)->first();
+        $prices = is_array($firstRound?->grade_prices) ? $firstRound->grade_prices : [];
+        $bundlePrices = is_array($prices[EduTrainingService::BUNDLE_GRADE_PRICE_KEY] ?? null)
+            ? $prices[EduTrainingService::BUNDLE_GRADE_PRICE_KEY]
+            : [];
+        $block = is_array($bundlePrices[$grade['code']] ?? null) ? $bundlePrices[$grade['code']] : null;
+
+        if (! $training->use_round || ! $block || ! filter_var($block['eligible'] ?? false, FILTER_VALIDATE_BOOL)) {
+            return [
+                'eligible' => false,
+                'price' => 0,
+                'message' => '전체 차시 결제 항목을 사용할 수 없습니다.',
+                'grade_code' => $grade['code'],
+                'grade_label' => $grade['label'],
+            ];
+        }
+
+        return [
+            'eligible' => true,
+            'price' => max(0, (int) ($block['price'] ?? 0)),
+            'message' => '',
+            'grade_code' => $grade['code'],
+            'grade_label' => $grade['label'],
+        ];
+    }
+
     public function isRoundFull(EduTrainingRound $round): bool
     {
         if ($round->is_capacity_unlimited || ! $round->capacity) {
@@ -352,17 +385,56 @@ class PublicTrainingCourseService
     }
 
     /** @param list<int> $roundIds */
-    public function selectedRoundSummary(EduTraining $training, array $roundIds, ?User $user): array
+    public function selectedRoundSummary(EduTraining $training, array $roundIds, ?User $user, bool $useBundle = false): array
     {
         $rounds = $this->publicRounds($training)
             ->filter(fn (EduTrainingRound $round): bool => in_array((int) $round->id, $roundIds, true))
             ->values();
+
+        if ($useBundle && $rounds->isNotEmpty()) {
+            $bundlePricing = $this->bundlePriceForTraining($training, $user);
+            $publicRoundIds = $this->publicRounds($training)
+                ->pluck('id')
+                ->map(static fn ($id): int => (int) $id)
+                ->sort()
+                ->values()
+                ->all();
+            $selectedIds = $rounds->pluck('id')
+                ->map(static fn ($id): int => (int) $id)
+                ->sort()
+                ->values()
+                ->all();
+
+            if ($bundlePricing['eligible'] && $publicRoundIds === $selectedIds) {
+                $first = true;
+                $items = $rounds->map(function (EduTrainingRound $round) use ($training, $bundlePricing, &$first): array {
+                    $price = $first ? (int) $bundlePricing['price'] : 0;
+                    $name = $first
+                        ? $training->title . ' - 전체 차시'
+                        : $training->title . ' - 전체 차시 (' . $round->round_label . ')';
+                    $first = false;
+
+                    return [
+                        'round' => $round,
+                        'name' => $name,
+                        'price' => $price,
+                        'pricing' => $bundlePricing,
+                    ];
+                });
+
+                return [
+                    'items' => $items,
+                    'subtotal' => (int) $bundlePricing['price'],
+                ];
+            }
+        }
+
         $items = $rounds->map(function (EduTrainingRound $round) use ($user, $training): array {
             $pricing = $this->priceForRound($round, $user);
 
             return [
                 'round' => $round,
-                'name' => $training->title . ' - ' . $round->round_label,
+                'name' => $training->use_round ? $training->title . ' - ' . $round->round_label : $training->title,
                 'price' => (int) $pricing['price'],
                 'pricing' => $pricing,
             ];
@@ -418,7 +490,8 @@ class PublicTrainingCourseService
     public function createPayment(EduTraining $training, array $data, ?User $user): EduTrainingPayment
     {
         $roundIds = array_map('intval', (array) ($data['round_ids'] ?? []));
-        $summary = $this->selectedRoundSummary($training, $roundIds, $user);
+        $useBundle = ($data['round_bundle'] ?? null) === self::ROUND_BUNDLE_VALUE;
+        $summary = $this->selectedRoundSummary($training, $roundIds, $user, $useBundle);
         if ($summary['items']->isEmpty()) {
             throw new \RuntimeException('결제 항목을 1개 이상 선택해주세요.');
         }

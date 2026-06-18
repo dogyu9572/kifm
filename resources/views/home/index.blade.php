@@ -14,30 +14,6 @@
 	$hasCertifiedMember = ! empty($certification['has_certified_member']);
 	$acquisition = $certification['acquisition'] ?? [];
 	$renewal = $certification['renewal'] ?? [];
-	$certificationLabel = '취득 요건';
-	$certificationCount = 0;
-	$certificationRequired = 3;
-	$certificationShortUnit = '개 조건';
-	$certificationPeriod = null;
-
-	if ($hasCertifiedMember) {
-		$generalCount = min((int) ($renewal['general_count'] ?? 0), (int) ($renewal['general_required'] ?? 4));
-		$winterCount = min((int) ($renewal['winter_count'] ?? 0), (int) ($renewal['winter_required'] ?? 1));
-		$certificationLabel = '갱신 요건';
-		$certificationCount = $generalCount + $winterCount;
-		$certificationRequired = max(1, (int) ($renewal['general_required'] ?? 4) + (int) ($renewal['winter_required'] ?? 1));
-		$certificationShortUnit = '회';
-		$certificationPeriod = $renewal['validity_period'] ?? ($memberCard['certification_period'] ?? null);
-	} else {
-		$certificationCount = (int) ! empty($acquisition['regular_even_completed'])
-			+ (int) ! empty($acquisition['regular_odd_completed'])
-			+ (int) ! empty($acquisition['winter_completed']);
-		$certificationPeriod = ! empty($acquisition['completed_at'])
-			? '취득 조건 충족'
-			: null;
-	}
-
-	$certificationShort = max(0, $certificationRequired - $certificationCount);
 @endphp
 
 @section('content')
@@ -118,33 +94,53 @@
 						<h2>안녕하세요, {{ $memberCard['name'] }} 선생님!</h2>
 						<a href="{{ route('mypage.profile_edit') }}" class="more"><span class="sound_only">마이페이지로 이동</span></a>
 					</div>
-					<div class="member_info">
-						<div class="tit">
-							<strong>인정의 자격 정보</strong>
-							@if (! empty($certificationPeriod))
-								<div class="date">{{ $certificationPeriod }}</div>
-							@endif
+					@if (! $hasCertifiedMember)
+						<div class="member_info participation_area">
+							<div class="tit">
+								<strong>인정의 취득 요건 현황</strong>
+								<p>인정의 취득을 위해 아래 조건을 충족해주세요</p>
+							</div>
+							<div class="slice_half">
+								<div class="box">
+									<div class="tt">정기 연수강좌 <div class="count"><strong class="c_iden">{{ $acquisition['regular_count'] ?? 0 }}</strong>/{{ $acquisition['regular_required'] ?? 2 }}회</div></div>
+									<div class="flex">
+										<span class="btn {{ ! empty($acquisition['regular_even_completed']) ? 'btn_wbb' : 'btn_ggg' }}">짝수년</span>
+										<span class="btn {{ ! empty($acquisition['regular_odd_completed']) ? 'btn_wbb' : 'btn_ggg' }}">홀수년</span>
+									</div>
+								</div>
+								<div class="box">
+									<div class="tt">동계 연수강좌 <div class="count"><strong class="c_iden">{{ $acquisition['winter_count'] ?? 0 }}</strong>/1회</div></div>
+									<span class="btn {{ ! empty($acquisition['winter_completed']) ? 'btn_wbb' : 'btn_wrr' }} w100p">{{ ! empty($acquisition['winter_completed']) ? '강좌 수료' : '강좌 미수료' }}</span>
+								</div>
+							</div>
 						</div>
-						<dl class="flex flex_between">
-							<dt>{{ $certificationLabel }}</dt>
-							<dd><strong class="c_iden">{{ $certificationCount }}</strong>/{{ $certificationRequired }}{{ $hasCertifiedMember ? '회' : '개' }}</dd>
-						</dl>
-						<div class="state_line"><div class="bar"></div></div>
-						@if ($certificationShort > 0)
-							<div class="info flex_end">
-								<div class="r"><p class="excl">{{ $certificationShort }}{{ $certificationShortUnit }} 부족</p></div>
+					@else
+						<div class="member_info participation_area">
+							<div class="tit">
+								<div class="flex">
+									<strong>자격 유효기간</strong>
+									<div class="date">{{ $renewal['validity_period'] ?? '-' }}</div>
+									<div class="d_day btn_wbb">{{ $renewal['d_day_label'] ?? '-' }}</div>
+								</div>
+								<p>갱신을 위해 아래 조건을 충족해주세요</p>
 							</div>
-						@else
-							<div class="info flex_end">
-								<div class="r"><p class="excl">조건 충족</p></div>
+							<div class="slice_half ptb6">
+								<div class="box">
+									<div class="tt mb0">학술 행사 참여 <div class="count"><strong class="c_iden">{{ $renewal['general_count'] ?? 0 }}</strong>/{{ $renewal['general_required'] ?? 4 }}회</div></div>
+									<div class="state_line blue_line"><div class="bar"></div></div>
+								</div>
+								<div class="box">
+									<div class="tt mb0">동계 연수강좌 <div class="count"><strong class="c_iden">{{ $renewal['winter_count'] ?? 0 }}</strong>/{{ $renewal['winter_required'] ?? 1 }}회</div></div>
+									<div class="state_line red_line"><div class="bar"></div></div>
+								</div>
 							</div>
-						@endif
-					</div>
+						</div>
+					@endif
 					<div class="btns">
 						<a href="{{ route('mypage.profile_edit') }}" class="btn btn_wbb">마이페이지</a>
 						<a href="{{ route('mypage.online_training') }}" class="btn btn_wkk">강의실 입장</a>
 					</div>
-				</div>
+				</div>				
 			@endif
 			<ul class="page_links">
 				<li class="i1"><a href="{{ route('member_plaza.fee_payment_guide') }}">회원가입 안내</a></li>
@@ -156,7 +152,11 @@
 	</div>
 	<div class="inner">
 		<div class="book_area">
-			<h3 class="book_label">학술지</h3>
+			<h3 class="book_label">
+				<a href="https://scholar.kyobobook.co.kr/article/external/list/lav143BicMrX1pUjjA9ZuIMWLS2qyH598A" target="_blank" rel="noopener">
+					<img src="/images/jkifm_logo.jpg" alt="JKIFM 학술지 바로가기">
+				</a>
+			</h3>
 			<div class="book_slide swiper">
 				<div class="swiper-wrapper">
 					@forelse ($journalPosts as $post)

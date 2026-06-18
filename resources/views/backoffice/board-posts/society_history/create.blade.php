@@ -188,6 +188,11 @@
                 </div>
                 @endif
 
+                <div class="board-form-group">
+                    <label for="title_en" class="board-form-label">제목 영문</label>
+                    <input type="text" class="board-form-control" id="title_en" name="title_en" value="{{ old('title_en') }}" maxlength="255">
+                </div>
+
                 @if($board->isFieldEnabled('content'))
                 <div class="board-form-group">
                     <label for="content" class="board-form-label">
@@ -199,6 +204,11 @@
                     <textarea class="board-form-control board-form-textarea" id="content" name="content" rows="15" data-backoffice-ckeditor data-source-editing="true" @if($board->isFieldRequired('content')) required @endif>{{ old('content') }}</textarea>
                 </div>
                 @endif
+
+                <div class="board-form-group">
+                    <label for="content_en" class="board-form-label">내용 영문</label>
+                    <textarea class="board-form-control board-form-textarea" id="content_en" name="content_en" rows="15" data-backoffice-ckeditor data-source-editing="true">{{ old('content_en') }}</textarea>
+                </div>
 
                 @if($board->enable_sorting)
                 <div class="board-form-group">

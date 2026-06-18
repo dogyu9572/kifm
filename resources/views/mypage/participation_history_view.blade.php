@@ -4,8 +4,10 @@
 @section('sName', $sName)
 @section('content')
 @php
+	$isTrainingCourse = ($participationType ?? 'academic_event') === 'training_course';
 	$member = $registration->member;
-	$itemNames = $registration->items?->pluck('item_name')->filter()->implode(', ') ?: ($registration->event?->title ?? '-');
+	$eventTitle = $isTrainingCourse ? ($registration->training?->title ?? '-') : ($registration->event?->title ?? '-');
+	$itemNames = $registration->items?->pluck('item_name')->filter()->implode(', ') ?: $eventTitle;
 	$statusLabel = $paymentStatusLabels[$registration->payment_status] ?? $registration->payment_status;
 	$methodLabel = $paymentMethodLabels[$registration->payment_method] ?? $registration->payment_method;
 	$isCompleted = $registration->payment_status === 'completed';
@@ -30,9 +32,11 @@
 				<li class="i2"><a href="mailto:0182253645@naver.com;">0182253645@naver.com</a></li>
 			</ul>
 			<div class="btns_btm flex_colm">
-				@if ($isCompleted)
+				@if ($isCompleted && ! $isTrainingCourse)
 				<a href="{{ route('mypage.print_participation', ['registration_id' => $registration->id]) }}" target="_blank" class="btn btn_print btn_wbb">참가증명서 출력</a>
 				<a href="{{ route('mypage.print_receipt_save', ['registration_id' => $registration->id]) }}" target="_blank" class="btn btn_print btn_kwg btn_kwg_line8">영수증 출력</a>
+				@elseif ($isCompleted && $isTrainingCourse)
+				<a href="{{ route('mypage.print_receipt_save', ['training_payment_id' => $registration->id]) }}" target="_blank" class="btn btn_print btn_kwg btn_kwg_line8">영수증 출력</a>
 				@else
 				<span class="btn btn_print btn_kwg btn_kwg_line8">결제 완료 후 출력 가능합니다.</span>
 				@endif
@@ -45,7 +49,7 @@
 				<tbody>
 					<tr>
 						<th scope="row">행사명</th>
-						<td>{{ $registration->event?->title ?? '-' }}</td>
+						<td>{{ $eventTitle }}</td>
 						<th scope="row">평점</th>
 						<td>-</td>
 					</tr>
@@ -108,10 +112,16 @@
 						<td>{{ $methodLabel }}</td>
 						@if ($registration->payment_method === 'bank_transfer')
 						<th scope="row">입금 계좌</th>
-						<td>{{ $registration->bank_account_text ?: config('mypage.membership_bank_display_name').': '.config('mypage.membership_bank_account_no').' / 예금주: '.config('mypage.membership_bank_holder') }}</td>
+						<td>
+							@if (! $isTrainingCourse && ! empty($registration->bank_account_text))
+								{{ $registration->bank_account_text }}
+							@else
+								{{ config('mypage.membership_bank_display_name').': '.config('mypage.membership_bank_account_no').' / 예금주: '.config('mypage.membership_bank_holder') }}
+							@endif
+						</td>
 						@else
 						<th scope="row">결제 번호</th>
-						<td>{{ $registration->registration_no ?: '-' }}</td>
+						<td>{{ $isTrainingCourse ? ($registration->order_no ?: '-') : ($registration->registration_no ?: '-') }}</td>
 						@endif
 					</tr>
 					@if ($registration->payment_method === 'bank_transfer')
@@ -146,8 +156,11 @@
 				</tbody>
 			</table>
 		</div>
-		@endif
 
+		@endif
+		<div class="btns_btm">
+			<a href="{{ route('mypage.participation_history') }}" class="btn btn_kwk">목록으로</a>
+		</div>
 	</div>
 </section>
 

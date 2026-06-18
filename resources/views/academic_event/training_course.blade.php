@@ -89,12 +89,8 @@
 						<x-frontend.bookmark-button content-type="academic_event_training_course" :content-id="$training->id" :title="$training->title" :menu-label="$sName" :url="$trainingCourse->detailUrl($training)" label="이 행사를 북마크에 추가" />
 					</li>
 				@empty
-					<li class="training-course-empty">
-						<div>
-							<span class="state end"><span class="sound_only">상태:</span>없음</span>
-							<h4>등록된 연수강좌가 없습니다.</h4>
-							<p>검색 조건을 변경해 주세요.</p>
-						</div>
+					<li class="no_board">
+						<div class="no_result">검색 조건에 해당하는 연수강좌가 없습니다.</div>
 					</li>
 				@endforelse
 			</ul>

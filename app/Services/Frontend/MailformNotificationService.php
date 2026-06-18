@@ -5,6 +5,7 @@ namespace App\Services\Frontend;
 use App\Models\AcademicEventRegistration;
 use App\Models\CertifiedMember;
 use App\Models\CommunityCommitteeApplication;
+use App\Models\EduCourseEnrollment;
 use App\Models\EduTrainingPayment;
 use App\Models\MembershipPayment;
 use App\Models\User;
@@ -41,11 +42,14 @@ class MailformNotificationService
 
     public function sendTrainingCourseApplicationComplete(EduTrainingPayment $payment): void
     {
-        $payment->loadMissing(['training', 'items']);
+        $payment->loadMissing(['training', 'items', 'member']);
+        $view = $payment->payment_method === 'bank_transfer'
+            ? 'mailform.mail_lecture_registration_complete'
+            : 'mailform.mail_course_application_complete';
         $this->send(
             (string) $payment->email,
             (string) ($payment->name ?: $payment->email),
-            'mailform.mail_course_application_complete',
+            $view,
             '연수강좌 신청 완료 안내',
             ['payment' => $payment]
         );
@@ -70,12 +74,32 @@ class MailformNotificationService
     public function sendAcademicConferencePreRegistrationComplete(AcademicEventRegistration $registration): void
     {
         $registration->loadMissing(['event', 'items', 'member']);
+        $view = $registration->payment_method === 'bank_transfer'
+            ? 'mailform.mail_conference_registration_vbank'
+            : 'mailform.mail_pre_registration_complete';
         $this->send(
             (string) ($registration->member?->email ?: $registration->email),
             (string) (($registration->member?->name ?: $registration->name) ?: $registration->email),
-            'mailform.mail_pre_registration_complete',
+            $view,
             '학술대회 사전등록 완료 안내',
             ['registration' => $registration]
+        );
+    }
+
+    public function sendOnlineAcademyRegistrationComplete(EduCourseEnrollment $enrollment): void
+    {
+        $enrollment->loadMissing(['course', 'member']);
+        $member = $enrollment->member;
+        $view = $enrollment->payment_method === 'bank_transfer'
+            ? 'mailform.mail_academy_registration_vbank'
+            : 'mailform.mail_academy_registration_card';
+
+        $this->send(
+            (string) $member?->email,
+            (string) ($member?->name ?: $member?->email),
+            $view,
+            '온라인 아카데미 신청 완료 안내',
+            ['enrollment' => $enrollment]
         );
     }
 

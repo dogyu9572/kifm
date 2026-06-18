@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 
 class EduTrainingService
 {
+    public const BUNDLE_GRADE_PRICE_KEY = '_bundle';
+
     public function paginateFiltered(Request $request): LengthAwarePaginator
     {
         $perPage = (int) $request->get('per_page', 10);
@@ -108,7 +110,9 @@ class EduTrainingService
         $training->introduction = isset($validated['introduction']) ? (string) $validated['introduction'] : null;
 
         $rounds = $this->normalizedRounds($validated);
-        $training->round_type = $validated['round_type'] ?? ($rounds[0]['round_label'] ?? null);
+        $training->round_type = $training->use_round
+            ? ($validated['round_type'] ?? ($rounds[0]['round_label'] ?? null))
+            : '전체';
         $training->training_method = $this->resolvedTrainingMethod($validated, $rounds);
     }
 
@@ -149,6 +153,33 @@ class EduTrainingService
     }
 
     /**
+     * @param  list<array<string, mixed>>  $rounds
+     * @return list<array<string, mixed>>
+     */
+    protected function roundsForStorage(EduTraining $training, array $validated, array $rounds): array
+    {
+        if ($rounds === []) {
+            return [];
+        }
+
+        if (! $training->use_round) {
+            $single = $rounds[0];
+            $single['round_order'] = 1;
+            $single['round_label'] = '전체';
+            $single['training_method'] = (string) ($validated['training_method'] ?? $single['training_method'] ?? 'offline');
+
+            return [$single];
+        }
+
+        $bundlePrices = $this->compactGradePrices($validated['bundle_grades'] ?? []);
+        if ($this->hasEligibleGradePrice($bundlePrices)) {
+            $rounds[0]['grade_prices'][self::BUNDLE_GRADE_PRICE_KEY] = $bundlePrices;
+        }
+
+        return $rounds;
+    }
+
+    /**
      * @param  array<string, mixed>  $grades
      * @return array<string, array{eligible: bool, price: float|null}>
      */
@@ -170,6 +201,21 @@ class EduTrainingService
         }
 
         return $out;
+    }
+
+    protected function hasEligibleGradePrice(array $gradePrices): bool
+    {
+        foreach ($gradePrices as $block) {
+            if (
+                is_array($block)
+                && filter_var($block['eligible'] ?? false, FILTER_VALIDATE_BOOL)
+                && ($block['price'] ?? null) !== null
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -199,7 +245,7 @@ class EduTrainingService
      */
     protected function syncRounds(EduTraining $training, array $validated): void
     {
-        $rounds = $training->use_round ? $this->normalizedRounds($validated) : [];
+        $rounds = $this->roundsForStorage($training, $validated, $this->normalizedRounds($validated));
 
         $training->rounds()->delete();
         foreach ($rounds as $roundData) {

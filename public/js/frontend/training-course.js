@@ -206,6 +206,7 @@
         const form = document.getElementById('training-course-payment-form');
         if (!form) { return; }
         const roundInputs = Array.from(form.querySelectorAll('input[name="round_ids[]"]'));
+        const bundleInput = form.querySelector('input[name="round_bundle"]');
         const couponInput = document.getElementById('training-coupon-num');
         const couponHidden = document.getElementById('training-coupon-code-hidden');
         const couponButton = document.getElementById('training-coupon-apply-btn');
@@ -226,7 +227,19 @@
         function selectedRounds() {
             return roundInputs.filter((input) => input.checked && !input.disabled);
         }
+        function bundleRoundIds() {
+            return String(bundleInput?.dataset.roundIds || '')
+                .split(',')
+                .map((id) => id.trim())
+                .filter(Boolean);
+        }
+        function isBundleSelected() {
+            return Boolean(bundleInput?.checked);
+        }
         function subtotal() {
+            if (isBundleSelected()) {
+                return Number(bundleInput.dataset.price) || 0;
+            }
             return selectedRounds().reduce((sum, input) => sum + (Number(input.dataset.price) || 0), 0);
         }
         function resetCoupon() {
@@ -251,7 +264,9 @@
             const currentSubtotal = subtotal();
             const discount = Math.min(appliedDiscount, currentSubtotal);
             const total = Math.max(0, currentSubtotal - discount);
-            const itemLabel = selected.length > 0
+            const itemLabel = isBundleSelected()
+                ? (bundleInput.dataset.label || '전체 차시')
+                : selected.length > 0
                 ? selected.map((input) => input.dataset.label || input.value).join(', ')
                 : '결제 항목을 선택해주세요.';
             if (summaryItems) { summaryItems.textContent = itemLabel; }
@@ -284,6 +299,7 @@
                     body: JSON.stringify({
                         training_id: form.querySelector('input[name="training_id"]')?.value || '',
                         round_ids: ids,
+                        round_bundle: isBundleSelected() ? bundleInput.value : '',
                         coupon_code: code,
                     }),
                 });
@@ -402,9 +418,26 @@
         }
         roundInputs.forEach((input) => {
             input.addEventListener('change', function () {
+                if (bundleInput?.checked) {
+                    const selectedIds = selectedRounds().map((item) => item.value).sort();
+                    const allIds = bundleRoundIds().sort();
+                    bundleInput.checked = allIds.length > 0
+                        && allIds.length === selectedIds.length
+                        && allIds.every((id, index) => id === selectedIds[index]);
+                }
                 resetCoupon();
                 updateSummary();
             });
+        });
+        bundleInput?.addEventListener('change', function () {
+            const ids = bundleRoundIds();
+            roundInputs.forEach((input) => {
+                if (!input.disabled) {
+                    input.checked = bundleInput.checked && ids.includes(input.value);
+                }
+            });
+            resetCoupon();
+            updateSummary();
         });
         couponButton?.addEventListener('click', applyCoupon);
         form.querySelectorAll('input[name="payment_method"]').forEach((input) => { input.addEventListener('change', togglePaymentMethod); });
@@ -439,6 +472,14 @@
         });
         togglePaymentMethod();
         toggleReceiptArea();
+        if (bundleInput?.checked) {
+            const ids = bundleRoundIds();
+            roundInputs.forEach((input) => {
+                if (!input.disabled) {
+                    input.checked = ids.includes(input.value);
+                }
+            });
+        }
         updateSummary();
     }
 	function initMobileAccordion() {

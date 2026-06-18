@@ -40,11 +40,13 @@ class HistoryController extends Controller
     public function participationView(Request $request): View
     {
         $id = (int) $request->query('id', 0);
-        $registration = $this->participationService->findForMember($this->currentMember(), $id);
+        $type = $request->query('type') === 'training_course' ? 'training_course' : 'academic_event';
+        $registration = $this->participationService->findForMember($this->currentMember(), $id, $type);
         abort_if($registration === null, 404);
 
         return $this->renderMypage('participation_history_view', '02', '참가내역 관리', 'participation_history_view', [
             'registration' => $registration,
+            'participationType' => $type,
             'paymentStatusLabels' => $this->participationService->paymentStatusLabels(),
             'paymentMethodLabels' => $this->participationService->paymentMethodLabels(),
         ]);

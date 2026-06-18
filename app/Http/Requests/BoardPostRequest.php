@@ -71,7 +71,9 @@ class BoardPostRequest extends FormRequest
 
         $rules = [
             'title' => 'required|string|max:255',
+            'title_en' => 'nullable|string|max:255',
             'content' => $contentRules,
+            'content_en' => ['nullable', 'string'],
             'category' => $categoryRules,
             'is_notice' => 'nullable|boolean',
             'is_secret' => 'nullable|boolean',
@@ -190,6 +192,7 @@ class BoardPostRequest extends FormRequest
         $messages = [
             'title.required' => '제목은 필수 입력 항목입니다.',
             'title.max' => '제목은 최대 255자까지 입력 가능합니다.',
+            'title_en.max' => '제목 영문은 최대 255자까지 입력 가능합니다.',
             'content.required' => '내용은 필수 입력 항목입니다.',
             'category.max' => '위원회(분류) 값은 최대 :max자까지 입력 가능합니다.',
             'category.exists' => '위원회 목록에 등록된 이름만 선택할 수 있습니다.',

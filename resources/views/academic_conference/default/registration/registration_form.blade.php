@@ -212,33 +212,33 @@
 	                <fieldset class="type_bank_hide">
 	                    <legend class="form_tit">환불정보</legend>
 	                    <div class="inputs">
-		<ul class="long_label">
-		    <li>
-		        <label for="training-refund-bank">은행명/계좌번호<span class="required c_iden">*</span></label>
-		        <div class="flex bank text">
-		            <select name="refund_bank" id="training-refund-bank" class="text">
-			                        <option value="">-- 은행 선택 --</option>
-		                @foreach ($refundBankOptions as $bankName)
-		                    <option value="{{ $bankName }}" @selected(old('refund_bank') === $bankName)>{{ $bankName }}</option>
-		                @endforeach
-		            </select>
-			            <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
-			        </div>
-			        @error('refund_bank')
-			            <p class="c_red" role="alert">{{ $message }}</p>
-			        @enderror
-			        @error('refund_account')
-			            <p class="c_red" role="alert">{{ $message }}</p>
-			        @enderror
-			    </li>
-			    <li>
-			        <label for="training-refund-holder">예금주명<span class="required c_iden">*</span></label>
-			        <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder', $member?->name) }}" placeholder="예금주명을 입력해주세요">
-			        @error('refund_holder')
-			            <p class="c_red" role="alert">{{ $message }}</p>
-			        @enderror
-			    </li>
-		</ul>
+							<ul class="long_label">
+								<li>
+									<label for="training-refund-bank">은행명/계좌번호<span class="required c_iden">*</span></label>
+									<div class="flex bank text">
+										<select name="refund_bank" id="training-refund-bank" class="text">
+														<option value="">-- 은행 선택 --</option>
+											@foreach ($refundBankOptions as $bankName)
+												<option value="{{ $bankName }}" @selected(old('refund_bank') === $bankName)>{{ $bankName }}</option>
+											@endforeach
+										</select>
+											<input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
+										</div>
+										@error('refund_bank')
+											<p class="c_red" role="alert">{{ $message }}</p>
+										@enderror
+										@error('refund_account')
+											<p class="c_red" role="alert">{{ $message }}</p>
+										@enderror
+									</li>
+									<li>
+										<label for="training-refund-holder">예금주명<span class="required c_iden">*</span></label>
+										<input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder', $member?->name) }}" placeholder="예금주명을 입력해주세요">
+										@error('refund_holder')
+											<p class="c_red" role="alert">{{ $message }}</p>
+										@enderror
+									</li>
+							</ul>
 	                    </div>
 	                </fieldset>
 

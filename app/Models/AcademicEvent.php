@@ -13,6 +13,7 @@ class AcademicEvent extends Model
         'season',
         'folder_name',
         'title',
+        'title_en',
         'main_title_1',
         'main_title_2',
         'event_material_path',

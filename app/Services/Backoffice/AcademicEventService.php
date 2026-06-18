@@ -281,7 +281,7 @@ class AcademicEventService
     protected function fillEventAttributes(AcademicEvent $event, array $v): void
     {
         $keys = [
-            'legacy_post_id', 'year', 'season', 'folder_name', 'title',
+            'legacy_post_id', 'year', 'season', 'folder_name', 'title', 'title_en',
             'main_title_1', 'main_title_2',
             'event_material_path', 'event_material_description',
             'event_type', 'online_url', 'is_public', 'main_exposure', 'venue',

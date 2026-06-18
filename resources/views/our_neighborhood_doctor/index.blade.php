@@ -168,7 +168,7 @@
         <button type="button" class="btn_close js-doctor-popup-close">Close</button>
         <h2 class="ptit">우리동네 주치의</h2>
         <div class="scroll">
-            <div class="con gbox">
+            <div class="con">
                 <div class="doctor_top">
                     <div class="imgfit">
                         <img src="/images/img_sample_doctor.jpg" alt="" class="js-popup-photo">
@@ -195,6 +195,34 @@
                             class="root_daum_roughmap root_daum_roughmap_landing js-roughmap-container"
                         ></div>
                     </div>
+					<h3 class="tit">시행하고 있는 기능의학 검사 리스트</h3>
+					<ul class="check_box">
+						<li>소변유기산검사</li>
+						<li>타액 호르몬 검사(Adrenal Stress Profile)</li>
+						<li>자율신경계검사</li>
+						<li>비타민 K2 검사</li>
+						<li>활성산소 & 항산화력 검사</li>
+						<li>NK세포 활성도 검사</li>
+						<li>음식알레르기 검사</li>
+						<li>장내세균부석검사(Gut Microbiota Analysis)</li>
+					</ul>
+					<h3 class="tit">치료 가능 영역</h3>
+					<ul class="check_box">
+						<li>두통(편두통)</li>
+						<li>주의력 결핍장애 (ADHD)</li>
+						<li>(수숙, 항암, 방사선치료) 전후 암환자 관리</li>
+						<li>비타민 K2 검사</li>
+						<li>음식알레르기 검사</li>
+						<li>류마티스성 관절염</li>
+						<li>이 외 자가면역성 질환</li>
+						<li>환경호르몬 검사</li>
+					</ul>
+					<h3 class="tit">기타 증상, 질환 및 증후군</h3>
+					<ul class="dots_list">
+						<li><span>기타 증상</span><strong>일반 감기 진단</strong></li>
+						<li><span>기타 질환</span><strong>-</strong></li>
+						<li><span>기타 증후군</span><strong>-</strong></li>
+					</ul>
                 </div>
             </div>
         </div>

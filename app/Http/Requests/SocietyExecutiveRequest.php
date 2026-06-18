@@ -16,8 +16,11 @@ class SocietyExecutiveRequest extends FormRequest
         return [
             'group_no' => ['required', 'integer', 'in:1,2,3'],
             'position' => ['required', 'string', 'max:100'],
+            'position_en' => ['nullable', 'string', 'max:100'],
             'name' => ['required', 'string', 'max:100'],
+            'name_en' => ['nullable', 'string', 'max:100'],
             'organization' => ['required', 'string', 'max:200'],
+            'organization_en' => ['nullable', 'string', 'max:200'],
             'email' => ['nullable', 'email:rfc,dns', 'max:150'],
             'sort_order' => ['nullable', 'integer', 'min:1'],
             'photo' => ['nullable', 'image', 'max:5120'],

@@ -1,0 +1,225 @@
+/* ------------------------------ PC Guide ------------------------------ */
+@media screen and (max-width:1440px){
+	br.pc_vw {display:none;}
+/* 공통 */
+	.sub_menu_area .set_s li {min-width:120px;}
+	.gtit {font-size:40px;}
+	.btit {font-size:24px; margin-bottom:20px;}
+	.btit ~ .btit {margin-top:80px;}
+/* header */
+	.header .gnb > li > a {padding:0 40px;}
+/** 학회소개 **/
+/* 기능의학이란 */
+	.what_is_fm_area01 .inbox {padding:70px 40px; gap:16px;}
+	.what_is_fm_area01 .inbox .tit {font-size:36px;}
+	.what_is_fm_area01 .inbox strong {font-size:22px;}
+	.what_is_fm_area02 {padding:80px 0; margin-top:80px;}
+	.what_is_fm_area02 .tb {margin-top:16px;}
+	.what_is_fm_area02 .chart_box {margin:50px 0; gap:20px;}
+	.what_is_fm_area02 .chart_box > li {width:calc(50% - 10px); gap:60px;}
+	.what_is_fm_area02 .chart_box .tit {width:160px; padding:30px;}
+	.what_is_fm_area02 .chart_box .tit:before {height:60px;}
+	.what_is_fm_area02 .chart_box h3 {font-size:22px; margin:30px 0 10px;}
+	.what_is_fm_area02 .chart_box p {font-size:15px;}
+	.what_is_fm_area02 .chart_box .list {gap:12px; width:calc(100% - 220px);}
+	.what_is_fm_area02 .chart_box .list li {font-size:14px; padding:16px 20px;}
+	.what_is_fm_area02 .chart_box .list li:before {width:40px;}
+	.what_is_fm_area02 .chart_box .left .list li:before {left:calc(100% + 10px);}
+	.what_is_fm_area02 .chart_box .left .list li:after {left:calc(100% + 6px);}
+	.what_is_fm_area02 .chart_box .right .list li:before {right:calc(100% + 10px);}
+	.what_is_fm_area02 .chart_box .right .list li:after {right:calc(100% + 6px);}
+	.what_is_fm_area02 .btm {font-size:22px;}
+/* 기능의학 나무 소개 */
+	.fm_tree_area .gbox {padding:70px 60px; margin-top:60px;}
+	.fm_tree_area .tree_area {margin-bottom:60px;}
+	.fm_tree_area .btm p {font-size:16px;}
+	.fm_tree_area .btm .end_txt {font-size:22px;}
+/* 7가지 핵심 임상 불균형 */
+	.clinical_imbalances_area .blus_box {padding:30px;}
+	.clinical_imbalances_area .list {margin-top:30px; gap:30px;}
+	.clinical_imbalances_area li {width:calc(50% - 15px); gap:20px; padding:40px 36px;}
+	.clinical_imbalances_area .icon {width:60px; height:60px; padding:15px;}
+	.clinical_imbalances_area .txt {width:calc(100% - 90px);}
+	.clinical_imbalances_area h3 {font-size:22px;}
+/* 기능의학적 진료 과정 */
+	.process_area {padding:80px 0;}
+	.process_area .tb {margin:10px 0 80px;}
+	.process_area .list span {font-size:15px;}
+	.process_area .list h3 {font-size:18px; margin-bottom:10px;}
+	.process_area .list p {font-size:15px;}
+
+/** 건강 알아가기 **/
+/* 기능의학 검사 이해 */
+	.examination_area .list {gap:30px; margin-bottom:50px;}
+	.examination_area .list > li {width:calc(50% - 15px); padding:30px; gap:20px;}
+	.examination_area .list .icon {width:60px; height:60px; padding:15px;}
+/* FAQ */
+	.faq_top {padding:30px; margin-bottom:40px;}
+	.faq_top h2 {font-size:24px;}
+	.faq_top p {font-size:15px; margin-top:10px;}
+}
+
+/* ------------------------------ Hover ------------------------------ */
+@media screen and (min-width:1024px){
+	.header .gnb > li:hover > a {color:var(--c_iden);}
+	.header .snb > li:hover > a {color:var(--c_iden);}
+	.header .gnb > li:hover .snb {display:block;}
+}
+
+/* ------------------------------ Tablet PC ------------------------------ */
+@media screen and (max-width:1023px){
+	.header .sitemap .menu {flex:0 0 auto;}
+/* 공통 */
+	.sub_menu_area .set_s a {padding:5px 10px; line-height:1.2; height:50px; display:flex; justify-content:center; align-items:center;}
+	.gtit {font-size:36px;}
+	.btit {font-size:22px; margin-bottom:16px;}
+	.btit ~ .btit {margin-top:60px;}
+/* header */
+	.header .gnb {display: none;}
+/** 학회소개 **/
+/* 기능의학이란 */
+	.what_is_fm_area01 .inbox {padding:50px 20px; gap:12px;}
+	.what_is_fm_area01 .inbox .tit {font-size:32px;}
+	.what_is_fm_area01 .inbox strong {font-size:18px;}
+	.what_is_fm_area02 {padding:60px 0; margin-top:60px;}
+	.what_is_fm_area02 .tb {margin-top:12px;}
+	.what_is_fm_area02 .chart_box {margin:40px 0; gap:16px;}
+	.what_is_fm_area02 .chart_box > li {width:calc(50% - 8px); gap:50px;}
+	.what_is_fm_area02 .chart_box > li:last-child:before {left:-33px; font-size:16px; width:50px; height:50px; line-height:50px;}
+	.what_is_fm_area02 .chart_box .tit {width:140px; padding:16px;}
+	.what_is_fm_area02 .chart_box .tit:before {height:50px;}
+	.what_is_fm_area02 .chart_box h3 {font-size:20px; margin:20px 0 8px;}
+	.what_is_fm_area02 .chart_box p {font-size:14px;}
+	.what_is_fm_area02 .chart_box .list {gap:10px; width:calc(100% - 190px);}
+	.what_is_fm_area02 .chart_box .list li {padding:14px 16px;}
+	.what_is_fm_area02 .btm {font-size:20px;}
+/* 기능의학 나무 소개 */
+	.fm_tree_area .gbox {padding:50px 30px; margin-top:40px;}
+	.fm_tree_area .tree_area {margin-bottom:40px;}
+	.fm_tree_area .list {gap:16px;}
+	.fm_tree_area .list li {gap:20px; padding:20px;}
+	.fm_tree_area .list .icon {width:80px; height:80px; padding:20px;}
+	.fm_tree_area .list .txt {width:calc(100% - 100px);}
+	.fm_tree_area .list span {font-size:15px;}
+	.fm_tree_area .list h3 {font-size:22px; margin:4px 0 10px;}
+	.fm_tree_area .list p {font-size:15px;}
+	.fm_tree_area .btm {margin-top:50px;}
+	.fm_tree_area .btm p {font-size:14px;}
+	.fm_tree_area .btm .end_txt {font-size:20px;}
+/* 7가지 핵심 임상 불균형 */
+	.clinical_imbalances_area .blus_box {padding:20px;}
+	.clinical_imbalances_area .list {margin-top:24px; gap:20px;}
+	.clinical_imbalances_area li {width:calc(50% - 10px); gap:16px; padding:30px 28px;}
+	.clinical_imbalances_area h3 {font-size:20px;}
+	.clinical_imbalances_area p {font-size:15px; margin-top:10px;}
+/* 기능의학적 진료 과정 */
+	.process_area {padding:60px 0;}
+	.process_area .tb {margin:10px 0 60px;}
+	.process_area .list:before {top:178px;}
+	.process_area .list .icon {width:140px; height:140px; padding:35px;}
+	.process_area .list .txt {padding-top:60px;}
+	.process_area .list h3 {font-size:16px; margin-bottom:8px;}
+	.process_area .list p {font-size:14px;}
+
+/** 건강 알아가기 **/
+/* 기능의학 검사 이해 */
+	.examination_area .list {gap:20px; margin-bottom:40px;}
+	.examination_area .list:before {width:50vw;}
+	.examination_area .list > li {width:calc(50% - 10px); padding:20px; gap:16px;}
+	.examination_area .list .txt {width:calc(100% - 76px);}
+	.examination_area .list h3 {font-size:20px; line-height:32px; margin-bottom:10px; gap:8px;}
+	.examination_area .excl_wrap {padding:20px;}
+/* FAQ */
+	.faq_top {padding:30px 20px; margin-bottom:30px;}
+	.faq_top h2 {font-size:20px;}
+	.faq_top p {font-size:14px; margin-top:8px;}
+	.faq_list {gap:12px;}
+	.faq_list .btn_q {padding:20px 70px 20px 50px; font-size:16px;}
+	.faq_list .btn_q i {right:20px}
+	.faq_list .con {padding:20px 20px 20px 50px;}
+	.faq_list .btn_q:before,
+	.faq_list .con:before {top:20px; left:20px;}
+}
+
+/* ------------------------------ Mobile ------------------------------ */
+@media screen and (max-width:767px){
+/* 공통 */
+	.gtit {font-size:24px;}
+	.btit {font-size:18px; margin-bottom:12px;}
+	.btit ~ .btit {margin-top:40px;}
+
+/** 학회소개 **/
+/* 기능의학이란 */
+	.what_is_fm_area01 .inbox {padding:30px 16px; gap:10px;}
+	.what_is_fm_area01 .inbox .tit {font-size:24px;}
+	.what_is_fm_area01 .inbox strong {font-size:16px;}
+	.what_is_fm_area02 {padding:40px 0; margin-top:40px;}
+	.what_is_fm_area02 .tb {margin-top:10px;}
+	.what_is_fm_area02 .chart_box {margin:30px 0; gap:10px;}
+	.what_is_fm_area02 .chart_box > li {width:calc(50% - 5px); flex-direction:column !important; gap:20px;}
+	.what_is_fm_area02 .chart_box > li:last-child:before {top:72px; left:-30px;}
+	.what_is_fm_area02 .chart_box .tit {width:100%; height:142px;}
+	.what_is_fm_area02 .chart_box .tit:before {height:40px;}
+	.what_is_fm_area02 .chart_box h3 {font-size:16px; margin:16px 0 6px;}
+	.what_is_fm_area02 .chart_box p {font-size:13px;}
+	.what_is_fm_area02 .chart_box .list {gap:8px; width:100%;}
+	.what_is_fm_area02 .chart_box .list li {font-size:13px; padding:10px;}
+	.what_is_fm_area02 .chart_box .list li:before {display:none;}
+	.what_is_fm_area02 .chart_box .list li:after {display:none;}
+	.what_is_fm_area02 .btm {font-size:16px;}
+/* 기능의학 나무 소개 */
+	.fm_tree_area .gbox {padding:20px; margin-top:30px;}
+	.fm_tree_area .tree_area {margin-bottom:30px;}
+	.fm_tree_area .list {gap:12px;}
+	.fm_tree_area .list li {position:relative; gap:12px; flex-direction:column; padding:16px;}
+	.fm_tree_area .list .icon {position:absolute; top:16px; left:16px; width:54px; height:54px; padding:15px;}
+	.fm_tree_area .list .txt {width:100%;}
+	.fm_tree_area .list span {font-size:13px; line-height:20px; padding-left:66px;}
+	.fm_tree_area .list h3 {font-size:18px; line-height:30px; padding-left:66px;}
+	.fm_tree_area .list p {font-size:13px;}
+	.fm_tree_area .btm {margin-top:30px;}
+	.fm_tree_area .btm p {font-size:13px;}
+	.fm_tree_area .btm .end_txt {font-size:16px;}
+/* 7가지 핵심 임상 불균형 */
+	.clinical_imbalances_area .blus_box {padding:16px;}
+	.clinical_imbalances_area .list {margin-top:22px; gap:16px;}
+	.clinical_imbalances_area li {position: relative; width:100%; gap:12px; padding:20px;}
+	.clinical_imbalances_area .icon {position:absolute; top:16px; left:16px; width:54px; height:54px; width:54px; height:54px; padding:15px;}
+	.clinical_imbalances_area .txt {width:100%;}
+	.clinical_imbalances_area h3 {font-size:16px; line-height:1.2; height:54px; padding-left:66px; display: flex; align-items: center;}
+	.clinical_imbalances_area p {font-size:13px; margin-top:4px;}
+/* 기능의학적 진료 과정 */
+	.process_area {padding:40px 0;}
+	.process_area .tb {margin:10px 0 40px;}
+	.process_area .list {flex-direction: column; gap:30px;}
+	.process_area .list:before {top:10px; left:101px; width:2px; height: calc(100% - 10px);}
+	.process_area .list li {width:100%; display: flex; gap:16px;}
+	.process_area .list .icon {width:80px; height:80px; padding:20px;}
+	.process_area .list .txt {width:calc(100% - 96px); padding:0 0 0 30px; text-align: left;}
+	.process_area .list .txt:before {top:10px; left:0; width:10px; height:10px; transform:translateY(-50%);}
+	.process_area .list span {font-size:13px; text-align: left;}
+	.process_area .list h3 {font-size:16px; margin-bottom:6px;}
+	.process_area .list p {font-size:13px;}
+
+/** 건강 알아가기 **/
+/* 기능의학 검사 이해 */
+	.examination_area .list {gap:16px; margin-bottom:30px;}
+	.examination_area .list:before {width:40vw;}
+	.examination_area .list > li {position: relative; width:100%; padding:16px; gap:12px;}
+	.examination_area .list .icon {position:absolute; top:16px; left:16px; width:54px; height:54px; padding:15px;}
+	.examination_area .list .txt {width:100%;}
+	.examination_area .list h3 {font-size:16px; line-height:1.4; height: 54px; margin-bottom:10px; gap:4px; padding-left:66px;}
+	.examination_area .list h3 span {font-size:13px; line-height:20px; height:20px; width:20px;}
+	.examination_area .excl_wrap {padding:16px;}
+/* FAQ */
+	.faq_top {padding:20px 16px; margin-bottom:20px;}
+	.faq_top h2 {font-size:16px;}
+	.faq_top p {font-size:13px; margin-top:6px;}
+	.faq_list {gap:10px;}
+	.faq_list .btn_q {padding:16px 50px 16px 40px; font-size:14px;}
+	.faq_list .btn_q i {right:16px; width:16px;}
+	.faq_list .con {padding:16px 16px 16px 40px; font-size:13px;}
+	.faq_list .con:after {width:calc(100% - 32px);}
+	.faq_list .btn_q:before,
+	.faq_list .con:before {top:16px; left:10px; width:20px; height:20px; line-height:20px; font-size:13px;}
+}

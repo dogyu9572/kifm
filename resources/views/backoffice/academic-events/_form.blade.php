@@ -162,6 +162,11 @@
         <input type="text" name="title" class="board-form-control @error('title') is-invalid @enderror" value="{{ old('title', $e->title) }}" required>
         @error('title')<span class="bo-inline-error">{{ $message }}</span>@enderror
     </div>
+    <div class="board-form-group">
+        <label class="board-form-label">행사명 영문</label>
+        <input type="text" name="title_en" class="board-form-control @error('title_en') is-invalid @enderror" value="{{ old('title_en', $e->title_en) }}" maxlength="255">
+        @error('title_en')<span class="bo-inline-error">{{ $message }}</span>@enderror
+    </div>
     <div class="bo-edu-form-row">
         <div class="board-form-group mb-0">
             <label class="board-form-label">타이틀 1</label>
@@ -342,7 +347,7 @@
     </div>
     <div class="board-form-group">
         <label class="board-form-label">조직위원회</label>
-        <textarea name="committee_content" id="committee_content" class="board-form-control board-form-textarea" rows="5" data-backoffice-ckeditor="true">{{ old('committee_content', $e->committee_content) }}</textarea>
+        <textarea name="committee_content" id="committee_content" class="board-form-control board-form-textarea" rows="5" data-backoffice-ckeditor="true" data-html-support="all">{{ old('committee_content', $e->committee_content) }}</textarea>
     </div>
     <div class="board-form-group">
         <label class="board-form-label">PC 메인배너</label>

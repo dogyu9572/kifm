@@ -330,9 +330,11 @@
 }
 
 /* 회원 등록/수정: 프로토타입 정합(섹션·2열·안내) */
+/* .board-card-body > .bo-form-section + .bo-member-history-section,
 .board-card-body > .bo-form-section + .bo-form-section {
-    margin-top: 1.5rem;
-}
+    margin-top: 4rem;
+} */
+
 
 .bo-form-row--stacked {
     flex-direction: column;

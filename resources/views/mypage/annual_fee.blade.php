@@ -10,6 +10,7 @@
     $bankName = (string) config('mypage.membership_bank_display_name');
     $bankAccount = (string) config('mypage.membership_bank_account_no');
     $bankHolder = (string) config('mypage.membership_bank_holder');
+	$refundBankOptions = ['국민은행', '신한은행', '우리은행', '하나은행', '농협은행', '기업은행', '카카오뱅크', '토스뱅크', '케이뱅크', 'SC제일은행', '씨티은행', '새마을금고', '신협', '우체국'];
 @endphp
 @section('content')
 <main class="sub_area">
@@ -108,9 +109,12 @@
                         <li>
                             <label for="bank_type">은행명/계좌번호</label>
                             <div class="flex bank text">
-								<select name="refund_bank_name" id="bank_type" class="text">
-									<option value="{{ $bankName }}" @selected(old('refund_bank_name', $bankName) === $bankName)>{{ $bankName }}</option>
-								</select>
+							<select name="refund_bank_name" id="bank_type" class="text">
+								<option value="">-- 은행 선택 --</option>
+								@foreach ($refundBankOptions as $bankName)
+									<option value="{{ $bankName }}" @selected(old('refund_bank_name') === $bankName)>{{ $bankName }}</option>
+								@endforeach
+							</select>
                             <input type="text" id="bank_number" name="refund_account_no" class="text" placeholder="111111-22-333333" value="{{ old('refund_account_no') }}">
                             </div>
                         </li>

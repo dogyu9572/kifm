@@ -200,7 +200,15 @@ class BoardPostService
             }
         }
 
-        if (in_array($slug, ['member_square_notices', 'inquiry_qna', 'academic_journals'], true) && $request->filled('visibility')) {
+        if (in_array($slug, [
+            'member_square_notices',
+            'inquiry_qna',
+            'academic_journals',
+            'public_video_contents',
+            'public_patient_stories',
+            'public_press_columns',
+            'public_media_lecture_events',
+        ], true) && $request->filled('visibility')) {
             if ($request->visibility === 'public') {
                 $query->where('is_active', true);
             } elseif ($request->visibility === 'private') {
@@ -398,6 +406,8 @@ class BoardPostService
         if ($slug === 'academic_notices') {
             $data['event_id'] = $request->filled('event_id') ? (int) $request->input('event_id') : null;
         }
+
+        $this->applyEnglishFields($data, $validated, $slug);
 
         return $data;
     }
@@ -607,7 +617,20 @@ class BoardPostService
             $data['event_id'] = $request->filled('event_id') ? (int) $request->input('event_id') : null;
         }
 
+        $this->applyEnglishFields($data, $validated, $slug);
+
         return $data;
+    }
+
+    private function applyEnglishFields(array &$data, array $validated, string $slug): void
+    {
+        if (in_array($slug, ['academic_journals', 'member_square_notices', 'society_history'], true)) {
+            $data['title_en'] = $validated['title_en'] ?? null;
+        }
+
+        if (in_array($slug, ['member_square_notices', 'society_history'], true)) {
+            $data['content_en'] = $this->sanitizeContent((string) ($validated['content_en'] ?? ''));
+        }
     }
 
     /**

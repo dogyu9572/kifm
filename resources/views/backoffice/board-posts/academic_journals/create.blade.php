@@ -32,6 +32,11 @@
                 </div>
 
                 <div class="board-form-group">
+                    <label for="title_en" class="board-form-label">제목 영문</label>
+                    <input type="text" class="board-form-control" id="title_en" name="title_en" value="{{ old('title_en') }}" maxlength="255">
+                </div>
+
+                <div class="board-form-group">
                     <label for="custom_field_link_url" class="board-form-label">링크 URL <span class="required">*</span></label>
                     <input type="url" class="board-form-control" id="custom_field_link_url" name="custom_field_link_url" value="{{ old('custom_field_link_url') }}" placeholder="https://example.com" required>
                 </div>

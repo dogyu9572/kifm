@@ -22,6 +22,8 @@ class EduTrainingRequest extends FormRequest
         foreach ($gradeKeys as $gk) {
             $gradeRules["rounds.*.grades.{$gk}.eligible"] = ['nullable', 'boolean'];
             $gradeRules["rounds.*.grades.{$gk}.price"] = ['nullable', 'numeric', 'min:0'];
+            $gradeRules["bundle_grades.{$gk}.eligible"] = ['nullable', 'boolean'];
+            $gradeRules["bundle_grades.{$gk}.price"] = ['nullable', 'numeric', 'min:0'];
         }
 
         $rules = [
@@ -44,7 +46,7 @@ class EduTrainingRequest extends FormRequest
             'delete_textbook_file' => ['nullable', 'boolean'],
             'attachment_files' => ['nullable', 'array'],
             'attachment_files.*' => ['nullable', 'file', 'max:20480', 'mimes:pdf,ppt,pptx,hwp'],
-            'rounds' => [Rule::requiredIf((bool) $this->boolean('use_round')), 'array'],
+            'rounds' => ['required', 'array', 'min:1'],
             'rounds.*.round_label' => ['nullable', 'string', 'max:30'],
             'rounds.*.training_method' => ['required_with:rounds', Rule::in(['offline', 'online', 'hybrid'])],
             'rounds.*.lecture_date' => ['required_with:rounds', 'date'],
@@ -87,48 +89,40 @@ class EduTrainingRequest extends FormRequest
         $gradeKeys = array_keys(EduTrainingService::registrationGradeLabels());
 
         $normalized = [];
-        if ($useRound) {
-            foreach ($rounds as $round) {
-                if (! is_array($round)) {
-                    continue;
-                }
-                $gradesIn = is_array($round['grades'] ?? null) ? $round['grades'] : [];
-                $gradesOut = [];
-                foreach ($gradeKeys as $gk) {
-                    $g = is_array($gradesIn[$gk] ?? null) ? $gradesIn[$gk] : [];
-                    $rawEl = $g['eligible'] ?? false;
-                    if (is_array($rawEl)) {
-                        $eligibleOut = (bool) array_filter(
-                            $rawEl,
-                            static fn ($v) => filter_var($v, FILTER_VALIDATE_BOOL)
-                        );
-                    } else {
-                        $eligibleOut = filter_var($rawEl, FILTER_VALIDATE_BOOL);
-                    }
-                    $gradesOut[$gk] = [
-                        'eligible' => $eligibleOut,
-                        'price' => $g['price'] ?? null,
-                    ];
-                }
-                $normalized[] = [
-                    'round_label' => isset($round['round_label']) ? trim((string) $round['round_label']) : null,
-                    'training_method' => $round['training_method'] ?? null,
-                    'lecture_date' => $round['lecture_date'] ?? null,
-                    'location_link' => isset($round['location_link']) ? trim((string) $round['location_link']) : null,
-                    'apply_start_date' => $round['apply_start_date'] ?? null,
-                    'apply_end_date' => $round['apply_end_date'] ?? null,
-                    'capacity' => $round['capacity'] ?? null,
-                    'is_capacity_unlimited' => filter_var($round['is_capacity_unlimited'] ?? false, FILTER_VALIDATE_BOOL),
-                    'duration_hours' => $round['duration_hours'] ?? null,
-                    'score' => $round['score'] ?? null,
-                    'grades' => $gradesOut,
-                    'status' => $round['status'] ?? 'PUBLIC',
-                ];
+        foreach ($rounds as $round) {
+            if (! is_array($round)) {
+                continue;
+            }
+            $gradesIn = is_array($round['grades'] ?? null) ? $round['grades'] : [];
+            $gradesOut = $this->normalizedGradeInput($gradesIn, $gradeKeys);
+            $normalized[] = [
+                'round_label' => isset($round['round_label']) ? trim((string) $round['round_label']) : null,
+                'training_method' => $useRound ? ($round['training_method'] ?? null) : ($this->input('training_method') ?: ($round['training_method'] ?? null)),
+                'lecture_date' => $round['lecture_date'] ?? null,
+                'location_link' => isset($round['location_link']) ? trim((string) $round['location_link']) : null,
+                'apply_start_date' => $round['apply_start_date'] ?? null,
+                'apply_end_date' => $round['apply_end_date'] ?? null,
+                'capacity' => $round['capacity'] ?? null,
+                'is_capacity_unlimited' => filter_var($round['is_capacity_unlimited'] ?? false, FILTER_VALIDATE_BOOL),
+                'duration_hours' => $round['duration_hours'] ?? null,
+                'score' => $round['score'] ?? null,
+                'grades' => $gradesOut,
+                'status' => $round['status'] ?? 'PUBLIC',
+            ];
+
+            if (! $useRound) {
+                break;
             }
         }
 
+        $bundleGrades = $this->normalizedGradeInput(
+            is_array($this->input('bundle_grades')) ? $this->input('bundle_grades') : [],
+            $gradeKeys
+        );
+
         $this->merge([
             'rounds' => $normalized,
+            'bundle_grades' => $bundleGrades,
             'use_round' => $useRound,
         ]);
 
@@ -143,6 +137,33 @@ class EduTrainingRequest extends FormRequest
                 $this->merge(['training_method' => 'hybrid']);
             }
         }
+    }
+
+    /**
+     * @param  list<string>  $gradeKeys
+     * @return array<string, array{eligible: bool, price: mixed}>
+     */
+    private function normalizedGradeInput(array $gradesIn, array $gradeKeys): array
+    {
+        $gradesOut = [];
+        foreach ($gradeKeys as $gk) {
+            $g = is_array($gradesIn[$gk] ?? null) ? $gradesIn[$gk] : [];
+            $rawEl = $g['eligible'] ?? false;
+            if (is_array($rawEl)) {
+                $eligibleOut = (bool) array_filter(
+                    $rawEl,
+                    static fn ($v) => filter_var($v, FILTER_VALIDATE_BOOL)
+                );
+            } else {
+                $eligibleOut = filter_var($rawEl, FILTER_VALIDATE_BOOL);
+            }
+            $gradesOut[$gk] = [
+                'eligible' => $eligibleOut,
+                'price' => $g['price'] ?? null,
+            ];
+        }
+
+        return $gradesOut;
     }
 
     public function withValidator($validator): void

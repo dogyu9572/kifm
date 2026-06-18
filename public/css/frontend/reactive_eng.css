@@ -1,0 +1,26 @@
+/* ------------------------------ PC Guide ------------------------------ */
+@media screen and (max-width:1440px){
+/* header */
+	.header .gnb > li > a {font-size:15px; padding:0 14px;}
+}
+
+/* ------------------------------ Tablet PC ------------------------------ */
+@media screen and (max-width:1023px){
+/* header */
+	.header .gnb {display: none;}
+	.header .btm .right {display:block;}
+	.header .sitemap .inner {padding-right:0;}
+	.header .sitemap .inner:before {display:none;}
+	.header .sitemap .menu {flex:0 0 auto;}
+	.header .sitemap .menu > a {padding-bottom:15px;}
+/* sub */
+	.officers_body.set3 {gap:20px;}
+	.officers_body.set3 li {width:calc(50% - 10px);}
+}
+
+/* ------------------------------ Mobile ------------------------------ */
+@media screen and (max-width:767px){
+/* sub */
+	.officers_body.set3 {gap:10px;}
+	.officers_body.set3 li {width:100%;}
+}

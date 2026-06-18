@@ -59,8 +59,16 @@ class MypageParticipationHistoryService
         ))->withQueryString();
     }
 
-    public function findForMember(User $user, int $id): ?AcademicEventRegistration
+    public function findForMember(User $user, int $id, string $type = 'academic_event'): AcademicEventRegistration|EduTrainingPayment|null
     {
+        if ($type === 'training_course') {
+            return EduTrainingPayment::query()
+                ->with(['training', 'items', 'member'])
+                ->where('member_id', $user->id)
+                ->whereKey($id)
+                ->first();
+        }
+
         return AcademicEventRegistration::query()
             ->with(['event', 'items', 'member'])
             ->where('member_id', $user->id)
@@ -121,7 +129,7 @@ class MypageParticipationHistoryService
             'paid_at' => $payment->paid_at,
             'participation_print_url' => null,
             'receipt_url' => route('mypage.print_receipt_save', ['training_payment_id' => $payment->id]),
-            'detail_url' => route('academic_event.training_course_end', ['payment' => $payment->id]),
+            'detail_url' => route('mypage.participation_history_view', ['type' => 'training_course', 'id' => $payment->id]),
         ];
     }
 }

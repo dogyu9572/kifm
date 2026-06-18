@@ -27,6 +27,8 @@ use App\Http\Controllers\Frontend\AcademicConference\AbstractController as Acade
 use App\Http\Controllers\Frontend\AcademicConference\NoticeController as AcademicConferenceNoticeController;
 use App\Http\Controllers\Frontend\AcademicConference\EtcController as AcademicConferenceEtcController;
 use App\Http\Controllers\Frontend\AcademicConference\OnsiteController as AcademicConferenceOnsiteController;
+use App\Http\Controllers\Frontend\GeneralPageController;
+use App\Http\Controllers\Frontend\EngPageController;
 use App\Http\Controllers\Frontend\AcademicConferenceSiteController;
 
 // =============================================================================
@@ -359,4 +361,64 @@ Route::prefix('academic_conference')->name('academic_conference.')->group(functi
         ->where('folderName', '[A-Za-z0-9_-]+')
         ->where('pagePath', '.*')
         ->name('site');
+});
+
+// 일반인
+Route::prefix('general_page')->name('general.')->group(function () {
+    Route::get('/', [GeneralPageController::class, 'index'])->name('index');
+
+    // 01. 학회소개
+    Route::prefix('introduction')->name('introduction.')->group(function () {
+        Route::get('/greeting', [GeneralPageController::class, 'greeting'])->name('greeting');
+        Route::get('/what_is_fm', [GeneralPageController::class, 'whatIsFm'])->name('what_is_fm');
+        Route::get('/fm_tree', [GeneralPageController::class, 'fmTree'])->name('fm_tree');
+        Route::get('/clinical_imbalances', [GeneralPageController::class, 'clinicalImbalances'])->name('clinical_imbalances');
+        Route::get('/process', [GeneralPageController::class, 'process'])->name('process');
+    });
+
+    // 02. 건강 알아가기
+    Route::prefix('content')->name('content.')->group(function () {
+        Route::get('/examination', [GeneralPageController::class, 'examination'])->name('examination');
+        Route::get('/video_afterrain', [GeneralPageController::class, 'videoAfterrain'])->name('video_afterrain');
+        Route::get('/video_afterrain_view', [GeneralPageController::class, 'videoAfterrainView'])->name('video_afterrain_view');
+        Route::get('/faq', [GeneralPageController::class, 'faq'])->name('faq');
+    });
+
+    // 03. 우리동네 주치의
+    Route::prefix('our_neighborhood_doctor')->name('our_neighborhood_doctor.')->group(function () {
+        Route::get('/', [GeneralPageController::class, 'doctorIndex'])->name('index');
+        Route::get('/doctors/{local_doctor}/popup', [GeneralPageController::class, 'popup'])
+            ->whereNumber('local_doctor')
+            ->name('popup');
+		Route::get('/patient_story', [GeneralPageController::class, 'patientStoryIndex'])->name('patient_story');
+        Route::get('/patient_story_view', [GeneralPageController::class, 'patientStoryView'])->name('patient_story_view');
+    });
+
+    // 04. 학회 뉴스
+    Route::prefix('news')->name('news.')->group(function () {
+        Route::get('/notices', [GeneralPageController::class, 'notices'])->name('notices');
+        Route::get('/notices_view', [GeneralPageController::class, 'noticesView'])->name('notices_view');
+        Route::get('/press_columns', [GeneralPageController::class, 'pressColumns'])->name('press_columns');
+        Route::get('/press_columns_view', [GeneralPageController::class, 'pressColumnsView'])->name('press_columns_view');
+        Route::get('/media_events', [GeneralPageController::class, 'mediaEvents'])->name('media_events');
+        Route::get('/media_events_view', [GeneralPageController::class, 'mediaEventsView'])->name('media_events_view');
+    });
+
+    // 약관
+    Route::prefix('terms')->name('terms.')->group(function () {
+        Route::get('/privacy_policy', [GeneralPageController::class, 'privacyPolicy'])->name('privacy_policy');
+        Route::get('/email_collection_refusal', [GeneralPageController::class, 'emailCollectionRefusal'])->name('email_collection_refusal');
+    });
+});
+
+//영문
+Route::prefix('eng')->name('eng.')->group(function () {
+	Route::get('/', [EngPageController::class, 'index'])->name('index');
+	Route::get('/greeting', [EngPageController::class, 'greeting'])->name('greeting');
+	Route::get('/history', [EngPageController::class, 'history'])->name('history');
+	Route::get('/organization', [EngPageController::class, 'organization'])->name('organization');
+	Route::get('/academic_events', [EngPageController::class, 'academicEvents'])->name('academic_events');
+	Route::get('/news', [EngPageController::class, 'news'])->name('news');
+	Route::get('/news_view', [EngPageController::class, 'newsView'])->name('news_view');
+	Route::get('/contact_us', [EngPageController::class, 'contactUs'])->name('contact_us');
 });

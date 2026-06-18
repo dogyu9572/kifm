@@ -168,6 +168,20 @@
     foreach ($gradeKeys as $gk) {
         $defaultGrades[$gk] = ['eligible' => false, 'price' => ''];
     }
+    $bundleGrades = old('bundle_grades');
+    if (! is_array($bundleGrades)) {
+        $bundleGrades = $defaultGrades;
+        $bundleSource = optional($eduTraining)->rounds?->first()?->grade_prices;
+        $bundleSource = is_array($bundleSource) ? ($bundleSource[\App\Services\Backoffice\EduTrainingService::BUNDLE_GRADE_PRICE_KEY] ?? []) : [];
+        foreach ($defaultGrades as $gk => $_) {
+            if (isset($bundleSource[$gk]) && is_array($bundleSource[$gk])) {
+                $bundleGrades[$gk] = [
+                    'eligible' => filter_var($bundleSource[$gk]['eligible'] ?? false, FILTER_VALIDATE_BOOL),
+                    'price' => $bundleSource[$gk]['price'] ?? '',
+                ];
+            }
+        }
+    }
 
     $existingRounds = old('rounds');
     if (! is_array($existingRounds)) {
@@ -219,7 +233,7 @@
     }
 @endphp
 
-<h3 class="bo-section-title">차수별 설정</h3>
+<h3 class="bo-section-title" id="bo-round-section-title">차수별 설정</h3>
 
 <div id="bo-rounds-section">
     <div class="bo-round-toolbar">
@@ -230,6 +244,47 @@
         </div>
     </div>
 
+    <div class="board-card mb-3" id="bo-round-bundle-section">
+        <div class="board-card-body">
+            <h4 class="bo-section-title mb-3 mt-0">[전체 차시 일괄 결제 금액]</h4>
+            <small class="board-form-text d-block mb-2">
+                ※ 입력한 등급만 사용자 결제 페이지 최상단에 전체 차시 항목으로 표시됩니다.
+            </small>
+            <div class="bo-grade-row-list">
+                @foreach ($gradeLabels as $gKey => $gLabel)
+                    @php
+                        $g = is_array($bundleGrades[$gKey] ?? null)
+                            ? $bundleGrades[$gKey]
+                            : ['eligible' => false, 'price' => ''];
+                        $gEligible = ! empty($g['eligible']);
+                    @endphp
+                    <div class="bo-grade-row bo-grade-row-item">
+                        <label class="board-radio-item mb-0">
+                            <input type="hidden" name="bundle_grades[{{ $gKey }}][eligible]" value="0">
+                            <input type="checkbox" value="1" class="js-bundle-grade-eligible"
+                                name="bundle_grades[{{ $gKey }}][eligible]"
+                                @checked($gEligible)>
+                            <span>{{ $gLabel }}</span>
+                        </label>
+                        <div
+                            class="bo-training-price-wrap d-flex align-items-center gap-2 js-bundle-grade-price-wrap @if (! $gEligible) bo-hidden @endif">
+                            <input type="number" step="1" min="0"
+                                class="board-form-control board-form-control--max-xs js-bundle-grade-price"
+                                name="bundle_grades[{{ $gKey }}][price]"
+                                value="{{ $g['price'] ?? '' }}"
+                                placeholder="전체 차시 금액 (원)"
+                                autocomplete="off">
+                            <span class="board-form-text mb-0">원</span>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            @error('bundle_grades')
+                <span class="bo-inline-error">{{ $message }}</span>
+            @enderror
+        </div>
+    </div>
+
     <div id="bo-round-panels">
         @foreach ($existingRounds as $idx => $round)
             <div class="bo-round-panel board-card mb-3 @if ($idx > 0) bo-hidden @endif" data-panel-index="{{ $idx }}">
@@ -237,6 +292,7 @@
                     <h4 class="bo-section-title mb-3 mt-0">
                         [<span class="js-round-heading-label">{{ $round['round_label'] ?? ($idx + 1) . '차' }}</span> 연수 설정]
                     </h4>
+                    <input type="hidden" name="rounds[{{ $idx }}][round_label]" value="{{ $round['round_label'] ?? ($idx + 1) . '차' }}">
 
                     <div class="bo-edu-form-row">
                         <div class="board-form-group mb-0">

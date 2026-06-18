@@ -234,6 +234,7 @@ class AcademicEventController extends Controller
             'training_id' => ['required', 'integer', 'exists:edu_trainings,id'],
             'round_ids' => ['required', 'array', 'min:1'],
             'round_ids.*' => ['integer', 'exists:edu_training_rounds,id'],
+            'round_bundle' => ['nullable', Rule::in([PublicTrainingCourseService::ROUND_BUNDLE_VALUE])],
             'name' => ['required', 'string', 'max:100'],
             'license_no' => ['nullable', 'string', 'max:80'],
             'phone' => ['required', 'string', 'max:30'],
@@ -345,11 +346,17 @@ class AcademicEventController extends Controller
             'training_id' => ['required', 'integer', 'exists:edu_trainings,id'],
             'round_ids' => ['required', 'array', 'min:1'],
             'round_ids.*' => ['integer', 'exists:edu_training_rounds,id'],
+            'round_bundle' => ['nullable', Rule::in([PublicTrainingCourseService::ROUND_BUNDLE_VALUE])],
             'coupon_code' => ['required', 'string', 'max:50'],
         ]);
 
         $training = $this->trainingCourseService->findVisible((int) $validated['training_id']);
-        $summary = $this->trainingCourseService->selectedRoundSummary($training, array_map('intval', $validated['round_ids']), $this->frontendUser());
+        $summary = $this->trainingCourseService->selectedRoundSummary(
+            $training,
+            array_map('intval', $validated['round_ids']),
+            $this->frontendUser(),
+            ($validated['round_bundle'] ?? null) === PublicTrainingCourseService::ROUND_BUNDLE_VALUE
+        );
         $coupon = $this->trainingCourseService->resolveCoupon($validated['coupon_code'], (int) $summary['subtotal']);
 
         if (! $coupon) {

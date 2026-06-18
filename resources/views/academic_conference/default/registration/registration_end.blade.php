@@ -28,7 +28,9 @@
 		<div class="inbox">
 		
 			<div class="title_area">
-				<h1 id="registration-end-heading" class="title">결제가 완료되었습니다.</h1>
+			<h1 id="registration-end-heading" class="title">
+				{{ $registration?->payment_method === 'bank_transfer' ? '결제 신청이 완료되었습니다.' : '결제가 완료되었습니다.' }}
+			</h1>
 				<p>신청하신 내역을 확인해 주세요.</p>
 			</div>
             @unless ($registration && $summary)

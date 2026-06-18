@@ -23,13 +23,28 @@
 </div>
 
 <div class="board-form-group">
+    <label for="name_en" class="board-form-label">이름 영문</label>
+    <input type="text" class="board-form-control" id="name_en" name="name_en" value="{{ old('name_en', $societyExecutive->name_en ?? '') }}" maxlength="100">
+</div>
+
+<div class="board-form-group">
     <label for="position" class="board-form-label">직책 <span class="required">*</span></label>
     <input type="text" class="board-form-control" id="position" name="position" value="{{ old('position', $societyExecutive->position ?? '') }}" maxlength="100" required>
 </div>
 
 <div class="board-form-group">
+    <label for="position_en" class="board-form-label">직책 영문</label>
+    <input type="text" class="board-form-control" id="position_en" name="position_en" value="{{ old('position_en', $societyExecutive->position_en ?? '') }}" maxlength="100">
+</div>
+
+<div class="board-form-group">
     <label for="organization" class="board-form-label">소속 <span class="required">*</span></label>
     <input type="text" class="board-form-control" id="organization" name="organization" value="{{ old('organization', $societyExecutive->organization ?? '') }}" maxlength="200" required>
+</div>
+
+<div class="board-form-group">
+    <label for="organization_en" class="board-form-label">소속 영문</label>
+    <input type="text" class="board-form-control" id="organization_en" name="organization_en" value="{{ old('organization_en', $societyExecutive->organization_en ?? '') }}" maxlength="200">
 </div>
 
 <div class="board-form-group">

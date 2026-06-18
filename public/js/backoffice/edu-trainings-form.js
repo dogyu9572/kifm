@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const addRoundBtn = document.getElementById('bo-add-round-btn');
     const removeRoundBtn = document.getElementById('bo-remove-current-round');
     const roundsSection = document.getElementById('bo-rounds-section');
+    const roundSectionTitle = document.getElementById('bo-round-section-title');
+    const roundBundleSection = document.getElementById('bo-round-bundle-section');
     const singleMethodBlock = document.getElementById('bo-training-method-single');
     const useRoundRadios = document.querySelectorAll('.js-use-round');
     const trainingMethodSelect = document.getElementById('training_method_select');
@@ -252,6 +254,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const syncBundleGradePriceRow = (chk) => {
+        const row = chk.closest('.bo-grade-row');
+        const wrap = row?.querySelector('.js-bundle-grade-price-wrap');
+        const price = row?.querySelector('.js-bundle-grade-price');
+        if (!wrap || !price) {
+            return;
+        }
+        if (chk.checked) {
+            wrap.classList.remove('bo-hidden');
+        } else {
+            wrap.classList.add('bo-hidden');
+            price.value = '';
+        }
+    };
+
+    const bindBundleGradePriceUi = () => {
+        document.querySelectorAll('.js-bundle-grade-eligible').forEach((chk) => {
+            chk.addEventListener('change', () => syncBundleGradePriceRow(chk));
+            syncBundleGradePriceRow(chk);
+        });
+    };
+
     const bindPanel = (panel) => {
         panel.querySelector('.js-capacity-unlimited')?.addEventListener('change', () => {
             syncCapacityDisabled(panel);
@@ -316,7 +340,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const syncUseRoundUi = () => {
         const useRound = document.querySelector('.js-use-round:checked')?.value === '1';
         if (roundsSection) {
-            roundsSection.style.display = useRound ? '' : 'none';
+            roundsSection.style.display = '';
+        }
+        if (roundSectionTitle) {
+            roundSectionTitle.textContent = useRound ? '차수별 설정' : '교육 설정';
+        }
+        if (roundBundleSection) {
+            roundBundleSection.style.display = useRound ? '' : 'none';
+            roundBundleSection.querySelectorAll('input, select, textarea').forEach((el) => {
+                el.disabled = !useRound;
+            });
         }
         if (singleMethodBlock) {
             singleMethodBlock.style.display = useRound ? 'none' : '';
@@ -332,20 +365,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (useRound) {
-            getPanels().forEach((panel) => {
+            getPanels().forEach((panel, idx) => {
                 panel.querySelectorAll('input, select, textarea').forEach((el) => {
                     el.disabled = false;
                 });
+                if (idx === 0) {
+                    const roundLabel = panel.querySelector('input[name^="rounds["][name$="[round_label]"]');
+                    const heading = panel.querySelector('.js-round-heading-label');
+                    if (roundLabel?.value === '전체') {
+                        roundLabel.value = '1차';
+                        if (heading) {
+                            heading.textContent = '1차';
+                        }
+                    }
+                }
                 syncCapacityDisabled(panel);
             });
+            rebuildTabs();
+            switchTab(currentTab);
         } else {
-            panelsContainer?.querySelectorAll('input, select, textarea').forEach((el) => {
-                el.disabled = true;
+            getPanels().forEach((panel, idx) => {
+                panel.classList.toggle('bo-hidden', idx !== 0);
+                panel.querySelectorAll('input, select, textarea').forEach((el) => {
+                    el.disabled = idx !== 0;
+                });
+                if (idx === 0) {
+                    const method = panel.querySelector('.js-round-method');
+                    if (method && trainingMethodSelect) {
+                        method.value = trainingMethodSelect.value;
+                    }
+                    const roundLabel = panel.querySelector('input[name^="rounds["][name$="[round_label]"]');
+                    if (roundLabel) {
+                        roundLabel.value = '전체';
+                    }
+                    const heading = panel.querySelector('.js-round-heading-label');
+                    if (heading) {
+                        heading.textContent = '단발성';
+                    }
+                    syncCapacityDisabled(panel);
+                }
             });
         }
+        tabsContainer?.closest('.bo-round-toolbar')?.classList.toggle('bo-hidden', !useRound);
     };
 
     getPanels().forEach((p) => bindPanel(p));
+    bindBundleGradePriceUi();
 
     rebuildTabs();
     switchTab(0);
@@ -354,6 +419,15 @@ document.addEventListener('DOMContentLoaded', () => {
         radio.addEventListener('change', () => {
             syncUseRoundUi();
         });
+    });
+    trainingMethodSelect?.addEventListener('change', () => {
+        if (document.querySelector('.js-use-round:checked')?.value === '1') {
+            return;
+        }
+        const firstPanelMethod = getPanels()[0]?.querySelector('.js-round-method');
+        if (firstPanelMethod) {
+            firstPanelMethod.value = trainingMethodSelect.value;
+        }
     });
     syncUseRoundUi();
 
@@ -383,6 +457,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const heading = clone.querySelector('.js-round-heading-label');
         if (heading) {
             heading.textContent = defaultLabel;
+        }
+        const labelInput = clone.querySelector('input[name^="rounds["][name$="[round_label]"]');
+        if (labelInput) {
+            labelInput.value = defaultLabel;
         }
         clone.classList.remove('bo-hidden');
         panelsContainer.appendChild(clone);
@@ -464,8 +542,10 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('submit', () => {
             const useRound = document.querySelector('.js-use-round:checked')?.value === '1';
             if (!useRound) {
-                panelsContainer?.querySelectorAll('input, select, textarea').forEach((el) => {
-                    el.disabled = true;
+                getPanels().forEach((panel, idx) => {
+                    panel.querySelectorAll('input, select, textarea').forEach((el) => {
+                        el.disabled = idx !== 0;
+                    });
                 });
             }
             if (typeof window.syncBackofficeCKEditorFields === 'function') {

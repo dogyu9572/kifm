@@ -143,7 +143,7 @@
 			@empty
 				<li class="no_board">
 					<span class="state"></span>
-					<h4>검색 조건에 해당하는 학술대회가 없습니다.</h4>
+					<h4>검색 조건에 해당하는 온라인강좌가 없습니다.</h4>
 				</li>
 			@endforelse
 		</ul>

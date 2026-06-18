@@ -1,0 +1,113 @@
+/* 공통 */
+	.container_wrap {overflow:visible;}
+	.svisual.g01 {background-image:url('/images/svisual_general01.jpg');}
+	.svisual.g02 {background-image:url('/images/svisual_general02.jpg');}
+	.svisual.g03 {background-image:url('/images/svisual_general03.jpg');}
+	.svisual.g04 {background-image:url('/images/svisual_general04.jpg');}
+	.sub_menu_area .set_s li {width:auto; min-width:140px;}
+	.sub_menu_area .set_s a {padding:5px 20px;}
+	.gtit {font-size:44px; text-align:center;}
+	.btit {font-size:26px; line-height:1.5; margin-bottom:24px;}
+	.btit ~ .btit {margin-top:100px;}
+
+/* header */
+	.header .gnb {display:flex; justify-content:center; align-items:center;}
+	.header .gnb > li {position:relative;}
+	.header .gnb > li > a {font-size:18px; color:#222; font-weight:600; line-height:78px; padding:0 60px;}
+	.header .gnb > li.on > a {color:var(--c_iden);}
+	.header .snb {position:absolute; top:100%; left:0; width:100%; background:#fff; border:#ddd 1px solid; padding:10px 0; display:none;}
+	.header .snb a {display:block; font-size:16px; color:#555; font-weight:500; line-height:40px; text-align:center;}
+	.header .snb > li.on > a {color:var(--c_iden);}
+/** 학회소개 **/
+/* 기능의학이란 */
+	.what_is_fm_area01 .inbox {padding:95px 100px; background:url('/images/img_general_what_fm_top.webp') no-repeat 50% 50% / cover; display:flex; flex-direction:column; gap:20px; line-height:1.6;}
+	.what_is_fm_area01 .inbox .tit {font-size:40px;}
+	.what_is_fm_area01 .inbox strong {font-size:26px; font-weight:600;}
+	.what_is_fm_area01 .inbox p {font-weight:500;}
+	.what_is_fm_area02 {background:#FAFAFA; padding:100px 0; margin-top:100px;}
+	.what_is_fm_area02 .tb {color:#666; line-height:1.5; margin-top:20px; text-align:center;}
+	.what_is_fm_area02 .chart_box {position:relative; margin:64px 0; display:flex; gap:24px;}
+	.what_is_fm_area02 .chart_box > li {position:relative; width:calc(50% - 12px); display:flex; gap:108px; line-height:1.6;}
+	.what_is_fm_area02 .chart_box > li:last-child:before {content:"VS"; position:absolute; top:50%; left:-44px; width:64px; height:64px; line-height:64px; text-align:center; background:#0088B8; border-radius:50%; transform:translateY(-50%); z-index:1; font-size:20px; color:#fff; font-weight:700;}
+	.what_is_fm_area02 .chart_box .tit {width:280px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; box-shadow:0 4px 20px 0 rgba(0, 0, 0, 0.08); border-radius:8px; padding:40px;}
+	.what_is_fm_area02 .chart_box .tit:before {content:""; display:block; width:100%; height:80px; background:no-repeat 50% 50% / contain;}
+	.what_is_fm_area02 .chart_box h3 {font-size:24px; margin:34px 0 12px;}
+	.what_is_fm_area02 .chart_box p {font-size:16px;}
+	.what_is_fm_area02 .chart_box .list {display:flex; flex-direction:column; gap:16px; width:calc(100% - 388px);}
+	.what_is_fm_area02 .chart_box .list li {position:relative; font-size:16px; line-height:1.5; padding:18px 24px; background:#0088B814; border-radius:8px;}
+	.what_is_fm_area02 .chart_box .list li:before,
+	.what_is_fm_area02 .chart_box .list li:after {content:""; position:absolute; top:50%;}
+	.what_is_fm_area02 .chart_box .list li:before {width:88px; height:2px; margin-top:-1px; background:linear-gradient(-90deg, rgba(0, 136, 184, 0.00) 0%, #0088B8 100%);}
+	.what_is_fm_area02 .chart_box .list li:after {width:8px; height:8px; margin-top:-4px; background:#0088B8; border-radius:50%;}
+	.what_is_fm_area02 .chart_box .left {flex-direction:row-reverse;}
+	.what_is_fm_area02 .chart_box .left .tit:before {background-image:url('/images/icon_what_is_fm01.svg');}
+	.what_is_fm_area02 .chart_box .right .tit:before {background-image:url('/images/icon_what_is_fm02.svg');}
+	.what_is_fm_area02 .chart_box .left .list li:before {left:calc(100% + 12px);}
+	.what_is_fm_area02 .chart_box .left .list li:after {left:calc(100% + 8px);}
+	.what_is_fm_area02 .chart_box .right .list li:before {right:calc(100% + 12px); transform:scaleX(-1);}
+	.what_is_fm_area02 .chart_box .right .list li:after {right:calc(100% + 8px);}
+	.what_is_fm_area02 .btm {font-size:26px; font-weight:700; line-height:1.6; text-align:center;}
+/* 기능의학 나무 소개 */
+	.fm_tree_area .tb {text-align:center;}
+	.fm_tree_area .gbox {padding:100px 140px; background:#fafafa; margin-top:80px;}
+	.fm_tree_area .tree_area {text-align:center; margin-bottom:80px;}
+	.fm_tree_area .list {display:flex; flex-direction:column; gap:20px;}
+	.fm_tree_area .list li {background:#fff; display:flex; gap:30px; padding:30px;}
+	.fm_tree_area .list .icon {width:100px; height:100px; background:#F8F8F8; border-radius:50%; display:flex; justify-content:center; align-items:center;}
+	.fm_tree_area .list .txt {width:calc(100% - 130px); display:flex; flex-direction:column; line-height:1.5;}
+	.fm_tree_area .list span {font-size:16px; color:#0088B8; font-weight:700;}
+	.fm_tree_area .list h3 {font-size:24px; margin:4px 0 12px;}
+	.fm_tree_area .list p {font-size:16px; color:#666;}
+	.fm_tree_area .btm {margin-top:60px; text-align:center; line-height:1.6;}
+	.fm_tree_area .btm p {font-size:20px; font-weight:500;}
+	.fm_tree_area .btm .end_txt {font-size:26px; color:#222; font-weight:700;}
+/* 7가지 핵심 임상 불균형 */
+	.clinical_imbalances_area {line-height:1.5;}
+	.clinical_imbalances_area .blus_box {background:#0088B814; border-radius:8px; padding:40px; border-radius:8px;}
+	.clinical_imbalances_area .list {margin-top:40px; display:flex; flex-wrap:wrap; gap:40px;}
+	.clinical_imbalances_area li {width:calc(50% - 20px); display:flex; gap:32px; box-shadow:0 4px 20px 0 rgba(0, 0, 0, 0.08); border-radius:8px; padding:48px 40px;}
+	.clinical_imbalances_area .icon {width:80px; height:80px; display:flex; justify-content:center; align-items:center; background:#f8f8f8; border-radius:50%;}
+	.clinical_imbalances_area .txt {width:calc(100% - 122px);}
+	.clinical_imbalances_area h3 {font-size:24px;}
+	.clinical_imbalances_area p {font-size:16px; color:#666; margin-top:12px;}
+/* 기능의학적 진료 과정 */
+	.process_area {line-height:1.5; background:#FAFAFA; padding:100px 0;}
+	.process_area .tb {color:#666; text-align:center; margin:10px 0 100px;}
+	.process_area .list {position:relative; display:flex;}
+	.process_area .list:before {content:""; position:absolute; top:218px; left:50%; width:100vw; height:2px; background:#0088B8; transform:translateX(-50%);}
+	.process_area .list li {width:25%;}
+	.process_area .list .icon {width:180px; height:180px; background:#fff; border-radius:50%; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 20px 0 rgba(0, 0, 0, 0.08); margin:0 auto;}
+	.process_area .list .txt {position:relative; padding-top:78px; text-align:center;}
+	.process_area .list .txt:before {content:""; position:absolute; top:32px; left:50%; width:14px; height:14px; background:#0088B8; border-radius:50%; transform:translateX(-50%);}
+	.process_area .list span {display:block; font-size:16px; color:#0088B8; font-weight:700; text-align:center;}
+	.process_area .list h3 {font-size:20px; margin-bottom:12px;}
+	.process_area .list p {font-size:16px; color:#666;}
+	.process_area .list li:last-child .icon {background:#0088B8;}
+
+/** 건강 알아가기 **/
+/* 기능의학 검사 이해 */
+	.examination_area p {color:#666; line-height:1.6;}
+	.examination_area .list {position:relative; display:flex; flex-wrap:wrap; gap:40px; margin-bottom:60px;}
+	.examination_area .list:before {content:""; position:absolute; top:50%; left:50%; width:620px; aspect-ratio:1/1; transform:translate(-50%,-50%); border-radius:50%; background:#0088B81A; filter:blur(50px);}
+	.examination_area .list > li {position:relative; width:calc(50% - 20px); background:#fff; border-radius:8px; box-shadow:0 4px 20px 0 rgba(0, 0, 0, 0.08); padding:40px; display:flex; gap:24px; z-index:1;}
+	.examination_area .list .icon {width:80px; height:80px; background:#f8f8f8; border-radius:50%; display:flex; justify-content:center; align-items:center;}
+	.examination_area .list .txt {width:calc(100% - 104px);}
+	.examination_area .list h3 {display:flex; font-size:24px; line-height:36px; margin-bottom:12px; display:flex; align-items:center; gap:10px;}
+	.examination_area .list h3 span {font-size:14px; color:#fff; font-weight:600; line-height:22px; height:22px; width:22px; text-align:center; background:#222; border-radius:50%;}
+	.examination_area .excl_wrap {padding:24px;}
+/* FAQ */
+	.faq_top {padding:40px; border-radius:8px; margin-bottom:48px; background:url('/images/bg_faq_top.jpg') no-repeat 50% 50% / cover; color:#fff; line-height:1.5;}
+	.faq_top h2 {font-size:28px;}
+	.faq_top p {font-size:16px; margin-top:12px;}
+	.faq_list {display:flex; flex-direction:column; gap:16px;}
+	.faq_list li {border:#F4F6F8 1px solid; background:#F4F6F8; border-radius:8px;}
+	.faq_list .btn_q {position:relative; padding:24px 75px 24px 60px; font-size:18px; font-weight:600; width:100%; text-align:left; white-space:normal;}
+	.faq_list .btn_q i {position:absolute; top:0; right:24px; width:20px; height:100%; background:url('/images/arrow_faq.svg') no-repeat 50% 50% / contain; transition:.2s linear; pointer-events:none;}
+	.faq_list .on .btn_q i {transform:rotate(180deg);}
+	.faq_list .con {position:relative; padding:24px 24px 24px 60px; font-size:16px; color:#666; display:none;}
+	.faq_list .con:after {content:""; position:absolute; top:0; left:50%; width:calc(100% - 48px); height:1px; transform:translateX(-50%); background:#EBEBEB;}
+	.faq_list .btn_q:before,
+	.faq_list .con:before {position:absolute; top:25px; left:24px; width:24px; height:24px; line-height:24px; text-align:center; font-size:16px; font-weight:600; border-radius:50%;}
+	.faq_list .btn_q:before {content:"Q"; color:#E60012; background:#fff;}
+	.faq_list .con:before {content:"A"; color:#E60012; background:#FDE6E8;}
+	

@@ -12,8 +12,11 @@ class SocietyExecutive extends Model
     protected $fillable = [
         'group_no',
         'position',
+        'position_en',
         'name',
+        'name_en',
         'organization',
+        'organization_en',
         'email',
         'photo_path',
         'note',

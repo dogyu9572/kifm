@@ -338,6 +338,9 @@
 	.type_bank_hide ul li .flex.bank select,
 	.type_bank_hide ul li .flex.bank input {width:100%;}
 	.type_bank_hide .bdt {padding-top:12px; margin-top:12px;}
+	.training_course_view_wrap .coupon_sale {margin-top:10px; gap:6px;}
+	.training_course_view_wrap .coupon_sale dt {padding:0 6px;}
+	.training_course_view_wrap .coupon_sale dd {width:calc(100% - 100px); font-size:13px;}
 /* Registration - 결제 완료 */
 	.academic_event_view_end .title_area .title {font-size:32px;}
 	.academic_event_view_end .title_area p {font-size:18px;}

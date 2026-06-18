@@ -96,6 +96,14 @@
     <link rel="stylesheet" href="/css/frontend/styles_academic.css?v={{ $ver_styles_aca }}">
 	<link rel="stylesheet" href="/css/frontend/reactive_academic.css?v={{ $ver_reactive_aca }}">
 	@endif
+	@if(isset($gNum) && $page_type == 'general')
+    <link rel="stylesheet" href="/css/frontend/styles_general.css?v={{ $ver_styles }}">
+	<link rel="stylesheet" href="/css/frontend/reactive_general.css?v={{ $ver_reactive }}">
+	@endif
+	@if(isset($gNum) && $page_type == 'eng')
+    <link rel="stylesheet" href="/css/frontend/styles_eng.css?v={{ $ver_styles }}">
+	<link rel="stylesheet" href="/css/frontend/reactive_eng.css?v={{ $ver_reactive }}">
+	@endif
     <!-- page Styles -->
     @yield('styles')
     @if(($gNum ?? '') == '03')
@@ -109,11 +117,11 @@
     <script src="/js/frontend/channel-talk.js"></script>
 </head>
 <body>
+	<div class="blind_link"><a href="#mainContent">본문 바로가기</a></div>
 	@php
 		$frontendMember = auth()->user()?->role === 'user' ? auth()->user() : null;
 	@endphp
-	<div class="blind_link"><a href="#mainContent">본문 바로가기</a></div>
-	@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'print' && $page_type!== 'academic_conference')
+	@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'print' && $page_type!== 'academic_conference' && $page_type!== 'general' && $page_type!== 'eng')
 	<!-- 일반인, 전문인, 온라인 아카데미 -->
     <header class="header {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }} {{ (isset($gNum) && $gNum == '03' && ($page ?? '') == 'view' || $gNum == '01' || $gNum == '02') ? 'white_mode' : '' }}">
 		<div class="top">
@@ -163,6 +171,12 @@
 				</div>
 				<div class="right">
 					<button type="button" class="btn_search_mobile mo_vw" aria-label="모바일 검색창 열기">검색</button>
+					<div class="favorites_menu">
+						<button type="button" class="btn flex_center">즐겨찾기</button>
+						<ul>
+							<li><a href="#this">메뉴명</a></li>
+						</ul>
+					</div>
 					<button type="button" class="btn_chatbot" aria-label="챗봇 열기">챗봇</button>
 					<button type="button" class="btn_menu" aria-label="전체 메뉴 열기" aria-controls="main-navi" aria-expanded="false">
 						<span class="line t" aria-hidden="true"></span>
@@ -280,22 +294,205 @@
 	</header>
 	<!-- //학술대회 -->
 	@endif
+
+	@if(isset($gNum) && $page_type == 'general')
+	<!-- 일반인 -->
+    <header class="header {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }} {{ (isset($gNum) && $gNum == '03' && ($page ?? '') == 'view' || $gNum == '01' || $gNum == '02') ? 'white_mode' : '' }}">
+		<div class="top">
+			<div class="inner">
+				<ul class="type" role="tablist" aria-label="회원 유형 선택">
+					@php $page_type = $page_type ?? ''; @endphp
+					<li role="presentation" class="c1 {{ $page_type == 'general' ? 'on' : '' }}">
+						<a href="javascript:alert('준비중입니다.')" role="tab" aria-selected="{{ $page_type == 'general' ? 'true' : 'false' }}" {!! $page_type == 'general' ? 'aria-current="page"' : '' !!}>일반인</a>
+					</li>
+					<li role="presentation" class="c2 {{ $page_type == 'professional' ? 'on' : '' }}">
+						<a href="{{ route('home') }}" role="tab" aria-selected="{{ $page_type == 'professional' ? 'true' : 'false' }}" {!! $page_type == 'professional' ? 'aria-current="page"' : '' !!}>전문인</a>
+					</li>
+					<li role="presentation" class="c3 {{ $page_type == 'online_academy' ? 'on' : '' }}">
+						<a href="/online_academy/" role="tab" aria-selected="{{ $page_type == 'online_academy' ? 'true' : 'false' }}" {!! $page_type == 'online_academy' ? 'aria-current="page"' : '' !!}>온라인 아카데미</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="btm">
+			<div class="inner">
+				<div class="left">
+					<a href="{{ route('general.index') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+				</div>
+				<ul class="center gnb">
+					<li class="menu {{ ($gNum ?? '') == '01' ? 'on' : '' }}">
+						<a href="/general_page/introduction/greeting" id="main-menu-01" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01') aria-current="page" @endif>학회소개</a>
+						<ul class="snb" aria-labelledby="main-menu-01">
+							<li><a href="/general_page/introduction/greeting" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>인사말</a></li>
+							<li><a href="/general_page/introduction/what_is_fm" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>기능의학이란</a></li>
+							<li><a href="/general_page/introduction/fm_tree" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>기능의학 나무 소개</a></li>
+							<li><a href="/general_page/introduction/clinical_imbalances" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>7가지 핵심 임상 불균형</a></li>
+							<li><a href="/general_page/introduction/process" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '05') class="on" aria-current="page" @endif>기능의학적 진료 과정</a></li>
+						</ul>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '02' ? 'on' : '' }}">
+						<a href="/general_page/content/examination" id="main-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>건강 알아가기</a>
+						<ul class="snb" aria-labelledby="main-menu-02">
+							<li><a href="/general_page/content/examination" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 검사 이해</a></li>
+							<li><a href="/general_page/content/video_afterrain" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>영상 콘텐츠(비온뒤)</a></li>
+							<li><a href="/general_page/content/faq" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
+						</ul>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}">
+						<a href="/general_page/our_neighborhood_doctor" id="main-menu-03" @if(($gNum ?? '') == '03') aria-current="page" @endif>진료 고민된다면</a>
+						<ul class="snb" aria-labelledby="main-menu-03">
+							<li><a href="/general_page/our_neighborhood_doctor" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
+							<li><a href="/general_page/our_neighborhood_doctor/patient_story" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>환자 이야기</a></li>
+						</ul>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}">
+						<a href="/general_page/news/notices" id="main-menu-04" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>학회 뉴스</a>
+						<ul class="snb" aria-labelledby="main-menu-04">
+							<li><a href="/general_page/news/notices" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>학회 소식</a></li>
+							<li><a href="/general_page/news/press_columns" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>보도자료&칼럼</a></li>
+							<li><a href="/general_page/news/media_events" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>미디어&행사</a></li>
+							<li><a href="https://scholar.kyobobook.co.kr/article/external/list/lav143BicMrX1pUjjA9ZuIMWLS2qyH598A" target="_blank">대한기능의학회지</a></li>
+						</ul>
+					</li>
+				</ul>
+				<div class="right">
+					<button type="button" class="btn_chatbot" aria-label="챗봇 열기">챗봇</button>
+					<button type="button" class="btn_menu" aria-label="전체 메뉴 열기" aria-controls="main-navi" aria-expanded="false">
+						<span class="line t" aria-hidden="true"></span>
+						<span class="line b" aria-hidden="true"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<nav class="sitemap" id="main-navi" aria-label="주 메뉴">
+			<div class="bg" aria-hidden="true"></div>
+			<div class="menu_wrap">
+				<ul class="flex inner width_auto">
+					<li class="menu {{ ($gNum ?? '') == '01' ? 'on' : '' }}">
+						<a href="/general_page/introduction/greeting" id="main-menu-01" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01') aria-current="page" @endif>학회소개</a>
+						<ul class="snb" aria-labelledby="main-menu-01">
+							<li><a href="/general_page/introduction/greeting" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>인사말</a></li>
+							<li><a href="/general_page/introduction/what_is_fm" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>기능의학이란</a></li>
+							<li><a href="/general_page/introduction/fm_tree" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>기능의학 나무 소개</a></li>
+							<li><a href="/general_page/introduction/clinical_imbalances" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>7가지 핵심 임상 불균형</a></li>
+							<li><a href="/general_page/introduction/process" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '05') class="on" aria-current="page" @endif>기능의학적 진료 과정</a></li>
+						</ul>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '02' ? 'on' : '' }}">
+						<a href="/general_page/content/examination" id="main-menu-02" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '02') aria-current="page" @endif>건강 알아가기</a>
+						<ul class="snb" aria-labelledby="main-menu-02">
+							<li><a href="/general_page/content/examination" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 검사 이해</a></li>
+							<li><a href="/general_page/content/video_afterrain" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>영상 콘텐츠(비온뒤)</a></li>
+							<li><a href="/general_page/content/faq" @if(($gNum ?? '') == '02' && ($sNum ?? '') == '04') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
+						</ul>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '03' ? 'on' : '' }}">
+						<a href="/general_page/our_neighborhood_doctor" id="main-menu-03" @if(($gNum ?? '') == '03') aria-current="page" @endif>진료 고민된다면</a>
+						<ul class="snb" aria-labelledby="main-menu-03">
+							<li><a href="/general_page/our_neighborhood_doctor" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
+							<li><a href="/general_page/our_neighborhood_doctor/patient_story" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>환자 이야기</a></li>
+						</ul>
+					</li>
+					<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}">
+						<a href="/general_page/news/notices" id="main-menu-04" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>학회 뉴스</a>
+						<ul class="snb" aria-labelledby="main-menu-04">
+							<li><a href="/general_page/news/notices" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '01') class="on" aria-current="page" @endif>학회 소식</a></li>
+							<li><a href="/general_page/news/press_columns" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '02') class="on" aria-current="page" @endif>보도자료&칼럼</a></li>
+							<li><a href="/general_page/news/media_events" @if(($gNum ?? '') == '04' && ($sNum ?? '') == '03') class="on" aria-current="page" @endif>미디어&행사</a></li>
+							<li><a href="https://scholar.kyobobook.co.kr/article/external/list/lav143BicMrX1pUjjA9ZuIMWLS2qyH598A" target="_blank">대한기능의학회지</a></li>
+						</ul>
+					</li>
+				</ul>
+				<button type="button" class="btn_menu_close" aria-label="전체 메뉴 닫기">전체 메뉴 닫기</button>
+			</div>
+		</nav>
+	</header>
+	<!-- //일반인 -->
+    @endif
+	
+	@if(isset($gNum) && $page_type == 'eng')
+	<!-- 영문 -->
+    <header class="header {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }} {{ (isset($gNum) && $gNum == '03' && ($page ?? '') == 'view' || $gNum == '01' || $gNum == '02') ? 'white_mode' : '' }}">
+		<div class="top">
+			<div class="inner">
+				<ul class="type" role="tablist" aria-label="회원 유형 선택">
+					@php $page_type = $page_type ?? ''; @endphp
+					<li role="presentation" class="c1 {{ $page_type == 'general' ? 'on' : '' }}">
+						<a href="javascript:alert('준비중입니다.')" role="tab" aria-selected="{{ $page_type == 'general' ? 'true' : 'false' }}" {!! $page_type == 'general' ? 'aria-current="page"' : '' !!}>일반인</a>
+					</li>
+					<li role="presentation" class="c2 {{ $page_type == 'professional' ? 'on' : '' }}">
+						<a href="{{ route('home') }}" role="tab" aria-selected="{{ $page_type == 'professional' ? 'true' : 'false' }}" {!! $page_type == 'professional' ? 'aria-current="page"' : '' !!}>전문인</a>
+					</li>
+					<li role="presentation" class="c3 {{ $page_type == 'online_academy' ? 'on' : '' }}">
+						<a href="/online_academy/" role="tab" aria-selected="{{ $page_type == 'online_academy' ? 'true' : 'false' }}" {!! $page_type == 'online_academy' ? 'aria-current="page"' : '' !!}>온라인 아카데미</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="btm">
+			<div class="inner">
+				<div class="left">
+					<a href="{{ route('eng.index') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+				</div>
+				<ul class="center gnb">
+					<li class="menu {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/eng/greeting" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '01') aria-current="page" @endif>Welcome Message</a></li>
+					<li class="menu {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/eng/history" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' && ($sNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '02') aria-current="page" @endif>History</a></li>
+					<li class="menu {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/eng/organization" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' && ($sNum ?? '') == '03' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '03') aria-current="page" @endif>Organization</a></li>
+					<li class="menu"><a href="https://scholar.kyobobook.co.kr/article/external/list/lav143BicMrX1pUjjA9ZuIMWLS2qyH598A" target="_blank">Journal</a></li>
+					<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}"><a href="/eng/academic_events" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>Academin Events</a></li>
+					<li class="menu {{ ($gNum ?? '') == '05' ? 'on' : '' }}"><a href="/eng/news" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '05' ? 'true' : 'false' }}" @if(($gNum ?? '') == '05') aria-current="page" @endif>News</a></li>
+					<li class="menu {{ ($gNum ?? '') == '06' ? 'on' : '' }}"><a href="/eng/contact_us" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '06' ? 'true' : 'false' }}" @if(($gNum ?? '') == '06') aria-current="page" @endif>Contact us</a></li>
+				</ul>
+				<div class="right">
+					<button type="button" class="btn_menu" aria-label="전체 메뉴 열기" aria-controls="main-navi" aria-expanded="false">
+						<span class="line t" aria-hidden="true"></span>
+						<span class="line b" aria-hidden="true"></span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<nav class="sitemap" id="main-navi" aria-label="주 메뉴">
+			<div class="bg" aria-hidden="true"></div>
+			<div class="menu_wrap">
+				<ul class="flex inner width_auto">
+					<li class="menu {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/eng/greeting" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '01') aria-current="page" @endif>Welcome Message</a></li>
+					<li class="menu {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/eng/history" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' && ($sNum ?? '') == '02' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '02') aria-current="page" @endif>History</a></li>
+					<li class="menu {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/eng/organization" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' && ($sNum ?? '') == '03' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '03') aria-current="page" @endif>Organization</a></li>
+					<li class="menu"><a href="https://scholar.kyobobook.co.kr/article/external/list/lav143BicMrX1pUjjA9ZuIMWLS2qyH598A" target="_blank">Journal</a></li>
+					<li class="menu {{ ($gNum ?? '') == '04' ? 'on' : '' }}"><a href="/eng/academic_events" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '04' ? 'true' : 'false' }}" @if(($gNum ?? '') == '04') aria-current="page" @endif>Academin Events</a></li>
+					<li class="menu {{ ($gNum ?? '') == '05' ? 'on' : '' }}"><a href="/eng/news" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '05' ? 'true' : 'false' }}" @if(($gNum ?? '') == '05') aria-current="page" @endif>News</a></li>
+					<li class="menu {{ ($gNum ?? '') == '06' ? 'on' : '' }}"><a href="/eng/contact_us" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '06' ? 'true' : 'false' }}" @if(($gNum ?? '') == '06') aria-current="page" @endif>Contact us</a></li>
+				</ul>
+				<button type="button" class="btn_menu_close" aria-label="전체 메뉴 닫기">전체 메뉴 닫기</button>
+			</div>
+		</nav>
+	</header>
+	<!-- //영문 -->
+    @endif
+	
 	<div class="container_wrap {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'sub_wrap' : '' }} {{ (isset($gNum) && $gNum !== 'main') ? 'g'.$gNum : '' }} {{ (isset($gNum) && $gNum == 'intro') ? 'mt0' : '' }} {{ (isset($gNum) && $gNum == 'print') ? 'print_wrap' : '' }} {{ (isset($page_type) && $page_type == 'online_academy') ? 'online_academy_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference') ? 'academic_conference_wrap' : '' }} {{ (isset($gNum) && $page_type == 'academic_conference' && $gNum == 'main') ? 'main' : '' }}">
+	
 		@if(isset($gNum) && $gNum !== 'main' && $gNum !== 'intro' && $gNum !== 'print' && $gNum !== 'total_search' && $page_type !== 'academic_conference')
 		<div class="svisual g{{ $gNum }} s{{ $sNum }} {{ ($gNum == 'online_academy' && $sNum != '00') ? 'hide' : '' }}">
 			@if(isset($gNum) && $gNum !== 'online_academy')
 			
 			<div class="title inner">
-				<strong>{{ $gName }}</strong>
-				@if(isset($geName) && $geName)
-					<span>{{ str_replace(['_view', '_list'], '', $geName) }}</span>
+				@if(isset($gNum) && $page_type !== 'eng')
+					<strong>{{ $gName }}</strong>
+					@if(isset($geName) && $geName)
+						<span>{{ str_replace(['_view', '_list'], '', $geName) }}</span>
+					@endif
+					<div class="location">
+						<a href="/home" class="home" aria-label="홈으로 이동">홈으로</a>
+						<span>{{ $gName }}</span>
+						<span>{{ $sName }}</span>
+					</div>
+					@yield('svisual_other')
 				@endif
-				<div class="location">
-					<a href="/home" class="home" aria-label="홈으로 이동">홈으로</a>
-					<span>{{ $gName }}</span>
-					<span>{{ $sName }}</span>
-				</div>
-				@yield('svisual_other')
+
+				@if(isset($gNum) && $page_type === 'eng')
+					<strong>{{ $geName }}</strong>
+				@endif
 			</div>
 			
 			
@@ -314,7 +511,8 @@
 		</div>
 		@endif
 		
-		@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '98' && $gNum !== '03' && $gNum !== 'total_search' && $page_type !== 'academic_conference' && $gNum !== 'online_academy')
+		<!-- 전문인 -->
+		@if(isset($gNum) && $gNum !== 'intro' && $gNum !== 'main' && $gNum !== '98' && $gNum !== '03' && $gNum !== 'total_search' && $page_type !== 'academic_conference' && $gNum !== 'online_academy' && $page_type !== 'general' && $page_type!== 'eng')
 		<nav class="sub_menu_area inner" id="sub-navi" aria-label="서브 메뉴">
 			<div class="menu set_g">
 				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-gnb-list">{{ $gName }}</button>
@@ -415,6 +613,54 @@
 			@endif
 		</nav>
 		@endif
+		<!-- //전문인 -->
+		
+		<!-- 일반인 -->
+		@if(isset($page_type) && $page_type == 'general' && ($gNum ?? '') !== '03' && ($gNum ?? '') !== 'main')
+		<nav class="sub_menu_area inner" id="sub-navi" aria-label="서브 메뉴">
+			<div class="menu set_g">
+				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-gnb-list">{{ $gName ?? '' }}</button>
+				<ul id="sub-gnb-list">
+					<li class="{{ ($gNum ?? '') == '01' ? 'on' : '' }}"><a href="/general_page/introduction/greeting" @if(($gNum ?? '') == '01') aria-current="page" @endif>학회소개</a></li>
+					<li class="{{ ($gNum ?? '') == '02' ? 'on' : '' }}"><a href="/general_page/content/examination" @if(($gNum ?? '') == '02') aria-current="page" @endif>건강 알아가기</a></li>
+					<li class="{{ ($gNum ?? '') == '03' ? 'on' : '' }}"><a href="/general_page/our_neighborhood_doctor" @if(($gNum ?? '') == '03') aria-current="page" @endif>진료 고민된다면</a></li>
+					<li class="{{ ($gNum ?? '') == '05' ? 'on' : '' }}"><a href="/general_page/news/notices" @if(($gNum ?? '') == '05') aria-current="page" @endif>학회 뉴스</a></li> </ul>
+			</div>
+			<div class="menu set_s">
+				<button type="button" class="btn" aria-expanded="false" aria-controls="sub-snb-list">{{ $sName ?? '' }}</button>
+				<ul id="sub-snb-list">
+					@if(($gNum ?? '') == '01')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/general_page/introduction/greeting" @if(($sNum ?? '') == '01') class="on" aria-current="page" @endif>인사말</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/general_page/introduction/what_is_fm" @if(($sNum ?? '') == '02') class="on" aria-current="page" @endif>기능의학이란</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/general_page/introduction/fm_tree" @if(($sNum ?? '') == '03') class="on" aria-current="page" @endif>기능의학 나무 소개</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/general_page/introduction/clinical_imbalances" @if(($sNum ?? '') == '04') class="on" aria-current="page" @endif>7가지 핵심 임상 불균형</a></li>
+						<li class="{{ ($sNum ?? '') == '05' ? 'on' : '' }}"><a href="/general_page/introduction/process" @if(($sNum ?? '') == '05') class="on" aria-current="page" @endif>기능의학적 진료 과정</a></li>
+					@endif
+					@if(($gNum ?? '') == '02')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/general_page/content/examination" @if(($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 검사 이해</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/general_page/content/video_afterrain" @if(($sNum ?? '') == '02') class="on" aria-current="page" @endif>영상 콘텐츠(비온뒤)</a></li>
+						<li class="{{ ($sNum ?? '') == '04' ? 'on' : '' }}"><a href="/general_page/content/faq" @if(($sNum ?? '') == '04') class="on" aria-current="page" @endif>자주 묻는 질문</a></li>
+					@endif
+					@if(($gNum ?? '') == '03')
+						<li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/general_page/our_neighborhood_doctor" @if(($sNum ?? '') == '01') class="on" aria-current="page" @endif>기능의학 의원 찾기</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/general_page/our_neighborhood_doctor/patient_story" @if(($sNum ?? '') == '02') class="on" aria-current="page" @endif>환자 이야기</a></li>
+					@endif
+					@if(($gNum ?? '') == '05') <li class="{{ ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/general_page/news/notices" @if(($sNum ?? '') == '01') class="on" aria-current="page" @endif>학회 소식</a></li>
+						<li class="{{ ($sNum ?? '') == '02' ? 'on' : '' }}"><a href="/general_page/news/press_columns" @if(($sNum ?? '') == '02') class="on" aria-current="page" @endif>보도자료&칼럼</a></li>
+						<li class="{{ ($sNum ?? '') == '03' ? 'on' : '' }}"><a href="/general_page/news/media_events" @if(($sNum ?? '') == '03') class="on" aria-current="page" @endif>미디어&행사</a></li>
+					@endif
+				</ul>
+			</div>
+		</nav>
+		@endif
+		<!-- //일반인 -->
+		
+		<!-- 영문 -->
+		@if(isset($page_type) && $page_type == 'eng' && ($gNum ?? '') !== 'main')
+		<nav class="sub_menu_area inner" id="sub-navi" aria-label="서브 메뉴">
+		</nav>
+		@endif
+		<!-- //영문 -->
 		
 		@if(isset($gNum) && $page_type == 'academic_conference' && $gNum !== 'intro' && $gNum !== 'main')
 		<div class="svisual g{{ $gNum }} s{{ $sNum }} {{ ($gNum == 'online_academy' && $sNum != '00') ? 'hide' : '' }}">
@@ -492,7 +738,12 @@
 			<button type="button" class="btn gotop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="페이지 맨 위로 이동" aria-hidden="true">TOP</button>
 		</div>
 	
-		<section class="fbanner {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'mt0' : '' }}" aria-label="배너 슬라이드">
+		<section class="fbanner {{ 
+			((($gNum ?? '') == '01' && ($sNum ?? '') == '01' && ($page_type ?? '') == 'professional') || 
+			 (($gNum ?? '') == '01' && ($sNum ?? '') == '02' && ($page_type ?? '') == 'general') || 
+			 (($gNum ?? '') == '01' && ($sNum ?? '') == '05' && ($page_type ?? '') == 'general')) 
+			? 'mt0' : '' 
+		}}" aria-label="배너 슬라이드">
 			<div class="inner">
 				<div class="fbanner_slide" id="fbanner-swiper">
 					<ul class="swiper-wrapper" role="list">
@@ -515,6 +766,7 @@
 		<section class="info" aria-label="대한기능의학회 연락처 정보">
 			<div class="inner">
 				<div class="address_area">
+					@if(isset($gNum) && $page_type !== 'eng')
 					<address>
 						<ul class="office_info" aria-label="회사 정보">
 							<li class="w100p"><strong class="sound_only">주소</strong> <span>경기도 수원시 영통구 월드컵로 164 (원천동, 아주대학병원) 1031호</span></li>
@@ -523,11 +775,32 @@
 							<li><strong>전화번호</strong> <span><a href="tel:01084414884">010-8441-4884</a></span></li>
 						</ul>
 					</address>
+					@endif
+					@if(isset($gNum) && $page_type == 'eng')
+					<address>
+						<ul class="office_info" aria-label="회사 정보">
+							<li class="w100p"><strong class="sound_only">주소</strong> <span>경기도 수원시 영통구 월드컵로 164 (원천동, 아주대학병원) 1031호</span></li>
+							<li><strong>대표자</strong> <span>김범택</span></li>
+							<li><strong>사업자번호</strong> <span>26-82-00017</span></li>
+							<li><strong>전화번호</strong> <span><a href="tel:01084414884">010-8441-4884</a></span></li>
+						</ul>
+					</address>
+					@endif
 					<p class="copyright">Copyright ⓒ Korean Society for Functional Medicine. All rights reserved.</p>
 					<nav class="footer_menus" aria-label="푸터 메뉴">
 						<ul class="flex">
+						@if(isset($gNum) && $page_type == 'general')
+							<li><a href="/general_page/terms/privacy_policy">개인정보처리방침</a></li>
+							<li><a href="/general_page/terms/email_collection_refusal">이메일무단수집거부</a></li>
+						@endif
+						@if(isset($gNum) && $page_type == 'professional')
 							<li><a href="/terms/privacy_policy">개인정보처리방침</a></li>
 							<li><a href="/terms/email_collection_refusal">이메일무단수집거부</a></li>
+						@endif
+						@if(isset($gNum) && $page_type == 'eng')
+							<li><a href="/eng/privacy_policy">개인정보처리방침</a></li>
+							<li><a href="/eng/email_collection_refusal">이메일무단수집거부</a></li>
+						@endif
 						</ul>
 					</nav>
 				</div>

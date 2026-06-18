@@ -23,6 +23,10 @@ class PublicOnlineAcademyService
     public const FALLBACK_VIEW_IMAGE = 'images/img_sample_online_academy_view.jpg';
     public const PAYMENT_COMPLETED_STATUSES = ['completed', 'paid'];
 
+    public function __construct(
+        private readonly MailformNotificationService $mailNotifier,
+    ) {}
+
     /** @return array<string, string> */
     public function courseTypeLabels(): array
     {
@@ -443,8 +447,9 @@ class PublicOnlineAcademyService
         $isFree = $amount <= 0;
         $isCompletedPayment = $isFree;
         $isPendingCardPayment = ! $isFree && $paymentMethod === 'card';
+        $shouldSendMail = false;
 
-        return DB::transaction(function () use ($course, $user, $data, $subtotal, $discount, $coupon, $amount, $paymentMethod, $isFree, $isCompletedPayment, $isPendingCardPayment) {
+        $enrollment = DB::transaction(function () use ($course, $user, $data, $subtotal, $discount, $coupon, $amount, $paymentMethod, $isFree, $isCompletedPayment, $isPendingCardPayment, &$shouldSendMail) {
             $enrollment = $this->activeEnrollment($course, $user) ?: new EduCourseEnrollment([
                 'edu_course_id' => $course->id,
                 'member_id' => $user->id,
@@ -486,8 +491,16 @@ class PublicOnlineAcademyService
                 $coupon->increment('usage_count');
             }
 
+            $shouldSendMail = $paymentMethod === 'bank_transfer' || $isCompletedPayment;
+
             return $enrollment->fresh(['course']);
         });
+
+        if ($shouldSendMail) {
+            $this->mailNotifier->sendOnlineAcademyRegistrationComplete($enrollment);
+        }
+
+        return $enrollment;
     }
 
     public function confirmTossPayment(string $orderId, string $paymentKey, int $amount, User $user): EduCourseEnrollment
@@ -524,7 +537,12 @@ class PublicOnlineAcademyService
             'admin_memo' => trim($memo . ';toss_payment_key=' . $paymentKey, ';'),
         ]);
 
-        return $enrollment->refresh()->loadMissing('course');
+        $enrollment = $enrollment->refresh()->loadMissing(['course', 'member']);
+        if ($isCompleted) {
+            $this->mailNotifier->sendOnlineAcademyRegistrationComplete($enrollment);
+        }
+
+        return $enrollment;
     }
 
     private function requestTossConfirm(string $paymentKey, string $orderId, int $amount): array

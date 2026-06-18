@@ -44,6 +44,9 @@ $(document).ready(function(){
 		$(".btn_menu").attr("aria-expanded", false).attr("aria-label", "전체 메뉴 열기");
 		$(".header .btm .center").removeClass("on");
 	});
+	$(".favorites_menu .btn").on('click', function(){
+		$(this).parent().find("ul").stop(true,true).slideToggle("fast");
+	});
 
 //footer
 	//gotop

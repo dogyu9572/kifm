@@ -125,6 +125,7 @@
         const uploadUrl = (element.dataset.uploadUrl || globalDefault || FALLBACK_UPLOAD_URL).trim();
         const fieldName = (element.dataset.uploadField || DEFAULT_UPLOAD_FIELD).trim() || DEFAULT_UPLOAD_FIELD;
         const enableSourceEditing = element.dataset.sourceEditing !== 'false';
+        const preserveAllHtml = element.dataset.htmlSupport === 'all';
         const toolbarItems = [
             'heading', '|',
             'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
@@ -169,10 +170,12 @@
             // 레거시 이관 본문 등에 포함될 수 있는 <video>/<source> 태그를 CKEditor 편집/저장 시 보존한다.
             // (기본 동작은 화이트리스트에 없는 요소를 제거하므로 명시 등록이 필요하다.)
             htmlSupport: {
-                allow: [
-                    { name: 'video', attributes: true, classes: true, styles: true },
-                    { name: 'source', attributes: true, classes: true, styles: true }
-                ]
+                allow: preserveAllHtml
+                    ? [{ name: /.*/, attributes: true, classes: true, styles: true }]
+                    : [
+                        { name: 'video', attributes: true, classes: true, styles: true },
+                        { name: 'source', attributes: true, classes: true, styles: true }
+                    ]
             },
             removePlugins: [...SHARED_REMOVE_PLUGINS]
         };

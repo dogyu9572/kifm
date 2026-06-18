@@ -311,6 +311,21 @@
                 $(this).find('.state_line .bar').css('width', percentage + '%');
             }
         });
+
+        $('.participation_area .box').each(function () {
+            var count = $(this).find('.count').first();
+            var bar = $(this).find('.state_line .bar');
+            var matches = count.text().match(/\d+/g);
+
+            if (bar.length === 0 || !matches || matches.length < 2) {
+                return;
+            }
+
+            var current = parseInt(matches[0], 10);
+            var total = parseInt(matches[1], 10);
+            var percentage = total > 0 ? Math.min(100, (current / total) * 100) : 0;
+            bar.css('width', percentage + '%');
+        });
     }
 
     function initPopups() {

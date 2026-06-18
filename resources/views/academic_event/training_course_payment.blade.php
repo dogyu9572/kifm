@@ -4,6 +4,13 @@
 @section('sName', $sName)
 @section('content')
 @inject('trainingCourse', 'App\Services\Frontend\PublicTrainingCourseService')
+@php
+$refundBankOptions = ['국민은행', '신한은행', '우리은행', '하나은행', '농협은행', '기업은행', '카카오뱅크', '토스뱅크', '케이뱅크', 'SC제일은행', '씨티은행', '새마을금고', '신협', '우체국'];
+$allRoundIds = $rounds->pluck('id')->map(fn ($id) => (int) $id)->values()->all();
+$publicRoundIds = $trainingCourse->publicRounds($training)->pluck('id')->map(fn ($id) => (int) $id)->values()->all();
+$bundlePricing = $trainingCourse->bundlePriceForTraining($training, $user);
+$canUseBundle = $training->use_round && $bundlePricing['eligible'] && $allRoundIds === $publicRoundIds && count($allRoundIds) > 1;
+@endphp
 <main class="sub_area">
 
 <section class="scon academic_event_view_detail training_course_view_wrap" aria-labelledby="training-course-payment-heading">
@@ -28,6 +35,20 @@
                         <p class="c_red">{{ $message }}</p>
                     @enderror
                     <ul class="check_box_line">
+                        @if ($canUseBundle)
+                            <li>
+                                <div class="checkbox">
+                                    <input type="checkbox" name="round_bundle" id="training_round_bundle_all" value="{{ \App\Services\Frontend\PublicTrainingCourseService::ROUND_BUNDLE_VALUE }}" data-price="{{ $bundlePricing['price'] }}" data-label="{{ $training->title }} - 전체 차시" data-round-ids="{{ implode(',', $allRoundIds) }}" @checked(old('round_bundle') === \App\Services\Frontend\PublicTrainingCourseService::ROUND_BUNDLE_VALUE)>
+                                    <label for="training_round_bundle_all">
+                                        <i aria-hidden="true"></i>
+                                        <span>
+                                            {{ $training->title }} - 전체 차시
+                                            <strong>{{ number_format((int) $bundlePricing['price']) }}원</strong>
+                                        </span>
+                                    </label>
+                                </div>
+                            </li>
+                        @endif
                         @foreach ($rounds as $round)
                             @php
                                 $status = $trainingCourse->roundStatus($round);
@@ -35,14 +56,15 @@
                                 $isFull = $trainingCourse->isRoundFull($round);
                                 $canApply = $trainingCourse->canApplyRound($round, $user);
                                 $disabledReason = $isFull ? '정원 마감' : ($status['code'] !== 'ongoing' ? $status['label'] : $pricing['message']);
+                                $itemLabel = $training->use_round ? $training->title . ' - ' . $round->round_label : $training->title;
                             @endphp
                             <li @class(['end' => ! $canApply])>
                                 <div class="checkbox">
-                                    <input type="checkbox" name="round_ids[]" id="training_round_{{ $round->id }}" value="{{ $round->id }}" data-price="{{ $pricing['price'] }}" data-label="{{ $training->title }} - {{ $round->round_label }}" @checked(in_array((string) $round->id, old('round_ids', []), true)) @disabled(! $canApply)>
+                                    <input type="checkbox" name="round_ids[]" id="training_round_{{ $round->id }}" value="{{ $round->id }}" data-price="{{ $pricing['price'] }}" data-label="{{ $itemLabel }}" @checked(in_array((string) $round->id, old('round_ids', []), true)) @disabled(! $canApply)>
                                     <label for="training_round_{{ $round->id }}">
                                         <i aria-hidden="true"></i>
                                         <span>
-                                            {{ $training->title }} - {{ $round->round_label }}
+                                            {{ $itemLabel }}
                                             @if (! $canApply)
                                                 <em class="end_tag">{{ $disabledReason ?: '신청 불가' }}</em>
                                             @endif
@@ -140,24 +162,27 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="type_bank_hide">
-                    <legend class="num_tit"><span>5</span>환불정보</legend>
-                    <ul class="glbox long_label">
-                        <li>
-                            <label for="training-refund-bank">은행명/계좌번호</label>
-                            <div class="flex bank text">
-                                <select name="refund_bank" id="training-refund-bank" class="text">
-                                    <option value="국민은행" @selected(old('refund_bank') === '국민은행')>국민은행</option>
-                                </select>
-	                                <input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
-	                            </div>
-	                        </li>
-	                        <li>
-	                            <label for="training-refund-holder">예금주명</label>
-	                            <input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="예금주명을 입력해주세요">
-	                        </li>
-                    </ul>
-                </fieldset>
+				<fieldset class="type_bank_hide">
+					<legend class="num_tit"><span>5</span>환불정보</legend>
+					<ul class="glbox long_label">
+						<li>
+							<label for="training-refund-bank">은행명/계좌번호</label>
+							<div class="flex bank text">
+								<select name="refund_bank" id="training-refund-bank" class="text">
+									<option value="">-- 은행 선택 --</option>
+									@foreach ($refundBankOptions as $bankName)
+										<option value="{{ $bankName }}" @selected(old('refund_bank') === $bankName)>{{ $bankName }}</option>
+									@endforeach
+								</select>
+								<input type="text" id="training-refund-account" name="refund_account" class="text" value="{{ old('refund_account') }}" placeholder="111111-22-333333">
+							</div>
+						</li>
+						<li>
+							<label for="training-refund-holder">예금주명</label>
+							<input type="text" id="training-refund-holder" name="refund_holder" class="text" value="{{ old('refund_holder') }}" placeholder="예금주명을 입력해주세요">
+						</li>
+					</ul>
+				</fieldset>
 
                 <fieldset class="type_bank_hide">
                     <legend class="num_tit"><span>6</span>현금 영수증 발행</legend>
