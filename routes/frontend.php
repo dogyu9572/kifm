@@ -38,7 +38,7 @@ use App\Http\Controllers\Frontend\AcademicConferenceSiteController;
 
 // 인트로 페이지
 Route::get('/intro', [FrontendHomeController::class, 'intro'])->name('intro');
-// 전문인 메인 페이지
+// 전문가 메인 페이지
 Route::get('/home', [FrontendHomeController::class, 'index'])->name('home');
 
 // 학회소개
@@ -243,7 +243,7 @@ Route::prefix('mypage')->name('mypage.')->middleware(['auth', 'frontend.member']
 Route::get('/total_search', [TotalSearchController::class, 'index'])->name('total_search');
 
 // 메일폼
-Route::prefix('mailform')->name('mailform.')->group(function () {
+Route::prefix('mailform')->name('mailform.')->middleware(['backoffice'])->group(function () {
     Route::get('/mail_welcome_approved', [MailformController::class, 'welcomeApproved'])->name('mail_welcome_approved');
     Route::get('/mail_password_changed', [MailformController::class, 'passwordChanged'])->name('mail_password_changed');
     Route::get('/mail_password_reset', [MailformController::class, 'passwordReset'])->name('mail_password_reset');
@@ -370,6 +370,8 @@ Route::prefix('general_page')->name('general.')->group(function () {
     // 01. 학회소개
     Route::prefix('introduction')->name('introduction.')->group(function () {
         Route::get('/greeting', [GeneralPageController::class, 'greeting'])->name('greeting');
+        Route::get('/history', [GeneralPageController::class, 'history'])->name('history');
+        Route::get('/location', [GeneralPageController::class, 'location'])->name('location');
         Route::get('/what_is_fm', [GeneralPageController::class, 'whatIsFm'])->name('what_is_fm');
         Route::get('/fm_tree', [GeneralPageController::class, 'fmTree'])->name('fm_tree');
         Route::get('/clinical_imbalances', [GeneralPageController::class, 'clinicalImbalances'])->name('clinical_imbalances');
@@ -418,7 +420,9 @@ Route::prefix('eng')->name('eng.')->group(function () {
 	Route::get('/history', [EngPageController::class, 'history'])->name('history');
 	Route::get('/organization', [EngPageController::class, 'organization'])->name('organization');
 	Route::get('/academic_events', [EngPageController::class, 'academicEvents'])->name('academic_events');
+	Route::get('/schedule', [EngPageController::class, 'schedule'])->name('schedule');
 	Route::get('/news', [EngPageController::class, 'news'])->name('news');
+	Route::get('/news/{id}', [EngPageController::class, 'newsView'])->whereNumber('id')->name('news_view.show');
 	Route::get('/news_view', [EngPageController::class, 'newsView'])->name('news_view');
 	Route::get('/contact_us', [EngPageController::class, 'contactUs'])->name('contact_us');
 });
