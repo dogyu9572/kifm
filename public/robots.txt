@@ -1,2 +1,5 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /backoffice
+
+Sitemap: https://www.kifm.kr/sitemap.xml
