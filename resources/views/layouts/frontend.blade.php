@@ -160,7 +160,7 @@
 		<div class="btm">
 			<div class="inner">
 				<div class="left">
-					<a href="{{ route('home') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+					<a href="{{ route('home') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo2.png" alt="대한기능의학회 로고"></a>
 				</div>
 				<div class="center">
 					<form method="GET" action="{{ route('total_search') }}" class="search_area">
@@ -249,7 +249,7 @@
 	@php $academicConferenceBaseUrl = $conferenceBaseUrl ?? url('/academic_conference'); @endphp
 	<header class="header {{ (isset($gNum) && $gNum == 'main') ? 'main' : '' }}">
 		<div class="inner">
-			<a href="{{ $academicConferenceBaseUrl }}" class="logo" aria-label="대한기능의학회 학술대회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+			<a href="{{ $academicConferenceBaseUrl }}" class="logo" aria-label="대한기능의학회 학술대회 홈으로 이동"><img src="/images/logo2.png" alt="대한기능의학회 로고"></a>
 			<div class="gnb">
 				<ul>
 					<li class="menu {{ ($gNum ?? '') == '01' ? 'on' : '' }}">
@@ -317,7 +317,7 @@
 		<div class="btm">
 			<div class="inner">
 				<div class="left">
-					<a href="{{ route('general.index') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+					<a href="{{ route('general.index') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo2.png" alt="대한기능의학회 로고"></a>
 				</div>
 				<ul class="center gnb">
 					<li class="menu {{ ($gNum ?? '') == '01' ? 'on' : '' }}">
@@ -447,7 +447,7 @@
 		<div class="btm">
 			<div class="inner">
 				<div class="left">
-					<a href="{{ route('eng.index') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo.png" alt="대한기능의학회 로고"></a>
+					<a href="{{ route('eng.index') }}" class="logo" aria-label="대한기능의학회 홈으로 이동"><img src="/images/logo2.png" alt="대한기능의학회 로고"></a>
 				</div>
 				<ul class="center gnb">
 					<li class="menu {{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'on' : '' }}"><a href="/eng/greeting" aria-haspopup="true" aria-expanded="{{ ($gNum ?? '') == '01' && ($sNum ?? '') == '01' ? 'true' : 'false' }}" @if(($gNum ?? '') == '01' && ($sNum ?? '') == '01') aria-current="page" @endif>Welcome Message</a></li>
