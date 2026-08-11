@@ -297,7 +297,7 @@
 	.header .btm .right .btn_chatbot {transition:none;}
 	.header.on .btm .center,
 	.header.on .logo {position:relative;}
-	.header.on .logo:before {content:""; position:absolute; top:0; left:0; width:100%; height:100%; background:#fffc; mask:url('/images/logo.png') no-repeat 50% 50% / contain; -webkit-mask:url('/images/logo.png') no-repeat 50% 50% / contain;}
+	.header.on .logo:before {content:""; position:absolute; top:0; left:0; width:100%; height:100%; background:#fffc; mask:url('/images/logo2.png') no-repeat 50% 50% / contain; -webkit-mask:url('/images/logo2.png') no-repeat 50% 50% / contain;}
 	.header.on .logo img {opacity:0;}
 	.header.on .btm .center,
 	.header.on .btm .right .btn_chatbot {opacity:0; pointer-events:none;}
